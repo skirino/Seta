@@ -27,9 +27,9 @@ private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.stdc.ctype;
 
+private import utils.stringUtil;
 private import constants;
 static private import config;
-private import stringUtil;
 
 
 struct KeyCode

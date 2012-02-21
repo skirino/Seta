@@ -38,11 +38,11 @@ private import glib.GException;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import vector;
-private import templateUtil;
-private import gioUtil;
-private import stringUtil;
-private import treeUtil;
+private import utils.vector;
+private import utils.templateUtil;
+private import utils.gioUtil;
+private import utils.stringUtil;
+private import utils.treeUtil;
 private import transferFiles;
 private import fileView;
 
@@ -566,4 +566,3 @@ private string NextChildDirectory(string fullpath, string parent)
   size_t end = locate(fullpath, '/', parent.length);
   return fullpath[0 .. end+1];
 }
-

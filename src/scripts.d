@@ -26,7 +26,7 @@ private import gio.FileInfo;
 private import tango.io.Stdout;
 private import tango.sys.Environment;
 
-private import stringUtil;
+private import utils.stringUtil;
 
 
 class NautilusScript

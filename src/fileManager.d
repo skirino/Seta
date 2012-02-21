@@ -37,10 +37,10 @@ private import gtkc.gio;
 
 private import tango.io.Stdout;
 
-private import bind;
-private import stringUtil;
-private import threadList;
+private import utils.bind;
+private import utils.stringUtil;
 private import constants;
+private import threadList;
 private import keybind;
 private import fileView;
 private import history;
@@ -378,7 +378,7 @@ public:
     scope menu = new Menu;
     foreach(n, l; list){
       string label = mediator_.FileSystemNativePath(l);
-      auto dlg = bind.bind(&MoveNTimesAndChangeDir!(ForwardDirection), _0, n+1).ptr();
+      auto dlg = bind(&MoveNTimesAndChangeDir!(ForwardDirection), _0, n+1).ptr();
       menu.append(new MenuItem(dlg, label, false));
     }
     menu.showAll();
@@ -418,12 +418,12 @@ public:
     string path = ParentDirectory(pwd);
     while(path != "/"){
       auto fullpath = mediator_.FileSystemMountedVFSPath(path);
-      auto dlg = bind.bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
+      auto dlg = bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
       menu.append(new MenuItem(dlg, path, false));
       path = ParentDirectory(path);
     }
     scope fullpath = mediator_.FileSystemMountedVFSPath("/");
-    scope dlg = bind.bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
+    scope dlg = bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
     menu.append(new MenuItem(dlg, "/", false));
     
     menu.showAll();

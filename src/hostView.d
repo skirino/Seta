@@ -29,7 +29,7 @@ private import gtk.CellRendererText;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import stringUtil;
+private import utils.stringUtil;
 static private import config;
 
 
@@ -107,5 +107,3 @@ public:
     rendRPrompt_.addOnEdited(cb4);
   }
 }
-
-

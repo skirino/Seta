@@ -50,14 +50,14 @@ private import tango.core.Thread;
 private import tango.util.MinMax;
 private import tango.stdc.stdlib;
 
-private import bind;
+private import utils.bind;
+private import utils.timeUtil;
+private import utils.stringUtil;
+private import utils.gioUtil;
+private import utils.templateUtil;
+private import utils.treeUtil;
+private import utils.vector;
 private import constants;
-private import timeUtil;
-private import stringUtil;
-private import gioUtil;
-private import templateUtil;
-private import treeUtil;
-private import vector;
 private import keybind;
 private import entry;
 private import listupThread;
@@ -878,7 +878,7 @@ private:
     try{
       RightClickMenu menu = new RightClickMenu(
         this, pwd_, GetNameFromPath(path), GetSelectedFileNames(),
-        bind.bind(&(mediator_.FilerChangeDirectory), _0, true, true).ptr());
+        bind(&(mediator_.FilerChangeDirectory), _0, true, true).ptr());
       
       // Passing eb.button as the 1st argument of menu.popup() is problematic,
       // since in that case the submenu cannot be simply activated.

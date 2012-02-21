@@ -39,8 +39,8 @@ private import tango.sys.Environment;
 private import tango.stdc.stdlib;
 private import tango.stdc.posix.unistd;
 
+private import utils.stringUtil;
 private import constants;
-private import stringUtil;
 private import configDialog;
 private import inputDialog;
 private import transferFiles;

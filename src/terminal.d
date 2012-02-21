@@ -37,8 +37,8 @@ private import tango.stdc.posix.termios;
 private import tango.stdc.posix.unistd;
 private import tango.core.Thread;
 
+private import utils.stringUtil;
 private import constants;
-private import stringUtil;
 private import threadList;
 private import keybind;
 private import mediator;

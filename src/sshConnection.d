@@ -26,7 +26,7 @@ private import gtk.MountOperation;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import stringUtil;
+private import utils.stringUtil;
 private import shellrc;
 
 
@@ -186,4 +186,3 @@ public:
     return toStr!(true);
   }
 }
-

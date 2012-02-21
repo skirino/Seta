@@ -53,8 +53,8 @@ private import pango.PgAttributeList;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import stringUtil;
-private import treeUtil;
+private import utils.stringUtil;
+private import utils.treeUtil;
 private import inputDialog;
 private import statusbar;
 

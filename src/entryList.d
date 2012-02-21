@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module entryList;
 
-private import vector;
+private import utils.vector;
 private import entry;
 private import listupThread;
 

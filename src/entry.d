@@ -27,10 +27,10 @@ private import glib.Str;
 private import tango.io.Stdout;
 private import tango.stdc.posix.sys.stat;// for permission flags
 
+private import utils.timeUtil;
+private import utils.stringUtil;
+private import utils.gioUtil;
 private import constants;
-private import timeUtil;
-private import stringUtil;
-private import gioUtil;
 
 
 class DirEntry

@@ -24,8 +24,8 @@ private import gtk.PopupBox;
 
 private import tango.io.Stdout;
 
-private import vector;
-private import timeUtil;
+private import utils.vector;
+private import utils.timeUtil;
 
 
 private enum ThreadInfoState

@@ -23,7 +23,7 @@ module hosts;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import stringUtil;
+private import utils.stringUtil;
 private import sshConnection;
 private import sshDialog;
 
@@ -108,4 +108,3 @@ SSHConnection Find(char[] username, char[] domain)
   }
   return null;
 }
-

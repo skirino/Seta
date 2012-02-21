@@ -38,9 +38,9 @@ private import gtk.TreeViewColumn;
 
 private import tango.io.Stdout;
 
+private import utils.stringUtil;
+private import utils.treeUtil;
 private import constants;
-private import stringUtil;
-private import treeUtil;
 static private import config;
 private import sshConnection;
 private import hosts;

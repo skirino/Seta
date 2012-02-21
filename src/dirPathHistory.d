@@ -25,8 +25,8 @@ private import tango.io.device.File;
 private import tango.io.stream.Lines;
 private import tango.sys.Environment;
 
-private import vector;
-private import stringUtil;
+private import utils.vector;
+private import utils.stringUtil;
 static private import config;
 
 

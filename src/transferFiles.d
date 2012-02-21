@@ -35,9 +35,9 @@ private import tango.io.Stdout;
 private import tango.core.Thread;
 private import tango.stdc.stdlib;
 
+private import utils.gioUtil;
+private import utils.stringUtil;
 private import constants;
-private import gioUtil;
-private import stringUtil;
 private import threadList;
 private import inputDialog;
 private import statusbar;

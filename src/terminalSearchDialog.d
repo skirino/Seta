@@ -36,7 +36,7 @@ private import glib.GException;
 
 private import tango.io.Stdout;
 
-private import stringUtil;
+private import utils.stringUtil;
 private import keybind;
 private import terminal;
 

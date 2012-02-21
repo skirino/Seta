@@ -50,10 +50,10 @@ private import gtk.MenuItem;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
+private import utils.gioUtil;
+private import utils.stringUtil;
+private import utils.treeUtil;
 static private import constants;
-private import gioUtil;
-private import stringUtil;
-private import treeUtil;
 static private import config;
 private import keybind;
 private import hostView;

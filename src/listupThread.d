@@ -31,9 +31,9 @@ private import tango.text.Util;
 private import tango.core.Thread;
 private import tango.stdc.string;
 
+private import utils.vector;
 private import constants;
 private import threadList;
-private import vector;
 private import entry;
 
 

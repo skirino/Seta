@@ -24,8 +24,8 @@ private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.sys.Environment;
 
-private import stringUtil;
-private import gioUtil;
+private import utils.stringUtil;
+private import utils.gioUtil;
 
 
 class FileSystem
@@ -83,7 +83,7 @@ public:
   
   char[] ParentDirectory(char[] path)
   {
-    return stringUtil.ParentDirectory(path, rootDir_);
+    return utils.stringUtil.ParentDirectory(path, rootDir_);
   }
   
   // for terminal which uses remote (native) filesystem path

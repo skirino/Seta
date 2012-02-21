@@ -26,7 +26,7 @@ private import tango.io.stream.Lines;
 private import tango.sys.Environment;
 private import tango.text.Util;
 
-private import stringUtil;
+private import utils.stringUtil;
 
 
 private ShellSetting localhostShell_;

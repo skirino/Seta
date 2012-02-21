@@ -32,8 +32,8 @@ private import tango.text.Util;
 private import tango.sys.Environment;
 private import tango.util.MinMax;
 
-private import gioUtil;
-private import stringUtil;
+private import utils.gioUtil;
+private import utils.stringUtil;
 private import constants;
 private import keybind;
 private import sshConnection;

@@ -43,8 +43,8 @@ private import tango.sys.Environment;
 private import tango.core.Thread;
 private import tango.util.MinMax;
 
-private import stringUtil;
-private import treeUtil;
+private import utils.stringUtil;
+private import utils.treeUtil;
 static private import config;
 private import keybind;
 private import page;

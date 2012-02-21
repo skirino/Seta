@@ -28,7 +28,7 @@ private import glib.ListG;
 
 private import tango.io.Stdout;
 
-private import stringUtil;
+private import utils.stringUtil;
 private import statusbar;
 private import pageList;
 

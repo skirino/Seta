@@ -32,10 +32,10 @@ private import gtk.Tooltip;
 private import tango.io.Stdout;
 private import tango.sys.Environment;
 
+private import utils.stringUtil;
+private import utils.gioUtil;
 private import constants;
 static private import config;
-private import stringUtil;
-private import gioUtil;
 private import tab;
 private import terminal;
 private import fileManager;

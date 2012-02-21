@@ -42,10 +42,10 @@ private import glib.ListG;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import bind;
+private import utils.bind;
+private import utils.templateUtil;
+private import utils.stringUtil;
 private import constants;
-private import templateUtil;
-private import stringUtil;
 static private import config;
 private import fileManager;
 private import volumeMonitor;
@@ -289,7 +289,7 @@ public:
     foreach(i, shortcut; shortcuts){
       string label = "(" ~ Str.toString(i+1) ~ ") " ~ shortcut.label_;
       string dir = shortcut.path_;
-      AppendShortcutButton(dir, label, dir, bind.bind(&RemoveShortcutPopup, _0, _1, dir).ptr());
+      AppendShortcutButton(dir, label, dir, bind(&RemoveShortcutPopup, _0, _1, dir).ptr());
     }
     
     // mounted volumes
@@ -304,7 +304,7 @@ public:
       string label = index <= 9 ? "(" ~ Str.toString(index) ~ ") " ~ baseName : baseName;
       string tooltip = name ~ " (" ~ path ~ ')';
       AppendShortcutButton(
-        path, label, tooltip, bind.bind(&UnmountMediaPopup, _0, _1, path, name).ptr());
+        path, label, tooltip, bind(&UnmountMediaPopup, _0, _1, path, name).ptr());
     }
     
     showAll();
@@ -332,7 +332,7 @@ private:
     auto b = new Button;
     b.add(child);
     b.setTooltipText(tooltip);
-    b.addOnClicked(bind.bind(&parent_.PathButtonClicked!(Button), _0, path).ptr());
+    b.addOnClicked(bind(&parent_.PathButtonClicked!(Button), _0, path).ptr());
     if(dlgButtonPress !is null){// connect callback on right-clicking this button
       b.addOnButtonPress(dlgButtonPress);
     }
@@ -344,7 +344,7 @@ private:
     
     // for overflow menu
     auto menuItem = new MenuItem(
-      bind.bind(&parent_.PathButtonClicked!(MenuItem), _0, path).ptr(),
+      bind(&parent_.PathButtonClicked!(MenuItem), _0, path).ptr(),
       label ~ " (" ~ path ~ ')', false);
     if(dlgButtonPress !is null){// connect callback on right-clicking this menuitem
       menuItem.addOnButtonPress(dlgButtonPress);
@@ -356,7 +356,7 @@ private:
   {
     if(eb.button == MouseButton.RIGHT){
       auto menu = new Menu;
-      menu.append(new MenuItem(bind.bind(&RemoveShortcut, _0, path).ptr(), "Remove this shortcut", false));
+      menu.append(new MenuItem(bind(&RemoveShortcut, _0, path).ptr(), "Remove this shortcut", false));
       menu.showAll();
       menu.popup(3, (new Event(cast(GdkEvent*)eb)).getTime());// 3 indicates "right click"
     }
@@ -407,7 +407,7 @@ private:
       }
       
       auto menu = new Menu;
-      menu.append(new MenuItem(bind.bind(&UnmountMedia, _0, path).ptr(), "Unmount " ~ name, false));
+      menu.append(new MenuItem(bind(&UnmountMedia, _0, path).ptr(), "Unmount " ~ name, false));
       menu.showAll();
       menu.popup(3, (new Event(cast(GdkEvent*)eb)).getTime());// 3 indicates "right click"
     }
