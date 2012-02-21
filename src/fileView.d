@@ -449,7 +449,7 @@ private:
     
     if(numRowsNow_ < entDSize){// there are directories which should be appended to the view
       size_t upper = min(maxRows, entDSize);
-      foreach(p; eList_.GetDSorted().array()[numRowsNow_ .. upper]){
+      foreach(p; eList_.GetDSorted()[numRowsNow_ .. upper]){
         store_.append(iter);
         store_.set(
           iter, cols,
@@ -466,7 +466,7 @@ private:
     if(numRowsNow_ < entDSize + entFSize){// there are files which should be appended to the view
       size_t upper = min(maxRows - entDSize, entFSize);
       
-      foreach(p; eList_.GetFSorted().array()[numRowsNow_ - entDSize .. upper]){
+      foreach(p; eList_.GetFSorted()[numRowsNow_ - entDSize .. upper]){
         store_.append(iter);
         store_.set(
           iter, cols,
@@ -1150,5 +1150,3 @@ public:
   }
   ////////////////////// drag and drop
 }
-
-

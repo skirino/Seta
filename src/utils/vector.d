@@ -90,6 +90,11 @@ public:
     return array_[i] = val;
   }
   
+  T[] opSlice(size_t i, size_t j)
+  {
+    return array_[i .. j];
+  }
+  
   T[] array()
   {
     return array_[0..size_];

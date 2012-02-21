@@ -50,18 +50,17 @@ string[] GetFilesFromStrv(char ** curis)
   if(curis == null){
     return null;
   }
-  else{
-    string[] files;
-    char ** ptr = curis;
-    while((*ptr) != null){
-      string temp = URI.unescapeString(Str.toString(*ptr), null);
-      if(temp.length > 7){
-        files ~= temp[7 .. $];// remove "file://"
-      }
-      ptr++;
+
+  string[] files;
+  char ** ptr = curis;
+  while((*ptr) != null){
+    string temp = URI.unescapeString(Str.toString(*ptr), null);
+    if(temp.length > 7){
+      files ~= temp[7 .. $];// remove "file://"
     }
-    return files;
+    ptr++;
   }
+  return files;
 }
 
 string[] GetFilesFromSelection(GtkSelectionData * selection)

@@ -236,24 +236,22 @@ private:
       p.free();
     }
   }
-  
+
   bool ButtonRelease(GdkEventButton * eb, Widget w)
   {
     TreePath path = GetPathAtPos(this, eb.x, eb.y);
     if(path is null){
       return false;
     }
-    else{
-      TreeIter iter = GetIter(store_, path);
-      path.free();
-      
-      string fullpath = GetFullPath(iter);
-      TryGoToDirectory(fullpath);
-      
-      return false;
-    }
+
+    TreeIter iter = GetIter(store_, path);
+    path.free();
+
+    string fullpath = GetFullPath(iter);
+    TryGoToDirectory(fullpath);
+    return false;
   }
-  
+
   bool TestExpandRow(TreeIter iter, TreePath path, TreeView view)
   {
     RemoveAllChildren(iter);
@@ -350,37 +348,35 @@ private:
     }
     return iter;
   }
-  
+
   TreeIter RecursiveExpandTo(string fullpath)
   {
     if(!(rootDir_ in openedDirs_)){// root is not expanded, need to expand
       expandRow(GetIterForRoot(), store_, 0);
     }
-    
+
     if(fullpath in openedDirs_){
       return GetIterOpened(fullpath);
     }
-    else{
-      string opened = fullpath;
-      do{
-        opened = ParentDirectory(opened);
-      }
-      while(!(opened in openedDirs_));
-      
-      TreeIter iter = GetIterOpened(opened);
-      while(opened.length != fullpath.length){
-        string nextChild = NextChildDirectory(fullpath, opened);
-        string name = nextChild[opened.length .. $];
-        iter = GetChildIterForName(name, nextChild, iter);
-        
-        expandRow(iter, store_, 0);
-        opened = nextChild;
-      }
-      
-      return iter;
+
+    string opened = fullpath;
+    do{
+      opened = ParentDirectory(opened);
     }
+    while(!(opened in openedDirs_));
+
+    TreeIter iter = GetIterOpened(opened);
+    while(opened.length != fullpath.length){
+      string nextChild = NextChildDirectory(fullpath, opened);
+      string name = nextChild[opened.length .. $];
+      iter = GetChildIterForName(name, nextChild, iter);
+
+      expandRow(iter, store_, 0);
+      opened = nextChild;
+    }
+    return iter;
   }
-  
+
   void ReopenUnder(string fullpath)
   {
     string[] keys = openedDirs_.keys;
