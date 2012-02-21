@@ -378,7 +378,7 @@ public:
     scope menu = new Menu;
     foreach(n, l; list){
       string label = mediator_.FileSystemNativePath(l);
-      scope dlg = bind.bind(&MoveNTimesAndChangeDir!(ForwardDirection), _0, n+1).ptr();
+      auto dlg = bind.bind(&MoveNTimesAndChangeDir!(ForwardDirection), _0, n+1).ptr();
       menu.append(new MenuItem(dlg, label, false));
     }
     menu.showAll();
@@ -417,8 +417,8 @@ public:
     scope menu = new Menu;
     string path = ParentDirectory(pwd);
     while(path != "/"){
-      scope fullpath = mediator_.FileSystemMountedVFSPath(path);
-      scope dlg = bind.bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
+      auto fullpath = mediator_.FileSystemMountedVFSPath(path);
+      auto dlg = bind.bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
       menu.append(new MenuItem(dlg, path, false));
       path = ParentDirectory(path);
     }

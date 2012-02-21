@@ -90,7 +90,7 @@ public:
     VBox contentArea = getContentArea();
     
     // setup TreeView
-    scope win = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
+    auto win = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
     contentArea.packStart(win, 1, 1, 5);
     view_ = new TreeView();
     win.add(view_);
@@ -102,8 +102,8 @@ public:
     view_.setModel(store_);
     
     // setup column
-    scope renderer = new CellRendererText;
-    scope col = new TreeViewColumn("Directories", renderer, "text", 0);
+    auto renderer = new CellRendererText;
+    auto col = new TreeViewColumn("Directories", renderer, "text", 0);
     col.addAttribute(renderer, "foreground", 1);
     view_.appendColumn(col);
     
@@ -273,6 +273,7 @@ private:
         path.next();
         view_.setCursor(path, null, 0);
         view_.getSelection().selectPath(path);
+        path.free();
       }
     }
     else if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_p) ||
@@ -284,6 +285,7 @@ private:
           view_.setCursor(path, null, 0);
           view_.getSelection().selectPath(path);
         }
+        path.free();
       }
     }
     

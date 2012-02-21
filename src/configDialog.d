@@ -104,29 +104,29 @@ private:
     keybinds_.setEnableSearch(0);
     keybinds_.addOnButtonPress(&KeybindButtonPress);
     
-    scope sw = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
+    auto sw = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
     sw.add(keybinds_);// without Viewport
     note_.appendPage(sw, "Key bindings");
     
-    scope rend0 = new CellRendererText;
-    scope col0 = new TreeViewColumn("Category", rend0, "text", 0);
+    auto rend0 = new CellRendererText;
+    auto col0 = new TreeViewColumn("Category", rend0, "text", 0);
     col0.setSizing(GtkTreeViewColumnSizing.FIXED);
     col0.setResizable(1);
     col0.setMinWidth(120);
     keybinds_.appendColumn(col0);
     
-    scope rend1 = new CellRendererText;
-    scope col1 = new TreeViewColumn("Action", rend1, "text", 1);
+    auto rend1 = new CellRendererText;
+    auto col1 = new TreeViewColumn("Action", rend1, "text", 1);
     col1.setSizing(GtkTreeViewColumnSizing.FIXED);
     col1.setResizable(1);
     col1.setMinWidth(180);
     keybinds_.appendColumn(col1);
     
-    scope rend2 = new CellRendererAccel;
+    auto rend2 = new CellRendererAccel;
     rend2.setProperty("accel-mode", cast(int)GtkCellRendererAccelMode.MODE_OTHER);// to react to accels with Tab
     rend2.addOnAccelEdited(&AccelEdited);
     rend2.addOnAccelCleared(&AccelCleared);
-    scope col2 = new TreeViewColumn("Key", rend2, "text", 2);
+    auto col2 = new TreeViewColumn("Key", rend2, "text", 2);
     col2.addAttribute(rend2, "editable", 3);
     col2.setSizing(GtkTreeViewColumnSizing.FIXED);
     col2.setResizable(1);
@@ -551,17 +551,17 @@ private:
     shortcuts_.addOnButtonPress(&ShortcutsButtonPress);
     AppendWithScrolledWindow(pageDirectories_, row++, shortcuts_);
     
-    scope rendLabel = new CellRendererText;
+    auto rendLabel = new CellRendererText;
     rendLabel.setProperty("editable", 1);
     rendLabel.addOnEdited(&(CellEdited!(0, "shortcutsStore_")));
-    scope colLabel = new TreeViewColumn("label", rendLabel, "text", 0);
+    auto colLabel = new TreeViewColumn("label", rendLabel, "text", 0);
     colLabel.setResizable(1);
     shortcuts_.appendColumn(colLabel);
     
-    scope rendDir = new CellRendererText;
+    auto rendDir = new CellRendererText;
     rendDir.setProperty("editable", 1);
     rendDir.addOnEdited(&(CellEdited!(1, "shortcutsStore_", "AppendSlash")));
-    scope colDir = new TreeViewColumn("path", rendDir, "text", 1);
+    auto colDir = new TreeViewColumn("path", rendDir, "text", 1);
     colDir.setResizable(1);
     shortcuts_.appendColumn(colDir);
     
@@ -863,7 +863,7 @@ private template AddEntry(string group, string key, string explanation, string t
 private Table AppendWrappedTable(Notebook note, string title)
 {
   Table t = new Table(1, 2, 0);
-  scope win = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
+  auto win = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
   win.addWithViewport(t);// Table needs Viewport
   note.appendPage(win, title);
   return t;
@@ -872,7 +872,7 @@ private Table AppendWrappedTable(Notebook note, string title)
 
 private void AppendWithScrolledWindow(Table t, uint row, Widget w)
 {
-  scope sw = new ScrolledWindow(GtkPolicyType.NEVER, GtkPolicyType.AUTOMATIC);
+  auto sw = new ScrolledWindow(GtkPolicyType.NEVER, GtkPolicyType.AUTOMATIC);
   sw.add(w);// widget is assumed to support scrolling by itself, not with Viewport
   t.attach(sw, 0, 2, row, row+1, GtkAttachOptions.FILL | GtkAttachOptions.EXPAND, GtkAttachOptions.FILL, XPadding, YPadding);
 }
@@ -896,7 +896,7 @@ private void AttachSectionLabel(Table t, uint row, string text)
   if(row > 0){// append additional space between sections
     t.setRowSpacing(row-1, 15);
   }
-  scope l = new Label("<b>" ~ text ~ "</b>");// bold text
+  auto l = new Label("<b>" ~ text ~ "</b>");// bold text
   l.setUseMarkup(1);
   l.setAlignment(0.0, 1.0);
   t.attach(l, 0, 2, row, row+1, GtkAttachOptions.FILL, GtkAttachOptions.FILL, 10, 5);
