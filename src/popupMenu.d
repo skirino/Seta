@@ -45,7 +45,7 @@ private import configDialog;
 private import inputDialog;
 private import transferFiles;
 private import fileView;
-private import rename;
+private import rename.dialog;
 private import scripts;
 
 

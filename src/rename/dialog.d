@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module rename;
+module rename.dialog;
 
 private import gtk.Dialog;
 private import gtk.Button;

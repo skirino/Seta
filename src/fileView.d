@@ -64,7 +64,7 @@ private import listupThread;
 private import popupMenu;
 private import mediator;
 private import transferFiles;
-private import rename;
+private import rename.dialog;
 private import entryList;
 
 
