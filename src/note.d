@@ -27,7 +27,8 @@ private import tango.io.Stdout;
 
 private import rcfile = config.rcfile;
 private import page;
-private import mainWindow;
+private import page_list;
+private import main_window;
 
 
 class Note : Notebook
@@ -108,7 +109,7 @@ private:
   
   void PageAdded(Widget w, uint u, Notebook note)
   {
-    pageList.Register(cast(Page)w);
+    page_list.Register(cast(Page)w);
     LabelAllPages(w, u, note);
   }
   ////////////////////////// GUI stuff

@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module volumeMonitor;
+module volume_monitor;
 
 private import gio.VolumeMonitor;
 private import gio.Mount;
@@ -28,9 +28,9 @@ private import glib.ListG;
 
 private import tango.io.Stdout;
 
-private import utils.stringUtil;
+private import utils.string_util;
 private import statusbar;
-private import pageList;
+private import page_list;
 
 
 private struct MountedVolumeMonitor
@@ -55,7 +55,7 @@ private:
   {
     PushIntoStatusbar("\"" ~ mount.getName() ~ "\" was mounted");
     RescanAll();
-    pageList.NotifyReconstructShortcuts();
+    page_list.NotifyReconstructShortcuts();
   }
   
   void NotifyUnmount(MountIF mount, VolumeMonitor monitor)
@@ -78,12 +78,12 @@ private:
           }
         }
         if(!found){
-          pageList.NotifyFilerDisconnect(name, p);
+          page_list.NotifyFilerDisconnect(name, p);
           break;
         }
       }
     }
-    pageList.NotifyReconstructShortcuts();
+    page_list.NotifyReconstructShortcuts();
   }
   
   void RescanAll()

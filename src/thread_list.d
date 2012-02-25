@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module threadList;
+module thread_list;
 
 private import gdk.Window;
 private import gdk.Cursor;
@@ -28,7 +28,7 @@ private import gtk.PopupBox;
 private import tango.io.Stdout;
 
 private import utils.vector;
-private import utils.timeUtil;
+private import utils.time_util;
 
 
 private enum ThreadInfoState

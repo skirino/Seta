@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module dirTree;
+module dir_tree;
 
 private import gtk.TreeView;
 private import gtk.TreeStore;
@@ -39,12 +39,12 @@ private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.vector;
-private import utils.templateUtil;
-private import utils.gioUtil;
-private import utils.stringUtil;
-private import utils.treeUtil;
-private import transferFiles;
-private import fileView;
+private import utils.template_util;
+private import utils.gio_util;
+private import utils.string_util;
+private import utils.tree_util;
+private import move_files_job;
+private import file_view;
 
 
 class DirTree : TreeView

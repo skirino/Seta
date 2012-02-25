@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module transferFiles;
+module move_files_job;
 
 private import gtk.Selections;
 private import gtk.Clipboard;
@@ -35,13 +35,13 @@ private import tango.io.Stdout;
 private import tango.core.Thread;
 private import tango.stdc.stdlib;
 
-private import utils.gioUtil;
-private import utils.stringUtil;
+private import utils.gio_util;
+private import utils.string_util;
 private import constants;
-private import threadList;
-private import inputDialog;
+private import thread_list;
+private import input_dialog;
 private import statusbar;
-private import fileView;
+private import file_view;
 
 
 
@@ -186,16 +186,16 @@ void TransferFiles(GdkDragAction action, string[] files, FileView sourceView, st
   
   if(action == GdkDragAction.ACTION_MOVE){
     if(sourceDir != destDir){// skip "move to the same directory"
-      (new TransferFilesThread!(true)(files, sourceDir, sourceView, destDir, destView)).start();
+      (new MoveFilesJob!(true)(files, sourceDir, sourceView, destDir, destView)).start();
     }
   }
   else if(action == GdkDragAction.ACTION_COPY){
-    (new TransferFilesThread!(false)(files, sourceDir, sourceView, destDir, destView)).start();
+    (new MoveFilesJob!(false)(files, sourceDir, sourceView, destDir, destView)).start();
   }
 }
 
 
-class TransferFilesThread(bool move) : Thread, StoppableOperationIF
+private class MoveFilesJob(bool move) : Thread, StoppableOperationIF
 {
   // public interface for ThreadList, implements StoppableOperationIF
   void Stop()
@@ -467,3 +467,4 @@ extern(C) {
   GdkDragAction  ExtractSuggestedAction(GdkDragContext * context);
 }
 //////////////////////// interface to C
+

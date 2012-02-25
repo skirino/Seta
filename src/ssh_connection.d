@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module sshConnection;
+module ssh_connection;
 
 private import gtk.Window;
 private import gtk.MountOperation;
@@ -26,7 +26,7 @@ private import gtk.MountOperation;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import utils.stringUtil;
+private import utils.string_util;
 private import shellrc = config.shellrc;
 
 

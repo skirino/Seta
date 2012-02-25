@@ -26,7 +26,7 @@ private import tango.io.stream.Lines;
 private import tango.sys.Environment;
 
 private import utils.vector;
-private import utils.stringUtil;
+private import utils.string_util;
 private import rcfile = config.rcfile;
 
 
@@ -126,3 +126,4 @@ public:
     file.close();
   }
 }
+

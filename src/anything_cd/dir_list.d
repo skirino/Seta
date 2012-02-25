@@ -32,9 +32,9 @@ private import tango.core.Array;
 private import tango.core.Thread;
 
 private import utils.vector;
-private import utils.stringUtil;
-private import utils.gioUtil;
-private import threadList;
+private import utils.string_util;
+private import utils.gio_util;
+private import thread_list;
 private import statusbar;
 
 

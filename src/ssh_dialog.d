@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module sshDialog;
+module ssh_dialog;
 
 private import gtk.Widget;
 private import gtk.Dialog;
@@ -38,13 +38,13 @@ private import gtk.TreeViewColumn;
 
 private import tango.io.Stdout;
 
-private import utils.stringUtil;
-private import utils.treeUtil;
+private import utils.string_util;
+private import utils.tree_util;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.known_hosts;
 private import config.hosts_view;
-private import sshConnection;
+private import ssh_connection;
 
 
 // Ask domain name of the remote host to be connected

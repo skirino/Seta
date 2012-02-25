@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module fileView;
+module file_view;
 
 private import gtk.TreeView;
 private import gtk.Widget;
@@ -51,22 +51,22 @@ private import tango.util.MinMax;
 private import tango.stdc.stdlib;
 
 private import utils.bind;
-private import utils.timeUtil;
-private import utils.stringUtil;
-private import utils.gioUtil;
-private import utils.templateUtil;
-private import utils.treeUtil;
+private import utils.time_util;
+private import utils.string_util;
+private import utils.gio_util;
+private import utils.template_util;
+private import utils.tree_util;
 private import utils.vector;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.keybind;
 private import entry;
-private import listupThread;
-private import popupMenu;
+private import prepare_entries_job;
+private import popup_menu;
 private import mediator;
-private import transferFiles;
+private import move_files_job;
 private import rename.dialog;
-private import entryList;
+private import entry_list;
 
 
 class FileView : TreeView
@@ -322,7 +322,7 @@ private:
   // number of rows (DirEntry's) present in the TreeView now
   uint numRowsNow_;
   
-  PrepareDirEntriesThread prepareUpdateThread_;
+  PrepareEntriesJob prepareUpdateThread_;
   
   void WaitStopIfRunning()
   {
@@ -345,7 +345,7 @@ private:
     WaitStopIfRunning();
     
     prepareUpdateThread_ =
-      new PrepareDirEntriesThread(
+      new PrepareEntriesJob(
         true, dir, this,
         mixin(RuntimeDispatch3!("&SetRowsCallback", "true", "appendToHistory", "notifyTerminal")),
         eList_.GetDTemp(), eList_.GetFTemp(), eList_.GetDFiltered(), eList_.GetFFiltered());
@@ -362,7 +362,7 @@ private:
     // Do not read the directory entries from disk,
     // reuse previous results (which are stored in entriesDAll_ and entriesFAll_)
     prepareUpdateThread_ =
-      new PrepareDirEntriesThread(
+      new PrepareEntriesJob(
         false, pwd_, this,
         &SetRowsCallback!(false, false, false),
         eList_.GetDAll(), eList_.GetFAll(), eList_.GetDFiltered(), eList_.GetFFiltered());

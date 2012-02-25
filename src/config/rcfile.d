@@ -32,15 +32,15 @@ private import tango.text.Util;
 private import tango.sys.Environment;
 private import tango.util.MinMax;
 
-private import utils.gioUtil;
-private import utils.stringUtil;
+private import utils.gio_util;
+private import utils.string_util;
 private import constants;
 private import config.shellrc;
 private import config.nautilus_scripts;
 private import config.keybind;
 private import known_hosts = config.known_hosts;
-private import sshConnection;
-private import pageList;
+private import ssh_connection;
+private import page_list;
 
 
 static const string SetaVersion = "0.6.1";
@@ -286,7 +286,7 @@ void ResetShortcuts(Shortcut[] list)
     string s = ToStringArray(list).join(SeparatorShortcutList);
     instance_.setString("Directories", "Shortcuts", NonnullString(s));
     instance_.changed_ = true;
-    pageList.NotifyReconstructShortcuts();
+    page_list.NotifyReconstructShortcuts();
   }
 }
 ///////////////// [Directories]

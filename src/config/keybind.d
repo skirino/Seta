@@ -27,7 +27,7 @@ private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.stdc.ctype;
 
-private import utils.stringUtil;
+private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
 
@@ -241,3 +241,4 @@ GdkModifierType TurnOffLockFlags(uint state)
   return cast(GdkModifierType) (state & MASK);
 }
 ///////////////////// utils to interpret GdkEventKey struct
+

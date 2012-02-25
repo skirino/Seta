@@ -43,8 +43,8 @@ private import tango.sys.Environment;
 private import tango.core.Thread;
 private import tango.util.MinMax;
 
-private import utils.stringUtil;
-private import utils.treeUtil;
+private import utils.string_util;
+private import utils.tree_util;
 private import config.keybind;
 private import page;
 private import anything_cd.filter_dirs_job;

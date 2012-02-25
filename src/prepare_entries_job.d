@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module listupThread;
+module prepare_entries_job;
 
 private import gio.File;
 private import gio.FileInfo;
@@ -34,11 +34,11 @@ private import tango.stdc.string;
 
 private import utils.vector;
 private import constants;
-private import threadList;
+private import thread_list;
 private import entry;
 
 
-class PrepareDirEntriesThread : Thread, StoppableOperationIF
+class PrepareEntriesJob : Thread, StoppableOperationIF
 {
 private:
   mixin ListedOperationT;

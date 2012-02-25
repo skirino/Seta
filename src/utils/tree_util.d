@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module treeUtil;
+module utils.tree_util;
 
 private import gtk.TreeView;
 private import gtk.TreeViewColumn;

@@ -32,15 +32,15 @@ private import gtk.Tooltip;
 private import tango.io.Stdout;
 private import tango.sys.Environment;
 
-private import utils.stringUtil;
-private import utils.gioUtil;
+private import utils.string_util;
+private import utils.gio_util;
 private import constants;
 private import rcfile = config.rcfile;
 private import tab;
 private import terminal;
-private import fileManager;
+private import file_manager;
 private import mediator;
-private import pageList;
+private import page_list;
 
 
 class Page : VBox
@@ -330,7 +330,7 @@ public:
   // "this" parameter's address might be different inside definition of inline-delegates.
   void UnregisterFromPageList(Widget w)
   {
-    pageList.Unregister(this);
+    page_list.Unregister(this);
   }
   ///////////////////////// PageList
 }

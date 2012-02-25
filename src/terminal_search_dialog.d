@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module terminalSearchDialog;
+module terminal_search_dialog;
 
 private import gtk.Dialog;
 private import gtk.Widget;
@@ -36,7 +36,7 @@ private import glib.GException;
 
 private import tango.io.Stdout;
 
-private import utils.stringUtil;
+private import utils.string_util;
 private import config.keybind;
 private import terminal;
 
@@ -209,3 +209,4 @@ private:
     overwrappedSearch = overwrappedSearch_.getActive();
   }
 }
+

@@ -26,12 +26,12 @@ private import gdk.Threads;
 
 private import tango.io.Stdout;
 
-private import mainWindow;
+private import main_window;
 private import constants;
 private import config.init;
 private import anything_cd.init;
-private import volumeMonitor;
-private import threadList;
+private import volume_monitor;
+private import thread_list;
 
 
 void Initialize()
@@ -40,16 +40,16 @@ void Initialize()
   constants.Init();
   config.init.Init();
   anything_cd.init.Init();
-  volumeMonitor.Init();
-  threadList.Init();
+  volume_monitor.Init();
+  thread_list.Init();
 }
 
 
 void Finalize()
 {
-  threadList.Finish();
-  config.init.Finish();
+  thread_list.Finish();
   anything_cd.init.Finish();
+  config.init.Finish();
 }
 
 

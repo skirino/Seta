@@ -50,14 +50,14 @@ private import gtk.MenuItem;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import utils.gioUtil;
-private import utils.stringUtil;
-private import utils.treeUtil;
+private import utils.gio_util;
+private import utils.string_util;
+private import utils.tree_util;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.keybind;
 private import config.hosts_view;
-private import pageList;
+private import page_list;
 
 
 void StartConfigDialog()
@@ -397,7 +397,7 @@ private:
     mixin(CheckSpinButton!("WindowSizeV"));
     
     if(changed){
-      pageList.NotifySetLayout();
+      page_list.NotifySetLayout();
     }
   }
   ///////////////////// [Layout]
@@ -507,7 +507,7 @@ private:
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText9", entUserDefinedText9_.getText());
     
     if(changed){
-      pageList.NotifyApplyTerminalPreferences();
+      page_list.NotifyApplyTerminalPreferences();
     }
   }
   ///////////////////// [Terminal]

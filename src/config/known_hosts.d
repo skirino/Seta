@@ -23,10 +23,10 @@ module config.known_hosts;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import utils.stringUtil;
+private import utils.string_util;
 private import rcfile = config.rcfile;
-private import sshConnection;
-private import sshDialog;
+private import ssh_connection;
+private import ssh_dialog;
 
 
 private SSHConnection[] registeredHosts_;
@@ -109,3 +109,4 @@ SSHConnection Find(char[] username, char[] domain)
   }
   return null;
 }
+

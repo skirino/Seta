@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module fileManager;
+module file_manager;
 
 private import gtk.Widget;
 private import gtk.VBox;
@@ -38,21 +38,21 @@ private import gtkc.gio;
 private import tango.io.Stdout;
 
 private import utils.bind;
-private import utils.stringUtil;
+private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.keybind;
 private import known_hosts = config.known_hosts;
-private import threadList;
-private import fileView;
+private import thread_list;
+private import file_view;
 private import history;
 private import mediator;
 private import statusbar;
-private import volumeMonitor;
-private import dirTree;
+private import volume_monitor;
+private import dir_tree;
 private import toolbar;
-private import sshConnection;
-private import sshDialog;
+private import ssh_connection;
+private import ssh_dialog;
 
 
 class FileManager : VBox

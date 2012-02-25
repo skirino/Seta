@@ -43,13 +43,13 @@ private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.bind;
-private import utils.templateUtil;
-private import utils.stringUtil;
+private import utils.template_util;
+private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.known_hosts;
-private import fileManager;
-private import volumeMonitor;
+private import file_manager;
+private import volume_monitor;
 
 
 class SetaToolbar : Toolbar
@@ -418,9 +418,9 @@ private:
   {
     // change directory of all pages showing dirs under "path"
     if(path.containsPattern("/.gvfs/sftp ")){
-      pageList.NotifyFilerDisconnect(path, path);
+      page_list.NotifyFilerDisconnect(path, path);
     }
-    pageList.NotifyEscapeFromPath(path);
+    page_list.NotifyEscapeFromPath(path);
     
     if(!UnmountByPath(path)){// "path" not found in monitored volumes, just remove the "item"
       remove(item);

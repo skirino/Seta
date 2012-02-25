@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module popupMenu;
+module popup_menu;
 
 private import gtk.Menu;
 private import gtk.MenuItem;
@@ -39,13 +39,13 @@ private import tango.sys.Environment;
 private import tango.stdc.stdlib;
 private import tango.stdc.posix.unistd;
 
-private import utils.stringUtil;
+private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.dialog;
-private import inputDialog;
-private import transferFiles;
-private import fileView;
+private import input_dialog;
+private import move_files_job;
+private import file_view;
 private import rename.dialog;
 private import scripts = config.nautilus_scripts;
 
@@ -434,3 +434,4 @@ void DeleteFiles(bool toTrash)(string pwd, string[] names)
 }
 
 alias DeleteFiles!(true) MoveToTrash;
+

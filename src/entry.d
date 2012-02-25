@@ -27,9 +27,9 @@ private import glib.Str;
 private import tango.io.Stdout;
 private import tango.stdc.posix.sys.stat;// for permission flags
 
-private import utils.timeUtil;
-private import utils.stringUtil;
-private import utils.gioUtil;
+private import utils.time_util;
+private import utils.string_util;
+private import utils.gio_util;
 private import constants;
 
 

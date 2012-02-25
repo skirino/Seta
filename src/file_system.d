@@ -18,14 +18,14 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module fileSystem;
+module file_system;
 
 private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.sys.Environment;
 
-private import utils.stringUtil;
-private import utils.gioUtil;
+private import utils.string_util;
+private import utils.gio_util;
 
 
 class FileSystem
@@ -83,7 +83,7 @@ public:
   
   char[] ParentDirectory(char[] path)
   {
-    return utils.stringUtil.ParentDirectory(path, rootDir_);
+    return utils.string_util.ParentDirectory(path, rootDir_);
   }
   
   // for terminal which uses remote (native) filesystem path

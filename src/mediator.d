@@ -24,12 +24,12 @@ module mediator;
 private import tango.io.Stdout;
 
 private import constants;
-private import inputDialog;
+private import input_dialog;
 private import page;
-private import fileManager;
+private import file_manager;
 private import terminal;
-private import fileSystem;
-private import sshConnection;
+private import file_system;
+private import ssh_connection;
 private import statusbar;
 
 

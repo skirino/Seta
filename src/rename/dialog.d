@@ -53,9 +53,9 @@ private import pango.PgAttributeList;
 private import tango.io.Stdout;
 private import tango.text.Util;
 
-private import utils.stringUtil;
-private import utils.treeUtil;
-private import inputDialog;
+private import utils.string_util;
+private import utils.tree_util;
+private import input_dialog;
 private import statusbar;
 
 
@@ -572,3 +572,4 @@ private class RenameDialog : Dialog
   }
   ///////////////////// editable cell
 }
+

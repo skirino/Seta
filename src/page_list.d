@@ -18,14 +18,14 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module pageList;
+module page_list;
 
 private import gtk.PopupBox;
 
 private import tango.io.Stdout;
 
 private import page;
-private import mainWindow;
+private import main_window;
 
 
 private Page[] pages_;

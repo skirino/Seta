@@ -28,9 +28,9 @@ private import tango.core.Thread;
 private import tango.util.MinMax;
 private import tango.text.Unicode;
 
-private import utils.stringUtil;
+private import utils.string_util;
 private import utils.vector;
-private import threadList;
+private import thread_list;
 static private import anything_cd.dir_list;
 static private import anything_cd.dir_history;
 
