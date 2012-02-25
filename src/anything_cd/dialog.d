@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module changeDirDialog;
+module anything_cd.dialog;
 
 private import gtk.Dialog;
 private import gtk.Widget;
@@ -47,7 +47,7 @@ private import utils.stringUtil;
 private import utils.treeUtil;
 private import config.keybind;
 private import page;
-private import filterDirPathThread;
+private import anything_cd.filter_dirs_job;
 
 
 const uint DelayTimeToStartScanInMillis = 500;
@@ -126,7 +126,7 @@ public:
 private:
   bool textChanged_;
   uint sourceID_;
-  FilterDirPathThread filterThread_;
+  FilterDirsJob filterThread_;
   
   void CancelTimeoutCallback()
   {
@@ -179,7 +179,7 @@ private:
       InitFilteredCandidates();
     }
     else{
-      filterThread_ = new FilterDirPathThread(text, &EndFiltering, &ResetTextChanged);
+      filterThread_ = new FilterDirsJob(text, &EndFiltering, &ResetTextChanged);
       filterThread_.start();
     }
   }
@@ -217,7 +217,7 @@ private:
   void InitFilteredCandidates()
   {
     // put most recent history (at most 100)
-    string[] dirlist = dirPathHistory.Get()[0 .. min!(size_t)($, 100)];
+    string[] dirlist = anything_cd.dir_history.Get()[0 .. min!(size_t)($, 100)];
     EndFiltering(dirlist, []);
   }
   //////////////////// filtering in background
@@ -243,7 +243,7 @@ private:
     }
     else if(responseID == SCAN_FILESYSTEM){
       if(PopupBox.yesNo("Start to scan your home directory?", "")){
-        dirPathList.Scan();
+        anything_cd.dir_list.Scan();
       }
       else{// do not destroy this dialog
         return;

@@ -35,7 +35,7 @@ private import config.dialog;
 private import config.keybind;
 private import statusbar;
 private import note;
-private import changeDirDialog;
+private import anything_cd.dialog;
 
 
 class SetaWindow : MainWindow

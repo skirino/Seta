@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module dirPathList;
+module anything_cd.dir_list;
 
 private import gio.FileInfo;
 private import gdk.Threads;

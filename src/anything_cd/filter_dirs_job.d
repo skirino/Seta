@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module filterDirPathThread;
+module anything_cd.filter_dirs_job;
 
 private import gdk.Threads;
 
@@ -31,11 +31,11 @@ private import tango.text.Unicode;
 private import utils.stringUtil;
 private import utils.vector;
 private import threadList;
-static private import dirPathList;
-static private import dirPathHistory;
+static private import anything_cd.dir_list;
+static private import anything_cd.dir_history;
 
 
-class FilterDirPathThread : Thread, StoppableOperationIF
+class FilterDirsJob : Thread, StoppableOperationIF
 {
 private:
   static const size_t MaxNumberOfPathsFromHistory = 100;
@@ -98,7 +98,7 @@ public:
     // paginate by PER_PAGE
     auto pathsFromHistory = new Vector!(string)(MaxNumberOfPathsFromHistory);
     {
-      string[] dirlist = dirPathHistory.Get();
+      string[] dirlist = anything_cd.dir_history.Get();
       size_t len = dirlist.length;
       size_t pageNum = len / PER_PAGE + 1;
       for(size_t pageIndex=0; pageIndex<pageNum; pageIndex++){
@@ -115,8 +115,8 @@ public:
     }
     
     auto pathsFromList = new Vector!(string)(MaxNumberOfPathsFromList);
-    if(!dirPathList.IsScanning()){
-      string[] dirlist = dirPathList.Get();
+    if(!anything_cd.dir_list.IsScanning()){
+      string[] dirlist = anything_cd.dir_list.Get();
       size_t len = dirlist.length;
       size_t pageNum = len / PER_PAGE + 1;
       for(size_t pageIndex=0; pageIndex<pageNum; pageIndex++){

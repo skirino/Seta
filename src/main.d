@@ -31,8 +31,8 @@ private import constants;
 private import rcfile = config.rcfile;
 private import volumeMonitor;
 private import threadList;
-private import dirPathList;
-private import dirPathHistory;
+private import anything_cd.dir_list;
+private import anything_cd.dir_history;
 
 
 void Initialize()
@@ -42,8 +42,8 @@ void Initialize()
   rcfile.Init();
   volumeMonitor.Init();
   threadList.Init();
-  dirPathList.Init();
-  dirPathHistory.Init();
+  anything_cd.dir_list.Init();
+  anything_cd.dir_history.Init();
 }
 
 
@@ -51,8 +51,8 @@ void Finalize()
 {
   threadList.Finish();
   rcfile.Free();
-  dirPathList.Finish();
-  dirPathHistory.Finish();
+  anything_cd.dir_list.Finish();
+  anything_cd.dir_history.Finish();
 }
 
 

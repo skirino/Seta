@@ -22,7 +22,7 @@ module history;
 
 private import tango.io.Stdout;
 
-private import dirPathHistory;
+private import anything_cd.dir_history;
 
 
 // history of directories visited by each page
@@ -72,7 +72,7 @@ public:
     bufferEnd_ = idxPWD_ = next;
     dirs_[idxPWD_] = dir;
     
-    dirPathHistory.Push(dir);
+    anything_cd.dir_history.Push(dir);
   }
   
   void GoNext(bool ForwardDirection)()

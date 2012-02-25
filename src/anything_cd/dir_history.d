@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module dirPathHistory;
+module anything_cd.dir_history;
 
 private import tango.io.Stdout;
 private import tango.io.device.File;
