@@ -18,12 +18,13 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module hosts;
+module config.known_hosts;
 
 private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.stringUtil;
+private import rcfile = config.rcfile;
 private import sshConnection;
 private import sshDialog;
 
@@ -86,7 +87,7 @@ void AddNewHost(SSHConnection con, bool save)
 {
   if(save){
     registeredHosts_ ~= con;
-    config.AddSSHHost(con);
+    rcfile.AddSSHHost(con);
   }
   else{
     temporalHosts_ ~= con;

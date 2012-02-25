@@ -39,12 +39,13 @@ private import tango.core.Thread;
 
 private import utils.stringUtil;
 private import constants;
+private import rcfile = config.rcfile;
 private import threadList;
-private import keybind;
+private import config.keybind;
 private import mediator;
 private import sshConnection;
 private import transferFiles;
-private import shellrc;
+private import shellrc = config.shellrc;
 private import terminalSearchDialog;
 
 
@@ -97,7 +98,7 @@ public:
     
     InitTermios();
     InitDragAndDropFunctionality();
-    shellSetting_ = GetLocalShellSetting();
+    shellSetting_ = shellrc.GetLocalShellSetting();
     
     ApplyPreferences();
   }
@@ -106,18 +107,18 @@ public:
   {
     // appearance
     GdkColor colorFore, colorBack;
-    Color.parse(config.GetColorForeground(), colorFore);
-    Color.parse(config.GetColorBackground(), colorBack);
+    Color.parse(rcfile.GetColorForeground(), colorFore);
+    Color.parse(rcfile.GetColorBackground(), colorBack);
     vte_terminal_set_colors(vte_, &colorFore, &colorBack, null, 0);
     
-    vte_terminal_set_font_from_string(vte_, Str.toStringz(config.GetFont()));
-    vte_terminal_set_background_saturation(vte_, config.GetTransparency());
+    vte_terminal_set_font_from_string(vte_, Str.toStringz(rcfile.GetFont()));
+    vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());
     
     // to extract last command and replace $L(R)DIR
-    prompt_  = config.GetPROMPT();
-    rprompt_ = config.GetRPROMPT();
-    enableReplace_ = config.GetEnablePathExpansion();
-    ResetReplaceTargets(config.GetReplaceTargetLeft(), config.GetReplaceTargetRight());
+    prompt_  = rcfile.GetPROMPT();
+    rprompt_ = rcfile.GetRPROMPT();
+    enableReplace_ = rcfile.GetEnablePathExpansion();
+    ResetReplaceTargets(rcfile.GetReplaceTargetLeft(), rcfile.GetReplaceTargetRight());
   }
   
 private:
@@ -212,7 +213,7 @@ private:
       TerminalAction.InputUserDefinedText8,
       TerminalAction.InputUserDefinedText9:
       int index = q + 1 - TerminalAction.InputUserDefinedText1;// 1 <= index <= 9
-      string text = config.GetUserDefinedText(index);
+      string text = rcfile.GetUserDefinedText(index);
       if(text.length > 0){
         if(enableReplace_){
           text = ReplaceLRDIR(text);
@@ -374,7 +375,7 @@ private:
   
   /////////////////// manipulate text in vte terminal
 private:
-  ShellSetting shellSetting_;
+  shellrc.ShellSetting shellSetting_;
   string prompt_, rprompt_;
   
   void FeedChild(string text)
@@ -637,7 +638,7 @@ public:
     rprompt_ = con.getRPrompt();
     
     ClearInputtedCommand();
-    string sshCommand = "ssh " ~ config.GetSSHOption() ~ " " ~ host ~ '\n';
+    string sshCommand = "ssh " ~ rcfile.GetSSHOption() ~ " " ~ host ~ '\n';
     FeedChild(sshCommand);
     
     if(password !is null){
@@ -650,9 +651,9 @@ public:
   
   void QuitSSH(string pwd)
   {
-    shellSetting_ = GetLocalShellSetting();
-    prompt_  = config.GetPROMPT();
-    rprompt_ = config.GetRPROMPT();
+    shellSetting_ = shellrc.GetLocalShellSetting();
+    prompt_  = rcfile.GetPROMPT();
+    rprompt_ = rcfile.GetRPROMPT();
     ClearInputtedCommand();
     FeedChild("exit\n");
     cwd_ = pwd;

@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module hostView;
+module config.hosts_view;
 
 private import gtk.TreeView;
 private import gtk.TreeViewColumn;
@@ -30,7 +30,7 @@ private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.stringUtil;
-static private import config;
+private import rcfile = config.rcfile;
 
 
 class HostView : TreeView
@@ -75,7 +75,7 @@ public:
     hostsStore_ = new ListStore([GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING]);
     setModel(hostsStore_);
     
-    foreach(host; config.GetSSHHosts()){
+    foreach(host; rcfile.GetSSHHosts()){
       TreeIter iter = new TreeIter;
       hostsStore_.append(iter);
       

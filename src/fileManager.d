@@ -40,8 +40,10 @@ private import tango.io.Stdout;
 private import utils.bind;
 private import utils.stringUtil;
 private import constants;
+private import rcfile = config.rcfile;
+private import config.keybind;
+private import known_hosts = config.known_hosts;
 private import threadList;
-private import keybind;
 private import fileView;
 private import history;
 private import mediator;
@@ -51,7 +53,6 @@ private import dirTree;
 private import toolbar;
 private import sshConnection;
 private import sshDialog;
-private import hosts;
 
 
 class FileManager : VBox
@@ -100,7 +101,7 @@ public:
   void SetLayout()
   {
     // width of the dirTree
-    uint w = config.GetWidthDirectoryTree();
+    uint w = rcfile.GetWidthDirectoryTree();
     if(w == 0){
       // set default split position to avoid allocating too much or too little
       hpaned_.setPosition(120);
@@ -120,7 +121,7 @@ public:
   void Realize(Widget w)
   {
     // necessary to make togglebutton consistent
-    if(config.GetWidthDirectoryTree() == 0){
+    if(rcfile.GetWidthDirectoryTree() == 0){
       swTree_.hideAll();
     }
     else{
@@ -233,7 +234,7 @@ private:
       FileManagerAction.GoToDir9:
       int index = q - FileManagerAction.GoToDir1;// 0 <= index <= 8
       if(index < toolbar_.GetNumShortcuts()){// shortcut exists
-        string dir = config.GetNthShortcut(index);
+        string dir = rcfile.GetNthShortcut(index);
         CheckChangeDir(dir);
       }
       else{// mounted volumes
@@ -331,7 +332,7 @@ public:
   {
     string pwd = hist_.GetPWD();
     if(pwd.StartsWith(path)){// inside the mounted volume
-      string dir = mediator_.OnLeftSide() ? config.GetInitialDirectoryLeft() : config.GetInitialDirectoryRight();
+      string dir = mediator_.OnLeftSide() ? rcfile.GetInitialDirectoryLeft() : rcfile.GetInitialDirectoryRight();
       ChangeDirectory(dir);
     }
     
@@ -527,7 +528,7 @@ public:
     string userDomain = mediator_.GetHostLabel();
     
     // decrement use count
-    hosts.Disconnect(userDomain);
+    known_hosts.Disconnect(userDomain);
     
     // send message to statusbar
     PushIntoStatusbar("Disconnected from " ~ userDomain);
@@ -570,9 +571,9 @@ public:
       mediator_.TerminalChangeDirectoryFromFiler(newpath);
     }
     
-    if(! AlreadyRegistered(con)){// not registered
+    if(! known_hosts.AlreadyRegistered(con)){// not registered
       bool save = PopupBox.yesNo("Register " ~ con.getDomain() ~ '?', "Unregistered host");
-      AddNewHost(con, save);
+      known_hosts.AddNewHost(con, save);
     }
   }
   

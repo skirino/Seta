@@ -30,8 +30,9 @@ private import gdk.Event;
 private import tango.io.Stdout;
 
 private import constants;
-private import configDialog;
-private import keybind;
+private import rcfile = config.rcfile;
+private import config.dialog;
+private import config.keybind;
 private import statusbar;
 private import note;
 private import changeDirDialog;
@@ -73,8 +74,8 @@ public:
     
     noteL_ = new Note('L', this);
     noteR_ = new Note('R', this);
-    noteL_.AppendNewPage(config.GetInitialDirectoryLeft());
-    noteR_.AppendNewPage(config.GetInitialDirectoryRight());
+    noteL_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
+    noteR_.AppendNewPage(rcfile.GetInitialDirectoryRight());
     hpaned_.pack1(noteL_, 1, 0);
     hpaned_.pack2(noteR_, 1, 0);
     
@@ -85,8 +86,8 @@ public:
   
   static void SetLayout()
   {
-    singleton_.setDefaultSize(config.GetWindowSizeH(), config.GetWindowSizeV());
-    singleton_.hpaned_.setPosition(config.GetSplitH());
+    singleton_.setDefaultSize(rcfile.GetWindowSizeH(), rcfile.GetWindowSizeV());
+    singleton_.hpaned_.setPosition(rcfile.GetSplitH());
     singleton_.statusbar_.SetLayout();
   }
   

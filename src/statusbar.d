@@ -30,7 +30,7 @@ private import gtkc.gtk;// for gtk_get_current_event_time()
 
 private import tango.io.Stdout;
 
-static private import config;
+private import rcfile = config.rcfile;
 private import threadList;
 private import note;
 
@@ -76,7 +76,7 @@ private:
 public:
   void SetLayout()
   {
-    uint height = config.GetHeightStatusbar();
+    uint height = rcfile.GetHeightStatusbar();
     if(height == 0){
       hide();
     }
@@ -137,10 +137,10 @@ private:
         else{
           if(note" ~ l ~ "_.getNPages() == 0){
             if('" ~ l ~ "' == 'L'){
-              note" ~ l ~ "_.AppendNewPage(config.GetInitialDirectoryLeft());
+              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
             }
             else{
-              note" ~ l ~ "_.AppendNewPage(config.GetInitialDirectoryRight());
+              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryRight());
             }
           }
           note" ~ l ~ "_.show();

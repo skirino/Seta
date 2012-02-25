@@ -35,7 +35,7 @@ private import tango.sys.Environment;
 private import utils.stringUtil;
 private import utils.gioUtil;
 private import constants;
-static private import config;
+private import rcfile = config.rcfile;
 private import tab;
 private import terminal;
 private import fileManager;
@@ -138,7 +138,7 @@ public:
   
   void SetLayout()
   {
-    uint split = tab_.OnLeftSide() ? config.GetSplitVLeft() : config.GetSplitVRight();
+    uint split = tab_.OnLeftSide() ? rcfile.GetSplitVLeft() : rcfile.GetSplitVRight();
     paned_.setPosition(split);
   }
   

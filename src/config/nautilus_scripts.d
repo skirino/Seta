@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module scripts;
+module config.nautilus_scripts;
 
 private import gio.File;
 private import gio.FileInfo;

@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module keybind;
+module config.keybind;
 
 private import gtk.AccelGroup;
 private import gdk.Keysyms;
@@ -29,7 +29,7 @@ private import tango.stdc.ctype;
 
 private import utils.stringUtil;
 private import constants;
-static private import config;
+private import rcfile = config.rcfile;
 
 
 struct KeyCode
@@ -197,7 +197,7 @@ void Init()
   keymaps[2].Clear();
   keymaps[3].Clear();
   
-  KeyCode[][string] dict = config.GetKeybinds();
+  KeyCode[][string] dict = rcfile.GetKeybinds();
   foreach(key; dict.keys){
     int x = ActionKeyToIndex(key);
     if(x != -1){

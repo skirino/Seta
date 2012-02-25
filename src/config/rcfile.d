@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module config;
+module config.rcfile;
 
 private import glib.KeyFile;
 private import gtk.PopupBox;
@@ -35,9 +35,11 @@ private import tango.util.MinMax;
 private import utils.gioUtil;
 private import utils.stringUtil;
 private import constants;
-private import keybind;
+private import config.shellrc;
+private import config.nautilus_scripts;
+private import config.keybind;
+private import known_hosts = config.known_hosts;
 private import sshConnection;
-private import hosts;
 private import pageList;
 
 
@@ -46,6 +48,10 @@ static const string SetaVersion = "0.5.6";
 void Init()
 {
   instance_ = new SetaRCFile();
+
+  config.nautilus_scripts.Init();
+  config.shellrc.Init();
+  config.keybind.Init();
 }
 
 void Write()
@@ -318,7 +324,7 @@ void RemoveSSHHost(SSHConnection con)
 {
   instance_.changed_ = true;
   
-  hosts.Unregister(con);
+  known_hosts.Unregister(con);
   if(instance_.hasKey("SSH", "Hosts")){
     string s1 = con.toStr!(true)();
     string s2 = con.toStr!(false)();
@@ -345,7 +351,7 @@ void ResetRemoteHosts(string[] list)
     string s = join(list, ",");
     instance_.setString("SSH", "Hosts", NonnullString(s));
     instance_.changed_ = true;
-    hosts.Register(list);
+    known_hosts.Register(list);
   }
 }
 ///////////////// [SSH]
@@ -364,7 +370,7 @@ bool ResetKeybind(string keyname, string[] codeList)
 void ReconstructKeybinds()
 {
   instance_.InstallKeybinds();
-  keybind.Init();
+  config.keybind.Init();
 }
 
 private template GetKeybindInString(string widget, string action)
@@ -528,7 +534,7 @@ private:
     InstallKeybinds();
     
     // register SSH hosts
-    hosts.Register(GetSSHHosts());
+    known_hosts.Register(GetSSHHosts());
   }
   
   void Write()

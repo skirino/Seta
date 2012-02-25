@@ -27,7 +27,7 @@ private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.stringUtil;
-private import shellrc;
+private import shellrc = config.shellrc;
 
 
 class SSHConnection : gtk.MountOperation.MountOperation
@@ -38,7 +38,7 @@ private:
   string homeDir_;
   string prompt_;
   string rprompt_;
-  ShellSetting shellSetting_;
+  shellrc.ShellSetting shellSetting_;
   
 public:
   void IncrementUseCount(){++count_;}
@@ -52,7 +52,7 @@ public:
   string getRPrompt(){return rprompt_;}
   void setRPrompt(string p){rprompt_ = p;}
   
-  ShellSetting GetShellSetting(){return shellSetting_;}
+  shellrc.ShellSetting GetShellSetting(){return shellSetting_;}
   
   void ReadShellSetting(string gvfsRoot)
   {
@@ -77,7 +77,7 @@ public:
           homeDir_ = home2;
         }
         
-        shellSetting_ = new ShellSetting(homeDir_, shell);
+        shellSetting_ = new shellrc.ShellSetting(homeDir_, shell);
       }
     }
   }

@@ -25,6 +25,7 @@ private import gtk.Widget;
 
 private import tango.io.Stdout;
 
+private import rcfile = config.rcfile;
 private import page;
 private import mainWindow;
 
@@ -80,10 +81,10 @@ public:
     string initialDir;
     if(p.LookingAtRemoteDir()){
       if(side_ == 'L'){
-        initialDir = config.GetInitialDirectoryLeft();
+        initialDir = rcfile.GetInitialDirectoryLeft();
       }
       else{
-        initialDir = config.GetInitialDirectoryRight();
+        initialDir = rcfile.GetInitialDirectoryRight();
       }
     }
     else{

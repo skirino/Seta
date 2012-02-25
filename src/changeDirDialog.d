@@ -45,8 +45,7 @@ private import tango.util.MinMax;
 
 private import utils.stringUtil;
 private import utils.treeUtil;
-static private import config;
-private import keybind;
+private import config.keybind;
 private import page;
 private import filterDirPathThread;
 

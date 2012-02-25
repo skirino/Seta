@@ -28,12 +28,9 @@ private import tango.io.Stdout;
 
 private import mainWindow;
 private import constants;
-static private import config;
+private import rcfile = config.rcfile;
 private import volumeMonitor;
-private import keybind;
 private import threadList;
-private import scripts;
-private import shellrc;
 private import dirPathList;
 private import dirPathHistory;
 
@@ -42,12 +39,9 @@ void Initialize()
 {
   // init utilities
   constants.Init();
-  config.Init();
+  rcfile.Init();
   volumeMonitor.Init();
-  keybind.Init();// should be after config.Init()
   threadList.Init();
-  scripts.Init();
-  shellrc.Init();
   dirPathList.Init();
   dirPathHistory.Init();
 }
@@ -56,7 +50,7 @@ void Initialize()
 void Finalize()
 {
   threadList.Finish();
-  config.Free();
+  rcfile.Free();
   dirPathList.Finish();
   dirPathHistory.Finish();
 }

@@ -46,10 +46,10 @@ private import utils.bind;
 private import utils.templateUtil;
 private import utils.stringUtil;
 private import constants;
-static private import config;
+private import rcfile = config.rcfile;
+private import config.known_hosts;
 private import fileManager;
 private import volumeMonitor;
-private import hosts;
 
 
 class SetaToolbar : Toolbar
@@ -104,23 +104,23 @@ public:
   ///////////////////// Layout
   void SetLayout()
   {
-    dirTreeButton_.setActive(config.GetWidthDirectoryTree() > 0);
+    dirTreeButton_.setActive(rcfile.GetWidthDirectoryTree() > 0);
     
     // buttons in toolbar
     numToolItemsShown_ = 0;
     mixin(FoldTupple!(InsertOrRemove, "Back", "Forward", "Up", "Root", "Home", "OtherSide", "Refresh", "SSH", "Hidden", "DirTree"));
-    mixin(InsertOrRemove!("Separator1", "config.GetShowFilter()"));
-    mixin(InsertOrRemove!("Filter",     "config.GetShowFilter()"));
+    mixin(InsertOrRemove!("Separator1", "rcfile.GetShowFilter()"));
+    mixin(InsertOrRemove!("Filter",     "rcfile.GetShowFilter()"));
     mixin(InsertOrRemove!("Separator2", "numToolItemsShown_ > 0"));
     
     // width of filter entry
-    filter_.setSizeRequest(config.GetWidthFilterEntry(), -1);
+    filter_.setSizeRequest(rcfile.GetWidthFilterEntry(), -1);
     
     // widths of the shortcut buttons in the toolbar
     auto list = GetShortcutButtonList();
     while(list !is null){
       Widget widget = new Widget(cast(GtkWidget*)list.data());
-      widget.setSizeRequest(config.GetWidthShortcutButton(), -1);
+      widget.setSizeRequest(rcfile.GetWidthShortcutButton(), -1);
       list = list.next();
     }
   }
@@ -128,7 +128,7 @@ public:
 private:
   template InsertOrRemove(string s)
   {
-    const string InsertOrRemove = InsertOrRemove!(s, "config.GetShow" ~ s ~ "Button()");
+    const string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
   }
   
   template InsertOrRemove(string s, string booleanExpression)
@@ -284,7 +284,7 @@ public:
     ClearShortcuts();
     
     // shortcuts
-    Shortcut[] shortcuts = config.GetShortcuts();
+    rcfile.Shortcut[] shortcuts = rcfile.GetShortcuts();
     numShortcuts_ = shortcuts.length;
     foreach(i, shortcut; shortcuts){
       string label = "(" ~ Str.toString(i+1) ~ ") " ~ shortcut.label_;
@@ -338,7 +338,7 @@ private:
     }
     
     auto item = new ToolItem;
-    item.setSizeRequest(config.GetWidthShortcutButton(), -1);
+    item.setSizeRequest(rcfile.GetWidthShortcutButton(), -1);
     item.add(b);
     insert(item);
     
@@ -365,7 +365,7 @@ private:
   
   void RemoveShortcut(MenuItem item, string path)
   {
-    config.RemoveDirectoryShortcut(path);
+    rcfile.RemoveDirectoryShortcut(path);
     // move focus to the file manager, since the focused button will go away by removing the shortcut
     parent_.GrabFocus();
   }

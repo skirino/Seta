@@ -41,10 +41,10 @@ private import tango.io.Stdout;
 private import utils.stringUtil;
 private import utils.treeUtil;
 private import constants;
-static private import config;
+private import rcfile = config.rcfile;
+private import config.known_hosts;
+private import config.hosts_view;
 private import sshConnection;
-private import hosts;
-private import hostView;
 
 
 // Ask domain name of the remote host to be connected
@@ -242,7 +242,7 @@ class StartSSHDialog : Dialog
       userDomainHome ~= iterCursor.getValueString(i);
     }
     auto con = new SSHConnection(userDomainHome);
-    config.RemoveSSHHost(con);
+    rcfile.RemoveSSHHost(con);
     hosts.GetListStore().remove(iterCursor);
   }
   

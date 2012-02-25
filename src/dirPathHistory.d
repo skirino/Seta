@@ -27,7 +27,7 @@ private import tango.sys.Environment;
 
 private import utils.vector;
 private import utils.stringUtil;
-static private import config;
+private import rcfile = config.rcfile;
 
 
 private DirPathHistory instance_;
@@ -68,8 +68,8 @@ public:
     filename_ = home_ ~ "/.seta_history";
     list_ = new Vector!(char[])(MAX);
     Load();
-    Push(config.GetInitialDirectoryLeft());
-    Push(config.GetInitialDirectoryRight());
+    Push(rcfile.GetInitialDirectoryLeft());
+    Push(rcfile.GetInitialDirectoryRight());
   }
   
   void Push(char[] path)

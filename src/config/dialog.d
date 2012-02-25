@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module configDialog;
+module config.dialog;
 
 private import gtk.Dialog;
 private import gtk.Widget;
@@ -53,10 +53,11 @@ private import tango.text.Util;
 private import utils.gioUtil;
 private import utils.stringUtil;
 private import utils.treeUtil;
-static private import constants;
-static private import config;
-private import keybind;
-private import hostView;
+private import constants;
+private import rcfile = config.rcfile;
+private import config.keybind;
+private import config.hosts_view;
+private import pageList;
 
 
 void StartConfigDialog()
@@ -150,7 +151,7 @@ private:
     keyStore_.setValue(categories_[3], 0, "terminal");
     
     // arrange rows
-    dictKeyCode_ = config.GetKeybinds();
+    dictKeyCode_ = rcfile.GetKeybinds();
     string[] keys = dictKeyCode_.keys;
     keys.sort;
     
@@ -208,7 +209,7 @@ private:
           }
           else{
             if(previousKey.length > 0){// exclude first time for each category
-              changed |= config.ResetKeybind(categoryName ~ previousKey, codeList);
+              changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
             }
             
             previousKey = key;
@@ -221,13 +222,13 @@ private:
         while(keyStore_.iterNext(iter));
         
         if(previousKey.length > 0){
-          changed |= config.ResetKeybind(categoryName ~ previousKey, codeList);
+          changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
         }
       }
     }
     
     if(changed){
-      ReconstructKeybinds();
+      rcfile.ReconstructKeybinds();
     }
   }
   
@@ -420,7 +421,7 @@ private:
     uint row = 0;
     
     AttachSectionLabel(pageTerminal_, row++, "Appearance");
-    fontButton_ = new FontButton(config.GetFont());
+    fontButton_ = new FontButton(rcfile.GetFont());
     AttachPairWidget(pageTerminal_, row++, "Fo_nt used in terminals: ", fontButton_);
     
     mixin(AddColorButton!("Terminal", "ColorForeground", "_Foreground color: "));
@@ -444,66 +445,66 @@ private:
     
     AttachSectionLabel(pageTerminal_, row++, "User defined texts that can be input by keyboard shortcuts\n   (\"\\n\" will be replaced with newline)");
     mixin(AddEntry!("Terminal", "UserDefinedText1",
-                    "\"User defined text 1 (bound to \" ~ config.GetInputUserDefinedText1() ~ ')'"));
+                    "\"User defined text 1 (bound to \" ~ rcfile.GetInputUserDefinedText1() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText2",
-                    "\"User defined text 2 (bound to \" ~ config.GetInputUserDefinedText2() ~ ')'"));
+                    "\"User defined text 2 (bound to \" ~ rcfile.GetInputUserDefinedText2() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText3",
-                    "\"User defined text 3 (bound to \" ~ config.GetInputUserDefinedText3() ~ ')'"));
+                    "\"User defined text 3 (bound to \" ~ rcfile.GetInputUserDefinedText3() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText4",
-                    "\"User defined text 4 (bound to \" ~ config.GetInputUserDefinedText4() ~ ')'"));
+                    "\"User defined text 4 (bound to \" ~ rcfile.GetInputUserDefinedText4() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText5",
-                    "\"User defined text 5 (bound to \" ~ config.GetInputUserDefinedText5() ~ ')'"));
+                    "\"User defined text 5 (bound to \" ~ rcfile.GetInputUserDefinedText5() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText6",
-                    "\"User defined text 6 (bound to \" ~ config.GetInputUserDefinedText6() ~ ')'"));
+                    "\"User defined text 6 (bound to \" ~ rcfile.GetInputUserDefinedText6() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText7",
-                    "\"User defined text 7 (bound to \" ~ config.GetInputUserDefinedText7() ~ ')'"));
+                    "\"User defined text 7 (bound to \" ~ rcfile.GetInputUserDefinedText7() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText8",
-                    "\"User defined text 8 (bound to \" ~ config.GetInputUserDefinedText8() ~ ')'"));
+                    "\"User defined text 8 (bound to \" ~ rcfile.GetInputUserDefinedText8() ~ ')'"));
     mixin(AddEntry!("Terminal", "UserDefinedText9",
-                    "\"User defined text 9 (bound to \" ~ config.GetInputUserDefinedText9() ~ ')'"));
+                    "\"User defined text 9 (bound to \" ~ rcfile.GetInputUserDefinedText9() ~ ')'"));
   }
   
   void ApplyChangesInTerminal()
   {
     bool changed = false;
     
-    changed |= config.ResetStringz("Terminal", "Font", fontButton_.getFontName());
+    changed |= rcfile.ResetStringz("Terminal", "Font", fontButton_.getFontName());
     
     mixin(CheckColorButton!("Terminal", "ColorForeground"));
     mixin(CheckColorButton!("Terminal", "ColorBackground"));
     
-    changed |= config.ResetDouble("Terminal", "BackgroundTransparency", sbTransparency_.getValue());
+    changed |= rcfile.ResetDouble("Terminal", "BackgroundTransparency", sbTransparency_.getValue());
     
-    changed |= config.ResetStringz("Terminal", "PROMPT",  entPROMPT_ .getText());
-    changed |= config.ResetStringz("Terminal", "RPROMPT", entRPROMPT_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "PROMPT",  entPROMPT_ .getText());
+    changed |= rcfile.ResetStringz("Terminal", "RPROMPT", entRPROMPT_.getText());
     
     mixin(CheckCheckButton!("Terminal", "EnablePathExpansion"));
     
     // check whether replace targets have "<n>"
     string targetL = entReplaceTargetLeft_.getText();
     if(targetL.containsPattern("<n>")){
-      changed |= config.ResetStringz("Terminal", "ReplaceTargetLeft" , targetL);
+      changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetLeft" , targetL);
     }
     else{
       PopupBox.error(targetL ~ " is neglected since the signature for replace should contain \"<n>\".", "");
     }
     string targetR = entReplaceTargetRight_.getText();
     if(targetR.containsPattern("<n>")){
-      changed |= config.ResetStringz("Terminal", "ReplaceTargetRight", targetR);
+      changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetRight", targetR);
     }
     else{
       PopupBox.error(targetR ~ " is neglected since the signature for replace should contain \"<n>\".", "");
     }
     
-    changed |= config.ResetStringz("Terminal", "UserDefinedText1", entUserDefinedText1_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText2", entUserDefinedText2_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText3", entUserDefinedText3_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText4", entUserDefinedText4_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText5", entUserDefinedText5_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText6", entUserDefinedText6_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText7", entUserDefinedText7_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText8", entUserDefinedText8_.getText());
-    changed |= config.ResetStringz("Terminal", "UserDefinedText9", entUserDefinedText9_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText1", entUserDefinedText1_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText2", entUserDefinedText2_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText3", entUserDefinedText3_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText4", entUserDefinedText4_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText5", entUserDefinedText5_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText6", entUserDefinedText6_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText7", entUserDefinedText7_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText8", entUserDefinedText8_.getText());
+    changed |= rcfile.ResetStringz("Terminal", "UserDefinedText9", entUserDefinedText9_.getText());
     
     if(changed){
       pageList.NotifyApplyTerminalPreferences();
@@ -527,13 +528,13 @@ private:
     
     AttachSectionLabel(pageDirectories_, row++, "Miscellaneous");
     
-    initialDirLEntry_ = new Entry(NonnullString(config.GetInitialDirectoryLeft()));
+    initialDirLEntry_ = new Entry(NonnullString(rcfile.GetInitialDirectoryLeft()));
     AttachPairWidget(pageDirectories_, row++, "Initial directory for left pane:  ", initialDirLEntry_);
     
-    initialDirREntry_ = new Entry(NonnullString(config.GetInitialDirectoryRight()));
+    initialDirREntry_ = new Entry(NonnullString(rcfile.GetInitialDirectoryRight()));
     AttachPairWidget(pageDirectories_, row++, "Initial directory for right pane: ", initialDirREntry_);
     
-    sshOptionEntry_ = new Entry(NonnullString(config.GetSSHOption()));
+    sshOptionEntry_ = new Entry(NonnullString(rcfile.GetSSHOption()));
     AttachPairWidget(pageDirectories_, row++, "Command-line option for SSH: ", sshOptionEntry_);
     
     AttachSectionLabel(pageDirectories_, row++, "Directory shortcuts");
@@ -569,7 +570,7 @@ private:
     shortcutsStore_ = new ListStore([GType.STRING, GType.STRING]);
     shortcuts_.setModel(shortcutsStore_);
     
-    foreach(shortcut; config.GetShortcuts()){
+    foreach(shortcut; rcfile.GetShortcuts()){
       TreeIter iter = new TreeIter;
       shortcutsStore_.append(iter);
       shortcutsStore_.setValue(iter, 0, shortcut.label_);
@@ -579,10 +580,10 @@ private:
   
   void ApplyChangesInDirectories()
   {
-    config.ResetStringz("Directories", "InitialDirectoryLeft",  AppendSlash(initialDirLEntry_.getText()));
-    config.ResetStringz("Directories", "InitialDirectoryRight", AppendSlash(initialDirREntry_.getText()));
+    rcfile.ResetStringz("Directories", "InitialDirectoryLeft",  AppendSlash(initialDirLEntry_.getText()));
+    rcfile.ResetStringz("Directories", "InitialDirectoryRight", AppendSlash(initialDirREntry_.getText()));
     
-    Shortcut[] list;
+    rcfile.Shortcut[] list;
     TreeIter iter = new TreeIter;
     iter.setModel(shortcutsStore_);
     if(shortcutsStore_.getIterFirst(iter)){// ListStore is not empty
@@ -596,7 +597,7 @@ private:
         }
         
         if(DirectoryExists(path)){
-          list ~= Shortcut(label, path);
+          list ~= rcfile.Shortcut(label, path);
         }
         else{
           invalidPaths ~= path;
@@ -613,7 +614,7 @@ private:
       }
     }
     
-    config.ResetShortcuts(list);
+    rcfile.ResetShortcuts(list);
   }
   
   void CellEdited(int idx, string modelIdentifier, string transformFun = "")(
@@ -722,7 +723,7 @@ private:
   
   void ApplyChangesInSSH()
   {
-    config.ResetStringz("SSH", "SSHOption", sshOptionEntry_.getText());
+    rcfile.ResetStringz("SSH", "SSHOption", sshOptionEntry_.getText());
     
     string[] list;
     TreeIter iter = new TreeIter;
@@ -739,7 +740,7 @@ private:
       while(hostsStore_.iterNext(iter));
     }
     
-    config.ResetRemoteHosts(list);
+    rcfile.ResetRemoteHosts(list);
   }
   
   // right click menu
@@ -777,7 +778,7 @@ private:
       ApplyChangesInTerminal();
       ApplyChangesInDirectories();
       ApplyChangesInSSH();
-      config.Write();
+      rcfile.Write();
     }
     
     if(responseID != GtkResponseType.GTK_RESPONSE_APPLY){
@@ -792,7 +793,7 @@ private template AddSpinButton(string group, string key, string args, string exp
   const string AddSpinButton =
     "
     sb" ~ key ~ "_ = new SpinButton(" ~ args ~ ");
-    sb" ~ key ~ "_.setValue(config.Get" ~ key ~ "());
+    sb" ~ key ~ "_.setValue(rcfile.Get" ~ key ~ "());
     AttachPairWidget(page" ~ group ~ "_, row++, \"" ~ explanation ~ "\", sb" ~ key ~ "_);
     ";
 }
@@ -800,7 +801,7 @@ private template CheckSpinButton(string key)// currently only for "Layout" group
 {
   const string CheckSpinButton =
     "
-    changed |= config.ResetInteger(\"Layout\", \"" ~ key ~ "\", sb" ~ key ~ "_.getValueAsInt());
+    changed |= rcfile.ResetInteger(\"Layout\", \"" ~ key ~ "\", sb" ~ key ~ "_.getValueAsInt());
     ";
 }
 
@@ -810,7 +811,7 @@ private template AddCheckButton(string group, string key, string explanation)
   const string AddCheckButton =
     "
     cb" ~ key ~ "_ = new CheckButton(\"" ~ explanation ~ "\");
-    cb" ~ key ~ "_.setActive(config.Get" ~ key ~ "());
+    cb" ~ key ~ "_.setActive(rcfile.Get" ~ key ~ "());
     page" ~ group ~ "_.attach(Alignment.west(cb" ~ key ~ "_), 0, 2, row, row+1,
                               GtkAttachOptions.FILL, cast(GtkAttachOptions)0, XPadding, YPadding);
     ++row;
@@ -820,7 +821,7 @@ private template CheckCheckButton(string group, string key)
 {
   const string CheckCheckButton =
     "
-    changed |= config.ResetBoolean(\"" ~ group ~ "\", \"" ~ key ~ "\", cb" ~ key ~ "_.getActive() != 0);
+    changed |= rcfile.ResetBoolean(\"" ~ group ~ "\", \"" ~ key ~ "\", cb" ~ key ~ "_.getActive() != 0);
     ";
 }
 
@@ -831,7 +832,7 @@ private template AddColorButton(string group, string key, string explanation)
     "
     {
       GdkColor color;
-      Color.parse(config.Get" ~ key ~ "(), color);
+      Color.parse(rcfile.Get" ~ key ~ "(), color);
       cb" ~ key ~ "_ = new ColorButton(new Color(&color));
       AttachPairWidget(page" ~ group ~ "_, row++, \"" ~ explanation ~ "\", cb" ~ key ~ "_);
     }
@@ -844,7 +845,7 @@ private template CheckColorButton(string group, string key)
     {
       Color temp = new Color;
       cb" ~ key ~ "_.getColor(temp);
-      changed |= config.ResetStringz(\"" ~ group ~ "\", \"" ~ key ~ "\", temp.toString());
+      changed |= rcfile.ResetStringz(\"" ~ group ~ "\", \"" ~ key ~ "\", temp.toString());
     }
     ";
 }
@@ -854,7 +855,7 @@ private template AddEntry(string group, string key, string explanation, string t
 {
   const string AddEntry =
     "
-    ent" ~ key ~ "_ = new Entry(NonnullString(config.Get" ~ key ~ "()));
+    ent" ~ key ~ "_ = new Entry(NonnullString(rcfile.Get" ~ key ~ "()));
     AttachPairWidget(page" ~ group ~ "_, row++, " ~ explanation ~ ", ent" ~ key ~ "_, \"" ~ tooltip ~ "\");
     ";
 }

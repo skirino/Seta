@@ -41,12 +41,13 @@ private import tango.stdc.posix.unistd;
 
 private import utils.stringUtil;
 private import constants;
-private import configDialog;
+private import rcfile = config.rcfile;
+private import config.dialog;
 private import inputDialog;
 private import transferFiles;
 private import fileView;
 private import rename.dialog;
-private import scripts;
+private import scripts = config.nautilus_scripts;
 
 
 void LaunchApp(AppInfoIF appInfo, File f)
@@ -305,13 +306,13 @@ private:
   void AddDirectoryShortcutFun(MenuItem item)
   {
     string path = (nameCursor_ == "../" ? ParentDirectory(pwd_) : (pwd_ ~ nameCursor_));
-    config.AddDirectoryShortcut(path);
+    rcfile.AddDirectoryShortcut(path);
   }
   
   
   
   /////////////////// nautilus-scripts
-  void AppendScriptDirectory(Menu m, ScriptsDir dir)
+  void AppendScriptDirectory(Menu m, scripts.ScriptsDir dir)
   {
     auto item = new MenuItem(RemoveSlash(dir.GetName()), false);
     m.append(item);
