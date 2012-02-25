@@ -20,6 +20,9 @@ MA 02110-1301 USA.
 
 module threadList;
 
+private import gdk.Window;
+private import gdk.Cursor;
+private import gtk.Main;
 private import gtk.PopupBox;
 
 private import tango.io.Stdout;
@@ -38,21 +41,39 @@ private enum ThreadInfoState
 template ListedOperationT()
 {
   uint threadID_;
-  
+
   void Register()
   {
     threadID_ = ThreadStart(this);
   }
-  
+
   void Unregister()
   {
     ThreadEnd(threadID_);
+  }
+
+  void ChangeMouseCursorDefault()
+  {
+    auto w = GetAssociatedWindow();
+    if(w !is null){
+      w.setCursor(new gdk.Cursor.Cursor(GdkCursorType.LEFT_PTR));
+    }
+  }
+  void ChangeMouseCursorWaiting()
+  {
+    auto w = GetAssociatedWindow();
+    if(w !is null){
+      w.setCursor(new gdk.Cursor.Cursor(GdkCursorType.WATCH));
+    }
   }
 }
 
 interface ListedOperationIF
 {
   string GetThreadListLabel(string startTime);
+
+  // override this to change mouse cursor during the execution of this thread
+  gdk.Window.Window GetAssociatedWindow();
 }
 
 interface StoppableOperationIF : ListedOperationIF
@@ -68,14 +89,14 @@ private:
   ThreadInfoState state_;
   ulong timeStart_;
   ListedOperationIF th_;
-  
+
   this()
   {
     state_ = ThreadInfoState.INVALID;
   }
-  
+
   string StartTimeStr(){return "started at " ~ EpochTimeToStringSeconds(timeStart_);}
-  
+
   void ForceStopThread()
   {
     if(state_ == ThreadInfoState.RUNNING){
@@ -86,7 +107,7 @@ private:
       }
     }
   }
-  
+
 public:
   void StopThread(T)(T t)
   {
@@ -104,12 +125,12 @@ public:
       }
     }
   }
-  
+
   string GetLabel()
   {
     return th_.GetThreadListLabel(StartTimeStr());
   }
-  
+
   int opCmp(Object rhs){return cast(int)(timeStart_ - (cast(ThreadInfo)rhs).timeStart_);}
 }
 
@@ -136,6 +157,7 @@ void Finish()
   }
 }
 
+
 ThreadInfo[] GetWorkingThreadList()
 {
   // pick up RUNNING threads
@@ -145,17 +167,20 @@ ThreadInfo[] GetWorkingThreadList()
       ret ~= info;
     }
   }
-  
+
   // sort by timeStart_, since order of threads in the list is completely random
   ret.sort;
-  
+
   return ret;
 }
+
 
 uint ThreadStart(ListedOperationIF th)
 {
   // called before spawning the thread, no need of gdk lock stuff
-  
+
+  ChangeMouseCursorWaiting(th.GetAssociatedWindow());
+
   // register the thread to list (use INVALID element in the vector)
   uint idx = 0;
   foreach(info; list.array()){
@@ -164,24 +189,34 @@ uint ThreadStart(ListedOperationIF th)
     }
     ++idx;
   }
-  
+
   if(idx == list.size()){// no INVALID elements in the list, append one
     list.append(new ThreadInfo);
   }
-  
+
   list[idx].state_ = ThreadInfoState.RUNNING;
   list[idx].timeStart_ = GetCurrentTime();
   list[idx].th_ = th;
-  
+
   return idx;
 }
 
 void ThreadEnd(uint idx)
 {
   // gdk lock should be held by the caller
-  
+
   // reset list[idx]
   list[idx].state_ = ThreadInfoState.INVALID;
+  ChangeMouseCursorDefault(list[idx].th_.GetAssociatedWindow());
   list[idx].th_ = null;
 }
 
+
+private void ChangeMouseCursor(GdkCursorType type)(gdk.Window.Window w)
+{
+  if(w !is null){
+    w.setCursor(new gdk.Cursor.Cursor(type));
+  }
+}
+private alias ChangeMouseCursor!(GdkCursorType.LEFT_PTR) ChangeMouseCursorDefault;
+private alias ChangeMouseCursor!(GdkCursorType.WATCH)    ChangeMouseCursorWaiting;

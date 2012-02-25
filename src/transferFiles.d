@@ -221,6 +221,10 @@ class TransferFilesThread(bool move) : Thread, StoppableOperationIF
       '(' ~ startTime ~ ", now finished " ~ PluralForm!(uint, "item")(numTransferred_) ~ ").\nStop this thread?";
   }
   
+  gdk.Window.Window GetAssociatedWindow(){return null;}
+  
+  
+  
 private:
   // utils for message strings
   static if(move){

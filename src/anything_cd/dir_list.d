@@ -22,6 +22,7 @@ module anything_cd.dir_list;
 
 private import gio.FileInfo;
 private import gdk.Threads;
+private import gdk.Window;
 
 private import tango.io.Stdout;
 private import tango.io.stream.Lines;
@@ -143,6 +144,10 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
   {
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
   }
+  
+  gdk.Window.Window GetAssociatedWindow(){return null;}
+  
+  
   
   void Start()
   {

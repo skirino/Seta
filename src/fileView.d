@@ -346,7 +346,7 @@ private:
     
     prepareUpdateThread_ =
       new PrepareDirEntriesThread(
-        true, dir,
+        true, dir, this,
         mixin(RuntimeDispatch3!("&SetRowsCallback", "true", "appendToHistory", "notifyTerminal")),
         eList_.GetDTemp(), eList_.GetFTemp(), eList_.GetDFiltered(), eList_.GetFFiltered());
     prepareUpdateThread_.SetForEnumerate(remote, fileInfoAttributes_, dirFile);
@@ -363,7 +363,7 @@ private:
     // reuse previous results (which are stored in entriesDAll_ and entriesFAll_)
     prepareUpdateThread_ =
       new PrepareDirEntriesThread(
-        false, pwd_,
+        false, pwd_, this,
         &SetRowsCallback!(false, false, false),
         eList_.GetDAll(), eList_.GetFAll(), eList_.GetDFiltered(), eList_.GetFFiltered());
     prepareUpdateThread_.SetForFilter(showHidden_, filterText_);

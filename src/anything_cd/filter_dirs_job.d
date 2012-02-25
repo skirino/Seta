@@ -70,6 +70,8 @@ public:
     return "Filtering directories in the whole file tree (" ~ startTime ~ ')';
   }
   
+  gdk.Window.Window GetAssociatedWindow(){return null;}
+  
   void Stop()
   {
     canceled_ = true;

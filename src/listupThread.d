@@ -24,6 +24,7 @@ private import gio.File;
 private import gio.FileInfo;
 private import gio.FileEnumerator;
 private import gdk.Threads;
+private import gtk.Widget;
 private import gtk.TreeView;
 
 private import tango.io.Stdout;
@@ -43,6 +44,7 @@ private:
   mixin ListedOperationT;
   bool canceled_;
   string dir_;
+  Widget fv_;
   
   // directory entries (reference to class fields in FileView)
   Vector!(DirEntry) entriesDAll_;
@@ -319,6 +321,7 @@ public:
   this(
     bool readDisk,
     string dir,
+    Widget fv,
     void delegate(bool, string, File) callback,
     Vector!(DirEntry) entriesD,
     Vector!(DirEntry) entriesF,
@@ -333,6 +336,7 @@ public:
     }
     canceled_ = false;
     dir_ = dir;
+    fv_ = fv;
     setRowsCallback_ = callback;
     
     // if(readDisk) : entriesD is already filled by valid entries
@@ -358,6 +362,11 @@ public:
   string GetStopDialogLabel(string startTime)
   {
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
+  }
+  
+  gdk.Window.Window GetAssociatedWindow()
+  {
+    return (fv_ is null) ? null : fv_.getWindow();
   }
   
   

@@ -626,7 +626,11 @@ private:
     {
       return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
     }
+    
+    gdk.Window.Window GetAssociatedWindow(){return null;}
   }
+  
+  
   
 public:
   void StartSSH(SSHConnection con)

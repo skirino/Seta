@@ -633,6 +633,8 @@ private:
     {
       return "Mounting " ~ con_.GetUserDomain() ~ " (" ~ startTime ~ ')';
     }
+    
+    gdk.Window.Window GetAssociatedWindow(){return null;}
   }
   
   SFTPMountStarter sftpStarter_;
