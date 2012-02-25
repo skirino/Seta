@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010 Shunsuke Kirino <shunsuke.kirino@gmail.com>
+Copyright (C) 2012 Shunsuke Kirino <shunsuke.kirino@gmail.com>
 
 This file is part of Seta.
 This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@ private import sshConnection;
 private import pageList;
 
 
-static const string SetaVersion = "0.5.6";
+static const string SetaVersion = "0.6.1";
 
 void Init()
 {
