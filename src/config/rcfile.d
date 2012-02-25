@@ -216,7 +216,7 @@ Shortcut[] GetShortcuts()
   if(instance_.hasKey("Directories", "Shortcuts")){
     string contents = instance_.getString("Directories", "Shortcuts");
     string[] list = contents.split(SeparatorShortcutList);
-    
+
     Shortcut[] ret;
     foreach(s; list){
       Shortcut temp;
@@ -224,7 +224,7 @@ Shortcut[] GetShortcuts()
         ret ~= temp;
       }
     }
-    
+
     return ret;
   }
   else{
@@ -246,7 +246,7 @@ string GetNthShortcut(uint n)
 void AddDirectoryShortcut(string path)
 {
   instance_.changed_ = true;
-  
+
   Shortcut[] list = GetShortcuts();
   list ~= Shortcut(GetBasename(path), path);
   ResetShortcuts(list);
@@ -255,7 +255,7 @@ void AddDirectoryShortcut(string path)
 void RemoveDirectoryShortcut(string path)
 {
   instance_.changed_ = true;
-  
+
   if(instance_.hasKey("Directories", "Shortcuts")){
     Shortcut[] old = GetShortcuts();
     Shortcut[] list;
@@ -271,7 +271,7 @@ void RemoveDirectoryShortcut(string path)
 void ResetShortcuts(Shortcut[] list)
 {
   Shortcut[] old = GetShortcuts();
-  
+
   bool same = list.length == old.length;
   if(same){
     foreach(i, l; list){
@@ -281,7 +281,7 @@ void ResetShortcuts(Shortcut[] list)
       }
     }
   }
-  
+
   if(!same){
     string s = ToStringArray(list).join(SeparatorShortcutList);
     instance_.setString("Directories", "Shortcuts", NonnullString(s));
@@ -304,7 +304,7 @@ string[] GetSSHHosts()
 void AddSSHHost(SSHConnection con)
 {
   instance_.changed_ = true;
-  
+
   string s = con.toStr!(true)();
   if(instance_.hasKey("SSH", "Hosts")){
     string older = instance_.getString("SSH", "Hosts");
@@ -319,12 +319,12 @@ void AddSSHHost(SSHConnection con)
 void RemoveSSHHost(SSHConnection con)
 {
   instance_.changed_ = true;
-  
+
   known_hosts.Unregister(con);
   if(instance_.hasKey("SSH", "Hosts")){
     string s1 = con.toStr!(true)();
     string s2 = con.toStr!(false)();
-    
+
     string older = instance_.getString("SSH", "Hosts");
     string[] hosts = split(older, ",");
     string[] newhosts;
@@ -396,18 +396,18 @@ private:
   bool changed_;
   string filename_;
   KeyCode[][string] dictKeybind_;
-  
+
   this()
   {
     super();
     setListSeparator(',');
-    
+
     changed_ = false;
     filename_ = Environment.get("HOME") ~ "/.setarc";
     bool exist = Exists(filename_);
     if(exist){
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
-      
+
       uint len;
       if(getGroups(len) == ["Version", "Layout", "Terminal", "Directories", "SSH", "Keybind"]){
         if(getString("Version", "Version") != SetaVersion){// .setarc is old
@@ -425,7 +425,7 @@ private:
       loadFromData(defaultContents, defaultContents.length, GKeyFileFlags.KEEP_COMMENTS);
       changed_ = true;
     }
-    
+
     // fill default values
     // [Layout]
     mixin(SetDefaultValue!("Integer", "Layout", "WindowSizeH", "1600"));
@@ -433,7 +433,7 @@ private:
     mixin(SetDefaultValue!("Integer", "Layout", "SplitH",      "800"));
     mixin(SetDefaultValue!("Integer", "Layout", "SplitVLeft",  "450"));
     mixin(SetDefaultValue!("Integer", "Layout", "SplitVRight", "450"));
-    
+
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowBackButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowForwardButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowUpButton", "true"));
@@ -445,24 +445,24 @@ private:
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowHiddenButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowDirTreeButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowFilter", "true"));
-    
+
     mixin(SetDefaultValue!("Integer", "Layout", "WidthFilterEntry",    "120"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthShortcutButton", "80"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthDirectoryTree",  "0"));
-    
+
     mixin(SetDefaultValue!("Integer", "Layout", "WidthType", "120"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthSize", "70"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthOwner", "70"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthPermissions", "85"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthLastModified", "125"));
-    
+
     mixin(SetDefaultValue!("Integer", "Layout", "HeightStatusbar", "20"));
-    
+
     mixin(SetDefaultValue!("String", "Layout", "ColorDirectory",  "\"#0000FF\""));
     mixin(SetDefaultValue!("String", "Layout", "ColorFile",       "\"#000000\""));
     mixin(SetDefaultValue!("String", "Layout", "ColorSymlink",    "\"#20B0E0\""));
     mixin(SetDefaultValue!("String", "Layout", "ColorExecutable", "\"#228B22\""));
-    
+
     // [Terminal]
     GdkColor colorTest;
     if(!hasKey("Terminal", "ColorForeground") ||
@@ -477,11 +477,11 @@ private:
     mixin(SetDefaultValue!("Double", "Terminal", "BackgroundTransparency", "0.0"));
     mixin(SetDefaultValue!("String", "Terminal", "PROMPT", "Environment.get(\"USER\") ~ \"@\""));
     mixin(SetDefaultValue!("String", "Terminal", "RPROMPT", "\"\""));
-    
+
     mixin(SetDefaultValue!("Boolean","Terminal", "EnablePathExpansion", "true"));
     mixin(SetDefaultValue!("String", "Terminal", "ReplaceTargetLeft" , "\"$L<n>DIR\""));
     mixin(SetDefaultValue!("String", "Terminal", "ReplaceTargetRight", "\"$R<n>DIR\""));
-    
+
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText1", "\"\""));
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText2", "\"\""));
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText3", "\"\""));
@@ -491,7 +491,7 @@ private:
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText7", "\"\""));
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText8", "\"\""));
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText9", "\"\""));
-    
+
     // [Directories]
     // check if entry is an existing directory
     bool setHomeDirL = true;
@@ -506,7 +506,7 @@ private:
       changed_ = true;
       setString("Directories", "InitialDirectoryLeft", AppendSlash(Environment.get("HOME")));
     }
-    
+
     bool setHomeDirR = true;
     if(hasKey("Directories", "InitialDirectoryRight")){
       string initialDir = trim(getString("Directories", "InitialDirectoryRight"));
@@ -519,25 +519,25 @@ private:
       changed_ = true;
       setString("Directories", "InitialDirectoryRight", AppendSlash(Environment.get("HOME")));
     }
-    
+
     mixin(SetDefaultValue!("String", "Directories", "Shortcuts", "\"\""));
-    
+
     // [SSH]
     mixin(SetDefaultValue!("String", "SSH", "Hosts", "\"\""));
     mixin(SetDefaultValue!("String", "SSH", "SSHOption", "\"-X\""));
-    
+
     // [Keybind]
     InstallKeybinds();
-    
+
     // register SSH hosts
     known_hosts.Register(GetSSHHosts());
   }
-  
+
   void Write()
   {
     if(changed_){
       changed_ = false;
-      
+
       // "scope" storage-class specifier is necessary to remove segfault at shutdown of Seta
       scope File f = File.parseName(filename_);
       scope FileOutputStream fs = f.replace(null, 1, GFileCreateFlags.NONE, null);
@@ -547,7 +547,7 @@ private:
       fs.close(null);
     }
   }
-  
+
   void InstallKeybinds()
   {
     mixin(InstallKeybind!("MainWindowAction.CreateNewPage"      , "<Alt>t,<Shift><Control>t"));
@@ -564,7 +564,7 @@ private:
     mixin(InstallKeybind!("MainWindowAction.ShowConfigDialog"   , "<Shift><Control>Escape"));
     mixin(InstallKeybind!("MainWindowAction.ToggleFullscreen"   , "F11"));
     mixin(InstallKeybind!("MainWindowAction.QuitApplication"    , "<Shift><Control>q"));
-    
+
     mixin(InstallKeybind!("FileManagerAction.GoToPrevious"    , "<Alt>b,<Shift><Control>b,<Alt>Left"));
     mixin(InstallKeybind!("FileManagerAction.GoToNext"        , "<Alt>f,<Alt>Right"));
     mixin(InstallKeybind!("FileManagerAction.GoToParent"      , "<Alt>p,<Shift><Control>p,<Alt>Up"));
@@ -586,7 +586,7 @@ private:
     mixin(InstallKeybind!("FileManagerAction.GoToDir7"        , "<Alt>7"));
     mixin(InstallKeybind!("FileManagerAction.GoToDir8"        , "<Alt>8"));
     mixin(InstallKeybind!("FileManagerAction.GoToDir9"        , "<Alt>9"));
-    
+
     mixin(InstallKeybind!("FileViewAction.SelectAll"    , "<Control>a"));
     mixin(InstallKeybind!("FileViewAction.SelectRow"    , "space,<Control>space"));
     mixin(InstallKeybind!("FileViewAction.Cut"          , "<Control>x"));
@@ -598,7 +598,7 @@ private:
     mixin(InstallKeybind!("FileViewAction.MoveToTrash"  , "F8"));
     mixin(InstallKeybind!("FileViewAction.FocusFilter"  , "<Control>f"));
     mixin(InstallKeybind!("FileViewAction.ClearFilter"  , "<Shift><Control>f"));
-    
+
     mixin(InstallKeybind!("TerminalAction.Copy"          , "<Shift><Control>c"));
     mixin(InstallKeybind!("TerminalAction.Paste"         , "<Shift><Control>v"));
     mixin(InstallKeybind!("TerminalAction.PasteFilePaths", "<Shift><Control>y"));
@@ -616,7 +616,7 @@ private:
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText8", "<Alt>8"));
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText9", "<Alt>9"));
   }
-  
+
   string[] GetSSHHosts()
   {
     if(hasKey("SSH", "Hosts")){

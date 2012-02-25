@@ -58,7 +58,7 @@ private:
   string delegate() getPWD_;
   bool delegate(string dirname) cdFileManager_;
   int[string] openedDirs_;
-  
+
 public:
   this(
     string delegate() getPWD,
@@ -69,20 +69,20 @@ public:
     workspace_ = new Vector!(string)(100);
     getPWD_ = getPWD;
     cdFileManager_ = cdFileManager;
-    
+
     super();
     setHeadersVisible(0);
     setShowExpanders(1);
     setHoverExpand(0);
-    
+
     store_ = new TreeStore([GType.STRING]);
     setModel(store_);
-    
+
     CellRenderer renderer = new CellRendererText;
     col_ = new TreeViewColumn("directory", renderer, "text", 0);
     col_.setSizing(GtkTreeViewColumnSizing.AUTOSIZE);
     appendColumn(col_);
-    
+
     addOnShow(&OnShow);
     addOnHide(&OnHide);
     addOnRowActivated(&RowActivated);
@@ -90,17 +90,17 @@ public:
     addOnTestExpandRow(&TestExpandRow);
     addOnRowExpanded(&RowExpanded);
     addOnRowCollapsed(&RowCollapsed);
-    
+
     InitDragAndDropFunctionality();
-    
+
     setHasTooltip(1);
     addOnQueryTooltip(&TooltipCallback);
-    
+
     // setup root directory
     rootDir_ = "/";
     AddPathWithDummyChild!(false)(rootDir_, null);
   }
-  
+
   void SetShowHidden(bool b)
   {
     if(showHidden_ != b){
@@ -110,15 +110,15 @@ public:
       }
     }
   }
-  
+
   void ChangeDirectory(string fullpath)
   {
     assert(fullpath.StartsWith(rootDir_));
-    
+
     if(!widgetShown_){
       return;
     }
-    
+
     TreeIter iter;
     if(fullpath in openedDirs_){
       iter = GetIterOpened(fullpath);
@@ -130,22 +130,22 @@ public:
       string name = fullpath[parentDir.length .. $];
       iter = GetChildIterForName(name, fullpath, iterParent);
     }
-    
+
     ScrollToIter(iter);
   }
-  
+
   void ReconstructFromOpenedDirs()
   {
     string[] keys = openedDirs_.keys;
     keys.sort.reverse;
-    
+
     RemoveAll();
-    
+
     foreach(key; keys){
       RecursiveExpandTo(key);
     }
   }
-  
+
   void RemoveUnmountedPath(string fullpath)
   {
     // remove rows for its children
@@ -154,7 +154,7 @@ public:
       RemoveAllChildren(iter);
       RemovePathFromOpenedDirs(fullpath);
     }
-    
+
     // remove row for itself
     string parent = ParentDirectory(fullpath);
     if(parent in openedDirs_){
@@ -165,7 +165,7 @@ public:
       }
     }
   }
-  
+
   void Update(string dirname)
   {
     if(!widgetShown_){
@@ -174,12 +174,12 @@ public:
     if(!(dirname in openedDirs_)){
       return;
     }
-    
+
     ReconstructFromOpenedDirs();
   }
-  
-  
-  
+
+
+
   ///////////////////// callbacks
 private:
   void OnShow(Widget w)
@@ -198,20 +198,20 @@ private:
     }
     ScrollToIter(iter);
   }
-  
+
   void OnHide(Widget w)
   {
     widgetShown_ = false;
     RemoveAll();
   }
-  
+
   void RowActivated(TreePath path, TreeViewColumn col, TreeView view)
   {
     TreeIter iter = GetIter(store_, path);
-    
+
     string fullpath = GetFullPath(iter);
     TryGoToDirectory(fullpath);
-    
+
     // now "iter" and "path" may be invalid.
     string parent = ParentDirectory(fullpath);
     TreeIter iterParent = GetIterOpened(parent);
@@ -230,7 +230,7 @@ private:
       else{
         // does not have any children at this time, rescan
         mixin(RuntimeDispatch1!("ScanChildren", "showHidden_", "(iter, fullpath)") ~ ';');
-        
+
         expandRow(p, 0);
       }
       p.free();
@@ -255,20 +255,20 @@ private:
   bool TestExpandRow(TreeIter iter, TreePath path, TreeView view)
   {
     RemoveAllChildren(iter);
-    
+
     string fullpath = GetFullPath(iter);
     mixin(RuntimeDispatch1!("ScanChildren", "showHidden_", "(iter, fullpath)") ~ ';');
-    
+
     // run default handler to expand
     // (does nothing when no child is appended)
     return false;
   }
-  
+
   void RowExpanded(TreeIter iter, TreePath path, TreeView view)
   {
     openedDirs_[GetFullPath(iter)] = 1;
   }
-  
+
   void RowCollapsed(TreeIter iter, TreePath path, TreeView view)
   {
     RemovePathFromOpenedDirs(GetFullPath(iter));
@@ -282,7 +282,7 @@ private:
       }
     }
   }
-  
+
   bool TooltipCallback(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
   {
     TreeModelIF model;
@@ -301,10 +301,10 @@ private:
     return false;
   }
   ///////////////////// callbacks
-  
-  
-  
-  
+
+
+
+
   TreeIter GetChildIterForName(string name, string fullpath, TreeIter parent)
   {
     if(name[0] == '.' && !showHidden_ && !(fullpath in openedDirs_)){
@@ -315,7 +315,7 @@ private:
       return FindChildForName(name, parent);
     }
   }
-  
+
   TreeIter FindChildForName(string name, TreeIter parent)
   {
     TreeIter child = new TreeIter;
@@ -330,12 +330,12 @@ private:
     }
     return null;
   }
-  
+
   TreeIter GetIterForRoot()
   {
     return GetIterFirst(store_);
   }
-  
+
   TreeIter GetIterOpened(string fullpath)
   {
     TreeIter iter = GetIterForRoot();
@@ -381,7 +381,7 @@ private:
   {
     string[] keys = openedDirs_.keys;
     keys.sort;
-    
+
     string[] reopen;
     foreach(key; keys){
       if(key.StartsWith(fullpath)){
@@ -394,13 +394,13 @@ private:
         }
       }
     }
-    
+
     reopen.reverse;
     foreach(dir; reopen){
       RecursiveExpandTo(dir);
     }
   }
-  
+
   void RemoveAll()
   {
     TreeIter root = GetIterForRoot();
@@ -408,7 +408,7 @@ private:
     AddPathWithDummyChild!(false)(rootDir_, null);
     openedDirs_ = null;
   }
-  
+
   void RemoveAllChildren(TreeIter iter)
   {
     TreeIter child = new TreeIter;
@@ -416,7 +416,7 @@ private:
       while(store_.remove(child)){}
     }
   }
-  
+
   TreeIter AddPathWithDummyChild(bool beforeFirstRow)(string name, TreeIter parent)
   {
     static if(beforeFirstRow){
@@ -429,7 +429,7 @@ private:
     store_.append(iter);
     return iter;
   }
-  
+
   string GetFullPath(TreeIter iter)
   {
     iter.setModel(store_);
@@ -441,7 +441,7 @@ private:
     }
     return ret;
   }
-  
+
   void ScanChildren(bool showHiddenFiles)(TreeIter iter, string fullpath)
   {
     File f = File.parseName(fullpath);
@@ -463,14 +463,14 @@ private:
     catch(GException ex){
       // permission denied
     }
-    
+
     workspace_.sort(&CompareStr);
     foreach(name; workspace_.array()){
       AddPathWithDummyChild!(false)(name ~ '/', iter);
     }
     workspace_.clear();
   }
-  
+
   void TryGoToDirectory(string fullpath)
   {
     // check whether the "fullpath" exists
@@ -480,7 +480,7 @@ private:
       if(!cdFileManager_(fullpath)){// no such directory
         // remove nonexistent path from "openedDirs_" and
         // reopen originally opened directories
-        
+
         openedDirs_.remove(fullpath);
         string d = ParentDirectory(fullpath);
         while(!Exists(d)){
@@ -491,7 +491,7 @@ private:
       }
     }
   }
-  
+
   void ScrollToIter(TreeIter iter)
   {
     TreePath path = store_.getPath(iter);
@@ -499,9 +499,9 @@ private:
     scrollToCell(path, null, 1, 0.5, 0.0);
     path.free();
   }
-  
-  
-  
+
+
+
   ////////////////// drag and drop
   void InitDragAndDropFunctionality()
   {
@@ -510,7 +510,7 @@ private:
       GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
     addOnDragDataReceived(&DragDataReceived);
   }
-  
+
   void DragDataReceived(
     GdkDragContext * context, int x, int y,
     GtkSelectionData * selection, uint info, uint time, Widget w)
@@ -519,26 +519,26 @@ private:
     GtkTreeViewDropPosition pos;
     getDestRowAtPos(x, y, path, pos);
     DragAndDrop dnd = new DragAndDrop(context);
-    
+
     if(path !is null){// destination exists
       TreeIter iter = GetIter(store_, path);
       path.free();
       string fullpath = GetFullPath(iter);
       string[] files = GetFilesFromSelection(selection);
       GdkDragAction action = ExtractSuggestedAction(context);// initialize it as given by GdkDragContext
-      
+
       TransferFiles(action, files, cast(FileView)dnd.getSourceWidget(), fullpath);
     }
-    
+
     dnd.finish(1, 0, 0);
   }
   ////////////////// drag and drop
-  
-  
-  
+
+
+
   ////////////////// SFTP/SSH
   string rootDir_;
-  
+
 public:
   void StartSSH(string gvfsRoot, string initialDir)
   {
@@ -546,7 +546,7 @@ public:
     RemoveAll();
     ChangeDirectory(initialDir);
   }
-  
+
   void QuitSSH(string pwd)
   {
     rootDir_ = "/";

@@ -39,7 +39,7 @@ private:
   VolumeMonitor volumeMonitor_;
   string[] names_;
   string[] paths_;
-  
+
   void Init()
   {
     // for an unknown reason (maybe GtkD's bug)
@@ -50,22 +50,22 @@ private:
     volumeMonitor_.addOnMountRemoved(&NotifyUnmount);
     RescanAll();
   }
-  
+
   void NotifyMount(MountIF mount, VolumeMonitor monitor)
   {
     PushIntoStatusbar("\"" ~ mount.getName() ~ "\" was mounted");
     RescanAll();
     page_list.NotifyReconstructShortcuts();
   }
-  
+
   void NotifyUnmount(MountIF mount, VolumeMonitor monitor)
   {
     string name = mount.getName();
     PushIntoStatusbar("\"" ~ name ~ "\" was unmounted");
-    
+
     string[] oldpaths = paths_.dup;// explicitly make copy of dynamic array
     RescanAll();
-    
+
     if(name.StartsWith("sftp (")){
       // BUG? gvfsRoot cannot be obtained by "mount.getRoot().getPath() ~ '/'".
       // Take diff between "oldpaths" and "paths_"
@@ -85,12 +85,12 @@ private:
     }
     page_list.NotifyReconstructShortcuts();
   }
-  
+
   void RescanAll()
   {
     names_.length = 0;
     paths_.length = 0;
-    
+
     auto list = volumeMonitor_.getMounts();
     while(list !is null){
       auto mount = new Mount(cast(GMount*)list.data());
@@ -98,7 +98,7 @@ private:
       paths_ ~= mount.getRoot().getPath() ~ '/';
       list = list.next();
     }
-    
+
     // sort volumes by their paths
     size_t len = names_.length;
     for(size_t i=0; i<len; ++i){
@@ -143,7 +143,7 @@ string GetPathToNthVolume(size_t n)
 bool UnmountByPath(string path)
 {
   ListG list = monitorInstance.volumeMonitor_.getMounts();
-  
+
   while(list !is null){
     auto mount = new Mount(cast(GMount*)list.data());
     string volumePath = mount.getRoot().getPath() ~ '/';
@@ -153,7 +153,7 @@ bool UnmountByPath(string path)
     }
     list = list.next();
   }
-  
+
   // "path" not found
   return false;
 }

@@ -48,20 +48,20 @@ class Page : VBox
   /////////////////////////// GUI stuff
 private:
   Mediator mediator_;
-  
+
   HBox topBar_;
   Label hostLabel_;
   Label pwdLabel_;
   Label itemsLabel_;
-  
+
   VPaned paned_;
   FileManager filer_;
   ScrolledWindow swTerm_;// to resize Terminal widget
   Terminal terminal_;
-  
+
   // just to have reference to the tab widget
   Tab tab_;
-  
+
 public:
   this(char side,
        string initialDir,
@@ -71,17 +71,17 @@ public:
   {
     getCWDFromMain_ = GetCWDFromMain;
     appendPage_ = AppendPageCopy;
-    
+
     tab_ = new Tab(side, ClosePage);
     mediator_ = new Mediator(this);
-    
+
     Button.setIconSize(GtkIconSize.MENU);
     auto appendPageButton = new Button(StockID.ADD, &AppendPage, true);
     appendPageButton.setTooltipText("Open new tab");
     auto viewModeButton = new Button(StockID.FULLSCREEN, &ViewModeButtonClicked, true);
     viewModeButton.setTooltipText("Switch view mode");
     Button.setIconSize(GtkIconSize.BUTTON);
-    
+
     hostLabel_ = new Label("localhost");
     pwdLabel_ = new Label("");
     pwdLabel_.setEllipsize(PangoEllipsizeMode.START);
@@ -105,49 +105,49 @@ public:
     topBar_.packStart(hostLabel_, 0, 0, 10);
     topBar_.packStart(pwdLabel_, 1, 1, 0);
     topBar_.packStart(itemsLabel_, 0, 0, 10);
-    
+
     // check whether "initialDir" is a valid path or not
     if(!DirectoryExists(initialDir)){
       initialDir = Environment.get("HOME") ~ '/';
     }
-    
+
     terminal_ = new Terminal(mediator_, initialDir, GetCWDFromMain);
     filer_ = new FileManager(mediator_, initialDir);
-    
+
     mediator_.SetFiler(filer_);
     mediator_.SetTerm(terminal_);
     filer_.ChangeDirectory(initialDir, false, false);// do not notify terminal and do not append history
-    
+
     // AUTOMATIC is a workaround to resize horizontally, not for horizontal scrolling
     swTerm_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
     swTerm_.add(terminal_);
-    
+
     paned_ = new VPaned;
     paned_.pack1(filer_, 1, 0);
     paned_.pack2(swTerm_, 1, 0);
-    
+
     super(0, 0);
     packStart(topBar_, 0, 0, 0);
     packStart(paned_,  1, 1, 0);
-    
+
     addOnUnrealize(&UnregisterFromPageList);
-    
+
     showAll();
     SetLayout();
   }
-  
+
   void SetLayout()
   {
     uint split = tab_.OnLeftSide() ? rcfile.GetSplitVLeft() : rcfile.GetSplitVRight();
     paned_.setPosition(split);
   }
-  
+
   bool OnLeftSide(){return tab_.OnLeftSide();}
   Mediator GetMediator(){return mediator_;}
   FileManager GetFileManager(){return filer_;}
   Terminal GetTerminal(){return terminal_;}
   Tab GetTab(){return tab_;}
-  
+
   void UpdatePathLabel(string path, uint numItems)
   {
     string nativePath=mediator_.FileSystemNativePath(path);
@@ -155,7 +155,7 @@ public:
     tab_.SetPath(path);
     itemsLabel_.setText(PluralForm!(uint, "item")(numItems));
   }
-  
+
   void SetHostLabel(string h)
   {
     hostLabel_.setText(h);
@@ -174,24 +174,24 @@ public:
     filer_.PrepareDestroy();
   }
   /////////////////////////// GUI stuff
-  
-  
-  
+
+
+
   //////////////////////// view mode
 private:
   ViewMode mode_ = ViewMode.BOTH;// initialize BOTH to read disk at startup
   int lastSplitPosition_;
   void delegate(char) appendPage_;
-  
+
   void AppendPage(Button b)
   {
     char side = tab_.GetID()[0];
     appendPage_(side);
   }
-  
+
 public:
   ViewMode GetViewMode(){return mode_;}
-  
+
   void ViewModeButtonClicked(Button b)
   {
     switch(mode_){
@@ -207,7 +207,7 @@ public:
     default:
     }
   }
-  
+
 private:
   void TerminalMode()
   {
@@ -221,7 +221,7 @@ private:
       filer_.hideAll();
     }
   }
-  
+
   void FilerMode()
   {
     if(mode_ != ViewMode.FILER){
@@ -238,7 +238,7 @@ private:
       }
     }
   }
-  
+
   void BothMode()
   {
     if(mode_ != ViewMode.BOTH){
@@ -254,34 +254,34 @@ private:
     }
   }
   //////////////////////// view mode
-  
-  
-  
+
+
+
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
 private:
   string delegate(char, uint) getCWDFromMain_;
-  
+
 public:
   string GetCWD()
   {
     // if remote, return locally-mounted path
     return filer_.GetPWD(!mediator_.FileSystemIsRemote());
   }
-  
+
   string GetCWDOtherSide()
   {
     char side = (tab_.GetID()[0] == 'L') ? 'R' : 'L';
     return getCWDFromMain_(side, 0);
   }
-  
+
   bool LookingAtRemoteDir()
   {
     return mediator_.FileSystemLookingAtRemoteFS(filer_.GetPWD(false));
   }
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
-  
-  
-  
+
+
+
   ///////////////////////// manipulation of focus
   FocusInPage WhichIsFocused()
   {
@@ -301,10 +301,10 @@ public:
       }
     }
   }
-  
+
   void FocusLower(){terminal_.grabFocus();}
   void FocusUpper(){filer_.GrabFocus();}
-  
+
   void FocusShownWidget()
   {
     if(mode_ == ViewMode.FILER){
@@ -314,7 +314,7 @@ public:
       terminal_.grabFocus();
     }
   }
-  
+
   void MoveFocusPosition()
   {
     if(getFocusChild() !is null){
@@ -322,9 +322,9 @@ public:
     }
   }
   ///////////////////////// manipulation of focus
-  
-  
-  
+
+
+
   ///////////////////////// PageList
   // It is unsafe to make this method inline-delegate since
   // "this" parameter's address might be different inside definition of inline-delegates.

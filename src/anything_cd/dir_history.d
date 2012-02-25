@@ -57,10 +57,10 @@ private class DirPathHistory
 {
 private:
   static const size_t MAX = 1000;
-  
+
   char[] home_, filename_;
   Vector!(char[]) list_;
-  
+
 public:
   this()
   {
@@ -71,14 +71,14 @@ public:
     Push(rcfile.GetInitialDirectoryLeft());
     Push(rcfile.GetInitialDirectoryRight());
   }
-  
+
   void Push(char[] path)
   {
     if(path.StartsWith(home_)){
       path = "~" ~ path[home_.length .. $];
     }
     char[][] array = list_.array();
-    
+
     // check uniqueness of paths
     int index = -1;
     foreach(int i, dir; array){
@@ -86,7 +86,7 @@ public:
         index = i;
       }
     }
-    
+
     if(index == -1){// not found
       if(list_.size() == MAX){
         list_.pop();
@@ -97,7 +97,7 @@ public:
       list_.moveToHead(index);
     }
   }
-  
+
   void Load()
   {
     try{
@@ -111,12 +111,12 @@ public:
           }
         }
       }
-      
+
       file.close();
     }
     catch(Exception ex){}// no such file
   }
-  
+
   void Save()
   {
     scope file = new tango.io.device.File.File(filename_, tango.io.device.File.File.WriteCreate);

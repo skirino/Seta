@@ -53,7 +53,7 @@ SSHConnection SSHConnectionDialog()
   scope d = new StartSSHDialog;
   d.showAll();
   d.run();
-  
+
   SSHConnection ret = d.ret;
   return ret;
 }
@@ -67,16 +67,16 @@ class StartSSHDialog : Dialog
   SSHConnection ret;
   HostView hosts;
   TreeIter iterCursor;
-  
+
   this()
   {
     super();
     setDefaultSize(640, 400);
     addOnResponse(&Respond);
-    
+
     VBox contentArea = getContentArea();
     contentArea.setSpacing(5);
-    
+
     // RadioButton to choose whether to use SSH or not
     radio1 = new RadioButton("both sftp(gvfs) and ssh");
     radio1.setTooltipText("Mount remote filesystem using gvfs (file manager) and connect to the remotehost using SSH (terminal).\nShell commands will be executed by the remotehost.");
@@ -85,42 +85,42 @@ class StartSSHDialog : Dialog
     radio2.setTooltipText("Mount remote filesystem using gvfs (file manager) and move to the mounted directory (terminal).\nKeep working within the localhost.");
     contentArea.add(radio2);
     contentArea.add(new HSeparator());
-    
+
     // Entries to directly type user name and host name
     label1 = new Label("user name");
     entry1 = new Entry("");
-    
+
     label2 = new Label("host name");
     entry2 = new Entry("");
-    
+
     label3 = new Label("home directory (optional)");
     entry3 = new Entry("");
     const string tooltip3 = "Home directory in the remote host for user.";
     label3.setTooltipText(tooltip3);
     entry3.setTooltipText(tooltip3);
-    
+
     label4 = new Label("PROMPT (optional)");
     entry4 = new Entry("");
     const string tooltip4 = "$PROMPT in the remote shell such as \"username@system\".\nWorks as a hint to extract command-line arguments in terminal.";
     label4.setTooltipText(tooltip4);
     entry4.setTooltipText(tooltip4);
-    
+
     label5 = new Label("RPROMPT (optional)");
     entry5 = new Entry("");
     const string tooltip5 = "$RPROMPT in zsh.\nWorks as a hint to extract command-line arguments in terminal.";
     label5.setTooltipText(tooltip5);
     entry5.setTooltipText(tooltip5);
-    
+
     // set home directory as the default in most cases
     entry1.addOnFocusOut(&SetDefaultFromUsername);
-    
+
     // connect pressing Enter on entries
     entry1.addOnActivate(&ActivateEntry);
     entry2.addOnActivate(&ActivateEntry);
     entry3.addOnActivate(&ActivateEntry);
     entry4.addOnActivate(&ActivateEntry);
     entry5.addOnActivate(&ActivateEntry);
-    
+
     // pack them into a table widget
     Table table = new Table(5, 2, 0);
     table.attachDefaults(label1, 0, 1, 0, 1);
@@ -135,7 +135,7 @@ class StartSSHDialog : Dialog
     table.attachDefaults(entry5, 1, 2, 4, 5);
     contentArea.add(table);
     contentArea.add(new HSeparator());
-    
+
     hosts = new HostView;
     hosts.addOnRowActivated(&RowActivated);
     hosts.addOnCursorChanged(&CursorChanged);
@@ -143,10 +143,10 @@ class StartSSHDialog : Dialog
     auto sw = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
     sw.add(hosts);
     contentArea.add(sw);
-    
+
     addButton("_Cancel", GtkResponseType.GTK_RESPONSE_CANCEL);
     addButton("_OK", GtkResponseType.GTK_RESPONSE_OK);
-    
+
     // focus first row of "hosts"
     hosts.grabFocus();
     TreeIter iter = GetIterFirst(hosts.getModel());
@@ -156,12 +156,12 @@ class StartSSHDialog : Dialog
       path.free();
     }
   }
-  
+
   void ActivateEntry(Entry e)
   {
     response(GtkResponseType.GTK_RESPONSE_OK);
   }
-  
+
   bool SetDefaultFromUsername(GdkEventFocus * ef, Widget w)
   {
     string username = entry1.getText();
@@ -171,25 +171,25 @@ class StartSSHDialog : Dialog
     }
     return false;
   }
-  
+
   void RowActivated(TreePath path, TreeViewColumn col, TreeView view)
   {
     SetRowContents(path, view);
     response(GtkResponseType.GTK_RESPONSE_OK);
   }
-  
+
   void CursorChanged(TreeView view)
   {
     TreePath path = GetPathAtCursor(view);
     SetRowContents(path, view);
     path.free();
   }
-  
+
   void SetRowContents(TreePath path, TreeView view)
   {
     SetRowContents(GetIter(view.getModel(), path));
   }
-  
+
   void SetRowContents(TreeIter iter)
   {
     entry1.setText(NonnullString(iter.getValueString(0)));
@@ -198,42 +198,42 @@ class StartSSHDialog : Dialog
     entry4.setText(NonnullString(iter.getValueString(3)));
     entry5.setText(NonnullString(iter.getValueString(4)));
   }
-  
+
   bool ButtonPress(GdkEventButton * eb, Widget w)
   {
     if(eb.window != hosts.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-    
+
     if(eb.button != MouseButton.RIGHT){// not right button
       return false;
     }
-    
+
     TreePath path = GetPathAtPos(hosts, eb.x, eb.y);
     if(path is null){// empty space
       return false;
     }
-    
+
     // set TreeIter
     iterCursor = GetIter(hosts.getModel(), path);
     path.free();
-    
+
     // menu for "Connect", "Unregister"
     auto menu = new Menu;
     menu.append(new MenuItem(&ConnectCallback, "_Connect"));
     menu.append(new MenuItem(&UnregisterCallback, "_Unregister"));
     menu.showAll();
     menu.popup(0, eb.time);
-    
+
     return false;
   }
-  
+
   void ConnectCallback(MenuItem item)
   {
     SetRowContents(iterCursor);
     response(GtkResponseType.GTK_RESPONSE_OK);
   }
-  
+
   void UnregisterCallback(MenuItem item)
   {
     // make SSHConnection object
@@ -245,32 +245,32 @@ class StartSSHDialog : Dialog
     rcfile.RemoveSSHHost(con);
     hosts.GetListStore().remove(iterCursor);
   }
-  
+
   void Respond(int responseID, Dialog dialog)
   {
     if(responseID == GtkResponseType.GTK_RESPONSE_OK){// connect to the host inputted in Entry widgets
       string username = entry1.getText();
       string domain   = entry2.getText();
       if(username.length > 0 && domain.length > 0){
-        
+
         ret = Find(username, domain);
         if(ret is null){
           ret = new SSHConnection;
           ret.setUsername(username);
           ret.setDomain(domain);
-          
+
           string home = entry3.getText();
           if(home.length == 0){// set default value
             home = "/home/" ~ ret.getUsername() ~ '/';
           }
           ret.setHomeDir(home);
-          
+
           string prompt = entry4.getText();
           if(prompt.length == 0){// set default value
             prompt = ret.getUsername() ~ '@';
           }
           ret.setPrompt(prompt);
-          
+
           string rprompt = entry5.getText();
           if(rprompt.length > 0){
             ret.setRPrompt(rprompt);

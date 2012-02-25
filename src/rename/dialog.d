@@ -61,9 +61,9 @@ private import statusbar;
 
 void RenameFiles(string dir, string[] infiles)
 {
-  
+
   string[] files;
-  
+
   if(dir.containsPattern("/.gvfs/sftp")){// remote
     // try renaming all files since "access::can-rename" is not accurate for remote files
     files = infiles;
@@ -77,17 +77,17 @@ void RenameFiles(string dir, string[] infiles)
         files ~= file;
       }
     }
-    
+
     if(files.length == 0){// nothing to be renamed
       PopupBox.error("Cannot rename: Permission denied", "error");
       return;
     }
   }
-  
+
   // fire up dialog
   scope d = new RenameDialog(files);
   d.run();
-  
+
   // now dialog is destroyed
   string[] newnames = d.ret_;
   uint num = 0;
@@ -96,7 +96,7 @@ void RenameFiles(string dir, string[] infiles)
     foreach(i, file; files){
       string newname = newnames[i];
       if(newname.length > 0 && file != newname){// new name is not null
-        
+
         // check whether "newname" contains slash or not
         if(file[$-1] == '/'){// directory
           if(newname[0 .. $-1].contains('/')){// && has slash
@@ -110,22 +110,22 @@ void RenameFiles(string dir, string[] infiles)
             continue;
           }
         }
-        
+
         // now "newname" is free from slash-issue
         File dest = File.parseName(dir ~ newname);
-        
+
         // check for overwriting existing file
         if(askOverwrite && dest.queryExists(null) != 0){// exists
           string message = newname ~ " exists. Overwrite?";
           int x;
-          
+
           if(files.length - i == 1){// only one file to rename
             x = ChooseDialog!(2)(message, ["_OK", "_Cancel"]);
           }
           else{// there are still more than one files to rename
             x = ChooseDialog!(4)(message, ["_OK", "_Skip this file", "Overwrite _all", "_Cancel all"]);
           }
-          
+
           if(x == 3){// "cancel all"
             break;
           }
@@ -136,7 +136,7 @@ void RenameFiles(string dir, string[] infiles)
             continue;
           }
         }
-        
+
         // does not exist || (exists && ("OK" || "overwrite all"))
         try{
           File src  = File.parseName(dir ~ file);
@@ -152,7 +152,7 @@ void RenameFiles(string dir, string[] infiles)
       }
     }
   }
-  
+
   // notify statusbar
   if(num == 0){
     PushIntoStatusbar("Rename was canceled");
@@ -179,7 +179,7 @@ private class RenameDialog : Dialog
   ComboBox comboBox_;
   Label lold_, lnew_, lpre_, lapp_, lerr_;
   Entry eold_, enew_, epre_, eapp_;
-  
+
   this(string[] files)
   {
     super();
@@ -187,10 +187,10 @@ private class RenameDialog : Dialog
     setDefaultSize(430, 450);
     addOnResponse(&Respond);
     auto contentArea = getContentArea();
-    
+
     cancel_ = addButton("_Cancel", GtkResponseType.GTK_RESPONSE_CANCEL);
     ok_     = addButton("_Rename", GtkResponseType.GTK_RESPONSE_OK);
-    
+
     // setup TreeView
     auto win = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
     contentArea.packStart(win, 1, 1, 5);
@@ -199,10 +199,10 @@ private class RenameDialog : Dialog
     view_.setRulesHint(1);// alternating row colors
     view_.setHasTooltip(1);
     view_.addOnQueryTooltip(&QueryTooltip);
-    
+
     store_ = new ListStore([GType.STRING, GType.STRING]);
     view_.setModel(store_);
-    
+
     // setup columns
     colOld_ = new TreeViewColumn("Name", new CellRendererText, "text", 0);
     renderer_ = new CellRendererText;
@@ -211,7 +211,7 @@ private class RenameDialog : Dialog
     // connect callback to update contents of the editable cell when focus-out
     Signals.connectData(renderer_.getCellRendererTextStruct(), "editing-started",
                         cast(GCallback)(&EditingStarted), cast(void*)this, null, GConnectFlags.AFTER);
-    
+
     colNew_ = new TreeViewColumn("New Name", renderer_, "text", 1);
     colOld_.setSizing(GtkTreeViewColumnSizing.FIXED);
     colNew_.setSizing(GtkTreeViewColumnSizing.FIXED);
@@ -219,23 +219,23 @@ private class RenameDialog : Dialog
     colNew_.setMinWidth(200);
     colOld_.setResizable(1);
     colNew_.setResizable(1);
-    
+
     view_.appendColumn(colOld_);
     view_.appendColumn(colNew_);
-    
+
     // insert rows to TreeView
     TreeIter iter = new TreeIter;
     foreach(file; files){
       store_.append(iter);
       store_.setValue(iter, 0, file);
     }
-    
+
     contentArea.packStart(new HSeparator, 0, 0, 0);
-    
+
     // setup ComboBox (all, first, last) for search & replace
     HBox hbox = new HBox(0, 10);
     contentArea.packStart(hbox, 0, 0, 0);
-    
+
     comboBox_ = new ComboBox();// ComboBox containing texts
     comboBox_.appendText("All Matches");
     comboBox_.appendText("First Match");
@@ -244,14 +244,14 @@ private class RenameDialog : Dialog
     comboBox_.setActive(idxComboBox);
     comboBox_.addOnChanged(&EntriesChanged!(ComboBox));
     hbox.packStart(comboBox_, 0, 0, 0);
-    
+
     lerr_ = new Label("");
     lerr_.setEllipsize(PangoEllipsizeMode.END);
     auto attrs = new PgAttributeList;
     attrs.insert(PgAttribute.foregroundNew(65535, 0, 0));
     lerr_.setAttributes(attrs);
     hbox.packEnd(lerr_, 1, 1, 10);
-    
+
     // setup Entries for search & replace
     lold_ = new Label("_Search For: ");
     lnew_ = new Label("Replace _With: ");
@@ -261,7 +261,7 @@ private class RenameDialog : Dialog
     lnew_.setMnemonicWidget(enew_);
     eold_.addOnChanged(&EntriesChanged!(EditableIF));
     enew_.addOnChanged(&EntriesChanged!(EditableIF));
-    
+
     // setup Entries for prepend & append
     lpre_ = new Label("_Prepend Text: ");
     lapp_ = new Label("_Append Text: ");
@@ -272,23 +272,23 @@ private class RenameDialog : Dialog
     epre_.addOnChanged(&EntriesChanged!(EditableIF));
     eapp_.addOnChanged(&EntriesChanged!(EditableIF));
     EntriesChanged!(Button)(null);
-    
+
     auto table = new Table(2, 2, 0);
     table.attachDefaults(lold_, 0, 1, 0, 1);
     table.attachDefaults(eold_, 1, 2, 0, 1);
     table.attachDefaults(lnew_, 0, 1, 1, 2);
     table.attachDefaults(enew_, 1, 2, 1, 2);
     contentArea.packStart(table, 0, 0, 5);
-    
+
     contentArea.packStart(new HSeparator, 0, 0, 0);
-    
+
     table = new Table(2, 2, 0);
     table.attachDefaults(lpre_, 0, 1, 0, 1);
     table.attachDefaults(epre_, 1, 2, 0, 1);
     table.attachDefaults(lapp_, 0, 1, 1, 2);
     table.attachDefaults(eapp_, 1, 2, 1, 2);
     contentArea.packStart(table, 0, 0, 5);
-    
+
     // set initial focus
     showAll();
     if(files.length == 1){// only one file
@@ -301,7 +301,7 @@ private class RenameDialog : Dialog
       eold_.grabFocus();
     }
   }
-  
+
   void Respond(int responseID, Dialog dialog)
   {
     if(responseID == GtkResponseType.GTK_RESPONSE_OK){
@@ -315,25 +315,25 @@ private class RenameDialog : Dialog
       assert(responseID == GtkResponseType.GTK_RESPONSE_CANCEL);
       ret_ = null;
     }
-    
+
     // restore dialog's state
     idxComboBox = comboBox_.getActive();
     searchFor   = eold_.getText();
     replaceWith = enew_.getText();
     prependText = epre_.getText();
     appendText  = eapp_.getText();
-    
+
     destroy();
   }
-  
-  
-  
+
+
+
   //////////////////// search & replace, then prepend & append
   void SetErrorLabel(string message)
   {
     lerr_.setText(message);//"<span foreground=\"red\"> " ~ message ~ " </span>");
     lerr_.setTooltipText(message);
-    
+
     if(message == ""){
       ok_.setSensitive(1);
     }
@@ -341,17 +341,17 @@ private class RenameDialog : Dialog
       ok_.setSensitive(0);
     }
   }
-  
+
   void EntriesChanged(ArgType)(ArgType arg)
   {
     // clear error message
     SetErrorLabel("");
-    
+
     map_.textSearch_  = eold_.getText();
     map_.textReplace_ = enew_.getText();
     map_.textPre_ = epre_.getText();
     map_.textApp_ = eapp_.getText();
-    
+
     // check slash
     if(map_.textSearch_.contains('/') ||
        map_.textReplace_.contains('/') ||
@@ -360,14 +360,14 @@ private class RenameDialog : Dialog
       SetErrorLabel("Cannot rename: slashes are not supported");
       return;
     }
-    
+
     if(map_.textSearch_.length == 0){// no search & replace
       RenameForeach!(Default)();
       return;
     }
-    
+
     int target = comboBox_.getActive();// 0: all, 1: first, 2: last, 3: regexp
-    
+
     if(target == 3){// regexp
       try{// check whether the input texts are valid
         map_.re_ = new Regex(map_.textSearch_, cast(GRegexCompileFlags)0, cast(GRegexMatchFlags)0);
@@ -376,7 +376,7 @@ private class RenameDialog : Dialog
         SetErrorLabel(ex.toString());
         return;
       }
-      
+
       if(map_.textReplace_.length == 0){// remove all matches
         RenameForeach!(RemoveRegexp)();
       }
@@ -402,7 +402,7 @@ private class RenameDialog : Dialog
       RenameForeach!(ReplaceStringLast)();
     }
   }
-  
+
   enum{
     ReplaceRegexp,
     RemoveRegexp,
@@ -411,7 +411,7 @@ private class RenameDialog : Dialog
     ReplaceStringLast,
     Default
   }
-  
+
   void RenameForeach(int ReplaceType)()
   {
     TreeIter iter = GetIterFirst(store_);
@@ -420,13 +420,13 @@ private class RenameDialog : Dialog
     }
     while(store_.iterNext(iter));
   }
-  
+
   MapNewName map_;
   struct MapNewName
   {
     string textSearch_, textReplace_, textPre_, textApp_;
     Regex re_;
-    
+
     string Do(int ReplaceType)(string oldname)
     {
       if(oldname[$-1] == '/'){// directory
@@ -436,7 +436,7 @@ private class RenameDialog : Dialog
         return textPre_ ~ SearchReplace!(ReplaceType)(oldname) ~ textApp_;
       }
     }
-    
+
     string SearchReplace(int ReplaceType)(string name)
     {
       static if(ReplaceType == ReplaceRegexp){
@@ -462,7 +462,7 @@ private class RenameDialog : Dialog
         else{// ReplaceStringLast
           size_t idx = locatePatternPrior(name, textSearch_);
         }
-        
+
         if(idx == name.length){// no match
           return name;
         }
@@ -476,9 +476,9 @@ private class RenameDialog : Dialog
     }
   }
   //////////////////// search & replace, then prepend & append
-  
-  
-  
+
+
+
   //////////////////// tooltip for long contents
   bool QueryTooltip(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
   {
@@ -490,16 +490,16 @@ private class RenameDialog : Dialog
     if(0 != view_.getTooltipContext(&x, &y, keyboardTip, model, path, iter)){
       if(path !is null){
         TreeViewColumn col = GetColAtPos(view_, x, y);
-        
+
         int colIndex = col is colOld_ ? 0 : 1;
         string text = iter.getValueString(colIndex);
         CellRenderer renderer = GetCellRendererFromCol(col);
-        
+
         // check whether the text is ellipsized or not
         int startPos, actualWidth;
         col.cellGetPosition(renderer, startPos, actualWidth);
         int textWidth = GetTextWidth(text);
-        
+
         if(actualWidth < textWidth){// text is too long
           Tooltip tip = new Tooltip(p);
           tip.setText(text);
@@ -507,24 +507,24 @@ private class RenameDialog : Dialog
           path.free();
           return true;
         }
-        
+
         path.free();
       }
     }
-    
+
     return false;
   }
   //////////////////// tooltip for long contents
-  
-  
-  
+
+
+
   ///////////////////// editable cell
   void EditedNewName(string pathString, string newName, CellRendererText renderer)
   {
     if(newName.length > 0){// valid input
       // update store
       TreeIter iter = GetIterFromString(store_, pathString);
-      
+
       // check whether the entry is a directory or not
       string name = iter.getValueString(0);
       if(name[$-1] == '/'){
@@ -541,12 +541,12 @@ private class RenameDialog : Dialog
       }
     }
   }
-  
+
   void EditingCellActivate(Entry e)
   {
     ok_.grabFocus();
   }
-  
+
   // to ensure that the cell contents is modified on focus-out
   string pathStringLast_;
   bool FocusOut(GdkEventFocus * ef, Widget w)
@@ -556,7 +556,7 @@ private class RenameDialog : Dialog
     EditedNewName(pathStringLast_, ent.getText(), renderer_);
     return false;
   }
-  
+
   // due to difficulties related to the GtkD interfaces,
   // the easiest way is to use C API
   extern(C) static void EditingStarted(GtkCellRenderer *renderer,

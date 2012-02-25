@@ -33,7 +33,7 @@ File GetFileForDirectory(string dirname)
   if(dirname.length == 0){
     return null;
   }
-  
+
   try{
     auto f = gio.File.File.parseName(dirname);
     scope FileInfo info = f.queryInfo("standard::type", GFileQueryInfoFlags.NONE, null);
@@ -54,7 +54,7 @@ bool Exists(string path)
   if(path.length == 0){
     return false;
   }
-  
+
   scope f = File.parseName(path);
   return f.queryExists(null) != 0;
 }

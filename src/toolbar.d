@@ -57,7 +57,7 @@ class SetaToolbar : Toolbar
 private:
   FileManager parent_;
   uint numToolItemsShown_, numShortcuts_;
-  
+
   ToolItem itemBack_, itemForward_, itemUp_, itemRoot_, itemHome_, itemOtherSide_, itemRefresh_,
     itemSSH_, itemHidden_, itemDirTree_, itemSeparator1_, itemFilter_, itemSeparator2_;
   Entry filter_;
@@ -65,7 +65,7 @@ private:
   CheckMenuItem showHiddenMenuItem_;
   ToggleButton dirTreeButton_;
   CheckMenuItem dirTreeMenuItem_;
-  
+
 public:
   this(FileManager fm)
   {
@@ -74,13 +74,13 @@ public:
     InitToolButtons();
     ReconstructShortcuts();
   }
-  
-  
-  
+
+
+
   ///////////////////// accessor
   uint GetNumShortcuts(){return numShortcuts_;}
   Entry GetFilterEntry(){return filter_;}
-  
+
   void ToggleShowHidden()
   {
     showHiddenButton_.setActive(showHiddenButton_.getActive() == 0);
@@ -98,24 +98,24 @@ public:
     dirTreeButton_.setActive(dirTreeButton_.getActive() == 0);
   }
   ///////////////////// accessor
-  
-  
-  
+
+
+
   ///////////////////// Layout
   void SetLayout()
   {
     dirTreeButton_.setActive(rcfile.GetWidthDirectoryTree() > 0);
-    
+
     // buttons in toolbar
     numToolItemsShown_ = 0;
     mixin(FoldTupple!(InsertOrRemove, "Back", "Forward", "Up", "Root", "Home", "OtherSide", "Refresh", "SSH", "Hidden", "DirTree"));
     mixin(InsertOrRemove!("Separator1", "rcfile.GetShowFilter()"));
     mixin(InsertOrRemove!("Filter",     "rcfile.GetShowFilter()"));
     mixin(InsertOrRemove!("Separator2", "numToolItemsShown_ > 0"));
-    
+
     // width of filter entry
     filter_.setSizeRequest(rcfile.GetWidthFilterEntry(), -1);
-    
+
     // widths of the shortcut buttons in the toolbar
     auto list = GetShortcutButtonList();
     while(list !is null){
@@ -124,13 +124,13 @@ public:
       list = list.next();
     }
   }
-  
+
 private:
   template InsertOrRemove(string s)
   {
     const string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
   }
-  
+
   template InsertOrRemove(string s, string booleanExpression)
   {
     const string InsertOrRemove =
@@ -149,16 +149,16 @@ private:
       }";
   }
   ///////////////////// Layout
-  
-  
-  
+
+
+
   ///////////////////// default buttons
 private:
   void InitToolButtons()
   {
     int width, height;
     gtk.IconSize.IconSize.lookup(GtkIconSize.LARGE_TOOLBAR, width, height);
-    
+
     itemBack_ = ConstructToolItemWithButton(LoadImage(StockID.GO_BACK), "Go back",
                                             &parent_.NextDirInHistoryClicked!(false, Button),
                                             &parent_.NextDirInHistoryClicked!(false, MenuItem),
@@ -184,22 +184,22 @@ private:
                                                &parent_.RefreshClicked!(MenuItem));
     itemSSH_ = ConstructToolItemWithButton(LoadImage(StockID.NETWORK), "Start/quit SSH",
                                            &parent_.SSHClicked!(Button), &parent_.SSHClicked!(MenuItem));
-    
+
     itemHidden_ = ConstructToolItemWithToggleButton(LoadImage("/usr/share/pixmaps/seta/seta_show-hidden-files.svg", width),
                                                     "Show/hide hidden files",
                                                     &HiddenClicked,
                                                     &HiddenClickedMenuItem,
                                                     showHiddenMenuItem_);
     showHiddenButton_ = cast(ToggleButton) itemHidden_.getChild();
-    
+
     itemDirTree_ = ConstructToolItemWithToggleButton(LoadImage(StockID.INDENT), "Show/hide directory tree pane",
                                                      &DirTreeButtonClicked,
                                                      &DirTreeButtonClickedMenuItem,
                                                      dirTreeMenuItem_);
     dirTreeButton_ = cast(ToggleButton) itemDirTree_.getChild();
-    
+
     itemSeparator1_ = new SeparatorToolItem;
-    
+
     // add Entry for filter
     filter_ = new Entry;
     filter_.setTooltipText("Filter directory entries");
@@ -207,10 +207,10 @@ private:
     filter_.addOnActivate(&parent_.GrabFocus);
     itemFilter_ = new ToolItem;
     itemFilter_.add(filter_);
-    
+
     itemSeparator2_ = new SeparatorToolItem;
   }
-  
+
   Image LoadImage(StockID stockID)
   {
     return new Image(stockID, GtkIconSize.LARGE_TOOLBAR);
@@ -224,7 +224,7 @@ private:
       return LoadImage(StockID.MISSING_IMAGE);
     }
   }
-  
+
   ToolItem ConstructToolItemWithButton(
     Image img,
     string tooltip,
@@ -240,14 +240,14 @@ private:
     if(dlg3 !is null){
       b.addOnButtonPress(dlg3);
     }
-    
+
     auto item = new ToolItem;
     item.add(b);
-    
+
     // for overflow menu
     auto menuItem = new MenuItem(dlg2, tooltip, false);
     item.setProxyMenuItem(tooltip, menuItem);
-    
+
     return item;
   }
   ToolItem ConstructToolItemWithToggleButton(
@@ -262,27 +262,27 @@ private:
     b.setImage(img);
     b.setTooltipText(tooltip);
     b.addOnToggled(dlg);
-    
+
     auto item = new ToolItem;
     item.add(b);
-    
+
     // for overflow menu
     menuItem = new CheckMenuItem(tooltip, false);
     menuItem.addOnToggled(dlg2);
     item.setProxyMenuItem(tooltip, menuItem);
-    
+
     return item;
   }
   ///////////////////// default buttons
-  
-  
-  
+
+
+
   ///////////////////// shortcut buttons
 public:
   void ReconstructShortcuts()
   {
     ClearShortcuts();
-    
+
     // shortcuts
     rcfile.Shortcut[] shortcuts = rcfile.GetShortcuts();
     numShortcuts_ = shortcuts.length;
@@ -291,25 +291,25 @@ public:
       string dir = shortcut.path_;
       AppendShortcutButton(dir, label, dir, bind(&RemoveShortcutPopup, _0, _1, dir).ptr());
     }
-    
+
     // mounted volumes
     string[] names, paths;
     QueryMountedVolumes(names, paths);
-    
+
     foreach(i, name; names){
       string path = paths[i];
       string baseName = GetBasename(path);
-      
+
       uint index = i + 1 + numShortcuts_;
       string label = index <= 9 ? "(" ~ Str.toString(index) ~ ") " ~ baseName : baseName;
       string tooltip = name ~ " (" ~ path ~ ')';
       AppendShortcutButton(
         path, label, tooltip, bind(&UnmountMediaPopup, _0, _1, path, name).ptr());
     }
-    
+
     showAll();
   }
-  
+
   void ClearShortcuts()
   {
     auto list = GetShortcutButtonList();
@@ -319,7 +319,7 @@ public:
       list = list.next();
     }
   }
-  
+
 private:
   void AppendShortcutButton(
     string path,
@@ -336,12 +336,12 @@ private:
     if(dlgButtonPress !is null){// connect callback on right-clicking this button
       b.addOnButtonPress(dlgButtonPress);
     }
-    
+
     auto item = new ToolItem;
     item.setSizeRequest(rcfile.GetWidthShortcutButton(), -1);
     item.add(b);
     insert(item);
-    
+
     // for overflow menu
     auto menuItem = new MenuItem(
       bind(&parent_.PathButtonClicked!(MenuItem), _0, path).ptr(),
@@ -351,7 +351,7 @@ private:
     }
     item.setProxyMenuItem(label, menuItem);
   }
-  
+
   bool RemoveShortcutPopup(GdkEventButton * eb, Widget w, string path)
   {
     if(eb.button == MouseButton.RIGHT){
@@ -362,18 +362,18 @@ private:
     }
     return false;
   }
-  
+
   void RemoveShortcut(MenuItem item, string path)
   {
     rcfile.RemoveDirectoryShortcut(path);
     // move focus to the file manager, since the focused button will go away by removing the shortcut
     parent_.GrabFocus();
   }
-  
+
   ListG GetShortcutButtonList()
   {
     ListG list = getChildren();
-    
+
     // skip default buttons
     int i=0;
     while(list !is null){
@@ -383,18 +383,18 @@ private:
       ++i;
       list = list.next();
     }
-    
+
     return list;
   }
   ///////////////////// shortcut buttons
-  
-  
-  
+
+
+
   ///////////////////// mounted volume buttons
   bool UnmountMediaPopup(GdkEventButton * eb, Widget w, string path, string name)
   {
     if(eb.button == MouseButton.RIGHT){
-      
+
       // if the remote host is still accessed via ssh, skip
       if(name.StartsWith("sftp (")){
         size_t posAtmark = locate(name, '@');
@@ -405,7 +405,7 @@ private:
           return false;
         }
       }
-      
+
       auto menu = new Menu;
       menu.append(new MenuItem(bind(&UnmountMedia, _0, path).ptr(), "Unmount " ~ name, false));
       menu.showAll();
@@ -413,7 +413,7 @@ private:
     }
     return false;
   }
-  
+
   void UnmountMedia(MenuItem item, string path)
   {
     // change directory of all pages showing dirs under "path"
@@ -421,18 +421,18 @@ private:
       page_list.NotifyFilerDisconnect(path, path);
     }
     page_list.NotifyEscapeFromPath(path);
-    
+
     if(!UnmountByPath(path)){// "path" not found in monitored volumes, just remove the "item"
       remove(item);
     }
-    
+
     // move focus to the file manager, since the focused button will go away by removing the shortcut
     parent_.GrabFocus();
   }
   ///////////////////// mounted volume buttons
-  
-  
-  
+
+
+
   ///////////////////// callbacks
   void HiddenClicked(ToggleButton x)
   {

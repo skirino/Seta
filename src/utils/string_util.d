@@ -67,7 +67,7 @@ int StrCmp(string s1, string s2)
   if (s2.length < len){
     len = s2.length;
   }
-  
+
   int result = memcmp(s1.ptr, s2.ptr, len);
   if (result == 0)
     result = cast(int)s1.length - cast(int)s2.length;
@@ -102,7 +102,7 @@ string PluralForm(INT, string singularForm, string pluralForm = singularForm ~ "
       return "? " ~ pluralForm;
     }
   }
-  
+
   if(n == 1){
     return "1 " ~ singularForm;
   }
@@ -151,7 +151,7 @@ string LineInFileWhichStartsWith(string phrase, string filename)
     file.close;
   }
   catch(Exception ex){}// cannot open (no such file, permission denied)
-  
+
   return ret;
 }
 
@@ -195,35 +195,35 @@ string ExpandPath(string path, string root)
 {
   assert(path[0] == '/');
   assert(path[$-1] == '/');
-  
+
   // first obtain an absolute path from the root directory
   // replace "////..." to "/"
   while(containsPattern(path, "//")){
     path = substitute(path, "//", "/");
   }
-  
+
   // replace "/./" before "/../"
   while(containsPattern(path, "/./")){
     path = substitute(path, "/./", "/");
   }
-  
+
   // if "/path/to/somewhere/../" is found replace with its parent directory
   size_t pos;
   while((pos = path.locatePattern("/../")) != path.length){
     string parent = ParentDirectory(path[0..pos+1], root);
     path = parent ~ path[pos+4..$];
   }
-  
+
   // now "path" becomes an absolute path.
   // next substitute escaped chars into original ones
   path = UnescapeSpecialChars(path);
-  
+
   // "path" should start with "root".
   // if not, "path" is modified as "root" ~ "path"
   if(!path.StartsWith(root)){
     path = root[0 .. $-1] ~ path;// remove '/' at the last of "root"
   }
-  
+
   return path;
 }
 
@@ -255,7 +255,7 @@ string UnescapeSpecialChars(string input)
           goto end_of_loop;
         }
       }
-      
+
       // no match in SpecialChars
       ret ~= input[i..i+2];
       ++i;// proceed 2 chars
@@ -263,10 +263,10 @@ string UnescapeSpecialChars(string input)
     else{
       ret ~= c1;
     }
-    
+
     end_of_loop:;
   }
-  
+
   return ret;
 }
 
@@ -308,16 +308,16 @@ private string ReplaceQuotedArg(string args)
 {
   size_t index = 0;
   string ret;
-  
+
   while(true){
     size_t startQuote1 = FindUnescapedChar(args, '\'', index);
     size_t startQuote2 = FindUnescapedChar(args, '\"', index);
-    
+
     if(startQuote1 == args.length && startQuote2 == args.length){
       ret ~= args[index .. $];
       break;
     }
-    
+
     size_t start;
     char quotation;
     if(startQuote1 < startQuote2){// '\'' comes faster than '\"'
@@ -328,7 +328,7 @@ private string ReplaceQuotedArg(string args)
       start = startQuote2;
       quotation = '\"';
     }
-    
+
     size_t end = FindUnescapedChar(args, quotation, start+1);
     if(end == args.length){// unmatched
       return null;
@@ -342,7 +342,7 @@ private string ReplaceQuotedArg(string args)
       }
     }
   }
-  
+
   return ret;
 }
 
@@ -376,7 +376,7 @@ string ExpandEnvVars(string arg)
 {
   size_t indexStart = 0;
   string ret;
-  
+
   while(indexStart != arg.length){
     // find dollar which is not escaped by backslash
     size_t dollar = FindUnescapedChar(arg, '$', indexStart);
@@ -384,18 +384,18 @@ string ExpandEnvVars(string arg)
     if(dollar == arg.length){
       break;
     }
-    
+
     // extract variable token
     size_t end = dollar+1;
     while(end != arg.length && !(iscntrl(arg[end]) || arg[end] == '/')){
       ++end;
     }
     string var = arg[dollar..end];
-    
+
     ret ~= Environment.get(var[1..$], var);
     indexStart = end;
   }
-  
+
   return ret;
 }
 
@@ -404,7 +404,7 @@ string RemovePercentBrace(string s)
 {
   int open = 0;
   string ret;
-  
+
   for(size_t i=0; i<s.length; ++i){
     if(s[i] == '%'){
       if(i<s.length-1){
@@ -419,7 +419,7 @@ string RemovePercentBrace(string s)
           continue;
         }
       }
-      
+
       if(open == 0){
         ret ~= '%';
       }
@@ -430,6 +430,6 @@ string RemovePercentBrace(string s)
       }
     }
   }
-  
+
   return ret;
 }

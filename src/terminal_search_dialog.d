@@ -60,7 +60,7 @@ private:
   CheckButton ignoreCases_;
   CheckButton backwardDirection_;
   CheckButton overwrappedSearch_;
-  
+
 public:
   this(Terminal terminal)
   {
@@ -69,32 +69,32 @@ public:
     addOnResponse(&Respond);
     addOnKeyPress(&KeyPressed);
     VBox contentArea = getContentArea();
-    
+
     auto hbox = new HBox(0, 0);
     auto l = new Label("_Search for: ");
     hbox.packStart(l, 0, 0, 5);
-    
+
     cb_ = new ComboBoxEntry;
     cb_.addOnChanged(&SearchTextChanged);
     hbox.packStart(cb_, 0, 0, 0);
     l.setMnemonicWidget(cb_);
     contentArea.packStart(hbox, 0, 0, 5);
-    
+
     ignoreCases_ = new CheckButton("_Ignore cases");
     contentArea.packStart(ignoreCases_, 0, 0, 0);
-    
+
     backwardDirection_ = new CheckButton("_Backward search");
     contentArea.packStart(backwardDirection_, 0, 0, 0);
-    
+
     overwrappedSearch_ = new CheckButton("_Overwrapped search");
     contentArea.packStart(overwrappedSearch_, 0, 0, 0);
-    
+
     addButton(StockID.CLOSE, GtkResponseType.GTK_RESPONSE_DELETE_EVENT);
     searchButton_ = addButton(StockID.FIND,  1);
-    
+
     ApplySettings();
   }
-  
+
 private:
   bool KeyPressed(GdkEventKey * ekey, Widget w)
   {
@@ -104,7 +104,7 @@ private:
     }
     return false;
   }
-  
+
   void Respond(int responseID, Dialog dialog)
   {
     if(responseID == GtkResponseType.GTK_RESPONSE_DELETE_EVENT){
@@ -115,22 +115,22 @@ private:
       Search();
     }
   }
-  
+
   void Search()
   {
     terminal_.SetOverwrappedSearch(overwrappedSearch_.getActive());
-    
+
     if(backwardDirection_.getActive() == 0){
       terminal_.SearchNext();
     }
     else{
       terminal_.SearchPrevious();
     }
-    
+
     // prepend or reorder the search text
     cb_.prependOrReplaceText(cb_.getActiveText());
   }
-  
+
   void SearchTextChanged(ComboBox cb)
   {
     BuildRegexp();
@@ -142,19 +142,19 @@ private:
       terminal_.SetSearchRegexp(re_);
     }
   }
-  
+
   void BuildRegexp()
   {
     if(re_ !is null){
       re_.unref();
     }
-    
+
     auto text = cb_.getActiveText();
     if(IsBlank(text)){
       re_ = null;
       return;
     }
-    
+
     try{
       auto compileFlags =
         (ignoreCases_.getActive() == 0) ? GRegexCompileFlags.MULTILINE :
@@ -165,31 +165,31 @@ private:
       re_ = null;
     }
   }
-  
-  
-  
+
+
+
   //////////////// remember settings used at last time
   static string[] searchTextHistory = [];
   static int ignoreCases = 0;
   static int backwardDirection = 0;
   static int overwrappedSearch = 0;
-  
+
   void ApplySettings()
   {
     foreach(text; searchTextHistory){
       cb_.appendText(text);
     }
     cb_.setActive(0);
-    
+
     ignoreCases_.setActive(ignoreCases);
     backwardDirection_.setActive(backwardDirection);
     overwrappedSearch_.setActive(overwrappedSearch);
   }
-  
+
   void RestoreSettings()
   {
     searchTextHistory = [];
-    
+
     // append text until it returns the same text twice
     string previous;
     int index = 0;
@@ -203,7 +203,7 @@ private:
       previous = text;
       ++index;
     }
-    
+
     ignoreCases = ignoreCases_.getActive();
     backwardDirection = backwardDirection_.getActive();
     overwrappedSearch = overwrappedSearch_.getActive();

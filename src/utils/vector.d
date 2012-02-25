@@ -29,22 +29,22 @@ class Vector(T)
 private:
   size_t size_;
   T[] array_;
-  
+
 public:
   alias T element_type;
-  
+
   this(size_t reserved = 1)
   {
     size_ = 0;
     array_.length = reserved;
   }
-  
+
   size_t size()  {return size_;}
   size_t length(){return size_;}
   size_t capacity(){return array_.length;}
-  
+
   void clear(){size_ = 0;}
-  
+
   void append(T t)
   {
     if(size_ == array_.length){
@@ -52,7 +52,7 @@ public:
     }
     array_[size_++] = t;
   }
-  
+
   void prepend(T t)
   {
     if(size_ == array_.length){
@@ -64,12 +64,12 @@ public:
     array_[0] = t;
     size_++;
   }
-  
+
   T pop()
   {
     return array_[--size_];
   }
-  
+
   void moveToHead(size_t index)
   {
     T t = array_[index];
@@ -78,47 +78,47 @@ public:
     }
     array_[0] = t;
   }
-  
+
   T opIndex(size_t i)
   {
     // note that for valued types T, returned element is copied, not reference to the same element
     return array_[i];
   }
-  
+
   void opIndexAssign(T val, size_t i)
   {
     return array_[i] = val;
   }
-  
+
   T[] opSlice(size_t i, size_t j)
   {
     return array_[i .. j];
   }
-  
+
   T[] array()
   {
     return array_[0..size_];
   }
-  
+
   void sort(bool function(T, T) pred)
   {
     tango.core.Array.sort(array_[0..size_], pred);
   }
-  
+
   void reserve(size_t len)
   {
     if(len > capacity()){
       array_.length = len;
     }
   }
-  
+
   void copy(Vector!(T) v)
   {
     v.reserve(array_.length);
     v.size_ = size_;
     v.array_[0 .. size_] = array_[0 .. size_];
   }
-  
+
   void filter(FilterFunc)(Vector!(T) v, FilterFunc filter)
   {
     v.clear();
@@ -128,7 +128,7 @@ public:
       }
     }
   }
-  
+
   void swap(Vector!(T) v)
   {
     if(v !is this){
@@ -140,7 +140,7 @@ public:
       array_ = array;
     }
   }
-  
+
 private:
   void enlarge()
   {

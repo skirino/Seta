@@ -32,7 +32,7 @@ private:
   static const int MaxHistory = 50;
   char[][MaxHistory] dirs_;// ring buffer
   int idxPWD_, bufferStart_, bufferEnd_;
-  
+
   int Idx(int i)
   {
     if(i < 0){
@@ -45,10 +45,10 @@ private:
       return i;
     }
   }
-  
+
 public:
   this(char[] dir){Reset(dir);}
-  
+
   void Reset(char[] dir)
   {
     bufferStart_ = 0;
@@ -56,25 +56,25 @@ public:
     idxPWD_ = 0;
     dirs_[0] = dir;
   }
-  
+
   char[] GetPWD(){return dirs_[idxPWD_];}
-  
+
   void Append(char[] dir)
   {
     int next = Idx(idxPWD_ + 1);
-    
+
     if(idxPWD_ == bufferEnd_){// if "idxPWD_" is at the end of the ring buffer
-      if(bufferStart_ == next){// "start" and "end" lie next to each other 
+      if(bufferStart_ == next){// "start" and "end" lie next to each other
         bufferStart_ = Idx(bufferStart_ + 1);
       }
     }
-    
+
     bufferEnd_ = idxPWD_ = next;
     dirs_[idxPWD_] = dir;
-    
+
     anything_cd.dir_history.Push(dir);
   }
-  
+
   void GoNext(bool ForwardDirection)()
   {
     static if(ForwardDirection){
@@ -88,7 +88,7 @@ public:
       }
     }
   }
-  
+
   char[] GetDirNext(bool ForwardDirection)()
   {
     static if(ForwardDirection){
@@ -108,7 +108,7 @@ public:
       }
     }
   }
-  
+
   void RemoveDirNext(bool ForwardDirection)()
   {
     static if(ForwardDirection){
@@ -118,7 +118,7 @@ public:
       int i = Idx(idxPWD_ - 1);
       idxPWD_ = i;
     }
-    
+
     while(i != bufferEnd_){
       int next = Idx(i + 1);
       if(next == bufferEnd_){
@@ -129,7 +129,7 @@ public:
     }
     bufferEnd_ = Idx(bufferEnd_ - 1);
   }
-  
+
   char[][] Listup10(bool ForwardDirection)()
   {
     static if(ForwardDirection){
@@ -140,15 +140,15 @@ public:
       const int shift = -1;
       int last = bufferStart_;
     }
-    
+
     int index = idxPWD_;
     char[][] ret;
-    
+
     while(ret.length < 10 && index != last){
       index = Idx(index + shift);
       ret ~= dirs_[index];
     }
-    
+
     return ret;
   }
 }

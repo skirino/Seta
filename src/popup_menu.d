@@ -80,14 +80,14 @@ private:
   string contentType_;
   Menu submenu_;
   ListG availableApps_;
-  
+
   string pwd_;
   string nameCursor_;
   string[] selectedFileNames_;
   bool delegate(string) changeDir_;
   FileView view_;
-  
-  
+
+
 public:
   this(
     FileView view,
@@ -102,28 +102,28 @@ public:
     selectedFileNames_ = selected;
     changeDir_ = changeDir;
     bool parentIncluded = (selected.length > 0) && (selected[0] == PARENT_STRING);
-    
+
     super();
-    
+
     if(selectedFileNames_.length > 0){
       if(selectedFileNames_.length == 1){
         selectedFiles_.length = 1;
         defaultApps_.length = 1;
-        
+
         selectedFiles_[0] = File.parseName(pwd ~ nameCursor_);
         FileInfo info = selectedFiles_[0].queryInfo("standard::content-type,access::can-execute", GFileQueryInfoFlags.NONE, null);
         contentType_ = info.getContentType();
         selectedOneIsDir_ = (contentType_ == "inode/directory");
-        
+
         if((!selectedOneIsDir_) && info.getAttributeBoolean("access::can-execute")){
           append(new MenuItem(&ExecuteFun, "_Execute"));
         }
-        
+
         defaultApps_[0] = DesktopAppInfo.getDefaultForType(contentType_, 0);
         if(defaultApps_[0] !is null){
           // button to open with default application
           append(new MenuItem(&OpenFun, "_Open (" ~ defaultApps_[0].getName() ~ ')'));
-          
+
           // submenu to open with other applications
           availableApps_ = DesktopAppInfo.getAllForType(contentType_);
           if(availableApps_.length() > 1){
@@ -131,15 +131,15 @@ public:
             append(submenuItem_);
             submenuItem_.addOnToggled(&SubmenuItemToggled);
             submenuItem_.addOnButtonPress(&SubmenuItemClicked);
-            
+
             submenu_ = new Menu;
             submenuItem_.setSubmenu(submenu_);
-            
+
             for(ListG node = availableApps_; node !is null; node = node.next()){
               auto appInfo = new DesktopAppInfo(cast(GDesktopAppInfo*)node.data());
               submenu_.append(new MenuItem(&OpenWithFun, appInfo.getName(), false));
             }
-            
+
             submenu_.append(new SeparatorMenuItem);
             submenu_.append(new MenuItem(&OpenWithCommandFun, "Use custom command", false));
           }
@@ -163,74 +163,74 @@ public:
         }
       }
     }
-    
+
     bool itemAboveIsSeparator = false;// to avoid double separator
     if(getChildren() !is null){
       append(new SeparatorMenuItem);
       itemAboveIsSeparator = true;
     }
-    
+
     if((!parentIncluded) && selected.length > 0){
       append(new MenuItem(&CutFun, "Cut(_X)"));
       append(new MenuItem(&CopyFun, "_Copy"));
       itemAboveIsSeparator = false;
     }
-    
+
     if(CanPaste()){
       append(new MenuItem(&PasteFun, "_Paste"));
       itemAboveIsSeparator = false;
     }
-    
+
     if((getChildren() !is null) && (!itemAboveIsSeparator)){
       append(new SeparatorMenuItem);
     }
-    
+
     if((!parentIncluded) && selected.length > 0){
       append(new MenuItem(&RenameFun, "_Rename"));
     }
-    
+
     if((!parentIncluded) && selected.length != 0){
       append(new MenuItem(&DeleteFun!(true), "Move to _Trash"));
       append(new SeparatorMenuItem);
       // append(new MenuItem(&DeleteFun!(false), "_Delete"));
     }
-    
+
     append(new MenuItem(&MkdirFun, "_Make directory"));
-    
+
     // nautilus-scripts
     auto scriptsDir = scripts.GetScriptsDirTop();
     if(scriptsDir !is null){
       AppendScriptDirectory(this, scriptsDir);
     }
-    
+
     append(new SeparatorMenuItem);
     if(selectedOneIsDir_){// only one entry is selected
       append(new MenuItem(&AddDirectoryShortcutFun, "_Add shortcut button"));
     }
     append(new MenuItem(&PreferenceDialogFun, "Pre_ferences"));
-    
+
     showAll();
   }
-  
+
 private:
   void PreferenceDialogFun(MenuItem item)
   {
     StartConfigDialog();
   }
-  
+
   void ExecuteFun(MenuItem item)
   {
     string command = selectedFiles_[0].getPath() ~ " & \0";
     system(command.ptr);
   }
-  
+
   void OpenAllFun(MenuItem item)
   {
     for(int i=0; i<selectedFiles_.length; ++i){
       LaunchApp(defaultApps_[i], selectedFiles_[i]);
     }
   }
-  
+
   void OpenFun(MenuItem item)
   {
     assert(defaultApps_[0] !is null);
@@ -242,19 +242,19 @@ private:
       LaunchApp(defaultApps_[0], selectedFiles_[0]);
     }
   }
-  
+
   void SubmenuItemToggled(CheckMenuItem)
   {
     submenuItem_.setActive(setDefaultApp_);
   }
-  
+
   bool SubmenuItemClicked(GdkEventButton * eb, Widget w)
   {
     setDefaultApp_ = !setDefaultApp_;
     submenuItem_.setActive(setDefaultApp_);
     return false;
   }
-  
+
   void OpenWithFun(MenuItem item)
   {
     string label = item.getLabel();
@@ -271,46 +271,46 @@ private:
       }
     }
   }
-  
+
   void OpenWithCommandFun(MenuItem item)
   {
     string command = InputDialog("", "command: ");
     if(command.length == 0){
       return;
     }
-    
+
     string fullcommand = command ~ ' ' ~ pwd_ ~ selectedFileNames_[0] ~ " &\0";
     system(fullcommand.ptr);
   }
-  
+
   void CutFun(MenuItem item) {PreparePaste(true,  pwd_, selectedFileNames_, view_);}
   void CopyFun(MenuItem item){PreparePaste(false, pwd_, selectedFileNames_, view_);}
   void PasteFun(MenuItem item){PasteFiles(pwd_);}
-  
+
   void RenameFun(MenuItem item)
   {
     RenameFiles(pwd_, selectedFileNames_);
     view_.TryUpdate();
   }
-  
+
   void DeleteFun(bool toTrash)(MenuItem item)
   {
     DeleteFiles!(toTrash)(pwd_, selectedFileNames_);
   }
-  
+
   void MkdirFun(MenuItem item)
   {
     MakeDirectory(pwd_);
   }
-  
+
   void AddDirectoryShortcutFun(MenuItem item)
   {
     string path = (nameCursor_ == "../" ? ParentDirectory(pwd_) : (pwd_ ~ nameCursor_));
     rcfile.AddDirectoryShortcut(path);
   }
-  
-  
-  
+
+
+
   /////////////////// nautilus-scripts
   void AppendScriptDirectory(Menu m, scripts.ScriptsDir dir)
   {
@@ -332,12 +332,12 @@ private:
       }
     }
   }
-  
+
   void LaunchNautilusScript(MenuItem i)
   {
     auto item = cast(MenuItemWithScript)i;
     string scriptPath = item.path_ ~ '\0';
-    
+
     // environment variables
     string[string] denv = Environment.get();
     char*[] envv;
@@ -345,10 +345,10 @@ private:
     foreach(key; keys){
       envv ~= Str.toStringz(key ~ '=' ~ denv[key]);
     }
-    
+
     // environment variables specific to nautilus-scripts
     string currentURI = "NAUTILUS_SCRIPT_CURRENT_URI=file://" ~ RemoveSlash(pwd_) ~ '\0';
-    
+
     string selectedFilePaths = "NAUTILUS_SCRIPT_SELECTED_FILE_PATHS=";
     string selectedURIs = "NAUTILUS_SCRIPT_SELECTED_URIS=";
     foreach(name; selectedFileNames_){
@@ -358,19 +358,19 @@ private:
     }
     selectedFilePaths ~= '\0';
     selectedURIs      ~= '\0';
-    
+
     envv ~= currentURI.ptr;
     envv ~= selectedFilePaths.ptr;
     envv ~= selectedURIs.ptr;
     envv ~= null;
-    
+
     // arguments
     char*[] argv;
     foreach(name; selectedFileNames_){
       argv ~= Str.toStringz(name);
     }
     argv ~= null;
-    
+
     // fork-exec
     pid_t p = fork();
     if(p == 0){// child process
@@ -378,7 +378,7 @@ private:
       execve(scriptPath.ptr, argv.ptr, envv.ptr);
     }
   }
-  
+
   class MenuItemWithScript : MenuItem
   {
     string path_;

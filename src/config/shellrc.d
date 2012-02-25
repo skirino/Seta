@@ -48,17 +48,17 @@ class ShellSetting
 private:
   bool autoCd_ = false;
   ChangeDirAlias[] cdAliases_;
-  
+
 public:
   bool GetAutoCd(){return autoCd_;}
   ChangeDirAlias[] GetChangeDirAliases(){return cdAliases_;}
-  
+
   this(char[] home, char[] shell)
   {
     if(home.length == 0 || shell.length == 0){
       return;// there's nothing I can do
     }
-    
+
     // obtain fullpaths to the shell's rc file
     uint possh    = shell.locatePattern("sh");
     uint posslash = shell.locatePrior('/', possh);
@@ -75,9 +75,9 @@ public:
         "/etc/" ~ shelltype ~ '/' ~ shelltype ~ "rc", // /etc/zsh/zshrc
         "/etc/" ~ shelltype ~ '/' ~ shelltype ~ "env" // /etc/zsh/zshenv
       ];
-    
+
     bool[char[]] filesProcessed;
-    
+
     for(size_t i=0; i<filenames.length; ++i){
       char[] filename = filenames[i];
       if(!(filename in filesProcessed)){
@@ -87,18 +87,18 @@ public:
       }
     }
   }
-  
+
 private:
   char[][] ReadFile(char[] filename, char[] home)
   {
     char[][] fileList;
-    
+
     try{
       scope file = new File(filename);
       scope lines = new Lines!(char)(file);
       foreach(line; lines){
         char[] l = trim(line);
-        
+
         // search for lines such as "alias cdu='cd ..'"
         // assume Bourne-like shell
         if(l.StartsWith("alias ")){// alias command
@@ -113,7 +113,7 @@ private:
             }
           }
         }
-        
+
         // search for "setopt auto_cd"
         if(l.StartsWith("setopt ")){
           char[] l2 = triml(l[7 .. $]);
@@ -121,7 +121,7 @@ private:
             autoCd_ = true;
           }
         }
-        
+
         // "source" command
         if(l.StartsWith("source ")){
           char[] args = triml(l[7 .. $]);
@@ -130,11 +130,11 @@ private:
           fileList ~= home ~ '/' ~ ExpandEnvVars(arg);
         }
       }
-      
+
       file.close;
     }
     catch(Exception ex){}// IOException: no such file or directory
-    
+
     return fileList;
   }
 }

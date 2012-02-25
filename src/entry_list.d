@@ -31,14 +31,14 @@ private:
   Vector!(DirEntry) fAll_;
   Vector!(DirEntry) dSorted_;
   Vector!(DirEntry) fSorted_;
-  
+
   // workspace to read, filter and sort entries
   Vector!(DirEntry) dTemp_;
   Vector!(DirEntry) fTemp_;
   Vector!(DirEntry) dFiltered_;
   Vector!(DirEntry) fFiltered_;
-  
-  
+
+
 public:
   this()
   {
@@ -51,7 +51,7 @@ public:
     dFiltered_ = new Vector!(DirEntry)(200);
     fFiltered_ = new Vector!(DirEntry)(200);
   }
-  
+
   Vector!(DirEntry) GetDAll(){return dAll_;}
   Vector!(DirEntry) GetFAll(){return fAll_;}
   Vector!(DirEntry) GetDSorted(){return dSorted_;}
@@ -60,17 +60,17 @@ public:
   Vector!(DirEntry) GetFTemp(){return fTemp_;}
   Vector!(DirEntry) GetDFiltered(){return dFiltered_;}
   Vector!(DirEntry) GetFFiltered(){return fFiltered_;}
-  
+
   size_t NumEntriesAll()
   {
     return dAll_.size() + fAll_.size();
   }
-  
+
   size_t NumEntriesSorted()
   {
     return dSorted_.size() + fSorted_.size();
   }
-  
+
   void SwapEntries(bool withEnumerateDirEntries)()
   {
     static if(withEnumerateDirEntries){

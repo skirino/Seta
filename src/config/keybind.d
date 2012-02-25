@@ -36,17 +36,17 @@ struct KeyCode
 {
   GdkModifierType state_;
   uint keyval_, actIdx_;
-  
+
   bool IsValid()
   {
     return state_ > 0 || keyval_ > 0;
   }
-  
+
   bool IsEqual(KeyCode code)
   {
     return (state_ == code.state_) && (keyval_ == code.keyval_);
   }
-  
+
   string toString()
   {
     return AccelGroup.acceleratorName(keyval_, state_);
@@ -57,22 +57,22 @@ struct KeyCode
 private KeyCode MakeKeyCode(GdkEventKey * ekey)// constructor
 {
   KeyCode code;
-  
+
   // translate redundant keyvals into the standard one
   switch(ekey.keyval){
   case GdkKeysyms.GDK_KP_Tab, GdkKeysyms.GDK_ISO_Left_Tab, GdkKeysyms.GDK_3270_BackTab:
     code.keyval_ = GdkKeysyms.GDK_Tab;
     break;
-    
+
     // other redundant keyvals should be put here ...
-    
+
   default:
     code.keyval_ = ekey.keyval;
   }
-  
+
   code.state_ = TurnOffLockFlags(ekey.state);
   code.actIdx_ = 0;
-  
+
   return code;
 }
 
@@ -121,11 +121,11 @@ string SerializeKeyCodeList(KeyCode[] codes)
 private struct MapKeyAction
 {
   KeyCode[] actions_;
-  
+
   int QueryAction(GdkEventKey * ekey)
   {
     KeyCode code = MakeKeyCode(ekey);
-    
+
     // simple linear search
     foreach(action; actions_){
       if(code.IsEqual(action)){
@@ -134,12 +134,12 @@ private struct MapKeyAction
     }
     return -1;
   }
-  
+
   void Register(KeyCode code)
   {
     actions_ ~= code;
   }
-  
+
   void Clear()
   {
     actions_.length = 0;
@@ -196,7 +196,7 @@ void Init()
   keymaps[1].Clear();
   keymaps[2].Clear();
   keymaps[3].Clear();
-  
+
   KeyCode[][string] dict = rcfile.GetKeybinds();
   foreach(key; dict.keys){
     int x = ActionKeyToIndex(key);
@@ -206,14 +206,14 @@ void Init()
       }
     }
   }
-  
+
   // keybinds in terminal which should not be modified by users
   // register Ret, C-j, C-m, C-o
   keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0, GdkKeysyms.GDK_Return, TerminalAction.Enter));
   keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_j, TerminalAction.Enter));
   keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_m, TerminalAction.Enter));
   keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_o, TerminalAction.Enter));
-  
+
   // register Tab, C-i
   keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0, GdkKeysyms.GDK_Tab, TerminalAction.Replace));
   keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_i, TerminalAction.Replace));

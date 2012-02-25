@@ -35,10 +35,10 @@ public:// make it easier to access through Mediator class
   char[] rootDir_;
   char[] homeDir_;
   char[] pwdLocal_;
-  
+
 public:
   this(){SetLocal();}
-  
+
   char[] SetLocal()
   {
     remote_ = false;
@@ -46,13 +46,13 @@ public:
     homeDir_ = Environment.get("HOME") ~ '/';
     return pwdLocal_;
   }
-  
+
   void SetRemote(char[] remoteRoot, char[] username, char[] homeDir, char[] pwdLocal)
   {
     remote_ = true;
     rootDir_ = AppendSlash(remoteRoot);
     pwdLocal_ = pwdLocal;
-    
+
     // Try to get $(HOME) of remote filesystem.
     char[] ret = GetHomeDirFrom_etc_passwd(username);
     if(ret !is null){
@@ -62,7 +62,7 @@ public:
         return;
       }
     }
-    
+
     // "homeDir" is not valid.
     if(homeDir !is null){
       char[] vfspath = MountedVFSPath(homeDir);
@@ -71,21 +71,21 @@ public:
         return;
       }
     }
-    
+
     // Both failed.
     homeDir_ = null;
   }
-  
+
   bool LookingAtRemoteFS(char[] pwd)
   {
     return remote_ || containsPattern(pwd, "/.gvfs/sftp");
   }
-  
+
   char[] ParentDirectory(char[] path)
   {
     return utils.string_util.ParentDirectory(path, rootDir_);
   }
-  
+
   // for terminal which uses remote (native) filesystem path
   // "/home/user/.gvfs/sftp.../home/user2/somewhere/" => "/home/user2/somewhere/"
   char[] NativePath(char[] vfspath)
@@ -98,7 +98,7 @@ public:
       return vfspath;
     }
   }
-  
+
   // for filer which uses locally-mounted vfs path
   char[] MountedVFSPath(char[] path)
   {
@@ -109,7 +109,7 @@ public:
       return path;
     }
   }
-  
+
 private:
   char[] GetHomeDirFrom_etc_passwd(char[] username)
   {

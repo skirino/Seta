@@ -45,32 +45,32 @@ private:
   bool canceled_;
   string dir_;
   Widget fv_;
-  
+
   // directory entries (reference to class fields in FileView)
   Vector!(DirEntry) entriesDAll_;
   Vector!(DirEntry) entriesFAll_;
   Vector!(DirEntry) entriesDFiltered_;
   Vector!(DirEntry) entriesFFiltered_;
-  
+
   void delegate(bool, string, File) setRowsCallback_;
-  
-  
-  
+
+
+
   /////////////// fields
 private:
   // enumerate
   bool remote_;
   string attributes_;
   File pwdFile_;
-  
+
   // filter
   bool showHidden_;
   string filterText_;
-  
+
   // sort
   ColumnType sortColumn_;
   GtkSortType sortOrder_;
-  
+
 public:
   void SetForEnumerate(bool remote, string attr, File pwdFile)
   {
@@ -84,25 +84,25 @@ public:
     }
     pwdFile_ = pwdFile;
   }
-  
+
   void SetForFilter(bool showHidden, string filter)
   {
     showHidden_ = showHidden;
     filterText_ = filter;
   }
-  
+
   void SetForSort(ColumnType sortColumn, GtkSortType sortOrder)
   {
     sortColumn_ = sortColumn;
     sortOrder_ = sortOrder;
   }
   /////////////// fields
-  
-  
-  
+
+
+
   /////////////// inside worker thread
 private:
-  
+
   static const string ReturnProcess =
     "
     gdkThreadsEnter();
@@ -114,29 +114,29 @@ private:
     "if(canceled_){" ~
       ReturnProcess ~
     "}";
-  
+
   static const string CloseAndReturnIfCanceled =
     "if(canceled_){
       enumerate.close(null);" ~
       ReturnProcess ~
     "}";
-  
+
   void EnumerateFilterSort()
   {
     mixin(ReturnIfCanceled);
-    
+
     // enumerate children and store them into "entriesDAll_"
     entriesDAll_.clear();
     entriesFAll_.clear();
-    
+
     // this code should be surrounded by try statement
     scope enumerate = pwdFile_.enumerateChildren(attributes_, GFileQueryInfoFlags.NONE, null);
-    
+
     GFileInfo * pinfo;
     if(remote_){// remote
       while((pinfo = enumerate.nextFile(null)) != null){
         mixin(CloseAndReturnIfCanceled);
-        
+
         scope FileInfo info = new FileInfo(pinfo);
         if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
           entriesDAll_.append(new DirEntry(info, 0));
@@ -149,7 +149,7 @@ private:
     else{// local
       while((pinfo = enumerate.nextFile(null)) != null){
         mixin(CloseAndReturnIfCanceled);
-        
+
         scope FileInfo info = new FileInfo(pinfo);
         if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
           entriesDAll_.append(new DirEntry(info, dir_));
@@ -159,16 +159,16 @@ private:
         }
       }
     }
-    
+
     enumerate.close(null);
-    
+
     FilterSort();
   }
-  
+
   void FilterSort()
   {
     mixin(ReturnIfCanceled);
-    
+
     // filter "entriesDAll_" -> "entriesDFiltered_"
     struct FilterHiddenFiles
     {
@@ -176,7 +176,7 @@ private:
         return e.GetName()[0] != '.';
       }
     }
-    
+
     struct FilterByName
     {
       string filterText_;
@@ -184,7 +184,7 @@ private:
         return containsPattern(e.GetName(), filterText_);
       }
     }
-    
+
     struct FilterHiddenAndName
     {
       string filterText_;
@@ -194,7 +194,7 @@ private:
         return name[0] != '.' && name.containsPattern(filterText_);
       }
     }
-    
+
     if(filterText_.length == 0){// simply copy contents
       if(showHidden_){
         entriesDAll_.copy(entriesDFiltered_);
@@ -220,10 +220,10 @@ private:
         entriesFAll_.filter!(FilterHiddenAndName)(entriesFFiltered_, f);
       }
     }
-    
+
     mixin(ReturnIfCanceled);
-    
-    
+
+
     // start sorting
     switch(sortColumn_){
     case ColumnType.NAME:
@@ -296,15 +296,15 @@ private:
         StoppableMPSort(entriesFFiltered_, &CompareLastModifiedThenName!(false));
       }
       break;
-      
+
     default:
     }
-    
+
     mixin(ReturnIfCanceled);
-    
+
     NotifyFinish();
   }
-  
+
   // on finish
   void NotifyFinish()
   {
@@ -314,9 +314,9 @@ private:
     gdkThreadsLeave();
   }
   /////////////// inside worker thread
-  
-  
-  
+
+
+
 public:
   this(
     bool readDisk,
@@ -338,39 +338,39 @@ public:
     dir_ = dir;
     fv_ = fv;
     setRowsCallback_ = callback;
-    
+
     // if(readDisk) : entriesD is already filled by valid entries
     // else         : it is necessary to read the filesystem and store entries into "entriesDAll_"
     entriesDAll_ = entriesD;
     entriesFAll_ = entriesF;
     entriesDFiltered_ = entriesDFiltered;
     entriesFFiltered_ = entriesFFiltered;
-    
+
     Register();
   }
-  
+
   string GetThreadListLabel(string startTime)
   {
     return "Preparing directory entries in \"" ~ dir_ ~ "\" (" ~ startTime ~ ')';
   }
-  
+
   void Stop()
   {
     canceled_ = true;
   }
-  
+
   string GetStopDialogLabel(string startTime)
   {
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
   }
-  
+
   gdk.Window.Window GetAssociatedWindow()
   {
     return (fv_ is null) ? null : fv_.getWindow();
   }
-  
-  
-  
+
+
+
   ///////////////// cancellable sort (based on mpsort in coreutils package, used by e.g. /bin/ls)
 private:
   /*
@@ -386,25 +386,25 @@ private:
     if(canceled_){
       return true;
     }
-    
+
     size_t n1 = n / 2;
     size_t n2 = n - n1;
-    
+
     if(mpsort_with_tmp (base + n1, n2, tmp, cmp)){
       return true;
     }
-    
+
     if(mpsort_with_tmp (base,      n1, tmp, cmp)){
       return true;
     }
-    
+
     size_t a = 0;
     size_t alim = n1;
     size_t b = n1;
     size_t blim = n;
     DirEntry ba = base[a];
     DirEntry bb = base[b];
-    
+
     for (;;){
       if (cmp (ba, bb) <= 0){
         *tmp++ = ba;
@@ -424,11 +424,11 @@ private:
         bb = base[b];
       }
     }
-    
+
     memcpy (tmp, base + a, (alim - a) * DirEntry.sizeof);
     return false;
   }
-  
+
   /*
     Sort a vector BASE containing N pointers, in place.  Use TMP
     (containing N / 2 pointers) for temporary storage.  Compare
@@ -455,14 +455,14 @@ private:
       if(canceled_){
         return true;
       }
-      
+
       size_t n1 = n / 2;
       size_t n2 = n - n1;
-      
+
       if(mpsort_with_tmp (base + n1, n2, tmp, cmp)){
         return true;
       }
-      
+
       if (n1 < 2){
         tmp[0] = base[0];
       }
@@ -471,14 +471,14 @@ private:
           return true;
         }
       }
-      
+
       size_t t = 0;
       size_t tlim = n1;
       size_t b = n1;
       size_t blim = n;
       DirEntry tt = tmp[t];
       DirEntry bb = base[b];
-      
+
       for (size_t i = 0; ; ){
         if (cmp (tt, bb) <= 0){
           base[i++] = tt;
@@ -500,7 +500,7 @@ private:
       return false;
     }
   }
-  
+
   void StoppableMPSort(Pred)(Vector!(DirEntry) buf, Pred pred)
   {
     size_t n = buf.size();

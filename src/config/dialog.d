@@ -71,58 +71,58 @@ void StartConfigDialog()
 private class ConfigDialog : Dialog
 {
   Notebook note_;
-  
+
   this()
   {
     super();
     setDefaultSize(640, 600);
     addOnResponse(&Respond);
-    
+
     addButton(StockID.CANCEL, GtkResponseType.GTK_RESPONSE_CANCEL);
     addButton(StockID.APPLY, GtkResponseType.GTK_RESPONSE_APPLY);
     addButton(StockID.OK, GtkResponseType.GTK_RESPONSE_OK);
-    
+
     note_ = new Notebook;
     note_.setScrollable(1);
     getContentArea().add(note_);
-    
+
     InitLayoutPage();
     InitKeybindPage();
     InitTerminalPage();
     InitDirectoriesPage();
   }
-  
+
 private:
   ///////////////////// [Keybind]
   TreeView keybinds_;
   TreeStore keyStore_;
   TreeIter[4] categories_;
   KeyCode[][string] dictKeyCode_;
-  
+
   void InitKeybindPage()
   {
     keybinds_ = new TreeView;
     keybinds_.setEnableSearch(0);
     keybinds_.addOnButtonPress(&KeybindButtonPress);
-    
+
     auto sw = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
     sw.add(keybinds_);// without Viewport
     note_.appendPage(sw, "Key bindings");
-    
+
     auto rend0 = new CellRendererText;
     auto col0 = new TreeViewColumn("Category", rend0, "text", 0);
     col0.setSizing(GtkTreeViewColumnSizing.FIXED);
     col0.setResizable(1);
     col0.setMinWidth(120);
     keybinds_.appendColumn(col0);
-    
+
     auto rend1 = new CellRendererText;
     auto col1 = new TreeViewColumn("Action", rend1, "text", 1);
     col1.setSizing(GtkTreeViewColumnSizing.FIXED);
     col1.setResizable(1);
     col1.setMinWidth(180);
     keybinds_.appendColumn(col1);
-    
+
     auto rend2 = new CellRendererAccel;
     rend2.setProperty("accel-mode", cast(int)GtkCellRendererAccelMode.MODE_OTHER);// to react to accels with Tab
     rend2.addOnAccelEdited(&AccelEdited);
@@ -133,28 +133,28 @@ private:
     col2.setResizable(1);
     col2.setMinWidth(180);
     keybinds_.appendColumn(col2);
-    
+
     //                         Category      Action        Key           (editable)
     keyStore_ = new TreeStore([GType.STRING, GType.STRING, GType.STRING, GType.BOOLEAN]);
     keybinds_.setModel(keyStore_);
-    
+
     categories_[0] = keyStore_.createIter();
     keyStore_.setValue(categories_[0], 0, "general");
-    
+
     categories_[1] = keyStore_.createIter();
     keyStore_.setValue(categories_[1], 0, "file manager");
-    
+
     categories_[2] = keyStore_.createIter();
     keyStore_.setValue(categories_[2], 0, "file view");
-    
+
     categories_[3] = keyStore_.createIter();
     keyStore_.setValue(categories_[3], 0, "terminal");
-    
+
     // arrange rows
     dictKeyCode_ = rcfile.GetKeybinds();
     string[] keys = dictKeyCode_.keys;
     keys.sort;
-    
+
     foreach(key; keys){
       int x = ActionKeyToIndex(key);
       if(x != -1){
@@ -168,17 +168,17 @@ private:
         }
       }
     }
-    
+
     keybinds_.expandAll();
   }
-  
+
   void AccelEdited(string pathStr, uint key, GdkModifierType mod, uint hardwareKeycode, CellRendererAccel rend)
   {
     // update contents of the cell by the accelerator name
     TreeIter iter = GetIterFromString(keyStore_, pathStr);
     keyStore_.setValue(iter, 2, AccelGroup.acceleratorName(key, mod));
   }
-  
+
   void AccelCleared(string pathStr, CellRendererAccel rend)
   {
     // Backspace is pressed
@@ -186,11 +186,11 @@ private:
     TreeIter iter = GetIterFromString(keyStore_, pathStr);
     keyStore_.setValue(iter, 2, AccelGroup.acceleratorName(cast(uint)GdkKeysyms.GDK_BackSpace, cast(GdkModifierType)0));
   }
-  
+
   void ApplyChangesInKeybind()
   {
     bool changed = false;
-    
+
     TreeIter iter = new TreeIter;
     iter.setModel(keyStore_);
     foreach(i, category; categories_){
@@ -198,7 +198,7 @@ private:
         string categoryName = IndexToActionKey(i) ~ '.';
         string previousKey;
         string[] codeList;
-        
+
         do{
           string key  = iter.getValueString(1);
           string code = iter.getValueString(2);
@@ -211,7 +211,7 @@ private:
             if(previousKey.length > 0){// exclude first time for each category
               changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
             }
-            
+
             previousKey = key;
             codeList.length = 0;
             if(code.length > 0){// skip empty (cleared) row
@@ -220,67 +220,67 @@ private:
           }
         }
         while(keyStore_.iterNext(iter));
-        
+
         if(previousKey.length > 0){
           changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
         }
       }
     }
-    
+
     if(changed){
       rcfile.ReconstructKeybinds();
     }
   }
-  
+
   // right click menu
   bool KeybindButtonPress(GdkEventButton * eb, Widget w)
   {
     if(eb.window != keybinds_.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-    
+
     if(eb.button != MouseButton.RIGHT){// not right button
       return false;
     }
-    
+
     grabFocus();
-    
+
     TreePath path = GetPathAtPos(keybinds_, eb.x, eb.y);
     if(path is null){// empty space is clicked
       return false;
     }
-    
+
     TreeIter iter = GetIter(keyStore_, path);
     path.free();
-    
+
     // show menu for "Clear" and "Add"
     scope menu = new KeybindMenu(keyStore_, iter);
     menu.popup(0, eb.time);
-    
+
     return false;
   }
-  
+
   class KeybindMenu : Menu
   {
     TreeStore keyStore_;
     TreeIter iter_;
-    
+
     this(TreeStore store, TreeIter iter)
     {
       keyStore_ = store;
       iter_ = iter;
-      
+
       append(new MenuItem(&Clear, "_Clear this accelerator"));
       append(new MenuItem(&Add, "_Add new accelerator for this action"));
-      
+
       showAll();
     }
-    
+
     void Clear(MenuItem item)
     {
       keyStore_.setValue(iter_, 2, "");
     }
-    
+
     void Add(MenuItem item)
     {
       TreeIter next = new TreeIter;
@@ -290,45 +290,45 @@ private:
     }
   }
   ///////////////////// [Keybind]
-  
-  
-  
+
+
+
   ///////////////////// [Layout]
   Table pageLayout_;
   SpinButton sbWidthType_, sbWidthSize_, sbWidthOwner_, sbWidthPermissions_, sbWidthLastModified_;
   SpinButton sbWidthDirectoryTree_, sbHeightStatusbar_;
-  
+
   // toolbar
   CheckButton cbShowBackButton_, cbShowForwardButton_, cbShowUpButton_, cbShowRootButton_, cbShowHomeButton_,
     cbShowOtherSideButton_, cbShowRefreshButton_, cbShowSSHButton_, cbShowHiddenButton_, cbShowDirTreeButton_,
     cbShowFilter_;
   SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
-  
+
   // main widgets
   SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_;
-  
+
   // row colors
   ColorButton cbColorDirectory_, cbColorFile_, cbColorSymlink_, cbColorExecutable_;
-  
+
   void InitLayoutPage()
   {
     pageLayout_ = AppendWrappedTable(note_, "Appearance");
-    
+
     uint row = 0;
-    
+
     AttachSectionLabel(pageLayout_, row++, "Columns in file view (0 to hide)");
     mixin(AddSpinButton!("Layout", "WidthType",         "0, 500, 1", "Width of 'type' column: "));
     mixin(AddSpinButton!("Layout", "WidthSize",         "0, 500, 1", "Width of 'size' column: "));
     mixin(AddSpinButton!("Layout", "WidthOwner",        "0, 500, 1", "Width of 'owner' column: "));
     mixin(AddSpinButton!("Layout", "WidthPermissions",  "0, 500, 1", "Width of 'permissions' column: "));
     mixin(AddSpinButton!("Layout", "WidthLastModified", "0, 500, 1", "Width of 'last modified' column: "));
-    
+
     AttachSectionLabel(pageLayout_, row++, "Colors for rows in file list");
     mixin(AddColorButton!("Layout", "ColorSymlink",    "Color for symbolic links: "));
     mixin(AddColorButton!("Layout", "ColorDirectory",  "Color for directories: "));
     mixin(AddColorButton!("Layout", "ColorExecutable", "Color for executable files: "));
     mixin(AddColorButton!("Layout", "ColorFile",       "Color for the others: "));
-    
+
     AttachSectionLabel(pageLayout_, row++, "Toolbar");
     mixin(AddCheckButton!("Layout", "ShowBackButton", "Show 'go back' button"));
     mixin(AddCheckButton!("Layout", "ShowForwardButton", "Show 'go forward' button"));
@@ -341,14 +341,14 @@ private:
     mixin(AddCheckButton!("Layout", "ShowHiddenButton", "Show 'show/hide hidden files' button"));
     mixin(AddCheckButton!("Layout", "ShowDirTreeButton", "Show 'show/hide directory tree' button"));
     mixin(AddCheckButton!("Layout", "ShowFilter", "Show filter box"));
-    
+
     mixin(AddSpinButton!("Layout", "WidthFilterEntry", "0, 200, 1", "Width of filter box in toolbar: "));
     mixin(AddSpinButton!("Layout", "WidthShortcutButton", "0, 200, 1", "Width of shortcut buttons in toolbar: "));
-    
+
     AttachSectionLabel(pageLayout_, row++, "Other widgets");
     mixin(AddSpinButton!("Layout", "WidthDirectoryTree", "0, 500, 1", "Default width of directory tree widget (0 to hide): "));
     mixin(AddSpinButton!("Layout", "HeightStatusbar", "0, 100, 1", "Height of the statusbar (0 to hide): "));
-    
+
     AttachSectionLabel(pageLayout_, row++, "Sizes of main widgets");
     mixin(AddSpinButton!("Layout", "SplitH", "0, 5000, 10", "Width of the left half: "));
     mixin(AddSpinButton!("Layout", "SplitVLeft" , "0, 5000, 10", "Height of the upper half on the left side: "));
@@ -356,22 +356,22 @@ private:
     mixin(AddSpinButton!("Layout", "WindowSizeH", "10, 5000, 10", "Horizontal size of the main window: "));
     mixin(AddSpinButton!("Layout", "WindowSizeV", "10, 5000, 10", "Vertical size of the main window: "));
   }
-  
+
   void ApplyChangesInLayout()
   {
     bool changed = false;
-    
+
     mixin(CheckSpinButton!("WidthType"));
     mixin(CheckSpinButton!("WidthSize"));
     mixin(CheckSpinButton!("WidthOwner"));
     mixin(CheckSpinButton!("WidthPermissions"));
     mixin(CheckSpinButton!("WidthLastModified"));
-    
+
     mixin(CheckColorButton!("Layout", "ColorSymlink"));
     mixin(CheckColorButton!("Layout", "ColorDirectory"));
     mixin(CheckColorButton!("Layout", "ColorExecutable"));
     mixin(CheckColorButton!("Layout", "ColorFile"));
-    
+
     mixin(CheckCheckButton!("Layout", "ShowBackButton"));
     mixin(CheckCheckButton!("Layout", "ShowForwardButton"));
     mixin(CheckCheckButton!("Layout", "ShowUpButton"));
@@ -383,27 +383,27 @@ private:
     mixin(CheckCheckButton!("Layout", "ShowHiddenButton"));
     mixin(CheckCheckButton!("Layout", "ShowDirTreeButton"));
     mixin(CheckCheckButton!("Layout", "ShowFilter"));
-    
+
     mixin(CheckSpinButton!("WidthFilterEntry"));
     mixin(CheckSpinButton!("WidthShortcutButton"));
-    
+
     mixin(CheckSpinButton!("WidthDirectoryTree"));
     mixin(CheckSpinButton!("HeightStatusbar"));
-    
+
     mixin(CheckSpinButton!("SplitH"));
     mixin(CheckSpinButton!("SplitVLeft"));
     mixin(CheckSpinButton!("SplitVRight"));
     mixin(CheckSpinButton!("WindowSizeH"));
     mixin(CheckSpinButton!("WindowSizeV"));
-    
+
     if(changed){
       page_list.NotifySetLayout();
     }
   }
   ///////////////////// [Layout]
-  
-  
-  
+
+
+
   ///////////////////// [Terminal]
   Table pageTerminal_;
   FontButton fontButton_;
@@ -413,36 +413,36 @@ private:
   Entry entPROMPT_, entRPROMPT_, entReplaceTargetLeft_, entReplaceTargetRight_,
     entUserDefinedText1_, entUserDefinedText2_, entUserDefinedText3_, entUserDefinedText4_, entUserDefinedText5_,
     entUserDefinedText6_, entUserDefinedText7_, entUserDefinedText8_, entUserDefinedText9_;
-  
+
   void InitTerminalPage()
   {
     pageTerminal_ = AppendWrappedTable(note_, "Terminal");
-    
+
     uint row = 0;
-    
+
     AttachSectionLabel(pageTerminal_, row++, "Appearance");
     fontButton_ = new FontButton(rcfile.GetFont());
     AttachPairWidget(pageTerminal_, row++, "Fo_nt used in terminals: ", fontButton_);
-    
+
     mixin(AddColorButton!("Terminal", "ColorForeground", "_Foreground color: "));
     mixin(AddColorButton!("Terminal", "ColorBackground", "_Background color: "));
-    
+
     mixin(AddSpinButton!("Terminal", "Transparency", "0.0, 1.0, 0.1", "_Transparency of background: "));
-    
+
     AttachSectionLabel(pageTerminal_, row++, "Hints for Seta to extract command-line argument");
-    
+
     mixin(AddEntry!("Terminal", "PROMPT",  "\"_PROMPT for terminal: \"", "PROMPT in shell"));
     mixin(AddEntry!("Terminal", "RPROMPT", "\"_RPROMPT for terminal (zsh): \"",
                     "RPROMPT in zsh, which is usually used to show additional information (e.g. working directory) on right side of terminal window"));
-    
+
     AttachSectionLabel(pageTerminal_, row++, "Assist in inputting directory paths by substitution in command-line");
     mixin(AddCheckButton!("Terminal", "EnablePathExpansion", "_Enable this feature"));
-    
+
     mixin(AddEntry!("Terminal", "ReplaceTargetLeft",  "\"Signature to be replaced with path (left): \"",
                     "In the case of $L<n>DIR, $LDIR will be replaced with pwd in left pane, $L1DIR with pwd in 1st tab in left pane and so on, when Enter or Tab is pressed."));
     mixin(AddEntry!("Terminal", "ReplaceTargetRight", "\"Signature to be replaced with path (right): \"",
                     "In the case of $R<n>DIR, $RDIR will be replaced with pwd in right pane, $R1DIR with pwd in 1st tab in right pane and so on, when Enter or Tab is pressed."));
-    
+
     AttachSectionLabel(pageTerminal_, row++, "User defined texts that can be input by keyboard shortcuts\n   (\"\\n\" will be replaced with newline)");
     mixin(AddEntry!("Terminal", "UserDefinedText1",
                     "\"User defined text 1 (bound to \" ~ rcfile.GetInputUserDefinedText1() ~ ')'"));
@@ -463,23 +463,23 @@ private:
     mixin(AddEntry!("Terminal", "UserDefinedText9",
                     "\"User defined text 9 (bound to \" ~ rcfile.GetInputUserDefinedText9() ~ ')'"));
   }
-  
+
   void ApplyChangesInTerminal()
   {
     bool changed = false;
-    
+
     changed |= rcfile.ResetStringz("Terminal", "Font", fontButton_.getFontName());
-    
+
     mixin(CheckColorButton!("Terminal", "ColorForeground"));
     mixin(CheckColorButton!("Terminal", "ColorBackground"));
-    
+
     changed |= rcfile.ResetDouble("Terminal", "BackgroundTransparency", sbTransparency_.getValue());
-    
+
     changed |= rcfile.ResetStringz("Terminal", "PROMPT",  entPROMPT_ .getText());
     changed |= rcfile.ResetStringz("Terminal", "RPROMPT", entRPROMPT_.getText());
-    
+
     mixin(CheckCheckButton!("Terminal", "EnablePathExpansion"));
-    
+
     // check whether replace targets have "<n>"
     string targetL = entReplaceTargetLeft_.getText();
     if(targetL.containsPattern("<n>")){
@@ -495,7 +495,7 @@ private:
     else{
       PopupBox.error(targetR ~ " is neglected since the signature for replace should contain \"<n>\".", "");
     }
-    
+
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText1", entUserDefinedText1_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText2", entUserDefinedText2_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText3", entUserDefinedText3_.getText());
@@ -505,45 +505,45 @@ private:
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText7", entUserDefinedText7_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText8", entUserDefinedText8_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText9", entUserDefinedText9_.getText());
-    
+
     if(changed){
       page_list.NotifyApplyTerminalPreferences();
     }
   }
   ///////////////////// [Terminal]
-  
-  
-  
+
+
+
   ///////////////////// [Directories]
   Table pageDirectories_;
   Entry initialDirLEntry_, initialDirREntry_, sshOptionEntry_;
   TreeView shortcuts_;
   ListStore shortcutsStore_;
-  
+
   void InitDirectoriesPage()
   {
     pageDirectories_ = AppendWrappedTable(note_, "Directories and SSH");
-    
+
     uint row = 0;
-    
+
     AttachSectionLabel(pageDirectories_, row++, "Miscellaneous");
-    
+
     initialDirLEntry_ = new Entry(NonnullString(rcfile.GetInitialDirectoryLeft()));
     AttachPairWidget(pageDirectories_, row++, "Initial directory for left pane:  ", initialDirLEntry_);
-    
+
     initialDirREntry_ = new Entry(NonnullString(rcfile.GetInitialDirectoryRight()));
     AttachPairWidget(pageDirectories_, row++, "Initial directory for right pane: ", initialDirREntry_);
-    
+
     sshOptionEntry_ = new Entry(NonnullString(rcfile.GetSSHOption()));
     AttachPairWidget(pageDirectories_, row++, "Command-line option for SSH: ", sshOptionEntry_);
-    
+
     AttachSectionLabel(pageDirectories_, row++, "Directory shortcuts");
     InitShortcutsTreeView(row);
-    
+
     AttachSectionLabel(pageDirectories_, row++, "Registered SSH hosts");
     InitSSHPage(row);
   }
-  
+
   void InitShortcutsTreeView(ref uint row)
   {
     shortcuts_ = new TreeView;
@@ -551,25 +551,25 @@ private:
     shortcuts_.setReorderable(1);
     shortcuts_.addOnButtonPress(&ShortcutsButtonPress);
     AppendWithScrolledWindow(pageDirectories_, row++, shortcuts_);
-    
+
     auto rendLabel = new CellRendererText;
     rendLabel.setProperty("editable", 1);
     rendLabel.addOnEdited(&(CellEdited!(0, "shortcutsStore_")));
     auto colLabel = new TreeViewColumn("label", rendLabel, "text", 0);
     colLabel.setResizable(1);
     shortcuts_.appendColumn(colLabel);
-    
+
     auto rendDir = new CellRendererText;
     rendDir.setProperty("editable", 1);
     rendDir.addOnEdited(&(CellEdited!(1, "shortcutsStore_", "AppendSlash")));
     auto colDir = new TreeViewColumn("path", rendDir, "text", 1);
     colDir.setResizable(1);
     shortcuts_.appendColumn(colDir);
-    
+
     //                               label         path          add color for dirs which are not found?
     shortcutsStore_ = new ListStore([GType.STRING, GType.STRING]);
     shortcuts_.setModel(shortcutsStore_);
-    
+
     foreach(shortcut; rcfile.GetShortcuts()){
       TreeIter iter = new TreeIter;
       shortcutsStore_.append(iter);
@@ -577,17 +577,17 @@ private:
       shortcutsStore_.setValue(iter, 1, shortcut.path_);
     }
   }
-  
+
   void ApplyChangesInDirectories()
   {
     rcfile.ResetStringz("Directories", "InitialDirectoryLeft",  AppendSlash(initialDirLEntry_.getText()));
     rcfile.ResetStringz("Directories", "InitialDirectoryRight", AppendSlash(initialDirREntry_.getText()));
-    
+
     rcfile.Shortcut[] list;
     TreeIter iter = new TreeIter;
     iter.setModel(shortcutsStore_);
     if(shortcutsStore_.getIterFirst(iter)){// ListStore is not empty
-      
+
       string[] invalidPaths;
       do{
         string label = trim(iter.getValueString(0));
@@ -595,7 +595,7 @@ private:
         if(label.length == 0){
           label = GetBasename(path);
         }
-        
+
         if(DirectoryExists(path)){
           list ~= rcfile.Shortcut(label, path);
         }
@@ -604,7 +604,7 @@ private:
         }
       }
       while(shortcutsStore_.iterNext(iter));
-      
+
       if(invalidPaths.length > 0){
         string temp = join(invalidPaths, ", ");
         PopupBox.error(
@@ -613,10 +613,10 @@ private:
           " neglected.", "error");
       }
     }
-    
+
     rcfile.ResetShortcuts(list);
   }
-  
+
   void CellEdited(int idx, string modelIdentifier, string transformFun = "")(
     string pathStr, string newName, CellRendererText rend)
   {
@@ -629,51 +629,51 @@ private:
       model.setValue(iter, idx, mixin(transformFun) (newName));
     }
   }
-  
+
   // right click menu
   bool ShortcutsButtonPress(GdkEventButton * eb, Widget w)
   {
     if(eb.window != shortcuts_.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-    
+
     if(eb.button != MouseButton.RIGHT){// not right button
       return false;
     }
-    
+
     TreePath path = GetPathAtPos(shortcuts_, eb.x, eb.y);
     TreeIter iter;
     if(path !is null){// there is a row at cursor
       iter = GetIter(shortcutsStore_, path);
       path.free();
     }
-    
+
     scope menu = new AppendRemoveMenu(shortcuts_, shortcutsStore_, iter);
     menu.popup(0, eb.time);
-    
+
     return false;
   }
-  
+
   class AppendRemoveMenu : Menu
   {
     TreeView view_;
     ListStore store_;
     TreeIter iter_;
-    
+
     this(TreeView view, ListStore store, TreeIter iter)
     {
       view_ = view;
       store_ = store;
       iter_ = iter;
-      
+
       append(new MenuItem(&Append, "_Append"));
       if(iter !is null){
         append(new MenuItem(&Remove, "_Remove"));
       }
-      
+
       showAll();
     }
-    
+
     void Append(MenuItem item)
     {
       TreeIter next = new TreeIter;
@@ -684,52 +684,52 @@ private:
       else{// one row is clicked
         store_.insertAfter(next, iter_);
       }
-      
+
       // select the new row
       TreePath path = next.getTreePath();
       view_.setCursor(path, null, 1);
       path.free();
     }
-    
+
     void Remove(MenuItem item)
     {
       store_.remove(iter_);
     }
   }
   ///////////////////// [Directories]
-  
-  
-  
+
+
+
   ///////////////////// [SSH]
   HostView hosts_;
   ListStore hostsStore_;
-  
+
   void InitSSHPage(ref uint row)
   {
     hosts_ = new HostView;
     hosts_.setReorderable(1);
     hosts_.addOnButtonPress(&HostsButtonPress);
-    
+
     hosts_.SetEditable(
       &CellEdited!(0, "hostsStore_"),
       &CellEdited!(1, "hostsStore_"),
       &CellEdited!(2, "hostsStore_", "AppendSlash"),
       &CellEdited!(3, "hostsStore_"),
       &CellEdited!(4, "hostsStore_"));
-    
+
     hostsStore_ = hosts_.GetListStore();
     AppendWithScrolledWindow(pageDirectories_, row++, hosts_);
   }
-  
+
   void ApplyChangesInSSH()
   {
     rcfile.ResetStringz("SSH", "SSHOption", sshOptionEntry_.getText());
-    
+
     string[] list;
     TreeIter iter = new TreeIter;
     iter.setModel(hostsStore_);
     if(hostsStore_.getIterFirst(iter)){// ListStore is not empty
-      
+
       do{
         string[] items;
         for(uint i=0; i<5; ++i){
@@ -739,37 +739,37 @@ private:
       }
       while(hostsStore_.iterNext(iter));
     }
-    
+
     rcfile.ResetRemoteHosts(list);
   }
-  
+
   // right click menu
   bool HostsButtonPress(GdkEventButton * eb, Widget w)
   {
     if(eb.window != hosts_.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-    
+
     if(eb.button != MouseButton.RIGHT){// not right button
       return false;
     }
-    
+
     TreePath path = GetPathAtPos(hosts_, eb.x, eb.y);
     TreeIter iter;
     if(path !is null){// there is a row at cursor
       iter = GetIter(hostsStore_, path);
       path.free();
     }
-    
+
     scope menu = new AppendRemoveMenu(hosts_, hostsStore_, iter);
     menu.popup(0, eb.time);
-    
+
     return false;
   }
   ///////////////////// [SSH]
-  
-  
-  
+
+
+
   void Respond(int responseID, Dialog dialog)
   {
     if(responseID == GtkResponseType.GTK_RESPONSE_OK || responseID == GtkResponseType.GTK_RESPONSE_APPLY){
@@ -780,7 +780,7 @@ private:
       ApplyChangesInSSH();
       rcfile.Write();
     }
-    
+
     if(responseID != GtkResponseType.GTK_RESPONSE_APPLY){
       destroy();
     }

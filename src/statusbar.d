@@ -59,20 +59,20 @@ private:
   static const uint num_ = 10;
   string[num_] previousMessages_;
   string messageNow_;
-  
-  
+
+
   this(Note noteL, Note noteR)
   {
     super();
-    
+
     noteL_ = noteL;
     noteR_ = noteR;
     mixin(ConstructToggleButton!('R'));
     mixin(ConstructToggleButton!('L'));
-    
+
     InitShowThreadListButton();
   }
-  
+
 public:
   void SetLayout()
   {
@@ -85,7 +85,7 @@ public:
       setSizeRequest(-1, height);
     }
   }
-  
+
 private:
   void SetTooltip(string text)
   {
@@ -94,7 +94,7 @@ private:
     }
     previousMessages_[num_-1] = messageNow_;
     messageNow_ = text;
-    
+
     string tooltip = "previous messages:";
     foreach(message; previousMessages_){
       if(message.length > 0){
@@ -103,14 +103,14 @@ private:
     }
     setTooltipText(tooltip);
   }
-  
-  
-  
+
+
+
   ///////////////////////// show/hide left/right pane
 private:
   ToggleButton showLButton, showRButton;
   Note noteL_, noteR_;
-  
+
   template ConstructToggleButton(char l)
   {
     const string ConstructToggleButton =
@@ -122,7 +122,7 @@ private:
       packEnd(show" ~ l ~ "Button, 0, 0, 0);
       ";
   }
-  
+
   template ToggleCallbackMixin(char l, char r)
   {
     const string ToggleCallbackMixin =
@@ -147,10 +147,10 @@ private:
         }
       }";
   }
-  
+
   mixin(ToggleCallbackMixin!('L', 'R'));
   mixin(ToggleCallbackMixin!('R', 'L'));
-  
+
   template MoveLRMixin(char l, char r)
   {
     const string MoveLRMixin =
@@ -169,17 +169,17 @@ private:
         return false;
       }";
   }
-  
+
   mixin(MoveLRMixin!('L', 'R'));
   mixin(MoveLRMixin!('R', 'L'));
   ///////////////////////// show/hide left/right pane
-  
-  
-  
+
+
+
   ///////////////////////// list up threads executing copying/moving files
 private:
   ToggleButton showThreadListButton_;
-  
+
   void InitShowThreadListButton()
   {
     showThreadListButton_ = new ToggleButton;
@@ -188,24 +188,24 @@ private:
     showThreadListButton_.setTooltipText("Show operations in progress");
     showThreadListButton_.addOnToggled(&ShowThreadList);
   }
-  
+
   void ThreadListDone(MenuShell m)
   {
     showThreadListButton_.setActive(0);
   }
-  
+
   struct XYPosition {int x_, y_;}
   ThreadInfo[] array_;
-  
+
   void ShowThreadList(ToggleButton b)
   {
     if(b.getActive()){
       XYPosition temp;
       showThreadListButton_.translateCoordinates(getToplevel(), 0, 0, temp.x_, temp.y_);
-      
+
       auto menu = new Menu;
       menu.addOnSelectionDone(&ThreadListDone);
-      
+
       // append items
       ThreadInfo[] list = GetWorkingThreadList();
       if(list.length == 0){
@@ -217,18 +217,18 @@ private:
         }
       }
       array_ = list;
-      
+
       // convert relative positions to absolute ones
       int posx, posy;
       getWindow().getPosition(posx, posy);
       temp.x_ += posx;
       temp.y_ += posy;
-      
+
       menu.showAll();
       menu.popup(null, null, &ThreadListPositioning, &temp, 0, gtk_get_current_event_time());
     }
   }
-  
+
   extern(C) static void ThreadListPositioning(
     GtkMenu * menu, gint * x, gint * y,
     gboolean * pushIn, void * data)
@@ -236,7 +236,7 @@ private:
     auto ptr = cast(XYPosition*)data;
     GtkRequisition req;
     gtk_widget_size_request(cast(GtkWidget*)menu, &req);
-    
+
     *x = ptr.x_;
     // horizontal position should be shifted by the height of the menu
     *y = ptr.y_ - req.height;

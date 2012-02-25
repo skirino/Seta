@@ -45,7 +45,7 @@ void Unregister(Page p)
       break;
     }
   }
-  
+
   if(idx != -1){
     pages_ = pages_[0 .. idx] ~ pages_[idx+1 .. $];
   }
@@ -62,7 +62,7 @@ void NotifyReconstructShortcuts()
 void NotifyFilerDisconnect(string mountName, string gvfsroot)
 {
   bool alreadyPopup = false;
-  
+
   foreach(page; pages_){
     if(page.GetMediator().FileSystemRoot() == gvfsroot){
       if(!alreadyPopup){// popup once

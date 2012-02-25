@@ -38,20 +38,20 @@ string InputDialog(bool hideInput = false)(string title, string description, str
   static if(hideInput){
     entry.setVisibility(0);
   }
-  
+
   Dialog d = new Dialog;
   d.setTitle(title);
-  
+
   string ret;
   entry.addOnActivate(delegate void(Entry e){
       d.response(GtkResponseType.GTK_RESPONSE_OK);
     });
-  
+
   scope box = new VBox(0, 5);
   box.add(label);
   box.add(entry);
   d.getContentArea.add(box);
-  
+
   d.addButtons(["OK", "_cancel"], [GtkResponseType.GTK_RESPONSE_OK, GtkResponseType.GTK_RESPONSE_CANCEL]);
   d.addOnResponse(
     delegate void(int responseID, Dialog dialog)
@@ -64,7 +64,7 @@ string InputDialog(bool hideInput = false)(string title, string description, str
         d.destroy();
       }
     });
-  
+
   d.showAll();
   entry.selectRegion(0, locatePrior(defaultValue, '.'));// do not select extension
   d.run();
@@ -87,11 +87,11 @@ int ChooseDialog(uint numOptions)(string message, string[numOptions] labels)
   static if(numOptions == 4){
     const GtkResponseType[] indices = cast(GtkResponseType[])[0, 1, 2, 3];
   }
-  
+
   Dialog d = new Dialog;
   d.getContentArea.add(new Label(message, false));
   d.addButtons(labels, indices);
-  
+
   int ret;
   d.addOnResponse(
     delegate void(int responseID, Dialog dialog){
@@ -101,7 +101,7 @@ int ChooseDialog(uint numOptions)(string message, string[numOptions] labels)
       ret = responseID;
       d.destroy();
     });
-  
+
   d.showAll();
   d.run();
   return ret;

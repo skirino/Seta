@@ -101,14 +101,14 @@ void PreparePaste(bool moveMode, string dir, string[] files, FileView sourceView
   else{
     storedFiles = files;
   }
-  
+
   size_t numItems = storedFiles.length;
   if(numItems > 0){
     storedMove  = moveMode;
     storedDir   = dir;
     auto cl = new Clipboard(GetDefaultClipboard());
     cl.setWithOwner(GetDragTargets(), &ClipboardGetFun, &ClipboardClearFun, sourceView);
-    
+
     // send message to statusbar
     PushIntoStatusbar(
       PluralForm!(size_t, "item was", "items were")(numItems) ~
@@ -156,18 +156,18 @@ GdkDragAction GetFilesInClipboard(out string[] files)
   auto action = GdkDragAction.ACTION_COPY;
   if((curis != null) && (*curis != null)){
     char ** ptr = curis;
-    
+
     // check whether "action" is explicitly specified as "move" by the source side
     if(Str.toString(curis[0]) == URI_MOVE){
       action = GdkDragAction.ACTION_MOVE;
       ptr++;
       gtk_clipboard_clear(cl);
     }
-    
+
     files = GetFilesFromStrv(ptr);
     g_strfreev(curis);
   }
-  
+
   return action;
 }
 /////////////////////// cut(copy) and paste
@@ -180,10 +180,10 @@ void TransferFiles(GdkDragAction action, string[] files, FileView sourceView, st
   if(files.length == 0){
     return;
   }
-  
+
   // obtain source directory by removing "basename" in files[0]
   string sourceDir = ParentDirectory(AppendSlash(files[0]));
-  
+
   if(action == GdkDragAction.ACTION_MOVE){
     if(sourceDir != destDir){// skip "move to the same directory"
       (new MoveFilesJob!(true)(files, sourceDir, sourceView, destDir, destView)).start();
@@ -205,14 +205,14 @@ private class MoveFilesJob(bool move) : Thread, StoppableOperationIF
       cancellable_.cancel();
     }
   }
-  
+
   string GetThreadListLabel(string startTime)
   {
     return
       "(" ~ GetRatioNow() ~ ") " ~ Moving ~ ' ' ~
       GetFromSourceDir() ~ ' ' ~ GetToDestDir() ~ " (" ~ startTime ~ ')';
   }
-  
+
   string GetStopDialogLabel(string startTime)
   {
     return
@@ -220,11 +220,11 @@ private class MoveFilesJob(bool move) : Thread, StoppableOperationIF
       GetFromSourceDir() ~ '\n' ~ GetToDestDir() ~ '\n' ~
       '(' ~ startTime ~ ", now finished " ~ PluralForm!(uint, "item")(numTransferred_) ~ ").\nStop this thread?";
   }
-  
+
   gdk.Window.Window GetAssociatedWindow(){return null;}
-  
-  
-  
+
+
+
 private:
   // utils for message strings
   static if(move){
@@ -235,7 +235,7 @@ private:
     static const string moving = "copying";
     static const string Moving = "Copying";
   }
-  
+
   string GetRatioNow()
   {
     return Str.toString(numTransferred_) ~ '/' ~ Str.toString(files_.length);
@@ -246,9 +246,9 @@ private:
   }
   string GetFromSourceDir(){return "from \"" ~ sourceDir_ ~ '\"';}
   string GetToDestDir()    {return "to \""   ~ destDir_   ~ '\"';}
-  
-  
-  
+
+
+
   // files to be transferred
   string[] files_;
   uint numTransferred_;
@@ -257,12 +257,12 @@ private:
   FileView sourceView_;
   string destDir_;
   FileView destView_;
-  
+
   // for managing thread and cancel operation
   mixin ListedOperationT;
   bool canCancelNow_;
   Cancellable cancellable_;
-  
+
   this(string[] files, string sourceDir, FileView sourceView, string destDir, FileView destView)
   {
     super(&Start);
@@ -271,21 +271,21 @@ private:
     destView_ = destView;
     sourceDir_ = sourceDir;
     sourceView_ = sourceView;
-    
+
     // still within the main thread
     PushIntoStatusbar(
       Moving ~ ' ' ~ PluralForm!(size_t, "item")(files_.length) ~ ' ' ~
       GetFromSourceDir() ~ ' ' ~ GetToDestDir() ~ " ...");
-    
+
     canCancelNow_ = false;
     cancellable_ = new Cancellable;
     Register();
   }
-  
+
   void NotifyFinish()
   {
     // inside gdk lock
-    
+
     // send message to statusbar and update FileView if appropriate
     if(numTransferred_ == 0){
       PushIntoStatusbar("Canceled " ~ moving);
@@ -302,7 +302,7 @@ private:
       PushIntoStatusbar(
         "Finished " ~ moving ~ ' ' ~ GetRatioItems() ~ ' ' ~ GetToDestDir());
     }
-    
+
     if(numTransferred_ > 0){
       // notify the source side to Update
       bool sourceUpdated = false;
@@ -312,7 +312,7 @@ private:
           sourceUpdated = true;
         }
       }
-      
+
       // notify the destination side to Update
       if(destView_ !is null){
         if(!(sourceView_ is destView_ && sourceUpdated)){
@@ -320,34 +320,34 @@ private:
         }
       }
     }
-    
+
     // remove from thread list
     Unregister();
   }
-  
+
   void Start()
   {
     size_t numItems = files_.length;
     numTransferred_ = 0;
     mode_ = numItems == 1 ? PasteModeFlags.ASK : (PasteModeFlags.MULTIPLE | PasteModeFlags.ASK);
-    
+
     foreach(file; files_){
       // stop copying/moving when forced by the main thread
       if(mode_ == PasteModeFlags.CANCEL_ALL){
         break;
       }
-      
+
       // determine "newname"
       string name = GetBasename(file);
       string newname = destDir_ ~ name;
       if(newname == file){
         static if(!move){// copy mode, ask new name
           string defaultValue = (name[$-1] == '/' ? name[0..$-1] : name) ~ "(copy)";
-          
+
           gdkThreadsEnter();
           string newBasename = InputDialog("copy", "new name: ", defaultValue);
           gdkThreadsLeave();
-          
+
           if(newBasename.length == 0){// no valid input is returned (CANCEL is pressed)
             break;
           }
@@ -360,7 +360,7 @@ private:
           }
         }
       }
-      
+
       // now start transfer this file/dir
       if(!move || !newname.StartsWith(file)){// avoid moving to its child directory
         try{
@@ -371,19 +371,19 @@ private:
         catch(GException ex){}// in most cases permission denied
       }
     }
-    
+
     gdkThreadsEnter();// grab gdk lock here to avoid repeating getting/releasing
     NotifyFinish();
     gdkThreadsLeave();
   }
-  
+
   bool Transfer1(string oldname, string newname)
   {
     bool doPaste = true;
     if((mode_ & PasteModeFlags.ASK) && Exists(newname)){// file already exists
       int x;
       string message = GetBasename(newname) ~ " exists. Overwrite?";
-      
+
       gdkThreadsEnter();
       if(mode_ & PasteModeFlags.MULTIPLE){
         x = ChooseDialog!(4)(message, ["_OK", "_Skip this file", "Overwrite _all", "_Cancel all"]);
@@ -392,11 +392,11 @@ private:
         x = ChooseDialog!(2)(message, ["_OK", "_Cancel"]);
       }
       gdkThreadsLeave();
-      
+
       if(x == -1 || x == 1 || x == 3){// invalid, "cancel" or "cancel all"
         doPaste = false;
       }
-      
+
       if(x == 2){// "overwrite all"
         mode_ -= PasteModeFlags.ASK;
       }
@@ -404,7 +404,7 @@ private:
         mode_ = PasteModeFlags.CANCEL_ALL;
       }
     }
-    
+
     if(doPaste && mode_ != PasteModeFlags.CANCEL_ALL){
       if(oldname[$-1] == '/'){// directory
         // g_file_copy in GIO library does not support recursive copy/move of directories.
@@ -430,7 +430,7 @@ private:
         scope src  = File.parseName(oldname);
         scope dest = File.parseName(newname);
         int result;
-        
+
         // Strictly speaking I should use mutex locking when reading/writing canCancelNow_,
         // but it does not have significant difference, just do another copy/move.
         // Also, GCancellable seems to permit cancel() after the work has been finished.
@@ -443,7 +443,7 @@ private:
           result = src.copy(dest, GFileCopyFlags.OVERWRITE, cancellable_, null, null);
         }
         canCancelNow_ = false;
-        
+
         return result != 0;
       }
     }
@@ -460,7 +460,7 @@ private:
 extern(C) {
   // GdkAtom GDK_SELECTION_CLIPBOARD is not available from D
   GtkClipboard * GetDefaultClipboard();
-  
+
   // one cannot access to members in C structs
   // since they are defined as empty structs in GtkD
   // and thus D compiler cannot know correct memory offset

@@ -60,13 +60,13 @@ void main(string[] args)
   gdkThreadsInit();
   Main.init(args);
   gdkThreadsEnter();
-  
+
   Initialize();
-  
+
   SetaWindow.Init();
   Main.run();
-  
+
   Finalize();
-  
+
   gdkThreadsLeave();
 }

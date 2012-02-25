@@ -42,13 +42,13 @@ private:
   static const size_t MaxNumberOfPathsFromList = 1000;
   static const size_t MaxNumberOfPaths = 1000;
   static const size_t PER_PAGE = 100;
-  
+
   mixin ListedOperationT;
   bool canceled_;
   string targetText_;
   void delegate(string[], string[]) callbackSuccess_;
   void delegate() callbackCancel_;
-  
+
 public:
   this(
     string targetText,
@@ -56,47 +56,47 @@ public:
     void delegate() callbackCancel)
   {
     super(&Start);
-    
+
     canceled_ = false;
     targetText_ = targetText;
     callbackSuccess_ = callbackSuccess;
     callbackCancel_ = callbackCancel;
-    
+
     Register();
   }
-  
+
   string GetThreadListLabel(string startTime)
   {
     return "Filtering directories in the whole file tree (" ~ startTime ~ ')';
   }
-  
+
   gdk.Window.Window GetAssociatedWindow(){return null;}
-  
+
   void Stop()
   {
     canceled_ = true;
   }
-  
+
   string GetStopDialogLabel(string startTime)
   {
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
   }
-  
+
   void Start()
   {
     if(IsBlank(targetText_)){
       return;
     }
-    
+
     mixin(ReturnIfCanceled);
-    
+
     string[] words = [];
     foreach(word; targetText_.toLower().delimit(" ")){
       if(word.length > 0){
         words ~= word;
       }
     }
-    
+
     // paginate by PER_PAGE
     auto pathsFromHistory = new Vector!(string)(MaxNumberOfPathsFromHistory);
     {
@@ -105,7 +105,7 @@ public:
       size_t pageNum = len / PER_PAGE + 1;
       for(size_t pageIndex=0; pageIndex<pageNum; pageIndex++){
         mixin(ReturnIfCanceled);
-        
+
         size_t start = pageIndex * PER_PAGE;
         size_t end   = min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
@@ -115,7 +115,7 @@ public:
         }
       }
     }
-    
+
     auto pathsFromList = new Vector!(string)(MaxNumberOfPathsFromList);
     if(!anything_cd.dir_list.IsScanning()){
       string[] dirlist = anything_cd.dir_list.Get();
@@ -123,7 +123,7 @@ public:
       size_t pageNum = len / PER_PAGE + 1;
       for(size_t pageIndex=0; pageIndex<pageNum; pageIndex++){
         mixin(ReturnIfCanceled);
-        
+
         size_t start = pageIndex * PER_PAGE;
         size_t end   = min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
@@ -131,23 +131,23 @@ public:
             pathsFromList.append(dirlist[i]);
           }
         }
-        
+
         if(pathsFromList.size >= MaxNumberOfPaths){// sufficient number of paths found
           break;
         }
       }
     }
-    
+
     mixin(ReturnIfCanceled);
-    
+
     // notify finish
     gdkThreadsEnter();
     Unregister();
     callbackSuccess_(pathsFromHistory.array(), pathsFromList.array());
     gdkThreadsLeave();
   }
-  
-  
+
+
 private:
   static const string ReturnIfCanceled =
     "if(canceled_){

@@ -40,7 +40,7 @@ private:
   FileSystem fsys_;
   FileManager filer_;
   Terminal term_;
-  
+
 public:
   this(Page p)
   {
@@ -49,18 +49,18 @@ public:
     term_ = null;
     fsys_ = new FileSystem;
   }
-  
+
   void SetFiler(FileManager f){filer_ = f;}
   void SetTerm(Terminal t){term_ = t;}
-  
-  
-  
+
+
+
   /////////////////// SSH
   void SSHConnectionSucceeded(char[] gvfsRoot, SSHConnection con)
   {
     // within GDK lock
     char[] userDomain = con.GetUserDomain();
-    
+
     if(con.GetBothSFTPAndSSH()){
       char[] password = con.getPassword();
       if(password.length == 0){
@@ -70,19 +70,19 @@ public:
         }
         con.setPassword(password);
       }
-      
+
       con.ReadShellSetting(gvfsRoot);
       term_.StartSSH(con);
       fsys_.SetRemote(gvfsRoot, con.getUsername(), con.getHomeDir(), FilerGetPWD(false));
     }
-    
+
     filer_.ConnectionSucceeded(con, gvfsRoot);
     PushIntoStatusbar("Succeeded in connecting to " ~ userDomain);
   }
   /////////////////// SSH
-  
-  
-  
+
+
+
   /////////////////// interface to Page
   bool FilerIsVisible(){return page_.GetViewMode() != ViewMode.TERMINAL;}
   char[] GetPageID(){return page_.GetTab().GetID();}
@@ -93,9 +93,9 @@ public:
   void CloseThisPage(){page_.CloseThisPage();}
   bool OnLeftSide(){return page_.OnLeftSide();}
   /////////////////// interface to Page
-  
-  
-  
+
+
+
   /////////////////// interface to FileManager
   char[] FilerGetPWD(bool b){return filer_.GetPWD(b);}
   void FilerAppendToHistory(char[] dir){filer_.AppendToHistory(dir);}
@@ -129,9 +129,9 @@ public:
   void FilerFocusFilter(){filer_.FocusFilter();}
   void FilerClearFilter(){filer_.ClearFilter();}
   /////////////////// interface to FileManager
-  
-  
-  
+
+
+
   /////////////////// interface to Terminal
   void TerminalChangeDirectoryFromFiler(char[] p)
   {
@@ -142,9 +142,9 @@ public:
   }
   void TerminalQuitSSH(char[] pwd){term_.QuitSSH(pwd);}
   /////////////////// interface to Terminal
-  
-  
-  
+
+
+
   /////////////////// interface to FileSystem
   bool FileSystemIsRemote(){return fsys_.remote_;}
   char[] FileSystemRoot(){return fsys_.rootDir_;}

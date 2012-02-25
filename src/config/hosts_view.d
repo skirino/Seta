@@ -39,55 +39,55 @@ private:
   TreeViewColumn colUser_, colHost_, colHome_, colPrompt_, colRPrompt_;
   CellRendererText rendUser_, rendHost_, rendHome_, rendPrompt_, rendRPrompt_;
   ListStore hostsStore_;
-  
+
 public:
   this()
   {
     super();
     setSizeRequest(-1, 160);
-    
+
     rendUser_ = new CellRendererText;
     colUser_ = new TreeViewColumn("user name", rendUser_, "text", 0);
     colUser_.setResizable(1);
     appendColumn(colUser_);
-    
+
     rendHost_ = new CellRendererText;
     colHost_ = new TreeViewColumn("host name", rendHost_, "text", 1);
     colHost_.setResizable(1);
     appendColumn(colHost_);
-    
+
     rendHome_ = new CellRendererText;
     colHome_ = new TreeViewColumn("home directory", rendHome_, "text", 2);
     colHome_.setResizable(1);
     appendColumn(colHome_);
-    
+
     rendPrompt_ = new CellRendererText;
     colPrompt_ = new TreeViewColumn("PROMPT", rendPrompt_, "text", 3);
     colPrompt_.setResizable(1);
     appendColumn(colPrompt_);
-    
+
     rendRPrompt_ = new CellRendererText;
     colRPrompt_ = new TreeViewColumn("RPROMPT", rendRPrompt_, "text", 4);
     colRPrompt_.setResizable(1);
     appendColumn(colRPrompt_);
-    
+
     //                           user          host          home          prompt        rprompt
     hostsStore_ = new ListStore([GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING]);
     setModel(hostsStore_);
-    
+
     foreach(host; rcfile.GetSSHHosts()){
       TreeIter iter = new TreeIter;
       hostsStore_.append(iter);
-      
+
       string[] items = TrimAll(split!(char)(host, ":"));
       foreach(i, item; items){
         hostsStore_.setValue(iter, i, item);
       }
     }
   }
-  
+
   ListStore GetListStore(){return hostsStore_;}
-  
+
   void SetEditable(
     void delegate(string, string, CellRendererText) cb0,
     void delegate(string, string, CellRendererText) cb1,

@@ -72,7 +72,7 @@ void Disconnect(char[] userDomain)
 {
   size_t posAtmark = locate(userDomain, '@');
   assert(posAtmark != userDomain.length);
-  
+
   auto con = Find(userDomain[0 .. posAtmark], userDomain[posAtmark+1 .. $]);
   assert(con !is null);
   con.DecrementUseCount();

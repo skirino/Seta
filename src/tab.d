@@ -44,7 +44,7 @@ private:
   void delegate(char, uint) closePage_;
   char lr_;// 'L' or 'R'
   uint pageNum_;
-  
+
 public:
   this(char side, void delegate(char, uint) closePage)
   {
@@ -52,26 +52,26 @@ public:
     labelIndex_ = new Label("idx");
     labelPath_ = new Label("");
     labelPath_.setEllipsize(PangoEllipsizeMode.START);
-    
+
     // to reduce blank space around the button, wrap "img" by HBox and VBox
     auto img = new Image("gtk-close", GtkIconSize.MENU);
     auto hboxImg = new HBox(0, 0);
     hboxImg.packStart(img, 1, 0, 0);
     auto vboxImg = new VBox(0, 0);
     vboxImg.packStart(hboxImg, 1, 0, 0);
-    
+
     // close button with x-mark
     closeButton_ = new Button;
     closeButton_.add(vboxImg);
     closeButton_.setRelief(GtkReliefStyle.NONE);
     closeButton_.setSizeRequest(20, 20);
     closeButton_.addOnClicked(&ClosePage);
-    
+
     hbox_ = new HBox(0, 0);
     hbox_.packStart(labelIndex_, 0, 0, 2);
     hbox_.packStart(labelPath_, 1, 1, 2);
     hbox_.packEnd(closeButton_, 0, 0, 2);
-    
+
     super();
     add(hbox_);
     closePage_ = closePage;
@@ -79,7 +79,7 @@ public:
     setVisibleWindow(0);// For clean redrawing of tabs, it is better not to have visible window.
     showAll();
   }
-  
+
 private:
   bool ButtonPressed(GdkEventButton * eb, Widget w)
   {
@@ -91,18 +91,18 @@ private:
       return false;
     }
   }
-  
+
   void ClosePage(Button b)
   {
     CloseThisPage();
   }
-  
+
 public:
   void CloseThisPage()
   {
     closePage_(lr_, pageNum_);
   }
-  
+
   void SetID(char lr, uint n)
   {
     lr_ = lr;
@@ -117,7 +117,7 @@ public:
   {
     return lr_ == 'L';
   }
-  
+
   void SetPath(string p)
   {
     labelPath_.setText(p);

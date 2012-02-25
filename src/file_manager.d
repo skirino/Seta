@@ -66,8 +66,8 @@ private:
   DirTree dirTree_;
   ScrolledWindow swView_;
   FileView view_;
-  
-  
+
+
 public:
   this(Mediator mediator, string initialDir)
   {
@@ -75,29 +75,29 @@ public:
     hist_ = new DirHistory(initialDir);
     view_ = new FileView(mediator_);
     dirTree_ = new DirTree(&(hist_.GetPWD), &ChangeDirectoryFromDirTree);
-    
+
     super(0, 0);
     addOnKeyPress(&KeyPressed);
     addOnRealize(&Realize);
-    
+
     toolbar_ = new SetaToolbar(this);
     packStart(toolbar_, 0, 0, 0);
-    
+
     hpaned_ = new HPaned;
     packStart(hpaned_, 1, 1, 0);
-    
+
     // TreeView does not need Viewport, just use add()
     swView_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
     swView_.add(view_);
     swTree_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
     swTree_.add(dirTree_);
-    
+
     hpaned_.pack1(swTree_, 1, 0);
     hpaned_.pack2(swView_, 1, 0);
-    
+
     SetLayout();
   }
-  
+
   void SetLayout()
   {
     // width of the dirTree
@@ -110,14 +110,14 @@ public:
     else{
       hpaned_.setPosition(w);
     }
-    
+
     // toolbar
     toolbar_.SetLayout();
-    
+
     // FileView
     view_.SetLayout();
   }
-  
+
   void Realize(Widget w)
   {
     // necessary to make togglebutton consistent
@@ -128,19 +128,19 @@ public:
       toolbar_.DirTreeSetActive();
     }
   }
-  
+
   void PrepareDestroy()
   {
     view_.StopOngoingOperations();
   }
   //////////////////////// GUI stuff
-  
-  
-  
+
+
+
   //////////////////////// view mode
 public:
   void Update(){view_.TryUpdate();}// called when switching from TERMINAL mode to FILER mode
-  
+
   void ShowAll()
   {
     if(toolbar_.DirTreeGetActive()){
@@ -155,74 +155,74 @@ public:
     }
   }
   //////////////////////// view mode
-  
-  
-  
+
+
+
   ///////////////////// manipulation of focus
 public:
   void GrabFocus(Entry e = null){view_.GrabFocus();}
   ///////////////////// manipulation of focus
-  
-  
-  
+
+
+
   //////////////////////// key pressed
 private:
   bool KeyPressed(GdkEventKey * ekey, Widget w)
   {
     int q = QueryFileManagerAction(ekey);
     switch(q){
-      
+
     case -1:
       return false;
-      
+
     case FileManagerAction.GoToPrevious:
       NextDirInHistoryClicked!(false)(null);
       return true;
-      
+
     case FileManagerAction.GoToNext:
       NextDirInHistoryClicked!(true)(null);
       return true;
-      
+
     case FileManagerAction.GoToParent:
       UpClicked(null);
       return true;
-      
+
     case FileManagerAction.GoToRoot:
       RootClicked(null);
       return true;
-      
+
     case FileManagerAction.GoToHome:
       HomeClicked(null);
       return true;
-      
+
     case FileManagerAction.GoToDirOtherSide:
       MoveToDirOtherSide(null);
       return true;
-      
+
     case FileManagerAction.Refresh:
       RefreshClicked!(Button)(null);
       return true;
-      
+
     case FileManagerAction.StartSSH:
       SSHClicked!(Button)(null);
       return true;
-      
+
     case FileManagerAction.ShowHidden:
       toolbar_.ToggleShowHidden();
       return true;
-      
+
     case FileManagerAction.ShowDirTree:
       toolbar_.ToggleShowDirTree();
       return true;
-      
+
     case FileManagerAction.SyncTerminalPWD:
       mediator_.TerminalChangeDirectoryFromFiler(hist_.GetPWD());
       return true;
-      
+
     case FileManagerAction.GoToChild:
       view_.GoDownIfOnlyOneDir();
       return true;
-      
+
     case FileManagerAction.GoToDir1,
       FileManagerAction.GoToDir2,
       FileManagerAction.GoToDir3,
@@ -242,15 +242,15 @@ private:
         CheckChangeDir(path);
       }
       return true;
-      
+
     default:
       return false;
     }
   }
   //////////////////////// key pressed
-  
-  
-  
+
+
+
   /////////////////////// traveling directory tree
 public:
   bool ChangeDirectory(
@@ -266,7 +266,7 @@ public:
       return false;
     }
   }
-  
+
 private:
   void CheckChangeDir(string path)
   {
@@ -274,7 +274,7 @@ private:
       ChangeDirectory(path);
     }
   }
-  
+
   bool ChangeDirectoryFromDirTree(string dirname)
   {
     if(view_.ChangeDirectory(dirname, true, true)){
@@ -285,13 +285,13 @@ private:
     }
   }
   /////////////////////// traveling directory tree
-  
-  
-  
+
+
+
   ////////////////////// history of directories
 private:
   DirHistory hist_;
-  
+
 public:
   string GetPWD(bool onlyAfterGVFS = true)
   {
@@ -302,20 +302,20 @@ public:
       return hist_.GetPWD();
     }
   }
-  
+
   string GetPreviousDir()// for "cd -" in terminal
   {
     return hist_.GetDirNext!(false)();
   }
-  
+
   void AppendToHistory(string dir)
   {
     hist_.Append(dir);
   }
   ////////////////////// history of directories
-  
-  
-  
+
+
+
   /////////////////////// directory tree
 public:
   void UpdateDirTree(string dirname)
@@ -323,9 +323,9 @@ public:
     dirTree_.Update(dirname);
   }
   /////////////////////// directory tree
-  
-  
-  
+
+
+
   /////////////////////// called for all pages in PageList
 public:
   void EscapeFromPath(string path)
@@ -335,14 +335,14 @@ public:
       string dir = mediator_.OnLeftSide() ? rcfile.GetInitialDirectoryLeft() : rcfile.GetInitialDirectoryRight();
       ChangeDirectory(dir);
     }
-    
+
     // notify directory tree
     dirTree_.RemoveUnmountedPath(path);
   }
   /////////////////////// called for all pages in PageList
-  
-  
-  
+
+
+
   /////////////////////// callbacks for toolbar
 public:
   // back and forward
@@ -370,12 +370,12 @@ public:
     if(eb.button != MouseButton.RIGHT){
       return false;
     }
-    
+
     string[] list = hist_.Listup10!(ForwardDirection)();
     if(list.length == 0){
       return false;
     }
-    
+
     scope menu = new Menu;
     foreach(n, l; list){
       string label = mediator_.FileSystemNativePath(l);
@@ -384,7 +384,7 @@ public:
     }
     menu.showAll();
     menu.popup(0, eb.time);
-    
+
     return false;
   }
   void MoveNTimesAndChangeDir(bool ForwardDirection)(MenuItem item, uint n)
@@ -394,7 +394,7 @@ public:
     }
     ChangeDirectory(hist_.GetPWD(), false, true);
   }
-  
+
   // go up
   void UpClicked(ArgType)(ArgType b)
   {
@@ -409,12 +409,12 @@ public:
     if(eb.button != MouseButton.RIGHT){
       return false;
     }
-    
+
     string pwd = GetPWD();
     if(pwd == "/"){
       return false;
     }
-    
+
     scope menu = new Menu;
     string path = ParentDirectory(pwd);
     while(path != "/"){
@@ -426,13 +426,13 @@ public:
     scope fullpath = mediator_.FileSystemMountedVFSPath("/");
     scope dlg = bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
     menu.append(new MenuItem(dlg, "/", false));
-    
+
     menu.showAll();
     menu.popup(0, eb.time);
-    
+
     return false;
   }
-  
+
   // miscellaneous
   void RootClicked(ArgType)(ArgType b)
   {
@@ -454,12 +454,12 @@ public:
     view_.TryUpdate();
     dirTree_.ReconstructFromOpenedDirs();
   }
-  
+
   // filter
   void FocusFilter(){toolbar_.GetFilterEntry().grabFocus();}
   void ClearFilter(){toolbar_.GetFilterEntry().setText("");}
   void FilterChanged(EditableIF entry){view_.FilterChanged((cast(Entry)entry).getText());}
-  
+
   // toggle buttons
   void SetShowHidden(bool b)
   {
@@ -475,7 +475,7 @@ public:
       swTree_.hideAll();
     }
   }
-  
+
   // shortcut buttons
   void PathButtonClicked(ArgType)(ArgType b, string path)
   {
@@ -488,9 +488,9 @@ public:
     }
   }
   /////////////////////// callbacks for toolbar
-  
-  
-  
+
+
+
   ///////////////////////// SSH
 private:
   void SSHClicked(ArgType)(ArgType b)
@@ -498,10 +498,10 @@ private:
     if(!mediator_.FileSystemIsRemote()){
       SSHConnection connection = SSHConnectionDialog();
       if(connection !is null && connection.IsValid()){
-        
+
         // send message to statusbar
         PushIntoStatusbar("Trying to establish SSH connection to " ~ connection.GetUserDomain() ~ " ...");
-        
+
         // check whether the remote host is already mounted
         File remoteRoot = File.parseName("sftp://" ~ connection.GetUserDomain() ~ '/');
         if(remoteRoot.queryExists(null)){// already mounted
@@ -521,30 +521,30 @@ private:
       Disconnect();
     }
   }
-  
+
 public:
   void Disconnect(bool notifyTerminal = true)()
   {
     string userDomain = mediator_.GetHostLabel();
-    
+
     // decrement use count
     known_hosts.Disconnect(userDomain);
-    
+
     // send message to statusbar
     PushIntoStatusbar("Disconnected from " ~ userDomain);
-    
+
     string pwd = mediator_.FileSystemSetLocal();
     static if(notifyTerminal){
       mediator_.TerminalQuitSSH(pwd);
     }
-    
+
     mediator_.SetHostLabel("localhost");
     hist_.Reset(pwd);
     view_.ChangeDirectory(pwd);
     dirTree_.QuitSSH(pwd);
     ReconstructShortcuts();
   }
-  
+
   // executed within the GDK lock
   void ConnectionSucceeded(SSHConnection con, string gvfsRoot)
   {
@@ -556,9 +556,9 @@ public:
     else{
       newpath = gvfsRoot ~ con.getHomeDir();
     }
-    
+
     view_.ChangeDirectory(newpath);
-    
+
     if(con.GetBothSFTPAndSSH()){
       dirTree_.StartSSH(gvfsRoot, newpath);
       hist_.Reset(newpath);
@@ -570,13 +570,13 @@ public:
       hist_.Append(newpath);
       mediator_.TerminalChangeDirectoryFromFiler(newpath);
     }
-    
+
     if(! known_hosts.AlreadyRegistered(con)){// not registered
       bool save = PopupBox.yesNo("Register " ~ con.getDomain() ~ '?', "Unregistered host");
       known_hosts.AddNewHost(con, save);
     }
   }
-  
+
 private:
   extern(C) static void MountFinishedCallback(
     GFile * ptr,
@@ -587,12 +587,12 @@ private:
     gdkThreadsEnter();
     SFTPMountStarter arg = cast(SFTPMountStarter)data;
     arg.Unregister();
-    
+
     // Since I don't know how to instantiate AsyncResultIF from GAsyncResult* (maybe I should use SimpleAsyncResult),
     // I use the original GIO function
     GError * error;
     g_file_mount_enclosing_volume_finish(ptr, res, &error);
-    
+
     if(error == null){// notify successful mount
       arg.dlgSuccess_(arg.remoteRoot_.getPath() ~ '/', arg.con_);// mediator_.ConnectionSucceeded
     }
@@ -605,26 +605,26 @@ private:
     }
     gdkThreadsLeave();
   }
-  
+
   class SFTPMountStarter : ListedOperationIF
   {
     mixin ListedOperationT;
     File remoteRoot_;
     void delegate(string, SSHConnection) dlgSuccess_;
     SSHConnection con_;
-    
+
     void Start(File remoteRoot, void delegate(string, SSHConnection) dlg, SSHConnection con)
     {
       remoteRoot_ = remoteRoot;
       dlgSuccess_ = dlg;
       con_ = con;
       Register();
-      
+
       remoteRoot_.mountEnclosingVolume(
         GMountMountFlags.NONE, con_, null,
         cast(GAsyncReadyCallback)(&MountFinishedCallback), cast(void*)this);
     }
-    
+
     // Judging from the source code in gvfs (gdaemonfile.c),
     // canceling "g_file_mount_enclosing_volume" seems not to be supported at present.
     // Thus this class is not a StoppableOperationIF.
@@ -633,10 +633,10 @@ private:
     {
       return "Mounting " ~ con_.GetUserDomain() ~ " (" ~ startTime ~ ')';
     }
-    
+
     gdk.Window.Window GetAssociatedWindow(){return null;}
   }
-  
+
   SFTPMountStarter sftpStarter_;
   ///////////////////////// SSH
 }

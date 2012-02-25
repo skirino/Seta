@@ -29,14 +29,14 @@ scope class ScopeTimer
 private:
   timeval start_;
   const char[] message_;
-  
+
 public:
   this(char[] message)
   {
     message_ = message;
     gettimeofday(&start_, null);
   }
-  
+
   ~this()
   {
     timeval end;
@@ -65,11 +65,11 @@ ulong GetCurrentTime()
 char[] EpochTimeToString(ulong l)
 {
   static char[16] ret;
-  
+
   tm st;
   auto t = cast(tango.stdc.time.time_t) l;
   tango.stdc.posix.time.localtime_r(&t, &st);
-  
+
   // 1900 + st.tm_year represents the year
   ret[0..4] = YEAR_1900_TO_2100[st.tm_year];
   ret[4] = '-';
@@ -80,18 +80,18 @@ char[] EpochTimeToString(ulong l)
   ret[11..13] = ZERO_TO_61[st.tm_hour];
   ret[13] = ':';
   ret[14..16] = ZERO_TO_61[st.tm_min];
-  
+
   return ret[];// return slice of local buffer
 }
 
 char[] EpochTimeToStringSeconds(ulong l)
 {
   static char[14] ret;
-  
+
   tm st;
   auto t = cast(tango.stdc.time.time_t) l;
   tango.stdc.posix.time.localtime_r(&t, &st);
-  
+
   ret[0..2] = ZERO_TO_61[st.tm_mon+1];
   ret[2] = '/';
   ret[3..5] = ZERO_TO_61[st.tm_mday];
@@ -101,7 +101,7 @@ char[] EpochTimeToStringSeconds(ulong l)
   ret[9..11] = ZERO_TO_61[st.tm_min];
   ret[11] = ':';
   ret[12..14] = ZERO_TO_61[st.tm_sec];
-  
+
   return ret[];// return slice of local buffer
 }
 

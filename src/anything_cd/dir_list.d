@@ -70,11 +70,11 @@ class DirPathList
 {
 private:
   static const size_t MAX = 1000;
-  
+
   bool changed_;
   string filename_;
   Vector!(string) list_;
-  
+
 public:
   this()
   {
@@ -83,7 +83,7 @@ public:
     list_ = new Vector!(string)(MAX);
     Load();
   }
-  
+
   void Load()
   {
     try{
@@ -94,12 +94,12 @@ public:
           list_.append(line.dup);
         }
       }
-      
+
       file.close();
     }
     catch(Exception ex){}// no such file
   }
-  
+
   void Save()
   {
     if(changed_){
@@ -120,39 +120,39 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
   bool canceled_;
   string home_;
   Vector!(string) v_;
-  
+
   this()
   {
     super(&Start);
     home_ = Environment.get("HOME");
     v_ = new Vector!(string)(DirPathList.MAX);
-    
+
     Register();
   }
-  
+
   void Stop()
   {
     canceled_ = true;
   }
-  
+
   string GetThreadListLabel(string startTime)
   {
     return "Scanning directories under " ~ home_;
   }
-  
+
   string GetStopDialogLabel(string startTime)
   {
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
   }
-  
+
   gdk.Window.Window GetAssociatedWindow(){return null;}
-  
-  
-  
+
+
+
   void Start()
   {
     ScanOneDirectory(home_);
-    
+
     gdkThreadsEnter();
     Unregister();
     if(!canceled_){
@@ -162,7 +162,7 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
     }
     gdkThreadsLeave();
   }
-  
+
   void AppendOneDirectory(string path)
   {
     if(path.StartsWith(home_)){
@@ -170,31 +170,31 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
     }
     v_.append(AppendSlash(path));
   }
-  
+
   void ScanOneDirectory(string path)
   {
     AppendOneDirectory(path);
-    
+
     string[] dirs = ScanChildren(path);
     foreach(dir; dirs){
       ScanOneDirectory(path ~ '/' ~ dir);
-      
+
       if(canceled_){
         break;
       }
     }
   }
-  
+
   string[] ScanChildren(string path)
   {
     static const string attributes = "standard::name,standard::type,standard::is-symlink";
     static const string[] ignoreDirs = ["lost+found", ".svn", ".git"];
-    
+
     string[] dirs = [];
-    
+
     try{
       scope enumerate = GetFileForDirectory(path).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
-      
+
       GFileInfo * pinfo;
       while((pinfo = enumerate.nextFile(null)) != null){
         scope FileInfo info = new FileInfo(pinfo);
@@ -208,7 +208,7 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
       enumerate.close(null);
     }
     catch(Exception ex){}// permission denied or directory has been removed
-    
+
     dirs.sort;
     return dirs;
   }

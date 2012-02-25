@@ -43,23 +43,23 @@ class SetaWindow : MainWindow
   ///////////////////////// GUI stuff
 private:
   static SetaWindow singleton_;
-  
+
   HPaned hpaned_;
   SetaStatusbar statusbar_;
   Note noteL_;
   Note noteR_;
-  
+
 public:
   static void Init()
   {
     singleton_ = new SetaWindow();
     SetLayout();
     singleton_.showAll();
-    
+
     // set initial focus to lower left widget (terminal)
     singleton_.noteL_.GetCurrentPage().FocusShownWidget();
   }
-  
+
   this()
   {
     super("Seta");
@@ -67,30 +67,30 @@ public:
     addOnWindowState(&WindowStateChangedCallback);
     addOnDelete(&WindowDelete);
     //setIcon(new Pixbuf("/home/skirino/temp/seta_main.jpg"));
-    
+
     VBox vbox = new VBox(0, 0);
     add(vbox);
     hpaned_ = new HPaned;
-    
+
     noteL_ = new Note('L', this);
     noteR_ = new Note('R', this);
     noteL_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
     noteR_.AppendNewPage(rcfile.GetInitialDirectoryRight());
     hpaned_.pack1(noteL_, 1, 0);
     hpaned_.pack2(noteR_, 1, 0);
-    
+
     vbox.packStart(hpaned_, 1, 1, 0);
     statusbar_ = InitStatusbar(noteL_, noteR_);
     vbox.packEnd(statusbar_, 0, 0, 0);
   }
-  
+
   static void SetLayout()
   {
     singleton_.setDefaultSize(rcfile.GetWindowSizeH(), rcfile.GetWindowSizeV());
     singleton_.hpaned_.setPosition(rcfile.GetSplitH());
     singleton_.statusbar_.SetLayout();
   }
-  
+
 private:
   bool WindowDelete(Event e, Widget w)
   {
@@ -100,7 +100,7 @@ private:
     // does not temporarily catch any keypress events.
     return true;
   }
-  
+
   void AppendPageCopy(char lr)
   {
     // Make a copy of the displayed page.
@@ -114,16 +114,16 @@ private:
       noteR_.AppendPageCopy();
     }
   }
-  
+
   void ClosePage(char lr, uint num)
   {
     Note note = lr == 'L' ? noteL_ : noteR_;
     note.GetNthPage(num-1).PrepareDestroy();
     note.removePage(num-1);
-    
+
     int npagesL = noteL_.getNPages();
     int npagesR = noteR_.getNPages();
-    
+
     if(npagesL == 0 && npagesR == 0){
       Main.quit();
     }
@@ -150,9 +150,9 @@ private:
     }
   }
   ///////////////////////// GUI stuff
-  
-  
-  
+
+
+
   ///////////////////////// file/dir path
   string GetCWDOfChildWidget(char lr, uint n)
   {
@@ -162,9 +162,9 @@ private:
     return (page is null) ? null : page.GetCWD();
   }
   ///////////////////////// file/dir path
-  
-  
-  
+
+
+
   ///////////////////////// manipulation of focus
   FocusInMainWindow WhichIsFocused()
   {
@@ -172,15 +172,15 @@ private:
     if(pageL !is null && pageL.WhichIsFocused() != FocusInPage.NONE){
       return FocusInMainWindow.LEFT;
     }
-    
+
     auto pageR = noteR_.GetCurrentPage();
     if(pageR !is null && pageR.WhichIsFocused() != FocusInPage.NONE){
       return FocusInMainWindow.RIGHT;
     }
-    
+
     return FocusInMainWindow.NONE;
   }
-  
+
   Note GetFocusedNote()
   {
     switch(WhichIsFocused()){
@@ -194,7 +194,7 @@ private:
       return null;
     }
   }
-  
+
   void MoveFocus(Direction direction)()
   {
     static if(direction == Direction.UP || direction == Direction.DOWN){
@@ -204,7 +204,7 @@ private:
       }
       auto page = note.GetCurrentPage();
       FocusInPage f = page.WhichIsFocused();
-      
+
       static if(direction == Direction.UP){
         if(f == FocusInPage.LOWER){
           page.FocusUpper();
@@ -225,13 +225,13 @@ private:
       if(pageR is null){
         return;
       }
-      
+
       FocusInPage fl = pageL.WhichIsFocused();
       FocusInPage fr = pageR.WhichIsFocused();
       if(fl == FocusInPage.NONE && fr == FocusInPage.NONE){
         return;
       }
-      
+
       static if(direction == Direction.LEFT){
         if(fr == FocusInPage.UPPER){
           pageL.FocusUpper();
@@ -251,18 +251,18 @@ private:
     }
   }
   ///////////////////////// manipulation of focus
-  
-  
-  
+
+
+
   ///////////////////////// callback for keyboard shortcuts
   bool KeyPressed(GdkEventKey * ekey, Widget w)
   {
     // called before the focused widget's callback
     switch(QueryMainWindowAction(ekey)){
-      
+
     case -1:
       return false;
-      
+
     case MainWindowAction.CreateNewPage:
       switch(WhichIsFocused()){
       case FocusInMainWindow.NONE:
@@ -276,7 +276,7 @@ private:
       default:
         return false;
       }
-      
+
     case MainWindowAction.MoveToNextPage:
       auto note = GetFocusedNote();
       if(note is null){
@@ -292,7 +292,7 @@ private:
         note.GetCurrentPage().FocusShownWidget();
         return true;
       }
-      
+
     case MainWindowAction.MoveToPreviousPage:
       auto note = GetFocusedNote();
       if(note is null){
@@ -308,7 +308,7 @@ private:
         note.GetCurrentPage().FocusShownWidget();
         return true;
       }
-      
+
     case MainWindowAction.SwitchViewMode:
       auto note = GetFocusedNote();
       if(note is null){
@@ -317,23 +317,23 @@ private:
       auto page = note.GetCurrentPage();
       page.ViewModeButtonClicked(null);
       return true;
-      
+
     case MainWindowAction.MoveFocusUp:
       MoveFocus!(Direction.UP)();
       return true;
-      
+
     case MainWindowAction.MoveFocusDown:
       MoveFocus!(Direction.DOWN)();
       return true;
-      
+
     case MainWindowAction.MoveFocusLeft:
       MoveFocus!(Direction.LEFT)();
       return true;
-      
+
     case MainWindowAction.MoveFocusRight:
       MoveFocus!(Direction.RIGHT)();
       return true;
-      
+
     case MainWindowAction.ExpandLeftPane:
       if(statusbar.ExpandLeftPane()){
         // now only noteL is displayed.
@@ -344,7 +344,7 @@ private:
         }
       }
       return true;
-      
+
     case MainWindowAction.ExpandRightPane:
       if(statusbar.ExpandRightPane()){
         auto pageR = noteR_.GetCurrentPage();
@@ -353,7 +353,7 @@ private:
         }
       }
       return true;
-      
+
     case MainWindowAction.ShowChangeDirDialog:
       auto note = GetFocusedNote();
       if(note is null){
@@ -361,11 +361,11 @@ private:
       }
       StartChangeDirDialog(note.GetCurrentPage());
       return true;
-      
+
     case MainWindowAction.ShowConfigDialog:
       StartConfigDialog();
       return true;
-      
+
     case MainWindowAction.ToggleFullscreen:
       if(isFullscreen_){
         unfullscreen();
@@ -374,22 +374,22 @@ private:
         fullscreen();
       }
       return true;
-      
+
     case MainWindowAction.QuitApplication:
       Main.quit();
-      
+
     default:
       return false;
     }
   }
   ///////////////////////// callback for keyboard shortcuts
-  
-  
-  
+
+
+
   ///////////////////////// toggle fullscreen
 private:
   bool isFullscreen_;
-  
+
   bool WindowStateChangedCallback(GdkEventWindowState * e, Widget w)
   {
     isFullscreen_ = (GdkWindowState.FULLSCREEN & e.newWindowState) != 0;

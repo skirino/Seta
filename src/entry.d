@@ -43,7 +43,7 @@ private:
   uint mode_;
   bool isSymlink_;
   ulong lastModified_;
-  
+
   void Construct(bool isDir)(FileInfo info)
   {
     static if(isDir){
@@ -56,7 +56,7 @@ private:
     mode_ = info.getAttributeUint32("unix::mode");
     isSymlink_ = info.getIsSymlink() != 0;
   }
-  
+
 public:
   this(FileInfo info)// constructor for files in local filesystems
   {
@@ -65,16 +65,16 @@ public:
     size_ = info.getSize();
     owner_ = info.getAttributeString("owner::user");
   }
-  
+
   this(FileInfo info, string pwd)// constructor for directories in local filesystems
   {
     Construct!(true)(info);
     size_ = CountNumEntries(pwd ~ name_);
     owner_ = info.getAttributeString("owner::user");
   }
-  
-  
-  
+
+
+
   ///////////////////////// SSH
   // Since "owner::user" cannot be queried from GVFS, it is skipped.
   // Also, counting entries in directories can take very long time and is avoided.
@@ -85,7 +85,7 @@ public:
     size_ = info.getSize();
     owner_ = "(skipped)";
   }
-  
+
   this(FileInfo info, int dummy)// constructor for directories in remote filesystems
   {
     Construct!(true)(info);
@@ -93,9 +93,9 @@ public:
     owner_ = "(skipped)";
   }
   ///////////////////////// SSH
-  
-  
-  
+
+
+
   ///////////////////////// accessor
   string GetName      (){return name_;}
   string GetType      (){return type_;}
@@ -105,7 +105,7 @@ public:
   string GetPermission(){return PermissionInStr(mode_, isSymlink_);}
   string GetModified  (){return EpochTimeToString(lastModified_);}
   bool IsSymlink(){return isSymlink_;}
-  
+
   FileColorType GetDirColorType()
   {
     // directories are not considered here
@@ -212,7 +212,7 @@ string FileSizeInStr(long n)
   const int kilo = 0x400;
   const int mega = 0x100000;
   const int giga = 0x40000000;
-  
+
   if(n < kilo){
     return Str.toString(cast(ulong)n) ~ " B";
   }
@@ -220,7 +220,7 @@ string FileSizeInStr(long n)
     string buffer;
     const size_t buflen = 4;
     buffer.length = buflen;
-    
+
     if(n < mega){
       string sizeStr = Str.asciiFormatd(buffer, buflen, "%3.1f", 1.0*n/kilo);
       return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " KB";
@@ -240,7 +240,7 @@ string FileSizeInStr(long n)
 string PermissionInStr(uint mode, bool isSymlink)
 {
   static char[10] ret;
-  
+
   if(isSymlink){
     ret[0] = 'l';
   }
@@ -250,22 +250,22 @@ string PermissionInStr(uint mode, bool isSymlink)
   else{
     ret[0] = '-';
   }
-  
+
   ret[1..4]  = RWX[(mode & S_IRWXU)/64];
   if(mode & S_ISUID){
     ret[3] = ret[3] == 'x' ? 's' : 'S';
   }
-  
+
   ret[4..7]  = RWX[(mode & S_IRWXG)/8];
   if(mode & S_ISGID){
     ret[6] = ret[6] == 'x' ? 's' : 'S';
   }
-  
+
   ret[7..10] = RWX[(mode & S_IRWXO)];
   if(mode & S_ISVTX){
     ret[9] = ret[9] == 'x' ? 't' : 'T';
   }
-  
+
   return ret[];
 }
 

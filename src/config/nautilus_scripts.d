@@ -33,7 +33,7 @@ class NautilusScript
 {
   string path_;
   this(string path){path_ = path;}
-  
+
   string GetPath(){return path_;}
   string GetName(){return GetBasename(path_);}
   int opCmp(Object rhs)
@@ -47,19 +47,19 @@ class ScriptsDir
   string path_;
   ScriptsDir[] dirs_;
   NautilusScript[] scripts_;
-  
+
   this(string path)
   {
     path_ = AppendSlash(path);
-    
+
     const string attributes = "standard::name,standard::type,access::can-execute";
     scope enumerate = File.parseName(path_).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
-    
+
     GFileInfo * pinfo;
     while((pinfo = enumerate.nextFile(null)) != null){
       scope FileInfo info = new FileInfo(pinfo);
       string name = path_ ~ info.getName();
-      
+
       if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
         dirs_ ~= new ScriptsDir(name);
       }
@@ -69,19 +69,19 @@ class ScriptsDir
         }
       }
     }
-    
+
     enumerate.close(null);
-    
+
     dirs_.sort;
     scripts_.sort;
   }
-  
+
   string GetName(){return GetBasename(path_);}
   int opCmp(Object rhs)
   {
     return StrCmp(path_, (cast(ScriptsDir)rhs).path_);
   }
-  
+
   bool IsEmpty()
   {
     return dirs_.length == 0 && scripts_.length == 0;

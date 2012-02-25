@@ -37,13 +37,13 @@ class Note : Notebook
 private:
   char side_;
   SetaWindow mainWin_;
-  
+
 public:
   this(char lr, SetaWindow mainWin)
   {
     side_ = lr;
     mainWin_ = mainWin;
-    
+
     super();
     setScrollable(1);
     setGroup(cast(void*)mainWin_);
@@ -51,7 +51,7 @@ public:
     addOnPageRemoved(&LabelAllPages);
     addOnPageReordered(&LabelAllPages);
   }
-  
+
   Page GetNthPage(uint n)
   {
     return cast(Page)getNthPage(n);
@@ -60,7 +60,7 @@ public:
   {
     return GetNthPage(getCurrentPage());
   }
-  
+
   void AppendNewPage(string initialDir)
   {
     auto page = new Page(
@@ -75,7 +75,7 @@ public:
     setTabLabelPacking(page, 1, 1, GtkPackType.START);
     page.show();
   }
-  
+
   void AppendPageCopy()
   {
     auto p = GetCurrentPage();
@@ -93,20 +93,20 @@ public:
     }
     AppendNewPage(initialDir);
   }
-  
+
 private:
   void LabelAllPages(Widget w, uint u, Notebook note)
   {
     uint num = getNPages();
     if(num > 0){
       setShowTabs(num-1);// show tabs when note has more than 1 pages
-      
+
       for(uint i=0; i<num; ++i){
         GetNthPage(i).GetTab().SetID(side_, i+1);
       }
     }
   }
-  
+
   void PageAdded(Widget w, uint u, Notebook note)
   {
     page_list.Register(cast(Page)w);

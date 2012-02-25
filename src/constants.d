@@ -58,7 +58,7 @@ static const string PARENT_STRING = "../";
 void Init()
 {
   directoryTypeDescription = ContentType.getDescription("inode/directory");
-  
+
   dragTargets[0].target = "text/uri-list";
   dragTargets[0].flags  = 0;
   dragTargets[0].info   = 1;

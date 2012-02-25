@@ -78,9 +78,9 @@ private:
      ColumnType.OWNER, ColumnType.PERMISSIONS, ColumnType.LAST_MODIFIED,
      ColumnType.COLOR];
   ListStore store_;
-  
+
   EntryList eList_;
-  
+
 public:
   this(Mediator mediator)
   {
@@ -139,7 +139,7 @@ public:
         cols_[id].setFixedWidth(width);
       }
     }
-    
+
     string old = fileInfoAttributes_;
     ResetFileInfoAttributes();
     if(pwd_ !is null){// not first time "SetLayout()" is called
@@ -148,13 +148,13 @@ public:
     }
   }
   //////////////////// GUI stuff
-  
-  
-  
+
+
+
   //////////////////// column
 private:
   TreeViewColumn[ColumnType.COLOR] cols_;
-  
+
   TreeViewColumn SetupNewColumn(ColumnType id)
   {
     auto renderer = new CellRendererText;
@@ -167,7 +167,7 @@ private:
     col.addOnClicked(&SortOrderCallback);
     return col;
   }
-  
+
   string GetValueString(TreeIter iter, TreeViewColumn col)
   {
     foreach(i, c; cols_){
@@ -178,14 +178,14 @@ private:
     return null;
   }
   //////////////////// column
-  
-  
-  
+
+
+
   //////////////////// list entries in directory
 private:
   Mediator mediator_;
   string pwd_;
-  
+
 public:
   void TryUpdate()
   {
@@ -214,25 +214,25 @@ public:
       }
     }
   }
-  
+
 private:
   void Update(string dirname, File file = null, bool appendToHistory = false, bool notifyTerminal = false)
   {
     assert(dirname[$-1] == '/');
-    
+
     File dirFile = file is null ? File.parseName(dirname) : file;
     bool remote = mediator_.FileSystemLookingAtRemoteFS(dirname);
-    
+
     if(!mediator_.FilerIsVisible()){
       pwd_ = dirname;
       contentsChanged_ = false;
       mediator_.UpdatePathLabel(dirname, CountNumEntries(dirname));// just count number of entries
       ResetMonitoring(remote, dirFile);
-      
+
       if(notifyTerminal){
         mediator_.TerminalChangeDirectoryFromFiler(pwd_);
       }
-      
+
       if(appendToHistory){
         mediator_.FilerAppendToHistory(pwd_);
       }
@@ -243,14 +243,14 @@ private:
     }
   }
   ///////////////////// list up entries in directory
-  
-  
-  
+
+
+
   ///////////////////// update driven by changes in directory
 private:
   FileMonitor monitor_;
   bool contentsChanged_;
-  
+
   extern(C) static int UpdateCallback(void * ptr)
   {
     FileView view = cast(FileView)ptr;
@@ -271,7 +271,7 @@ private:
     }
     return 0;
   }
-  
+
   void DirChanged(File f1, File f2, GFileMonitorEvent e, FileMonitor m)
   {
     if(!contentsChanged_){
@@ -279,14 +279,14 @@ private:
       gdkThreadsAddTimeout(500, &UpdateCallback, cast(void*)this);
     }
   }
-  
+
   void UpdateIfNecessary()
   {
     if(contentsChanged_){
       TryUpdate();
     }
   }
-  
+
   void ResetMonitoring(bool remote, File pwdNewFile)
   {
     if(monitor_ !is null){
@@ -300,7 +300,7 @@ private:
       catch(GException ex){}// cannot monitor e.g. directories in music CDs
     }
   }
-  
+
 public:
   void StopOngoingOperations(Widget w = null)
   {
@@ -309,26 +309,26 @@ public:
       monitor_.cancel();
     }
     contentsChanged_ = false;
-    
+
     // stop running thread
     WaitStopIfRunning();
   }
   ///////////////////// update driven by changes in directory
-  
-  
-  
+
+
+
   ///////////////////// listup in another thread
 private:
   // number of rows (DirEntry's) present in the TreeView now
   uint numRowsNow_;
-  
+
   PrepareEntriesJob prepareUpdateThread_;
-  
+
   void WaitStopIfRunning()
   {
     if(prepareUpdateThread_ !is null && prepareUpdateThread_.isRunning()){
       prepareUpdateThread_.Stop();
-      
+
       // wait for the end of the thread
       while(prepareUpdateThread_.isRunning()){
         // For the thread to finish its work, releasing GDK lock is necessary here
@@ -339,11 +339,11 @@ private:
       }
     }
   }
-  
+
   void EnumerateFilterSortSet(bool remote, string dir, File dirFile, bool appendToHistory, bool notifyTerminal)
   {
     WaitStopIfRunning();
-    
+
     prepareUpdateThread_ =
       new PrepareEntriesJob(
         true, dir, this,
@@ -354,11 +354,11 @@ private:
     prepareUpdateThread_.SetForSort(sortColumn_, sortOrder_);
     prepareUpdateThread_.start();
   }
-  
+
   void FilterSortSet()
   {
     WaitStopIfRunning();
-    
+
     // Do not read the directory entries from disk,
     // reuse previous results (which are stored in entriesDAll_ and entriesFAll_)
     prepareUpdateThread_ =
@@ -370,42 +370,42 @@ private:
     prepareUpdateThread_.SetForSort(sortColumn_, sortOrder_);
     prepareUpdateThread_.start();
   }
-  
+
   void SetRowsCallback(bool withEnumerateDirEntries, bool appendToHistory, bool notifyTerminal)(
     bool remote, string pwdNew, File pwdNewFile)
   {
     // set DirEntry vectors (swap internal arrays to avoid deep copy)
     eList_.SwapEntries!(withEnumerateDirEntries)();
-    
+
     // update monitoring
     static if(withEnumerateDirEntries){
       if(pwd_ != pwdNew){
         ResetMonitoring(remote, pwdNewFile);
       }
     }
-    
+
     pwd_ = pwdNew;
     contentsChanged_ = false;
-    
+
     ResetRows();
-    
+
     static if(appendToHistory){
       mediator_.FilerAppendToHistory(pwd_);
     }
-    
+
     static if(notifyTerminal){
       mediator_.TerminalChangeDirectoryFromFiler(pwd_);
     }
   }
-  
+
   void ResetRows()
   {
     mediator_.UpdatePathLabel(pwd_, eList_.NumEntriesAll());
-    
+
     // cleanup
     store_.clear();
     numRowsNow_ = 0;
-    
+
     string[] colors = rcfile.GetRowColors();
     TreeIter iter = new TreeIter;
     {// parent dir
@@ -423,31 +423,31 @@ private:
          EpochTimeToString(info.getAttributeUint64("time::modified")),
          colors[FileColorType.Directory]]);
     }
-    
+
     // set entries to ListStore
     AppendRows(1000, colors, iter);// append up to 1000 rows
     if(numRowsNow_ < eList_.NumEntriesSorted()){// if there are remaining rows to be added
       gdkThreadsAddIdle(&AppendRowsAtIdle, cast(void*)this);
     }
   }
-  
+
   void AppendRows(size_t numAppend, string[] colors = null, TreeIter iter = null)
   {
     if(numRowsNow_ >= eList_.NumEntriesSorted()){
       return;
     }
-    
+
     if(colors is null){
       colors = rcfile.GetRowColors();
     }
     if(iter is null){
       iter = new TreeIter;
     }
-    
+
     size_t entDSize = eList_.GetDSorted().size();
     size_t entFSize = eList_.GetFSorted().size();
     size_t maxRows = numRowsNow_ + numAppend;
-    
+
     if(numRowsNow_ < entDSize){// there are directories which should be appended to the view
       size_t upper = min(maxRows, entDSize);
       foreach(p; eList_.GetDSorted()[numRowsNow_ .. upper]){
@@ -458,15 +458,15 @@ private:
            p.GetPermission(), p.GetModified(), colors[p.GetDirColorType()]]);
       }
       numRowsNow_ = upper;
-      
+
       if(maxRows <= entDSize){// finished appending "numAppend" directories at this time
         return;
       }
     }
-    
+
     if(numRowsNow_ < entDSize + entFSize){// there are files which should be appended to the view
       size_t upper = min(maxRows - entDSize, entFSize);
-      
+
       foreach(p; eList_.GetFSorted()[numRowsNow_ - entDSize .. upper]){
         store_.append(iter);
         store_.set(
@@ -477,12 +477,12 @@ private:
       numRowsNow_ = entDSize + upper;
     }
   }
-  
+
   void AppendAllRows()
   {
     AppendRows(eList_.NumEntriesSorted());
   }
-  
+
   extern(C) static gboolean AppendRowsAtIdle(void * ptr)
   {
     // This callback is called when displaying directories with more than 1000 entries.
@@ -496,26 +496,26 @@ private:
     }
   }
   ///////////////////// listup in another thread
-  
-  
-  
+
+
+
   ///////////////////// enumerate directory entries
 private:
   string fileInfoAttributes_;
-  
+
   static const string necessaryAttributes_ = "standard::name,standard::type,standard::is-symlink";
   static const string[ColumnType.COLOR] optionalAttributes_ =
     ["", "standard::content-type", "standard::size", "owner::user", "unix::mode", "time::modified"];
-  
+
   void InitFileInfoAttributes()
   {
     fileInfoAttributes_ = necessaryAttributes_ ~ ',' ~ optionalAttributes_.join(",");
   }
-  
+
   void ResetFileInfoAttributes()
   {
     fileInfoAttributes_ = necessaryAttributes_;
-    
+
     foreach(int id, width; rcfile.GetWidths()){
       if(id > 0){// omit "ColumnType.NAME"
         if(width > 0){
@@ -525,35 +525,35 @@ private:
     }
   }
   ///////////////////// enumerate directory entries
-  
-  
-  
+
+
+
   ///////////////////// filter
 private:
   bool showHidden_;
   string filterText_;
-  
+
 public:
   void SetShowHidden(bool b)
   {
     showHidden_ = b;
     FilterSortSet();
   }
-  
+
   void FilterChanged(string text)
   {
     filterText_ = text;
     FilterSortSet();
   }
   ///////////////////// filter
-  
-  
-  
+
+
+
   ////////////////////// sort entries
 private:
   ColumnType sortColumn_;
   GtkSortType sortOrder_;
-  
+
   void SortOrderCallback(TreeViewColumn col)
   {
     if(col is cols_[sortColumn_]){// flip sort order of clicked column
@@ -564,11 +564,11 @@ private:
       // move sort indicator
       cols_[sortColumn_].setSortIndicator(0);
       col.setSortIndicator(1);
-      
+
       // default for sortOrder_ is "ascending";
       sortOrder_ = GtkSortType.ASCENDING;
       col.setSortOrder(sortOrder_);// default is 'ascending'
-      
+
       // update sortColumn_
       foreach(i, c; cols_){
         if(col is c){
@@ -577,14 +577,14 @@ private:
         }
       }
     }
-    
+
     // reorder rows (no need to read disk)
     FilterSortSet();
   }
   ////////////////////// sort entries
-  
-  
-  
+
+
+
   ////////////////////// change directory
 public:
   // called by the parent (FileManager)
@@ -592,7 +592,7 @@ public:
   {
     // dirname must end with '/'
     assert(dirname[$-1] == '/');
-    
+
     if(dirname != pwd_){
       // check whether the directory can be opened
       File f = GetFileForDirectory(dirname);
@@ -605,7 +605,7 @@ public:
     }
     return false;
   }
-  
+
   void GoDownIfOnlyOneDir()
   {
     auto ents = eList_.GetDSorted();
@@ -614,9 +614,9 @@ public:
     }
   }
   ////////////////////// change directory
-  
-  
-  
+
+
+
   ////////////////////// manipulation of focus
 public:
   void GrabFocus()
@@ -624,7 +624,7 @@ public:
     grabFocus();
     MoveCursorToSecondRow();
   }
-  
+
 private:
   void MoveCursorToSecondRow()
   {
@@ -636,9 +636,9 @@ private:
     path.free();
   }
   ////////////////////// manipulation of focus
-  
-  
-  
+
+
+
   /////////////////////////// tooltip
 private:
   void InitTooltipFunctionality()
@@ -646,7 +646,7 @@ private:
     setHasTooltip(1);
     addOnQueryTooltip(&TooltipCallback);
   }
-  
+
   // callback to show tooltip for ellipsized texts or target paths of symlinks
   bool TooltipCallback(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
   {
@@ -660,7 +660,7 @@ private:
         TreeViewColumn col = GetColAtPos(this, x, y);
         string tooltipContent;
         auto renderer = GetCellRendererFromCol(col);
-        
+
         ////////////////////// tooltip for long file name or type
         {
           // get actualWidth, widthNeeded for column (at this point not for cell)
@@ -673,13 +673,13 @@ private:
           }
         }
         //////////////////////
-        
+
         ////////////////////// tooltip for symlink target
         int row = path.getIndices()[0];
         if(row != 0){// exclude "../"
           // Just after changing directory, "row" can be larger than the max index of entries.
           // Exclude these cases.
-          
+
           if(row < 1 + eList_.NumEntriesSorted()){
             DirEntry ent =
               (row <= eList_.GetDSorted().size()) ? eList_.GetDSorted()[row-1] :
@@ -694,25 +694,25 @@ private:
           }
         }
         //////////////////////
-        
+
         if(tooltipContent.length > 0){
           Tooltip tip = new Tooltip(p);
           tip.setText(tooltipContent);
           setTooltipCell(tip, path, col, renderer);// set position for the tooltip to appear
           return true;
         }
-        
+
         path.free();
       }
     }
-    
+
     // in the other cases tooltip should not appear
     return false;
   }
   /////////////////////////// tooltip
-  
-  
-  
+
+
+
   /////////////////////////// util
 private:
   string[] GetSelectedFileNames()
@@ -727,7 +727,7 @@ private:
     }
     return ret;
   }
-  
+
   string GetNameFromIter(TreeIter iter)
   {
     if(iter is null){
@@ -737,15 +737,15 @@ private:
       return iter.getValueString(ColumnType.NAME);
     }
   }
-  
+
   string GetNameFromPath(TreePath path)
   {
     return GetNameFromIter(GetIter(store_, path));
   }
   /////////////////////////// util
-  
-  
-  
+
+
+
   /////////////////////  event handling
 private:
   // double clicking or pressing Enter
@@ -786,18 +786,18 @@ private:
       }
     }
   }
-  
+
   bool KeyPressed(GdkEventKey * ekey, Widget w)
   {
     switch(QueryFileViewAction(ekey)){
-      
+
     case -1:
       return false;
-      
+
     case FileViewAction.SelectAll:
       // add all DirEntry's to the view
       AppendAllRows();
-      
+
       // select all except "../"
       MoveCursorToSecondRow();
       TreeSelection selection = getSelection();
@@ -806,7 +806,7 @@ private:
       selection.unselectPath(path);// unselect 1st row
       path.free();
       return true;
-      
+
     case FileViewAction.SelectRow:
       TreePath path = GetPathAtCursor(this);
       if(path is null){
@@ -823,19 +823,19 @@ private:
         path.free();
         return true;
       }
-      
+
     case FileViewAction.Cut:
       PreparePaste(true, pwd_, GetSelectedFileNames(), this);
       return true;
-      
+
     case FileViewAction.Copy:
       PreparePaste(false, pwd_, GetSelectedFileNames(), this);
       return true;
-      
+
     case FileViewAction.Paste:
       PasteFiles(pwd_, this);
       return true;
-      
+
     case FileViewAction.PopupMenu:
       // popup right-click menu
       TreePath path = GetPathAtCursor(this);
@@ -847,40 +847,40 @@ private:
         path.free();
       }
       return true;
-      
+
     case FileViewAction.Rename:
       RenameFiles(pwd_, GetSelectedFileNames());
       TryUpdate();
       return true;
-      
+
     case FileViewAction.MakeDirectory:
       MakeDirectory(pwd_);
       return true;
-      
+
     case FileViewAction.MoveToTrash:
       MoveToTrash(pwd_, GetSelectedFileNames());
       return true;
-      
+
     case FileViewAction.FocusFilter:
       mediator_.FilerFocusFilter();
       return true;
-      
+
     case FileViewAction.ClearFilter:
       mediator_.FilerClearFilter();
       return true;
-      
+
     default:
       return false;
     }
   }
-  
+
   void PopupFilerMenu(bool usePositionFunc = false)(TreePath path, uint activateTime)
   {
     try{
       RightClickMenu menu = new RightClickMenu(
         this, pwd_, GetNameFromPath(path), GetSelectedFileNames(),
         bind(&(mediator_.FilerChangeDirectory), _0, true, true).ptr());
-      
+
       // Passing eb.button as the 1st argument of menu.popup() is problematic,
       // since in that case the submenu cannot be simply activated.
       // The 1st arg should be 0 as written in the gtk+ docs.
@@ -903,9 +903,9 @@ private:
     }
   }
   /////////////////////  event handling
-  
-  
-  
+
+
+
   ////////////////////// drag and drop
 private:
   DraggingState draggingState_;
@@ -913,40 +913,40 @@ private:
   int dragStartX_;
   int dragStartY_;
   bool selectionDoneWhenPressed_;
-  
+
   void InitDragAndDropFunctionality()
   {
     GtkTargetEntry[] dragTargets = constants.GetDragTargets();
     enableModelDragDest(
       dragTargets,
       GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
-    
+
     enableModelDragSource(
       GdkModifierType.BUTTON1_MASK | GdkModifierType.BUTTON2_MASK,
       dragTargets,
       GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
-    
+
     addOnButtonPress(&ButtonPressed);
     addOnButtonRelease(&ButtonReleased);
     addOnMotionNotify(&MotionNotify);
     addOnDragDataGet(&DragDataGet);
     addOnDragDataReceived(&DragDataReceived);
   }
-  
+
   // handles row selections and stores the position of the cursor for drag start
   bool ButtonPressed(GdkEventButton * eb, Widget treeView)
   {
     if(eb.window != getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-    
+
     grabFocus();// to enable select path at 1st click
     TreePath path = GetPathAtPos(this, eb.x, eb.y);
     TreeSelection selection = getSelection();
     if(path is null){// empty space is clicked
       selection.unselectAll();
     }
-    
+
     if(eb.button == MouseButton.RIGHT){// right button, popup menu
       if(path !is null){
         // check whether the clicked row is already selected
@@ -956,14 +956,14 @@ private:
           selection.selectPath(path);
         }
       }
-      
+
       PopupFilerMenu(path, eb.time);
-      
+
       // prevent default handler to unselect selected rows other than "path"
       if(path !is null) path.free();
       return true;
     }
-    
+
     if(path !is null){
       if(eb.button == MouseButton.LEFT && Event.isDoubleClick(eb)){// when double-clicked, activate the clicked row
         draggingState_ = DraggingState.NEUTRAL;
@@ -972,7 +972,7 @@ private:
         return true;
       }
       else if(eb.button == MouseButton.LEFT || eb.button == MouseButton.MIDDLE){
-        
+
         if(selection.pathIsSelected(path)){
           // check whether the mouse cursor is on the first row ("../") or not
           string namePath = GetNameFromPath(path);
@@ -988,7 +988,7 @@ private:
               dragStartY_ = cast(int)eb.y;
             }
           }
-          
+
           // returning false here will unselect the selected rows
           // and avoid rubber banding
           path.free();
@@ -1000,13 +1000,13 @@ private:
           return false;// default handler will select the clicked row
         }
       }
-      
+
       path.free();
     }
-    
+
     return false;
   }
-  
+
   // selection handling, right click menu and end of dragging
   bool ButtonReleased(GdkEventButton * eb, Widget w)
   {
@@ -1041,15 +1041,15 @@ private:
           }
         }
       }
-      
+
       // reset
       selectionDoneWhenPressed_ = false;
       draggingState_ = DraggingState.NEUTRAL;
     }
-    
+
     return false;
   }
-  
+
   // Check whether the left or middle button has been pressed
   // and whether the distance covered is larger than the threshold value.
   // If true, start dragging.
@@ -1060,19 +1060,19 @@ private:
                                     cast(int)em.x, cast(int)em.y)){
         // start dragging
         draggingState_ = DraggingState.DRAGGING;
-        
+
         // specify possible action for this drag here (judging from the dragging button)
         GdkDragAction action = dragStartButton_ == MouseButton.LEFT ? GdkDragAction.ACTION_MOVE : GdkDragAction.ACTION_COPY;
-        
+
         auto dnd = DragAndDrop.begin(
           this,
           new TargetList(constants.GetDragTargets()),
           action,
           dragStartButton_,
           new Event(cast(GdkEvent*)em));
-        
+
         gtk_drag_set_icon_default(dnd.getDragContextStruct());
-        
+
         // reset drag button
         dragStartButton_ = 0;
       }
@@ -1082,7 +1082,7 @@ private:
       return false;
     }
   }
-  
+
   void DragDataGet(GdkDragContext * context, GtkSelectionData * selection, uint info, uint time, Widget w)
   {
     // prepare items that will be moved/copied
@@ -1092,7 +1092,7 @@ private:
     }
     draggingState_ = DraggingState.NEUTRAL;
   }
-  
+
   // do move or copy dragged items
   void DragDataReceived(
     GdkDragContext * context, int x, int y,
@@ -1100,7 +1100,7 @@ private:
   {
     DragAndDrop dnd = new DragAndDrop(context);
     string[] files = GetFilesFromSelection(selection);
-    
+
     if(files.length > 0){
       // determine "destDir"
       string destDir = pwd_;
@@ -1108,7 +1108,7 @@ private:
       GtkTreeViewDropPosition pos;
       getDestRowAtPos(x, y, path, pos);
       Widget sourceWidget = dnd.getSourceWidget();
-      
+
       // if dropped on a row for a directory, set "destDir" to the path to that directory
       if(pos == GtkTreeViewDropPosition.GTK_TREE_VIEW_DROP_INTO_OR_BEFORE ||
          pos == GtkTreeViewDropPosition.GTK_TREE_VIEW_DROP_INTO_OR_AFTER){
@@ -1128,17 +1128,17 @@ private:
           }
         }
       }
-      
+
       GdkDragAction action = ExtractSuggestedAction(context);
       TransferFiles(action, files, cast(FileView)sourceWidget, destDir, this);// cast may fail and null may be passed
-      
+
       finish:
       if(path !is null) path.free();
     }
-    
+
     dnd.finish(1, 0, 0);
   }
-  
+
 public:
   // called from sub threads (other than main thread)
   void TransferFinished(string destDir)
