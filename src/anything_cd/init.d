@@ -18,55 +18,23 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module main;
-
-private import gtk.Main;
-private import gthread.Thread;
-private import gdk.Threads;
+module anything_cd.init;
 
 private import tango.io.Stdout;
 
-private import mainWindow;
-private import constants;
-private import config.init;
-private import anything_cd.init;
-private import volumeMonitor;
-private import threadList;
+private import anything_cd.dir_list;
+private import anything_cd.dir_history;
 
 
-void Initialize()
+void Init()
 {
-  // init utilities
-  constants.Init();
-  config.init.Init();
-  anything_cd.init.Init();
-  volumeMonitor.Init();
-  threadList.Init();
+  anything_cd.dir_list.Init();
+  anything_cd.dir_history.Init();
 }
 
-
-void Finalize()
+void Finish()
 {
-  threadList.Finish();
-  config.init.Finish();
-  anything_cd.init.Finish();
+  anything_cd.dir_list.Finish();
+  anything_cd.dir_history.Finish();
 }
 
-
-void main(string[] args)
-{
-  // init libs
-  Thread.init(null);
-  gdkThreadsInit();
-  Main.init(args);
-  gdkThreadsEnter();
-  
-  Initialize();
-  
-  SetaWindow.Init();
-  Main.run();
-  
-  Finalize();
-  
-  gdkThreadsLeave();
-}

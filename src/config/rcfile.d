@@ -48,10 +48,6 @@ static const string SetaVersion = "0.5.6";
 void Init()
 {
   instance_ = new SetaRCFile();
-
-  config.nautilus_scripts.Init();
-  config.shellrc.Init();
-  config.keybind.Init();
 }
 
 void Write()
