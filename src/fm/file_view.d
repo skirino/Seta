@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module file_view;
+module fm.file_view;
 
 private import gtk.TreeView;
 private import gtk.Widget;
@@ -60,13 +60,13 @@ private import utils.vector;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.keybind;
-private import entry;
-private import prepare_entries_job;
-private import popup_menu;
-private import mediator;
+private import fm.entry;
+private import fm.entry_list;
+private import fm.prepare_entries_job;
+private import fm.popup_menu;
+private import fm.rename_dialog;
 private import move_files_job;
-private import rename.dialog;
-private import entry_list;
+private import mediator;
 
 
 class FileView : TreeView

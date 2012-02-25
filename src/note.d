@@ -26,8 +26,8 @@ private import gtk.Widget;
 private import tango.io.Stdout;
 
 private import rcfile = config.rcfile;
-private import page;
 private import page_list;
+private import page;
 private import main_window;
 
 

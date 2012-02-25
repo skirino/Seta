@@ -46,8 +46,8 @@ private import tango.util.MinMax;
 private import utils.string_util;
 private import utils.tree_util;
 private import config.keybind;
-private import page;
 private import anything_cd.filter_dirs_job;
+private import page;
 
 
 const uint DelayTimeToStartScanInMillis = 500;

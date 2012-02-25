@@ -18,10 +18,10 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module entry_list;
+module fm.entry_list;
 
 private import utils.vector;
-private import entry;
+private import fm.entry;
 
 
 class EntryList

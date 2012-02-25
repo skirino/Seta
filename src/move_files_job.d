@@ -38,10 +38,10 @@ private import tango.stdc.stdlib;
 private import utils.gio_util;
 private import utils.string_util;
 private import constants;
+private import fm.file_view;
 private import thread_list;
 private import input_dialog;
 private import statusbar;
-private import file_view;
 
 
 

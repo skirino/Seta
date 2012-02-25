@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module prepare_entries_job;
+module fm.prepare_entries_job;
 
 private import gio.File;
 private import gio.FileInfo;
@@ -34,8 +34,8 @@ private import tango.stdc.string;
 
 private import utils.vector;
 private import constants;
+private import fm.entry;
 private import thread_list;
-private import entry;
 
 
 class PrepareEntriesJob : Thread, StoppableOperationIF

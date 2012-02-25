@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module popup_menu;
+module fm.popup_menu;
 
 private import gtk.Menu;
 private import gtk.MenuItem;
@@ -43,11 +43,11 @@ private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
 private import config.dialog;
-private import input_dialog;
-private import move_files_job;
-private import file_view;
-private import rename.dialog;
 private import scripts = config.nautilus_scripts;
+private import fm.file_view;
+private import fm.rename_dialog;
+private import move_files_job;
+private import input_dialog;
 
 
 void LaunchApp(AppInfoIF appInfo, File f)

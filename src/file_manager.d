@@ -43,14 +43,14 @@ private import constants;
 private import rcfile = config.rcfile;
 private import config.keybind;
 private import known_hosts = config.known_hosts;
+private import fm.file_view;
+private import fm.history;
+private import fm.toolbar;
+private import fm.dir_tree;
 private import thread_list;
-private import file_view;
-private import history;
 private import mediator;
 private import statusbar;
 private import volume_monitor;
-private import dir_tree;
-private import toolbar;
 private import ssh_connection;
 private import ssh_dialog;
 

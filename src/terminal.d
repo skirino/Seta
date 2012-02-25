@@ -40,13 +40,13 @@ private import tango.core.Thread;
 private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
-private import thread_list;
 private import config.keybind;
+private import shellrc = config.shellrc;
+private import term.search_dialog;
+private import thread_list;
 private import mediator;
 private import ssh_connection;
 private import move_files_job;
-private import shellrc = config.shellrc;
-private import terminal_search_dialog;
 
 
 // wrapper class of VteTerminal widget

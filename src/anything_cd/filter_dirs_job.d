@@ -30,9 +30,9 @@ private import tango.text.Unicode;
 
 private import utils.string_util;
 private import utils.vector;
-private import thread_list;
 static private import anything_cd.dir_list;
 static private import anything_cd.dir_history;
+private import thread_list;
 
 
 class FilterDirsJob : Thread, StoppableOperationIF

@@ -33,9 +33,9 @@ private import constants;
 private import rcfile = config.rcfile;
 private import config.dialog;
 private import config.keybind;
+private import anything_cd.dialog;
 private import statusbar;
 private import note;
-private import anything_cd.dialog;
 
 
 class SetaWindow : MainWindow
