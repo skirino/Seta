@@ -32,14 +32,14 @@ private import tango.util.MinMax;
 
 string InputDialog(bool hideInput = false)(string title, string description, string defaultValue = "")
 {
-  Label label = new Label(description, false);
-  Entry entry = new Entry(defaultValue);
+  scope label = new Label(description, false);
+  scope entry = new Entry(defaultValue);
   entry.setWidthChars(max!(ulong)(defaultValue.length, 20));// ensure width of "entry"
   static if(hideInput){
     entry.setVisibility(0);
   }
 
-  Dialog d = new Dialog;
+  scope d = new Dialog;
   d.setTitle(title);
 
   string ret;
@@ -51,8 +51,9 @@ string InputDialog(bool hideInput = false)(string title, string description, str
   box.add(label);
   box.add(entry);
   d.getContentArea.add(box);
+  d.addButtons(["OK"                           , "_cancel"],
+               [GtkResponseType.GTK_RESPONSE_OK, GtkResponseType.GTK_RESPONSE_CANCEL]);
 
-  d.addButtons(["OK", "_cancel"], [GtkResponseType.GTK_RESPONSE_OK, GtkResponseType.GTK_RESPONSE_CANCEL]);
   d.addOnResponse(
     delegate void(int responseID, Dialog dialog)
     {
@@ -88,7 +89,7 @@ int ChooseDialog(uint numOptions)(string message, string[numOptions] labels)
     const GtkResponseType[] indices = cast(GtkResponseType[])[0, 1, 2, 3];
   }
 
-  Dialog d = new Dialog;
+  scope d = new Dialog;
   d.getContentArea.add(new Label(message, false));
   d.addButtons(labels, indices);
 

@@ -345,7 +345,7 @@ private:
           string defaultValue = (name[$-1] == '/' ? name[0..$-1] : name) ~ "(copy)";
 
           gdkThreadsEnter();
-          string newBasename = InputDialog("copy", "new name: ", defaultValue);
+          string newBasename = InputDialog("copy", "New name: ", defaultValue);
           gdkThreadsLeave();
 
           if(newBasename.length == 0){// no valid input is returned (CANCEL is pressed)

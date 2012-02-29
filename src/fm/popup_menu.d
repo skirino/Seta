@@ -139,9 +139,6 @@ public:
               auto appInfo = new DesktopAppInfo(cast(GDesktopAppInfo*)node.data());
               submenu_.append(new MenuItem(&OpenWithFun, appInfo.getName(), false));
             }
-
-            submenu_.append(new SeparatorMenuItem);
-            submenu_.append(new MenuItem(&OpenWithCommandFun, "Use custom command", false));
           }
         }
       }
@@ -272,17 +269,6 @@ private:
     }
   }
 
-  void OpenWithCommandFun(MenuItem item)
-  {
-    string command = InputDialog("", "command: ");
-    if(command.length == 0){
-      return;
-    }
-
-    string fullcommand = command ~ ' ' ~ pwd_ ~ selectedFileNames_[0] ~ " &\0";
-    system(fullcommand.ptr);
-  }
-
   void CutFun(MenuItem item) {PreparePaste(true,  pwd_, selectedFileNames_, view_);}
   void CopyFun(MenuItem item){PreparePaste(false, pwd_, selectedFileNames_, view_);}
   void PasteFun(MenuItem item){PasteFiles(pwd_);}
@@ -394,7 +380,7 @@ private:
 
 void MakeDirectory(string pwd)
 {
-  string dirname = InputDialog("mkdir", "new directory: ");
+  string dirname = InputDialog("mkdir", "New directory: ");
   if(dirname.length > 0){// valid input
     string absname = pwd ~ dirname;
     File newdir = File.parseName(absname);
