@@ -64,7 +64,7 @@ void NotifyFilerDisconnect(string mountName, string gvfsroot)
   bool alreadyPopup = false;
 
   foreach(page; pages_){
-    if(page.GetMediator().FileSystemRoot() == gvfsroot){
+    if(page.FileSystemRoot() == gvfsroot){
       if(!alreadyPopup){// popup once
         PopupBox.information("SFTP connection to " ~ mountName ~ " has suddenly been shut down.", "");
         alreadyPopup = true;

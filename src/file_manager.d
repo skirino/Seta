@@ -84,16 +84,17 @@ public:
     packStart(toolbar_, 0, 0, 0);
 
     hpaned_ = new HPaned;
+    {
+      // TreeView does not need Viewport. just use add()
+      swTree_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
+      swTree_.add(dirTree_);
+      hpaned_.pack1(swTree_, 1, 0);
+
+      swView_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
+      swView_.add(view_);
+      hpaned_.pack2(swView_, 1, 0);
+    }
     packStart(hpaned_, 1, 1, 0);
-
-    // TreeView does not need Viewport, just use add()
-    swView_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
-    swView_.add(view_);
-    swTree_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
-    swTree_.add(dirTree_);
-
-    hpaned_.pack1(swTree_, 1, 0);
-    hpaned_.pack2(swView_, 1, 0);
 
     SetLayout();
   }

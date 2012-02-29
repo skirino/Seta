@@ -50,8 +50,11 @@ public:
     fsys_ = new FileSystem;
   }
 
-  void SetFiler(FileManager f){filer_ = f;}
-  void SetTerm(Terminal t){term_ = t;}
+  void Set(FileManager f, Terminal t)
+  {
+    filer_ = f;
+    term_ = t;
+  }
 
 
 

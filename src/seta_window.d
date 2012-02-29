@@ -69,19 +69,22 @@ public:
     //setIcon(new Pixbuf("/home/skirino/temp/seta_main.jpg"));
 
     auto vbox = new VBox(0, 0);
+    {
+      hpaned_ = new HPaned;
+      {
+        noteL_ = new Note('L', this);
+        noteR_ = new Note('R', this);
+        noteL_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
+        noteR_.AppendNewPage(rcfile.GetInitialDirectoryRight());
+        hpaned_.pack1(noteL_, 1, 0);
+        hpaned_.pack2(noteR_, 1, 0);
+      }
+      vbox.packStart(hpaned_, 1, 1, 0);
+
+      statusbar_ = InitStatusbar(noteL_, noteR_);
+      vbox.packEnd(statusbar_, 0, 0, 0);
+    }
     add(vbox);
-    hpaned_ = new HPaned;
-
-    noteL_ = new Note('L', this);
-    noteR_ = new Note('R', this);
-    noteL_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
-    noteR_.AppendNewPage(rcfile.GetInitialDirectoryRight());
-    hpaned_.pack1(noteL_, 1, 0);
-    hpaned_.pack2(noteR_, 1, 0);
-
-    vbox.packStart(hpaned_, 1, 1, 0);
-    statusbar_ = InitStatusbar(noteL_, noteR_);
-    vbox.packEnd(statusbar_, 0, 0, 0);
   }
 
   static void SetLayout()

@@ -69,27 +69,80 @@ public:
        void delegate(char) AppendPageCopy,
        void delegate(char, uint) ClosePage)
   {
+    // check whether "initialDir" is a valid path or not
+    if(!DirectoryExists(initialDir)){
+      initialDir = Environment.get("HOME") ~ '/';
+    }
+
     getCWDFromMain_ = GetCWDFromMain;
     appendPage_ = AppendPageCopy;
 
+    super(0, 0);
+    addOnUnrealize(&UnregisterFromPageList);
+
+    // initialize children
     tab_ = new Tab(side, ClosePage);
     mediator_ = new Mediator(this);
+    terminal_ = new Terminal(mediator_, initialDir, GetCWDFromMain);
+    filer_ = new FileManager(mediator_, initialDir);
+    mediator_.Set(filer_, terminal_);
 
+    topBar_ = new HBox(0, 0);
+    SetupTopBar();
+    packStart(topBar_, 0, 0, 0);
+
+    paned_ = new VPaned;
+    {
+      paned_.pack1(filer_, 1, 0);
+
+      // AUTOMATIC is a workaround to resize horizontally; not for horizontal scrolling
+      swTerm_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
+      swTerm_.add(terminal_);
+      paned_.pack2(swTerm_, 1, 0);
+    }
+    packStart(paned_,  1, 1, 0);
+
+    filer_.ChangeDirectory(initialDir, false, false);// do not notify terminal and do not append history
+
+    showAll();
+    SetLayout();
+  }
+
+  // initialize and set 5 widgets in topBar_
+  private void SetupTopBar()
+  {
+    // set button size
     Button.setIconSize(GtkIconSize.MENU);
+
     auto appendPageButton = new Button(StockID.ADD, &AppendPage, true);
     appendPageButton.setTooltipText("Open new tab");
+    topBar_.packStart(appendPageButton, 0, 0, 0);
+
     auto viewModeButton = new Button(StockID.FULLSCREEN, &ViewModeButtonClicked, true);
     viewModeButton.setTooltipText("Switch view mode");
+    topBar_.packStart(viewModeButton, 0, 0, 0);
+
+    // reset button size
     Button.setIconSize(GtkIconSize.BUTTON);
 
     hostLabel_ = new Label("localhost");
+    topBar_.packStart(hostLabel_, 0, 0, 10);
+
     pwdLabel_ = new Label("");
+    SetupPWDLabel();
+    topBar_.packStart(pwdLabel_, 1, 1, 0);
+
+    itemsLabel_ = new Label("");
+    topBar_.packStart(itemsLabel_, 0, 0, 10);
+  }
+
+  private void SetupPWDLabel()
+  {
     pwdLabel_.setEllipsize(PangoEllipsizeMode.START);
     // tooltip for long path
     pwdLabel_.setHasTooltip(1);
     pwdLabel_.addOnQueryTooltip(
-      delegate bool(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
-      {
+      delegate bool(int x, int y, int keyboardTip, GtkTooltip * p, Widget w){
         auto l = cast(Label)w;
         if(l.getLayout().isEllipsized()){
           auto tip = new Tooltip(p);
@@ -98,42 +151,6 @@ public:
         }
         return false;
       });
-    itemsLabel_ = new Label("");
-    topBar_ = new HBox(0, 0);
-    topBar_.packStart(appendPageButton, 0, 0, 0);
-    topBar_.packStart(viewModeButton, 0, 0, 0);
-    topBar_.packStart(hostLabel_, 0, 0, 10);
-    topBar_.packStart(pwdLabel_, 1, 1, 0);
-    topBar_.packStart(itemsLabel_, 0, 0, 10);
-
-    // check whether "initialDir" is a valid path or not
-    if(!DirectoryExists(initialDir)){
-      initialDir = Environment.get("HOME") ~ '/';
-    }
-
-    terminal_ = new Terminal(mediator_, initialDir, GetCWDFromMain);
-    filer_ = new FileManager(mediator_, initialDir);
-
-    mediator_.SetFiler(filer_);
-    mediator_.SetTerm(terminal_);
-    filer_.ChangeDirectory(initialDir, false, false);// do not notify terminal and do not append history
-
-    // AUTOMATIC is a workaround to resize horizontally, not for horizontal scrolling
-    swTerm_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
-    swTerm_.add(terminal_);
-
-    paned_ = new VPaned;
-    paned_.pack1(filer_, 1, 0);
-    paned_.pack2(swTerm_, 1, 0);
-
-    super(0, 0);
-    packStart(topBar_, 0, 0, 0);
-    packStart(paned_,  1, 1, 0);
-
-    addOnUnrealize(&UnregisterFromPageList);
-
-    showAll();
-    SetLayout();
   }
 
   void SetLayout()
@@ -142,8 +159,9 @@ public:
     paned_.setPosition(split);
   }
 
+
+
   bool OnLeftSide(){return tab_.OnLeftSide();}
-  Mediator GetMediator(){return mediator_;}
   FileManager GetFileManager(){return filer_;}
   Terminal GetTerminal(){return terminal_;}
   Tab GetTab(){return tab_;}
@@ -262,6 +280,11 @@ private:
   string delegate(char, uint) getCWDFromMain_;
 
 public:
+  string FileSystemRoot()
+  {
+    return mediator_.FileSystemRoot();
+  }
+
   string GetCWD()
   {
     // if remote, return locally-mounted path
