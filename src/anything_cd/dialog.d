@@ -185,6 +185,11 @@ private:
       }
     }
 
+    // Cancel by C-g
+    if(state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_g){
+      Respond(GtkResponseType.GTK_RESPONSE_CANCEL, this);
+    }
+
     return false;
   }
 
