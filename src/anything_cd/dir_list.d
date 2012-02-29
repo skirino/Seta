@@ -38,53 +38,53 @@ private import thread_list;
 private import statusbar;
 
 
-private DirPathList instance_;
-private ScanHomeDirectoryThread thread_;
-
-
-string[] Get()
+///////////// public interfaces of this module
+char[][] Get()
 {
   return instance_.list_.array();
 }
 
 bool Changed(){return instance_.changed_;}
+
 bool IsScanning(){return (thread_ !is null) && (thread_.isRunning());}
 
 void Scan()
 {
-  thread_ = new ScanHomeDirectoryThread;
+  thread_ = new ScanHomeDirectoryJob;
   thread_.start();
 }
 
+
 void Init()
 {
-  instance_ = new DirPathList;
+  instance_ = new DirList;
 }
 void Finish()
 {
   instance_.Save();
 }
+///////////// public interfaces of this module
 
 
-class DirPathList
+private DirList instance_;
+private ScanHomeDirectoryJob thread_;
+
+
+class DirListBase
 {
-private:
+protected:
   static const size_t MAX = 1000;
-
-  bool changed_;
-  string filename_;
-  Vector!(string) list_;
+  Vector!(char[]) list_;
+  char[] filename_;
 
 public:
-  this()
+  this(char[] filename)
   {
-    changed_ = false;
-    filename_ = Environment.get("HOME") ~ "/.seta_dirlist";
-    list_ = new Vector!(string)(MAX);
-    Load();
+    filename_ = filename;
+    list_ = new Vector!(char[])(MAX);
   }
 
-  void Load()
+  void Load(bool withinMAX = false)()
   {
     try{
       scope file = new tango.io.device.File.File(filename_);
@@ -92,6 +92,12 @@ public:
       foreach(line; lines){
         if(line.length > 0){
           list_.append(line.dup);
+
+          static if(withinMAX){
+            if(list_.size() == MAX){
+              break;
+            }
+          }
         }
       }
 
@@ -102,30 +108,50 @@ public:
 
   void Save()
   {
+    scope file = new tango.io.device.File.File(filename_, tango.io.device.File.File.WriteCreate);
+    foreach(path; list_.array()){
+      file.write(path ~ '\n');
+    }
+    file.close();
+  }
+}
+
+
+private class DirList : DirListBase
+{
+private:
+  bool changed_;
+
+public:
+  this()
+  {
+    super(Environment.get("HOME") ~ "/.seta_dirlist");
+    changed_ = false;
+    Load();
+  }
+
+  void Save()
+  {
     if(changed_){
-      scope file = new tango.io.device.File.File(filename_, tango.io.device.File.File.WriteCreate);
-      foreach(path; list_.array()){
-        file.write(path ~ '\n');
-      }
-      file.close();
+      super.Save();
     }
   }
 }
 
 
 
-private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
+private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
 {
   mixin ListedOperationT;
   bool canceled_;
-  string home_;
-  Vector!(string) v_;
+  char[] home_;
+  Vector!(char[]) v_;
 
   this()
   {
-    super(&Start);
+    super(&Scan);
     home_ = Environment.get("HOME");
-    v_ = new Vector!(string)(DirPathList.MAX);
+    v_ = new Vector!(char[])(DirList.MAX);
 
     Register();
   }
@@ -135,12 +161,12 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
     canceled_ = true;
   }
 
-  string GetThreadListLabel(string startTime)
+  char[] GetThreadListLabel(char[] startTime)
   {
     return "Scanning directories under " ~ home_;
   }
 
-  string GetStopDialogLabel(string startTime)
+  char[] GetStopDialogLabel(char[] startTime)
   {
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
   }
@@ -149,7 +175,7 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
 
 
 
-  void Start()
+  void Scan()
   {
     ScanOneDirectory(home_);
 
@@ -163,7 +189,7 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
     gdkThreadsLeave();
   }
 
-  void AppendOneDirectory(string path)
+  void AppendOneDirectory(char[] path)
   {
     if(path.StartsWith(home_)){
       path = "~" ~ path[home_.length .. $];
@@ -171,11 +197,12 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
     v_.append(AppendSlash(path));
   }
 
-  void ScanOneDirectory(string path)
+  void ScanOneDirectory(char[] path)
   {
+    // depth-first
     AppendOneDirectory(path);
 
-    string[] dirs = ScanChildren(path);
+    char[][] dirs = ScanChildren(path);
     foreach(dir; dirs){
       ScanOneDirectory(path ~ '/' ~ dir);
 
@@ -185,12 +212,12 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
     }
   }
 
-  string[] ScanChildren(string path)
+  char[][] ScanChildren(char[] path)
   {
-    static const string attributes = "standard::name,standard::type,standard::is-symlink";
-    static const string[] ignoreDirs = ["lost+found", ".svn", ".git"];
+    static const char[] attributes = "standard::name,standard::type,standard::is-symlink";
+    static const char[][] ignoreDirs = ["lost+found", ".svn", ".git"];
 
-    string[] dirs = [];
+    char[][] dirs = [];
 
     try{
       scope enumerate = GetFileForDirectory(path).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
@@ -199,7 +226,7 @@ private class ScanHomeDirectoryThread : Thread, StoppableOperationIF
       while((pinfo = enumerate.nextFile(null)) != null){
         scope FileInfo info = new FileInfo(pinfo);
         if((info.getFileType() == GFileType.TYPE_DIRECTORY) && (info.getIsSymlink() == 0)){
-          string name = info.getName();
+          char[] name = info.getName();
           if(ignoreDirs.find(name) == ignoreDirs.length){
             dirs ~= name;
           }

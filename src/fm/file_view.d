@@ -130,7 +130,7 @@ public:
 
   void SetLayout()
   {
-    foreach(int id, width; rcfile.GetWidths()){
+    foreach(id, width; rcfile.GetWidths()){
       if(width == 0){
         cols_[id].setVisible(0);
       }
@@ -516,7 +516,7 @@ private:
   {
     fileInfoAttributes_ = necessaryAttributes_;
 
-    foreach(int id, width; rcfile.GetWidths()){
+    foreach(id, width; rcfile.GetWidths()){
       if(id > 0){// omit "ColumnType.NAME"
         if(width > 0){
           fileInfoAttributes_ ~= ',' ~ optionalAttributes_[id];

@@ -50,16 +50,14 @@ private import anything_cd.filter_dirs_job;
 private import page;
 
 
-const uint DelayTimeToStartScanInMillis = 500;
-
-
+///////////// public interfaces of this module
 void StartChangeDirDialog(Page page)
 {
   scope d = new ChangeDirDialog;
   d.showAll();
   d.run();
 
-  string path = d.ret_;
+  string path = d.dir_chosen_;
   if(!IsBlank(path)){
     if(path.StartsWith("~")){
       path = Environment.get("HOME") ~ path[1..$];
@@ -67,6 +65,7 @@ void StartChangeDirDialog(Page page)
     page.GetFileManager().ChangeDirectory(path);
   }
 }
+///////////// public interfaces of this module
 
 
 private class ChangeDirDialog : Dialog
@@ -122,8 +121,86 @@ public:
 
 
 
+  //////////////////// event handlers
+private:
+  private const int SCAN_FILESYSTEM = 1;// custom response ID
+  string dir_chosen_;
+
+  void Respond(int responseID, Dialog dialog)
+  {
+    CancelTimeoutCallback();
+    WaitStopIfRunning();
+    destroyed_ = true;
+
+    if(responseID == GtkResponseType.GTK_RESPONSE_OK){
+      TreeIter iter = view_.getSelectedIter();
+      if(iter !is null){
+        dir_chosen_ = iter.getValueString(0);
+      }
+    }
+    else if(responseID == SCAN_FILESYSTEM){
+      if(PopupBox.yesNo("Start to scan your home directory?", "")){
+        anything_cd.dir_list.Scan();
+      }
+      else{// do not destroy this dialog
+        return;
+      }
+    }
+
+    destroy();
+  }
+
+  bool KeyPressed(GdkEventKey * ekey, Widget w)
+  {
+    GdkModifierType state = TurnOffLockFlags(ekey.state);
+
+    // Enter --> try to change directory
+    if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
+      Respond(GtkResponseType.GTK_RESPONSE_OK, this);
+      return false;
+    }
+
+    // C-n, Up / C-p, Down --> move cursor upward/downward
+    if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_n) ||
+       (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Up)){
+      scope iter = view_.getSelectedIter();
+      if(iter !is null){
+        scope path = iter.getTreePath();
+        path.next();
+        view_.setCursor(path, null, 0);
+        view_.getSelection().selectPath(path);
+        path.free();
+      }
+    }
+    else if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_p) ||
+            (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Down)){
+      scope iter = view_.getSelectedIter();
+      if(iter !is null){
+        scope path = iter.getTreePath();
+        if(path.prev()){
+          view_.setCursor(path, null, 0);
+          view_.getSelection().selectPath(path);
+        }
+        path.free();
+      }
+    }
+
+    return false;
+  }
+
+  void RowActivated(TreePath path, TreeViewColumn col, TreeView view)
+  {
+    view_.getSelection().selectPath(path);
+    Respond(GtkResponseType.GTK_RESPONSE_OK, this);
+  }
+  //////////////////// event handlers
+
+
+
   //////////////////// filtering in background
 private:
+  static const uint IdleTimeToStartScanInMillis = 500;
+
   bool textChanged_;
   uint sourceID_;
   FilterDirsJob filterThread_;
@@ -144,13 +221,13 @@ private:
     else{
       textChanged_ = true;
     }
-    sourceID_ = gdkThreadsAddTimeout(DelayTimeToStartScanInMillis, &SearchDirsCallback, cast(void*)this);
+    sourceID_ = gdkThreadsAddTimeout(IdleTimeToStartScanInMillis, &SearchDirsCallback, cast(void*)this);
   }
 
   extern(C) static int SearchDirsCallback(void * ptr)
   {
     ChangeDirDialog self = cast(ChangeDirDialog)ptr;
-    if(self !is null && self.textChanged_ && !self.destroyed_){
+    if(self !is null && !self.destroyed_ && self.textChanged_){
       self.StartFiltering();
     }
     return 0;
@@ -221,80 +298,4 @@ private:
     EndFiltering(dirlist, []);
   }
   //////////////////// filtering in background
-
-
-
-  //////////////////// change directory
-private:
-  private const int SCAN_FILESYSTEM = 1;// custom response ID
-  string ret_;
-
-  void Respond(int responseID, Dialog dialog)
-  {
-    CancelTimeoutCallback();
-    WaitStopIfRunning();
-    destroyed_ = true;
-
-    if(responseID == GtkResponseType.GTK_RESPONSE_OK){
-      TreeIter iter = view_.getSelectedIter();
-      if(iter !is null){
-        ret_ = iter.getValueString(0);
-      }
-    }
-    else if(responseID == SCAN_FILESYSTEM){
-      if(PopupBox.yesNo("Start to scan your home directory?", "")){
-        anything_cd.dir_list.Scan();
-      }
-      else{// do not destroy this dialog
-        return;
-      }
-    }
-
-    destroy();
-  }
-
-  bool KeyPressed(GdkEventKey * ekey, Widget w)
-  {
-    GdkModifierType state = TurnOffLockFlags(ekey.state);
-
-    // Enter --> try to change directory
-    if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
-      Respond(GtkResponseType.GTK_RESPONSE_OK, this);
-      return false;
-    }
-
-    // C-n, Up / C-p, Down --> move cursor in directory list view upward/downward
-    if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_n) ||
-       (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Up)){
-      scope iter = view_.getSelectedIter();
-      if(iter !is null){
-        scope path = iter.getTreePath();
-        path.next();
-        view_.setCursor(path, null, 0);
-        view_.getSelection().selectPath(path);
-        path.free();
-      }
-    }
-    else if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_p) ||
-            (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Down)){
-      scope iter = view_.getSelectedIter();
-      if(iter !is null){
-        scope path = iter.getTreePath();
-        if(path.prev()){
-          view_.setCursor(path, null, 0);
-          view_.getSelection().selectPath(path);
-        }
-        path.free();
-      }
-    }
-
-    return false;
-  }
-
-  void RowActivated(TreePath path, TreeViewColumn col, TreeView view)
-  {
-    view_.getSelection().selectPath(path);
-    Respond(GtkResponseType.GTK_RESPONSE_OK, this);
-  }
-  //////////////////// change directory
 }

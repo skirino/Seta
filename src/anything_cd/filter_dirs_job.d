@@ -97,7 +97,7 @@ public:
       }
     }
 
-    // paginate by PER_PAGE
+    // process paths PER_PAGE and check cancel flag at start of page
     auto pathsFromHistory = new Vector!(string)(MaxNumberOfPathsFromHistory);
     {
       string[] dirlist = anything_cd.dir_history.Get();

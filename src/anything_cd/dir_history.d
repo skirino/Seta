@@ -28,10 +28,10 @@ private import tango.sys.Environment;
 private import utils.vector;
 private import utils.string_util;
 private import rcfile = config.rcfile;
+private import anything_cd.dir_list;
 
 
-private DirPathHistory instance_;
-
+///////////// public interfaces of this module
 char[][] Get()
 {
   return instance_.list_.array();
@@ -42,32 +42,33 @@ void Push(char[] path)
   instance_.Push(path);
 }
 
+
 void Init()
 {
-  instance_ = new DirPathHistory;
+  instance_ = new DirHistory;
 }
 
 void Finish()
 {
   instance_.Save();
 }
+///////////// public interfaces of this module
 
 
-private class DirPathHistory
+private DirHistory instance_;
+
+
+private class DirHistory : DirListBase
 {
 private:
-  static const size_t MAX = 1000;
-
-  char[] home_, filename_;
-  Vector!(char[]) list_;
+  char[] home_;
 
 public:
   this()
   {
     home_ = Environment.get("HOME");
-    filename_ = home_ ~ "/.seta_history";
-    list_ = new Vector!(char[])(MAX);
-    Load();
+    super(home_ ~ "/.seta_history");
+    Load!(true)();
     Push(rcfile.GetInitialDirectoryLeft());
     Push(rcfile.GetInitialDirectoryRight());
   }
@@ -81,9 +82,10 @@ public:
 
     // check uniqueness of paths
     int index = -1;
-    foreach(int i, dir; array){
+    foreach(i, dir; array){
       if(dir == path){
         index = i;
+        break;
       }
     }
 
@@ -96,34 +98,6 @@ public:
     else{// found
       list_.moveToHead(index);
     }
-  }
-
-  void Load()
-  {
-    try{
-      scope file = new File(filename_);
-      scope lines = new Lines!(char)(file);
-      foreach(line; lines){
-        if(line.length > 0){
-          list_.append(line.dup);
-          if(list_.size() == MAX){
-            break;
-          }
-        }
-      }
-
-      file.close();
-    }
-    catch(Exception ex){}// no such file
-  }
-
-  void Save()
-  {
-    scope file = new tango.io.device.File.File(filename_, tango.io.device.File.File.WriteCreate);
-    foreach(path; list_.array()){
-      file.write(path ~ '\n');
-    }
-    file.close();
   }
 }
 
