@@ -26,17 +26,16 @@ private import gdk.Threads;
 
 private import tango.io.Stdout;
 
-private import main_window;
 private import constants;
 private import config.init;
 private import anything_cd.init;
 private import volume_monitor;
 private import thread_list;
+private import seta_window;
 
 
 void Initialize()
 {
-  // init utilities
   constants.Init();
   config.init.Init();
   anything_cd.init.Init();
@@ -55,12 +54,13 @@ void Finalize()
 
 void main(string[] args)
 {
-  // init libs
+  // initialize libraries
   Thread.init(null);
   gdkThreadsInit();
   Main.init(args);
   gdkThreadsEnter();
 
+  // initialize Seta utilities
   Initialize();
 
   SetaWindow.Init();

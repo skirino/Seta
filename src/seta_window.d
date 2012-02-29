@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module main_window;
+module seta_window;
 
 private import gtk.MainWindow;
 private import gtk.Main;
@@ -68,7 +68,7 @@ public:
     addOnDelete(&WindowDelete);
     //setIcon(new Pixbuf("/home/skirino/temp/seta_main.jpg"));
 
-    VBox vbox = new VBox(0, 0);
+    auto vbox = new VBox(0, 0);
     add(vbox);
     hpaned_ = new HPaned;
 

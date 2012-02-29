@@ -28,7 +28,7 @@ private import tango.io.Stdout;
 private import rcfile = config.rcfile;
 private import page_list;
 private import page;
-private import main_window;
+private import seta_window;
 
 
 class Note : Notebook
