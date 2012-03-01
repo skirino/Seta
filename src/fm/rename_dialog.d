@@ -61,7 +61,6 @@ private import statusbar;
 
 void RenameFiles(string dir, string[] infiles)
 {
-
   string[] files;
 
   if(dir.containsPattern("/.gvfs/sftp")){// remote

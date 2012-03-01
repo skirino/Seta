@@ -849,8 +849,11 @@ private:
       return true;
 
     case FileViewAction.Rename:
-      RenameFiles(pwd_, GetSelectedFileNames());
-      TryUpdate();
+      auto selectedFiles = GetSelectedFileNames();
+      if(selectedFiles.length > 0){
+        RenameFiles(pwd_, selectedFiles);
+        TryUpdate();
+      }
       return true;
 
     case FileViewAction.MakeDirectory:
