@@ -42,6 +42,11 @@ void Push(char[] path)
   instance_.Push(path);
 }
 
+void Remove(char[] dir)
+{
+  instance_.Remove(dir);
+}
+
 
 void Init()
 {

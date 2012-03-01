@@ -255,15 +255,16 @@ private:
   /////////////////////// traveling directory tree
 public:
   bool ChangeDirectory(
-    string dirname,
+    string dir,
     bool appendToHistory = true,
     bool notifyTerminal = true)
   {
-    if(view_.ChangeDirectory(dirname, appendToHistory, notifyTerminal)){
-      dirTree_.ChangeDirectory(dirname);
+    if(view_.ChangeDirectory(dir, appendToHistory, notifyTerminal)){
+      dirTree_.ChangeDirectory(dir);
       return true;
     }
     else{
+      anything_cd.dir_list.Remove(dir);
       return false;
     }
   }

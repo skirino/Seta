@@ -70,6 +70,24 @@ public:
     return array_[--size_];
   }
 
+  void remove(T val)
+  {
+    int index = -1;
+    for(int i=0; i<size_; ++i){
+      if(array_[i] == val){
+        index = i;
+        break;
+      }
+    }
+
+    if(index != -1){
+      for(int i=index+1; i<size_; ++i){
+        array_[i-1] = array_[i];
+      }
+      --size_;
+    }
+  }
+
   void moveToHead(size_t index)
   {
     T t = array_[index];
@@ -81,7 +99,7 @@ public:
 
   T opIndex(size_t i)
   {
-    // note that for valued types T, returned element is copied, not reference to the same element
+    // note that for valued types returned element is copied, not reference to the same element
     return array_[i];
   }
 

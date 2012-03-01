@@ -36,6 +36,7 @@ private import utils.string_util;
 private import utils.gio_util;
 private import thread_list;
 private import statusbar;
+private import anything_cd.dir_history;
 
 
 ///////////// public interfaces of this module
@@ -52,6 +53,16 @@ void Scan()
 {
   thread_ = new ScanHomeDirectoryJob;
   thread_.start();
+}
+
+void Remove(char[] dir)
+{
+  auto home = Environment.get("HOME");
+  if(dir.StartsWith(dir)){
+    dir = '~' ~ dir[home.length .. $];
+  }
+  instance_.Remove(dir);
+  anything_cd.dir_history.Remove(dir);
 }
 
 
@@ -114,6 +125,11 @@ public:
     }
     file.close();
   }
+
+  void Remove(char[] dir)
+  {
+    list_.remove(dir);
+  }
 }
 
 
@@ -135,6 +151,12 @@ public:
     if(changed_){
       super.Save();
     }
+  }
+
+  void Remove(char[] dir)
+  {
+    super.Remove(dir);
+    changed_ = true;
   }
 }
 
