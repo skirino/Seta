@@ -51,21 +51,6 @@ template ListedOperationT()
   {
     ThreadEnd(threadID_);
   }
-
-  void ChangeMouseCursorDefault()
-  {
-    auto w = GetAssociatedWindow();
-    if(w !is null){
-      w.setCursor(new gdk.Cursor.Cursor(GdkCursorType.LEFT_PTR));
-    }
-  }
-  void ChangeMouseCursorWaiting()
-  {
-    auto w = GetAssociatedWindow();
-    if(w !is null){
-      w.setCursor(new gdk.Cursor.Cursor(GdkCursorType.WATCH));
-    }
-  }
 }
 
 interface ListedOperationIF
