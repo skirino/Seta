@@ -253,7 +253,7 @@ private:
     path.free();
 
     // show menu for "Clear" and "Add"
-    scope menu = new KeybindMenu(keyStore_, iter);
+    auto menu = new KeybindMenu(keyStore_, iter);
     menu.popup(0, eb.time);
 
     return false;
@@ -647,7 +647,7 @@ private:
       path.free();
     }
 
-    scope menu = new AppendRemoveMenu(shortcuts_, shortcutsStore_, iter);
+    auto menu = new AppendRemoveMenu(shortcuts_, shortcutsStore_, iter);
     menu.popup(0, eb.time);
 
     return false;
@@ -760,7 +760,7 @@ private:
       path.free();
     }
 
-    scope menu = new AppendRemoveMenu(hosts_, hostsStore_, iter);
+    auto menu = new AppendRemoveMenu(hosts_, hostsStore_, iter);
     menu.popup(0, eb.time);
 
     return false;
