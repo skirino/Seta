@@ -47,7 +47,6 @@ private import gtk.AccelGroup;
 private import gtk.Menu;
 private import gtk.MenuItem;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.gio_util;

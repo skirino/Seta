@@ -39,7 +39,6 @@ private import glib.GException;
 private import glib.Str;
 private import glib.ListG;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.bind;

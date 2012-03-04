@@ -37,7 +37,6 @@ private import gdk.Threads;
 private import gdk.Keysyms;
 private import glib.Source;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.sys.Environment;
 private import tango.core.Thread;

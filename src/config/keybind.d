@@ -23,7 +23,6 @@ module config.keybind;
 private import gtk.AccelGroup;
 private import gdk.Keysyms;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.stdc.ctype;
 

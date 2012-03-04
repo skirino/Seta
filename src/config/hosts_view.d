@@ -26,7 +26,6 @@ private import gtk.TreeIter;
 private import gtk.ListStore;
 private import gtk.CellRendererText;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.string_util;

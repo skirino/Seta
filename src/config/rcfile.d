@@ -27,7 +27,6 @@ private import gio.File;
 private import gio.FileOutputStream;
 private import glib.Str;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.sys.Environment;
 private import tango.util.MinMax;

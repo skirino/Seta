@@ -27,8 +27,6 @@ private import gtk.HPaned;
 private import gtk.VBox;
 private import gdk.Event;
 
-private import tango.io.Stdout;
-
 private import constants;
 private import rcfile = config.rcfile;
 private import config.dialog;

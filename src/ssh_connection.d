@@ -23,7 +23,6 @@ module ssh_connection;
 private import gtk.Window;
 private import gtk.MountOperation;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.string_util;

@@ -21,8 +21,6 @@ MA 02110-1301 USA.
 
 module mediator;
 
-private import tango.io.Stdout;
-
 private import constants;
 private import input_dialog;
 private import page;

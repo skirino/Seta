@@ -20,8 +20,6 @@ MA 02110-1301 USA.
 
 module fm.history;
 
-private import tango.io.Stdout;
-
 private import anything_cd.dir_history;
 
 

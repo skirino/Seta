@@ -35,7 +35,6 @@ private import gio.File;
 private import gio.FileInfo;
 private import glib.GException;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.vector;

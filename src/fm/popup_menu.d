@@ -34,7 +34,6 @@ private import glib.Str;
 private import glib.ListG;
 private import glib.GException;
 
-private import tango.io.Stdout;
 private import tango.sys.Environment;
 private import tango.stdc.stdlib;
 private import tango.stdc.posix.unistd;
@@ -420,4 +419,3 @@ void DeleteFiles(bool toTrash)(string pwd, string[] names)
 }
 
 alias DeleteFiles!(true) MoveToTrash;
-

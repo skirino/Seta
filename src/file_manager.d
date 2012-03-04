@@ -35,8 +35,6 @@ private import gio.File;
 private import glib.Str;
 private import gtkc.gio;
 
-private import tango.io.Stdout;
-
 private import utils.bind;
 private import utils.string_util;
 private import constants;

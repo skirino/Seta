@@ -31,7 +31,6 @@ private import glib.URI;
 private import gtkc.gtk;
 private import gtkc.glib;
 
-private import tango.io.Stdout;
 private import tango.core.Thread;
 private import tango.stdc.stdlib;
 

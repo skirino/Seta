@@ -20,7 +20,6 @@ MA 02110-1301 USA.
 
 module file_system;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.sys.Environment;
 

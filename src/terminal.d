@@ -29,7 +29,6 @@ private import gdk.Color;
 private import glib.Str;
 private import glib.Regex;
 
-private import tango.io.Stdout;
 private import tango.sys.Environment;
 private import tango.text.Util;
 private import tango.stdc.posix.stdlib;

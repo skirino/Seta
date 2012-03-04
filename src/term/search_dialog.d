@@ -34,8 +34,6 @@ private import gdk.Keysyms;
 private import glib.Regex;
 private import glib.GException;
 
-private import tango.io.Stdout;
-
 private import utils.string_util;
 private import config.keybind;
 private import terminal;

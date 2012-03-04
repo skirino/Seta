@@ -20,8 +20,6 @@ MA 02110-1301 USA.
 
 module anything_cd.init;
 
-private import tango.io.Stdout;
-
 private import anything_cd.dir_list;
 private import anything_cd.dir_history;
 

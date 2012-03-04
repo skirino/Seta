@@ -25,7 +25,6 @@ private import gtk.Entry;
 private import gtk.Dialog;
 private import gtk.VBox;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.util.MinMax;
 

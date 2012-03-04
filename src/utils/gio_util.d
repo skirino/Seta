@@ -25,8 +25,6 @@ private import gio.FileInfo;
 private import gio.FileEnumerator;
 private import glib.GException;
 
-private import tango.io.Stdout;
-
 
 File GetFileForDirectory(string dirname)
 {

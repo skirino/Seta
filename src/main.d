@@ -24,8 +24,6 @@ private import gtk.Main;
 private import gthread.Thread;
 private import gdk.Threads;
 
-private import tango.io.Stdout;
-
 private import constants;
 private import config.init;
 private import anything_cd.init;

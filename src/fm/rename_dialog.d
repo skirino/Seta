@@ -50,7 +50,6 @@ private import gobject.Signals;
 private import pango.PgAttribute;
 private import pango.PgAttributeList;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.string_util;

@@ -27,7 +27,6 @@ private import gdk.Threads;
 private import gtk.Widget;
 private import gtk.TreeView;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.core.Thread;
 private import tango.stdc.string;

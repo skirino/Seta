@@ -22,8 +22,6 @@ module page_list;
 
 private import gtk.PopupBox;
 
-private import tango.io.Stdout;
-
 private import page;
 private import seta_window;
 

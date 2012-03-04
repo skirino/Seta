@@ -20,8 +20,6 @@ MA 02110-1301 USA.
 
 module utils.template_util;
 
-private import tango.io.Stdout;
-
 
 template RuntimeDispatch1(char[] tmplt, char[] b, char[] args = "")
 {

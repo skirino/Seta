@@ -44,7 +44,6 @@ private import gio.DesktopAppInfo;
 private import glib.GException;
 private import gtkc.gtk;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.core.Thread;
 private import tango.util.MinMax;

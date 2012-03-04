@@ -20,7 +20,6 @@ MA 02110-1301 USA.
 
 module vector;
 
-private import tango.io.Stdout;
 private import tango.core.Array;
 
 

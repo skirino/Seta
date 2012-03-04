@@ -29,7 +29,6 @@ private import gtk.Label;
 private import gtk.Button;
 private import gtk.Tooltip;
 
-private import tango.io.Stdout;
 private import tango.sys.Environment;
 
 private import utils.string_util;

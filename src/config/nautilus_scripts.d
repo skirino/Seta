@@ -23,7 +23,6 @@ module config.nautilus_scripts;
 private import gio.File;
 private import gio.FileInfo;
 
-private import tango.io.Stdout;
 private import tango.sys.Environment;
 
 private import utils.string_util;

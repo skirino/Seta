@@ -20,8 +20,6 @@ MA 02110-1301 USA.
 
 module config.init;
 
-private import tango.io.Stdout;
-
 private import config.rcfile;
 private import config.keybind;
 private import config.shellrc;

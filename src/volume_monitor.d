@@ -26,8 +26,6 @@ private import gio.MountIF;
 private import gtkc.gio;
 private import glib.ListG;
 
-private import tango.io.Stdout;
-
 private import utils.string_util;
 private import statusbar;
 private import page_list;

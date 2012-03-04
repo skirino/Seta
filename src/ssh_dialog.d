@@ -36,8 +36,6 @@ private import gtk.TreePath;
 private import gtk.TreeView;
 private import gtk.TreeViewColumn;
 
-private import tango.io.Stdout;
-
 private import utils.string_util;
 private import utils.tree_util;
 private import constants;

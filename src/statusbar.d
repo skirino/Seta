@@ -28,8 +28,6 @@ private import gtk.MenuShell;
 private import gtk.MenuItem;
 private import gtkc.gtk;// for gtk_get_current_event_time()
 
-private import tango.io.Stdout;
-
 private import rcfile = config.rcfile;
 private import thread_list;
 private import note;

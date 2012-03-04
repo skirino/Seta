@@ -20,9 +20,6 @@ MA 02110-1301 USA.
 
 module anything_cd.dir_history;
 
-private import tango.io.Stdout;
-private import tango.io.device.File;
-private import tango.io.stream.Lines;
 private import tango.sys.Environment;
 
 private import utils.vector;

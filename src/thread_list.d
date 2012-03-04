@@ -25,8 +25,6 @@ private import gdk.Cursor;
 private import gtk.Main;
 private import gtk.PopupBox;
 
-private import tango.io.Stdout;
-
 private import utils.vector;
 private import utils.time_util;
 

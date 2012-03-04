@@ -20,7 +20,6 @@ MA 02110-1301 USA.
 
 module config.known_hosts;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 
 private import utils.string_util;

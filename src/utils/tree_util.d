@@ -27,8 +27,6 @@ private import gtk.TreeIter;
 private import gtk.TreePath;
 private import gtk.CellRenderer;
 
-private import tango.io.Stdout;
-
 
 // convenience functions to wrap TreeView's API
 TreePath GetPathAtCursor(TreeView view)

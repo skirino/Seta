@@ -23,9 +23,9 @@ module string_util;
 private import gtk.Label;
 private import glib.Str;
 
-private import tango.io.Stdout;
 private import tango.sys.Environment;
 private import tango.text.Util;
+private import tango.io.device.File;
 private import tango.io.stream.Lines;
 private import tango.util.MinMax;
 private import tango.stdc.ctype;
@@ -136,22 +136,33 @@ bool EndsWith(string s1, string s2)
 }
 
 
-string LineInFileWhichStartsWith(string phrase, string filename)
+void EachLineInFile(string filename, bool delegate(string) f)
 {
-  string ret;
   try{
     scope file = new tango.io.device.File.File(filename);
     scope lines = new Lines!(char)(file);
     foreach(line; lines){
-      if(line.StartsWith(phrase)){
-        ret = line[phrase.length+1 .. $];// return remaining part (excludes "phrase")
+      bool continueLoop = f(line);
+      if(!continueLoop){
         break;
       }
     }
-    file.close;
+    file.close();
   }
-  catch(Exception ex){}// cannot open (no such file, permission denied)
+  catch(Exception ex){}// no such file or permission denied
+}
 
+
+string LineInFileWhichStartsWith(string phrase, string filename)
+{
+  string ret;
+  EachLineInFile(filename, delegate bool(string line){
+      if(line.StartsWith(phrase)){
+        ret = line[phrase.length .. $];// return remaining part
+        return false;
+      }
+      return true;
+    });
   return ret;
 }
 

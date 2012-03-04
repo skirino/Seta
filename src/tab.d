@@ -29,8 +29,6 @@ private import gtk.VBox;
 private import gtk.EventBox;
 private import glib.Str;
 
-private import tango.io.Stdout;
-
 
 // tab with close button
 // In order to catch button press event on tab, make a subclass of EventBox

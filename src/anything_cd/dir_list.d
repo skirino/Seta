@@ -24,9 +24,6 @@ private import gio.FileInfo;
 private import gdk.Threads;
 private import gdk.Window;
 
-private import tango.io.Stdout;
-private import tango.io.stream.Lines;
-private import tango.io.device.File;
 private import tango.sys.Environment;
 private import tango.core.Array;
 private import tango.core.Thread;
@@ -97,24 +94,17 @@ public:
 
   void Load(bool withinMAX = false)()
   {
-    try{
-      scope file = new tango.io.device.File.File(filename_);
-      scope lines = new Lines!(char)(file);
-      foreach(line; lines){
+    EachLineInFile(filename_, delegate bool(char[] line){
         if(line.length > 0){
           list_.append(line.dup);
-
           static if(withinMAX){
             if(list_.size() == MAX){
-              break;
+              return false;
             }
           }
         }
-      }
-
-      file.close();
-    }
-    catch(Exception ex){}// no such file
+        return true;
+      });
   }
 
   void Save()

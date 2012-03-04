@@ -23,8 +23,6 @@ module note;
 private import gtk.Notebook;
 private import gtk.Widget;
 
-private import tango.io.Stdout;
-
 private import rcfile = config.rcfile;
 private import page_list;
 private import page;

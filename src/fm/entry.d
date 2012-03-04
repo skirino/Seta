@@ -24,7 +24,6 @@ private import gio.FileInfo;
 private import gio.ContentType;
 private import glib.Str;
 
-private import tango.io.Stdout;
 private import tango.stdc.posix.sys.stat;// for permission flags
 
 private import utils.time_util;

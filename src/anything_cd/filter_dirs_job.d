@@ -22,7 +22,6 @@ module anything_cd.filter_dirs_job;
 
 private import gdk.Threads;
 
-private import tango.io.Stdout;
 private import tango.text.Util;
 private import tango.core.Thread;
 private import tango.util.MinMax;

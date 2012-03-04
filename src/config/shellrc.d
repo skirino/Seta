@@ -20,9 +20,6 @@ MA 02110-1301 USA.
 
 module config.shellrc;
 
-private import tango.io.Stdout;
-private import tango.io.device.File;
-private import tango.io.stream.Lines;
 private import tango.sys.Environment;
 private import tango.text.Util;
 
@@ -93,10 +90,7 @@ private:
   {
     char[][] fileList;
 
-    try{
-      scope file = new File(filename);
-      scope lines = new Lines!(char)(file);
-      foreach(line; lines){
+    EachLineInFile(filename, delegate bool(char[] line){
         char[] l = trim(line);
 
         // search for lines such as "alias cdu='cd ..'"
@@ -126,14 +120,20 @@ private:
         if(l.StartsWith("source ")){
           char[] args = triml(l[7 .. $]);
           // currently only 1 file (specified by the 1st argument) is processed
-          char[] arg = Extract1stArg(args);
-          fileList ~= home ~ '/' ~ ExpandEnvVars(arg);
+          char[] arg = args.Extract1stArg().ExpandEnvVars();
+          if(arg.StartsWith("/")){
+            fileList ~= arg;
+          }
+          else if(arg.StartsWith("~")){
+            fileList ~= home ~ arg[1 .. $];
+          }
+          else{
+            fileList ~= home ~ '/' ~ ExpandEnvVars(arg);
+          }
         }
-      }
 
-      file.close;
-    }
-    catch(Exception ex){}// IOException: no such file or directory
+        return true;// continue reading this file
+      });
 
     return fileList;
   }
