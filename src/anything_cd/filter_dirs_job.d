@@ -24,9 +24,9 @@ private import gdk.Threads;
 
 private import tango.text.Util;
 private import tango.core.Thread;
-private import tango.util.MinMax;
 private import tango.text.Unicode;
 
+private import utils.min_max;
 private import utils.string_util;
 private import utils.vector;
 static private import anything_cd.dir_list;
@@ -106,7 +106,7 @@ public:
         mixin(ReturnIfCanceled);
 
         size_t start = pageIndex * PER_PAGE;
-        size_t end   = min(start + PER_PAGE, len);
+        size_t end   = Min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
           if(dirlist[i].containsStrings(words)){
             pathsFromHistory.append(dirlist[i]);
@@ -124,7 +124,7 @@ public:
         mixin(ReturnIfCanceled);
 
         size_t start = pageIndex * PER_PAGE;
-        size_t end   = min(start + PER_PAGE, len);
+        size_t end   = Min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
           if(dirlist[i].containsStrings(words)){
             pathsFromList.append(dirlist[i]);

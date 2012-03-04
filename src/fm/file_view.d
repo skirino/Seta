@@ -46,9 +46,9 @@ private import gtkc.gtk;
 
 private import tango.text.Util;
 private import tango.core.Thread;
-private import tango.util.MinMax;
 private import tango.stdc.stdlib;
 
+private import utils.min_max;
 private import utils.bind;
 private import utils.time_util;
 private import utils.string_util;
@@ -448,7 +448,7 @@ private:
     size_t maxRows = numRowsNow_ + numAppend;
 
     if(numRowsNow_ < entDSize){// there are directories which should be appended to the view
-      size_t upper = min(maxRows, entDSize);
+      size_t upper = Min(maxRows, entDSize);
       foreach(p; eList_.GetDSorted()[numRowsNow_ .. upper]){
         store_.append(iter);
         store_.set(
@@ -464,7 +464,7 @@ private:
     }
 
     if(numRowsNow_ < entDSize + entFSize){// there are files which should be appended to the view
-      size_t upper = min(maxRows - entDSize, entFSize);
+      size_t upper = Min(maxRows - entDSize, entFSize);
 
       foreach(p; eList_.GetFSorted()[numRowsNow_ - entDSize .. upper]){
         store_.append(iter);

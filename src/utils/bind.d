@@ -22,7 +22,7 @@ MA 02110-1301 USA.
  * This module is simplified version of std.bind in Phobos.
  */
 
-module bind;
+module utils.bind;
 
 
 

@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module string_util;
+module utils.string_util;
 
 private import gtk.Label;
 private import glib.Str;
@@ -27,9 +27,10 @@ private import tango.sys.Environment;
 private import tango.text.Util;
 private import tango.io.device.File;
 private import tango.io.stream.Lines;
-private import tango.util.MinMax;
 private import tango.stdc.ctype;
 private import tango.stdc.string;
+
+private import utils.min_max;
 
 
 bool IsBlank(string s)
@@ -310,7 +311,7 @@ string Extract1stArg(string args)
     size_t posSpace = FindUnescapedChar(replaced, ' ');
     size_t posNewline = locate(replaced, '\n');
     size_t posSemicolon = FindUnescapedChar(replaced, ';');
-    return replaced[0 .. min(min(posSpace, posNewline), posSemicolon)];
+    return replaced[0 .. Min(posSpace, posNewline, posSemicolon)];
   }
 }
 

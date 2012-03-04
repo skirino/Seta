@@ -29,8 +29,8 @@ private import glib.Str;
 
 private import tango.text.Util;
 private import tango.sys.Environment;
-private import tango.util.MinMax;
 
+private import utils.min_max;
 private import utils.gio_util;
 private import utils.string_util;
 private import constants;
@@ -109,7 +109,7 @@ mixin(GetUint!("WidthLastModified"));
 
 uint[] GetWidths()
 {
-  int widthName = max(10,
+  int widthName = Max(10,
                       instance_.getInteger("Layout", "SplitH") - 40 -
                       instance_.getInteger("Layout", "WidthDirectoryTree") -
                       instance_.getInteger("Layout", "WidthType") -

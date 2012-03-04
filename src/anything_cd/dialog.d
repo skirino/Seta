@@ -40,8 +40,8 @@ private import glib.Source;
 private import tango.text.Util;
 private import tango.sys.Environment;
 private import tango.core.Thread;
-private import tango.util.MinMax;
 
+private import utils.min_max;
 private import utils.string_util;
 private import utils.tree_util;
 private import config.keybind;
@@ -298,7 +298,7 @@ private:
   void InitFilteredCandidates()
   {
     // put most recent history (at most 100)
-    string[] dirlist = anything_cd.dir_history.Get()[0 .. min!(size_t)($, 100)];
+    string[] dirlist = anything_cd.dir_history.Get()[0 .. Min($, cast(size_t)100)];
     EndFiltering(dirlist, []);
   }
   //////////////////// filtering in background

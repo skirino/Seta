@@ -26,14 +26,15 @@ private import gtk.Dialog;
 private import gtk.VBox;
 
 private import tango.text.Util;
-private import tango.util.MinMax;
+
+private import utils.min_max;
 
 
 string InputDialog(bool hideInput = false)(string title, string description, string defaultValue = "")
 {
   scope label = new Label(description, false);
   scope entry = new Entry(defaultValue);
-  entry.setWidthChars(max!(ulong)(defaultValue.length, 20));// ensure width of "entry"
+  entry.setWidthChars(Max(defaultValue.length, cast(size_t)20));// ensure width of "entry"
   static if(hideInput){
     entry.setVisibility(0);
   }
