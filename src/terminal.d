@@ -29,13 +29,13 @@ private import gdk.Color;
 private import glib.Str;
 private import glib.Regex;
 
-private import tango.sys.Environment;
 private import tango.text.Util;
+private import tango.core.Thread;
 private import tango.stdc.posix.stdlib;
 private import tango.stdc.posix.termios;
 private import tango.stdc.posix.unistd;
-private import tango.core.Thread;
 
+private import migrate;
 private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
@@ -76,7 +76,7 @@ public:
 
     // Fork the child process.
     // Passing "argv" is essential when the default shell is zsh.
-    char *[2] argv = [Str.toStringz(Environment.get("SHELL")), null];
+    char *[2] argv = [Str.toStringz(migrate.getenv("SHELL")), null];
     // deprecated since 0.26
     pid_ = vte_terminal_fork_command(
       vte_, argv[0], argv.ptr, null,

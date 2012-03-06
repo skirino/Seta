@@ -29,8 +29,7 @@ private import gtk.Label;
 private import gtk.Button;
 private import gtk.Tooltip;
 
-private import tango.sys.Environment;
-
+private import migrate;
 private import utils.string_util;
 private import utils.gio_util;
 private import constants;
@@ -70,7 +69,7 @@ public:
   {
     // check whether "initialDir" is a valid path or not
     if(!DirectoryExists(initialDir)){
-      initialDir = Environment.get("HOME") ~ '/';
+      initialDir = getenv("HOME") ~ '/';
     }
 
     getCWDFromMain_ = GetCWDFromMain;

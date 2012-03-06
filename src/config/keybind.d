@@ -24,7 +24,7 @@ private import gtk.AccelGroup;
 private import gdk.Keysyms;
 
 private import tango.text.Util;
-private import tango.stdc.ctype;
+private import std.ctype;
 
 private import utils.string_util;
 private import constants;

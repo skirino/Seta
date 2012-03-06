@@ -46,7 +46,7 @@ private import gtkc.gtk;
 
 private import tango.text.Util;
 private import tango.core.Thread;
-private import tango.stdc.stdlib;
+private import std.c.stdlib;
 
 private import utils.min_max;
 private import utils.bind;

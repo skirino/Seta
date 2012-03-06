@@ -20,8 +20,7 @@ MA 02110-1301 USA.
 
 module anything_cd.dir_history;
 
-private import tango.sys.Environment;
-
+private import migrate;
 private import utils.vector;
 private import utils.string_util;
 private import rcfile = config.rcfile;
@@ -68,7 +67,7 @@ private:
 public:
   this()
   {
-    home_ = Environment.get("HOME");
+    home_ = getenv("HOME");
     super(home_ ~ "/.seta_history");
     Load!(true)();
     Push(rcfile.GetInitialDirectoryLeft());

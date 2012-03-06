@@ -38,9 +38,9 @@ private import gdk.Keysyms;
 private import glib.Source;
 
 private import tango.text.Util;
-private import tango.sys.Environment;
 private import tango.core.Thread;
 
+private import migrate;
 private import utils.min_max;
 private import utils.string_util;
 private import utils.tree_util;
@@ -59,7 +59,7 @@ void StartChangeDirDialog(Page page)
   string path = d.dir_chosen_;
   if(!IsBlank(path)){
     if(path.StartsWith("~")){
-      path = Environment.get("HOME") ~ path[1..$];
+      path = getenv("HOME") ~ path[1..$];
     }
     page.GetFileManager().ChangeDirectory(path);
   }

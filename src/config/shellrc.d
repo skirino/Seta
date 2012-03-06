@@ -20,9 +20,9 @@ MA 02110-1301 USA.
 
 module config.shellrc;
 
-private import tango.sys.Environment;
 private import tango.text.Util;
 
+private import migrate;
 private import utils.string_util;
 
 
@@ -30,7 +30,7 @@ private ShellSetting localhostShell_;
 ShellSetting GetLocalShellSetting(){return localhostShell_;}
 void Init()
 {
-  localhostShell_ = new ShellSetting(Environment.get("HOME"), Environment.get("SHELL"));
+  localhostShell_ = new ShellSetting(getenv("HOME"), getenv("SHELL"));
 }
 
 

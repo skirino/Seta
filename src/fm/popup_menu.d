@@ -34,10 +34,10 @@ private import glib.Str;
 private import glib.ListG;
 private import glib.GException;
 
-private import tango.sys.Environment;
-private import tango.stdc.stdlib;
 private import tango.stdc.posix.unistd;
+private import std.c.stdlib;
 
+private import migrate;
 private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
@@ -324,7 +324,7 @@ private:
     string scriptPath = item.path_ ~ '\0';
 
     // environment variables
-    string[string] denv = Environment.get();
+    string[string] denv = getenvall();
     char*[] envv;
     string[] keys = denv.keys;
     foreach(key; keys){

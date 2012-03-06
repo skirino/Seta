@@ -32,7 +32,7 @@ private import gtkc.gtk;
 private import gtkc.glib;
 
 private import tango.core.Thread;
-private import tango.stdc.stdlib;
+private import std.c.stdlib;
 
 private import utils.gio_util;
 private import utils.string_util;

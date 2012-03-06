@@ -24,10 +24,9 @@ private import gio.FileInfo;
 private import gdk.Threads;
 private import gdk.Window;
 
-private import tango.sys.Environment;
-private import tango.core.Array;
 private import tango.core.Thread;
 
+private import migrate;
 private import utils.vector;
 private import utils.string_util;
 private import utils.gio_util;
@@ -54,7 +53,7 @@ void Scan()
 
 void Remove(char[] dir)
 {
-  auto home = Environment.get("HOME");
+  auto home = getenv("HOME");
   if(dir.StartsWith(dir)){
     dir = '~' ~ dir[home.length .. $];
   }
@@ -131,7 +130,7 @@ private:
 public:
   this()
   {
-    super(Environment.get("HOME") ~ "/.seta_dirlist");
+    super(getenv("HOME") ~ "/.seta_dirlist");
     changed_ = false;
     Load();
   }
@@ -162,7 +161,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
   this()
   {
     super(&Scan);
-    home_ = Environment.get("HOME");
+    home_ = getenv("HOME");
     v_ = new Vector!(char[])(DirList.MAX);
 
     Register();
@@ -239,7 +238,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
         scope FileInfo info = new FileInfo(pinfo);
         if((info.getFileType() == GFileType.TYPE_DIRECTORY) && (info.getIsSymlink() == 0)){
           char[] name = info.getName();
-          if(ignoreDirs.find(name) == ignoreDirs.length){
+          if(ignoreDirs.findElement(name) == ignoreDirs.length){
             dirs ~= name;
           }
         }

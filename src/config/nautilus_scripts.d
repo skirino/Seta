@@ -23,8 +23,7 @@ module config.nautilus_scripts;
 private import gio.File;
 private import gio.FileInfo;
 
-private import tango.sys.Environment;
-
+private import migrate;
 private import utils.string_util;
 
 
@@ -94,7 +93,7 @@ ScriptsDir GetScriptsDirTop(){return top;}
 
 void Init()
 {
-  top = new ScriptsDir(Environment.get("HOME") ~ "/.gnome2/nautilus-scripts/");
+  top = new ScriptsDir(getenv("HOME") ~ "/.gnome2/nautilus-scripts/");
   if(top.IsEmpty()){
     top = null;
   }

@@ -463,7 +463,7 @@ private:
       // permission denied
     }
 
-    workspace_.sort(&CompareStr);
+    workspace_.array().sort;
     foreach(name; workspace_.array()){
       AddPathWithDummyChild!(false)(name ~ '/', iter);
     }

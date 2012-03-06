@@ -20,8 +20,6 @@ MA 02110-1301 USA.
 
 module utils.vector;
 
-private import tango.core.Array;
-
 
 class Vector(T)
 {
@@ -115,11 +113,6 @@ public:
   T[] array()
   {
     return array_[0..size_];
-  }
-
-  void sort(bool function(T, T) pred)
-  {
-    tango.core.Array.sort(array_[0..size_], pred);
   }
 
   void reserve(size_t len)

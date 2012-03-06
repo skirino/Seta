@@ -21,8 +21,8 @@ MA 02110-1301 USA.
 module file_system;
 
 private import tango.text.Util;
-private import tango.sys.Environment;
 
+private import migrate;
 private import utils.string_util;
 private import utils.gio_util;
 
@@ -42,7 +42,7 @@ public:
   {
     remote_ = false;
     rootDir_ = "/";
-    homeDir_ = Environment.get("HOME") ~ '/';
+    homeDir_ = getenv("HOME") ~ '/';
     return pwdLocal_;
   }
 

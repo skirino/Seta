@@ -23,13 +23,13 @@ module utils.string_util;
 private import gtk.Label;
 private import glib.Str;
 
-private import tango.sys.Environment;
 private import tango.text.Util;
 private import tango.io.device.File;
 private import tango.io.stream.Lines;
-private import tango.stdc.ctype;
 private import tango.stdc.string;
+private import std.ctype;
 
+private import migrate;
 private import utils.min_max;
 
 
@@ -110,12 +110,6 @@ string PluralForm(INT, string singularForm, string pluralForm = singularForm ~ "
   else{
     return Str.toString(n) ~ ' ' ~ pluralForm;
   }
-}
-
-
-bool CompareStr(string s1, string s2)
-{
-  return Str.strcmp0(s1, s2) < 0;
 }
 
 
@@ -404,7 +398,7 @@ string ExpandEnvVars(string arg)
     }
     string var = arg[dollar..end];
 
-    ret ~= Environment.get(var[1..$], var);
+    ret ~= getenv(var[1..$]) || var;
     indexStart = end;
   }
 

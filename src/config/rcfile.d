@@ -28,8 +28,8 @@ private import gio.FileOutputStream;
 private import glib.Str;
 
 private import tango.text.Util;
-private import tango.sys.Environment;
 
+private import migrate;
 private import utils.min_max;
 private import utils.gio_util;
 private import utils.string_util;
@@ -402,7 +402,7 @@ private:
     setListSeparator(',');
 
     changed_ = false;
-    filename_ = Environment.get("HOME") ~ "/.setarc";
+    filename_ = getenv("HOME") ~ "/.setarc";
     bool exist = Exists(filename_);
     if(exist){
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
@@ -474,7 +474,7 @@ private:
     }
     mixin(SetDefaultValue!("String", "Terminal", "Font", "\"Monospace 11\""));
     mixin(SetDefaultValue!("Double", "Terminal", "BackgroundTransparency", "0.0"));
-    mixin(SetDefaultValue!("String", "Terminal", "PROMPT", "Environment.get(\"USER\") ~ \"@\""));
+    mixin(SetDefaultValue!("String", "Terminal", "PROMPT", "getenv(\"USER\") ~ \"@\""));
     mixin(SetDefaultValue!("String", "Terminal", "RPROMPT", "\"\""));
 
     mixin(SetDefaultValue!("Boolean","Terminal", "EnablePathExpansion", "true"));
@@ -503,7 +503,7 @@ private:
     }
     if(setHomeDirL){
       changed_ = true;
-      setString("Directories", "InitialDirectoryLeft", AppendSlash(Environment.get("HOME")));
+      setString("Directories", "InitialDirectoryLeft", AppendSlash(getenv("HOME")));
     }
 
     bool setHomeDirR = true;
@@ -516,7 +516,7 @@ private:
     }
     if(setHomeDirR){
       changed_ = true;
-      setString("Directories", "InitialDirectoryRight", AppendSlash(Environment.get("HOME")));
+      setString("Directories", "InitialDirectoryRight", AppendSlash(getenv("HOME")));
     }
 
     mixin(SetDefaultValue!("String", "Directories", "Shortcuts", "\"\""));
