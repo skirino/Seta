@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module file_system;
 
-private import tango.text.Util;
+//private import tango.text.Util;
 
 private import migrate;
 private import utils.string_util;
@@ -31,14 +31,14 @@ class FileSystem
 {
 public:// make it easier to access through Mediator class
   bool remote_;
-  char[] rootDir_;
-  char[] homeDir_;
-  char[] pwdLocal_;
+  string rootDir_;
+  string homeDir_;
+  string pwdLocal_;
 
 public:
   this(){SetLocal();}
 
-  char[] SetLocal()
+  string SetLocal()
   {
     remote_ = false;
     rootDir_ = "/";
@@ -46,16 +46,16 @@ public:
     return pwdLocal_;
   }
 
-  void SetRemote(char[] remoteRoot, char[] username, char[] homeDir, char[] pwdLocal)
+  void SetRemote(string remoteRoot, string username, string homeDir, string pwdLocal)
   {
     remote_ = true;
     rootDir_ = AppendSlash(remoteRoot);
     pwdLocal_ = pwdLocal;
 
     // Try to get $(HOME) of remote filesystem.
-    char[] ret = GetHomeDirFrom_etc_passwd(username);
+    string ret = GetHomeDirFrom_etc_passwd(username);
     if(ret !is null){
-      char[] vfspath = MountedVFSPath(ret);
+      string vfspath = MountedVFSPath(ret);
       if(DirectoryExists(vfspath)){// can open
         homeDir_ = MountedVFSPath(ret);
         return;
@@ -64,7 +64,7 @@ public:
 
     // "homeDir" is not valid.
     if(homeDir !is null){
-      char[] vfspath = MountedVFSPath(homeDir);
+      string vfspath = MountedVFSPath(homeDir);
       if(DirectoryExists(vfspath)){// can open
         homeDir_ = vfspath;
         return;
@@ -75,19 +75,21 @@ public:
     homeDir_ = null;
   }
 
-  bool LookingAtRemoteFS(char[] pwd)
+  bool LookingAtRemoteFS(string pwd)
   {
-    return remote_ || containsPattern(pwd, "/.gvfs/sftp");
+    //TODO
+    //return remote_ || containsPattern(pwd, "/.gvfs/sftp");
+    return remote_;
   }
 
-  char[] ParentDirectory(char[] path)
+  string ParentDirectory(string path)
   {
     return utils.string_util.ParentDirectory(path, rootDir_);
   }
 
   // for terminal which uses remote (native) filesystem path
   // "/home/user/.gvfs/sftp.../home/user2/somewhere/" => "/home/user2/somewhere/"
-  char[] NativePath(char[] vfspath)
+  string NativePath(string vfspath)
   {
     if(remote_){
       assert(vfspath.length >= rootDir_.length);
@@ -99,7 +101,7 @@ public:
   }
 
   // for filer which uses locally-mounted vfs path
-  char[] MountedVFSPath(char[] path)
+  string MountedVFSPath(string path)
   {
     if(remote_){
       return rootDir_[0..$-1] ~ path;
@@ -110,13 +112,15 @@ public:
   }
 
 private:
-  char[] GetHomeDirFrom_etc_passwd(char[] username)
+  string GetHomeDirFrom_etc_passwd(string username)
   {
-    char[] line = LineInFileWhichStartsWith(username ~ ':', rootDir_ ~ "etc/passwd");
+    string line = LineInFileWhichStartsWith(username ~ ':', rootDir_ ~ "etc/passwd");
     if(line !is null){
-      size_t end   = locatePrior(line, ':');
-      size_t start = locatePrior(line, ':', end);
-      return line[start+1 .. end] ~ '/';
+      //TODO
+      //size_t end   = locatePrior(line, ':');
+      //size_t start = locatePrior(line, ':', end);
+      //return line[start+1 .. end] ~ '/';
+      return line;
     }
     else{
       return null;

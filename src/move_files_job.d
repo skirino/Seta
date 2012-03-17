@@ -31,7 +31,8 @@ private import glib.URI;
 private import gtkc.gtk;
 private import gtkc.glib;
 
-private import tango.core.Thread;
+//private import tango.core.Thread;
+private import core.thread;
 private import std.c.stdlib;
 
 private import utils.gio_util;

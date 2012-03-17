@@ -24,7 +24,8 @@ private import gio.FileInfo;
 private import gdk.Threads;
 private import gdk.Window;
 
-private import tango.core.Thread;
+//private import tango.core.Thread;
+private import core.thread;
 
 private import migrate;
 private import utils.vector;
@@ -36,7 +37,7 @@ private import anything_cd.dir_history;
 
 
 ///////////// public interfaces of this module
-char[][] Get()
+string[] Get()
 {
   return instance_.list_.array();
 }
@@ -51,7 +52,7 @@ void Scan()
   thread_.start();
 }
 
-void Remove(char[] dir)
+void Remove(string dir)
 {
   auto home = getenv("HOME");
   if(dir.StartsWith(dir)){
@@ -81,21 +82,21 @@ class DirListBase
 {
 protected:
   static const size_t MAX = 1000;
-  Vector!(char[]) list_;
-  char[] filename_;
+  Vector!(string) list_;
+  string filename_;
 
 public:
-  this(char[] filename)
+  this(string filename)
   {
     filename_ = filename;
-    list_ = new Vector!(char[])(MAX);
+    list_ = new Vector!(string)(MAX);
   }
 
   void Load(bool withinMAX = false)()
   {
-    EachLineInFile(filename_, delegate bool(char[] line){
+    EachLineInFile(filename_, delegate bool(string line){
         if(line.length > 0){
-          list_.append(line.dup);
+          list_.append(line);
           static if(withinMAX){
             if(list_.size() == MAX){
               return false;
@@ -108,14 +109,17 @@ public:
 
   void Save()
   {
+    //TODO
+    /+
     scope file = new tango.io.device.File.File(filename_, tango.io.device.File.File.WriteCreate);
     foreach(path; list_.array()){
       file.write(path ~ '\n');
     }
     file.close();
+    +/
   }
 
-  void Remove(char[] dir)
+  void Remove(string dir)
   {
     list_.remove(dir);
   }
@@ -142,7 +146,7 @@ public:
     }
   }
 
-  void Remove(char[] dir)
+  void Remove(string dir)
   {
     super.Remove(dir);
     changed_ = true;
@@ -155,14 +159,14 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
 {
   mixin ListedOperationT;
   bool canceled_;
-  char[] home_;
-  Vector!(char[]) v_;
+  string home_;
+  Vector!(string) v_;
 
   this()
   {
     super(&Scan);
     home_ = getenv("HOME");
-    v_ = new Vector!(char[])(DirList.MAX);
+    v_ = new Vector!(string)(DirList.MAX);
 
     Register();
   }
@@ -172,12 +176,12 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     canceled_ = true;
   }
 
-  char[] GetThreadListLabel(char[] startTime)
+  string GetThreadListLabel(string startTime)
   {
     return "Scanning directories under " ~ home_;
   }
 
-  char[] GetStopDialogLabel(char[] startTime)
+  string GetStopDialogLabel(string startTime)
   {
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
   }
@@ -200,7 +204,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     gdkThreadsLeave();
   }
 
-  void AppendOneDirectory(char[] path)
+  void AppendOneDirectory(string path)
   {
     if(path.StartsWith(home_)){
       path = "~" ~ path[home_.length .. $];
@@ -208,12 +212,12 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     v_.append(AppendSlash(path));
   }
 
-  void ScanOneDirectory(char[] path)
+  void ScanOneDirectory(string path)
   {
     // depth-first
     AppendOneDirectory(path);
 
-    char[][] dirs = ScanChildren(path);
+    string[] dirs = ScanChildren(path);
     foreach(dir; dirs){
       ScanOneDirectory(path ~ '/' ~ dir);
 
@@ -223,12 +227,12 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     }
   }
 
-  char[][] ScanChildren(char[] path)
+  string[] ScanChildren(string path)
   {
-    static const char[] attributes = "standard::name,standard::type,standard::is-symlink";
-    static const char[][] ignoreDirs = ["lost+found", ".svn", ".git"];
+    static const string attributes = "standard::name,standard::type,standard::is-symlink";
+    static const string[] ignoreDirs = ["lost+found", ".svn", ".git"];
 
-    char[][] dirs = [];
+    string[] dirs = [];
 
     try{
       scope enumerate = GetFileForDirectory(path).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
@@ -237,7 +241,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
       while((pinfo = enumerate.nextFile(null)) != null){
         scope FileInfo info = new FileInfo(pinfo);
         if((info.getFileType() == GFileType.TYPE_DIRECTORY) && (info.getIsSymlink() == 0)){
-          char[] name = info.getName();
+          string name = info.getName();
           if(ignoreDirs.findElement(name) == ignoreDirs.length){
             dirs ~= name;
           }

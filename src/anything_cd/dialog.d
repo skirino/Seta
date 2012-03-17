@@ -37,8 +37,10 @@ private import gdk.Threads;
 private import gdk.Keysyms;
 private import glib.Source;
 
-private import tango.text.Util;
-private import tango.core.Thread;
+//private import tango.text.Util;
+//private import tango.core.Thread;
+private import core.thread;
+private import std.string;
 
 private import migrate;
 private import utils.min_max;
@@ -245,7 +247,7 @@ private:
       while(filterThread_.isRunning()){
         gdkThreadsLeave();
         Thread.yield();
-        Thread.sleep(0.05);
+        Thread.sleep(500_000);
         gdkThreadsEnter();
       }
     }
@@ -255,7 +257,10 @@ private:
   {
     WaitStopIfRunning();
 
-    string text = trim(entry_.getText());
+    //TODO
+    //string text = trim(entry_.getText());
+    string text = entry_.getText();
+
     if(text is null || text.length == 0){
       InitFilteredCandidates();
     }

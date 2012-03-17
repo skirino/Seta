@@ -23,11 +23,14 @@ module utils.string_util;
 private import gtk.Label;
 private import glib.Str;
 
-private import tango.text.Util;
-private import tango.io.device.File;
-private import tango.io.stream.Lines;
-private import tango.stdc.string;
-private import std.ctype;
+//private import tango.text.Util;
+private import std.string;
+//private import tango.io.device.File;
+//private import tango.io.stream.Lines;
+private import std.stdio;
+//private import tango.stdc.string;
+private import std.c.string;
+private import std.ascii;
 
 private import migrate;
 private import utils.min_max;
@@ -55,7 +58,8 @@ string[] TrimAll(string[] l)
   string[] ret;
   ret.length = l.length;
   foreach(i, e; l){
-    ret[i] = trim(e);
+    //TODO
+    //ret[i] = trim(e);
   }
   return ret;
 }
@@ -133,6 +137,8 @@ bool EndsWith(string s1, string s2)
 
 void EachLineInFile(string filename, bool delegate(string) f)
 {
+  //TODO
+  /+
   try{
     scope file = new tango.io.device.File.File(filename);
     scope lines = new Lines!(char)(file);
@@ -145,6 +151,7 @@ void EachLineInFile(string filename, bool delegate(string) f)
     file.close();
   }
   catch(Exception ex){}// no such file or permission denied
+  +/
 }
 
 
@@ -190,9 +197,13 @@ string GetBasename(string path)
     return path;
   }
   else{
+    // TODO
+    /+
     size_t pos = locatePrior(path, '/', path.length-1);
     assert(pos != path.length);
     return path[pos+1..$];
+    +/
+    return null;
   }
 }
 
@@ -202,6 +213,8 @@ string ExpandPath(string path, string root)
   assert(path[0] == '/');
   assert(path[$-1] == '/');
 
+  //TODO
+  /+
   // first obtain an absolute path from the root directory
   // replace "////..." to "/"
   while(containsPattern(path, "//")){
@@ -231,6 +244,8 @@ string ExpandPath(string path, string root)
   }
 
   return path;
+  +/
+  return path;
 }
 
 
@@ -241,7 +256,8 @@ string EscapeSpecialChars(string input)
 {
   string ret = input;
   foreach(c; SpecialChars){
-    ret = substitute(ret, "" ~ c, "\\" ~ c);
+    //TODO
+    //ret = substitute(ret, "" ~ c, "\\" ~ c);
   }
   return ret;
 }
@@ -303,9 +319,11 @@ string Extract1stArg(string args)
   }
   else{
     size_t posSpace = FindUnescapedChar(replaced, ' ');
-    size_t posNewline = locate(replaced, '\n');
-    size_t posSemicolon = FindUnescapedChar(replaced, ';');
-    return replaced[0 .. Min(posSpace, posNewline, posSemicolon)];
+    //TODO
+    //size_t posNewline = locate(replaced, '\n');
+    //size_t posSemicolon = FindUnescapedChar(replaced, ';');
+    //return replaced[0 .. Min(posSpace, posNewline, posSemicolon)];
+    return null;
   }
 }
 
@@ -393,7 +411,7 @@ string ExpandEnvVars(string arg)
 
     // extract variable token
     size_t end = dollar+1;
-    while(end != arg.length && !(iscntrl(arg[end]) || arg[end] == '/')){
+    while(end != arg.length && !(isControl(arg[end]) || arg[end] == '/')){
       ++end;
     }
     string var = arg[dollar..end];

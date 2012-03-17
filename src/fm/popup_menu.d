@@ -34,8 +34,10 @@ private import glib.Str;
 private import glib.ListG;
 private import glib.GException;
 
-private import tango.stdc.posix.unistd;
+//private import tango.stdc.posix.unistd;
 private import std.c.stdlib;
+private import core.sys.posix.unistd;
+private import core.sys.posix.sys.types;
 
 private import migrate;
 private import utils.string_util;
@@ -344,9 +346,9 @@ private:
     selectedFilePaths ~= '\0';
     selectedURIs      ~= '\0';
 
-    envv ~= currentURI.ptr;
-    envv ~= selectedFilePaths.ptr;
-    envv ~= selectedURIs.ptr;
+    envv ~= cast(char*)currentURI.ptr;
+    envv ~= cast(char*)selectedFilePaths.ptr;
+    envv ~= cast(char*)selectedURIs.ptr;
     envv ~= null;
 
     // arguments

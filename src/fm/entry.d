@@ -24,7 +24,9 @@ private import gio.FileInfo;
 private import gio.ContentType;
 private import glib.Str;
 
-private import tango.stdc.posix.sys.stat;// for permission flags
+//private import tango.stdc.posix.sys.stat;// for permission flags
+private import std.c.stdlib;
+private import core.sys.posix.sys.stat;
 
 private import utils.time_util;
 private import utils.string_util;
@@ -167,10 +169,10 @@ private template CompareIntegerFuncMixin(string nameFun, string member)
       }
       else{
         static if(ascending){
-          return e1." ~ member ~ " - e2." ~ member ~ ";
+          return cast(int)(e1." ~ member ~ " - e2." ~ member ~ ");
         }
         else{
-          return e2." ~ member ~ " - e1." ~ member ~ ";
+          return cast(int)(e2." ~ member ~ " - e1." ~ member ~ ");
         }
       }
     }";
@@ -250,6 +252,8 @@ string PermissionInStr(uint mode, bool isSymlink)
     ret[0] = '-';
   }
 
+  //TODO
+  /+
   ret[1..4]  = RWX[(mode & S_IRWXU)/64];
   if(mode & S_ISUID){
     ret[3] = ret[3] == 'x' ? 's' : 'S';
@@ -264,8 +268,9 @@ string PermissionInStr(uint mode, bool isSymlink)
   if(mode & S_ISVTX){
     ret[9] = ret[9] == 'x' ? 't' : 'T';
   }
+  +/
 
-  return ret[];
+  return ret.idup;
 }
 
 private static const char[3][8] RWX =

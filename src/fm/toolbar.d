@@ -39,9 +39,8 @@ private import glib.GException;
 private import glib.Str;
 private import glib.ListG;
 
-private import tango.text.Util;
+//private import tango.text.Util;
 
-private import utils.bind;
 private import utils.template_util;
 private import utils.string_util;
 private import constants;
@@ -122,30 +121,6 @@ public:
       widget.setSizeRequest(rcfile.GetWidthShortcutButton(), -1);
       list = list.next();
     }
-  }
-
-private:
-  template InsertOrRemove(string s)
-  {
-    const string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
-  }
-
-  template InsertOrRemove(string s, string booleanExpression)
-  {
-    const string InsertOrRemove =
-      "
-      if(" ~ booleanExpression ~ "){
-        if(item" ~ s ~ "_.getParent is null){
-          insert(item" ~ s ~ "_, numToolItemsShown_);
-        }
-        ++numToolItemsShown_;
-      }
-      else{
-        if(item" ~ s ~ "_.getParent !is null){
-          item" ~ s ~ "_.doref();
-          remove(item" ~ s ~ "_);
-        }
-      }";
   }
   ///////////////////// Layout
 
@@ -288,7 +263,11 @@ public:
     foreach(i, shortcut; shortcuts){
       string label = "(" ~ Str.toString(i+1) ~ ") " ~ shortcut.label_;
       string dir = shortcut.path_;
-      AppendShortcutButton(dir, label, dir, bind(&RemoveShortcutPopup, _0, _1, dir).ptr());
+      AppendShortcutButton(
+        dir, label, dir,
+        delegate bool(GdkEventButton * eb, Widget w){
+          return RemoveShortcutPopup(eb, w, dir);
+        });
     }
 
     // mounted volumes
@@ -303,7 +282,10 @@ public:
       string label = index <= 9 ? "(" ~ Str.toString(index) ~ ") " ~ baseName : baseName;
       string tooltip = name ~ " (" ~ path ~ ')';
       AppendShortcutButton(
-        path, label, tooltip, bind(&UnmountMediaPopup, _0, _1, path, name).ptr());
+        path, label, tooltip,
+        delegate bool(GdkEventButton * eb, Widget w){
+          return UnmountMediaPopup(eb, w, path, name);
+        });
     }
 
     showAll();
@@ -331,7 +313,10 @@ private:
     auto b = new Button;
     b.add(child);
     b.setTooltipText(tooltip);
-    b.addOnClicked(bind(&parent_.PathButtonClicked!(Button), _0, path).ptr());
+    b.addOnClicked(
+      delegate void(Button b){
+        parent_.PathButtonClicked(b, path);
+      });
     if(dlgButtonPress !is null){// connect callback on right-clicking this button
       b.addOnButtonPress(dlgButtonPress);
     }
@@ -343,7 +328,9 @@ private:
 
     // for overflow menu
     auto menuItem = new MenuItem(
-      bind(&parent_.PathButtonClicked!(MenuItem), _0, path).ptr(),
+      delegate void(MenuItem item){
+        parent_.PathButtonClicked(item, path);
+      },
       label ~ " (" ~ path ~ ')', false);
     if(dlgButtonPress !is null){// connect callback on right-clicking this menuitem
       menuItem.addOnButtonPress(dlgButtonPress);
@@ -355,7 +342,11 @@ private:
   {
     if(eb.button == MouseButton.RIGHT){
       auto menu = new Menu;
-      menu.append(new MenuItem(bind(&RemoveShortcut, _0, path).ptr(), "Remove this shortcut", false));
+      menu.append(new MenuItem(
+                    delegate void(MenuItem item){
+                      RemoveShortcut(item, path);
+                    },
+                    "Remove this shortcut", false));
       menu.showAll();
       menu.popup(3, (new Event(cast(GdkEvent*)eb)).getTime());// 3 indicates "right click"
     }
@@ -396,7 +387,9 @@ private:
 
       // if the remote host is still accessed via ssh, skip
       if(name.StartsWith("sftp (")){
-        size_t posAtmark = locate(name, '@');
+        //TODO
+        //size_t posAtmark = locate(name, '@');
+        size_t posAtmark = 7;
         assert(posAtmark != name.length);
         string user   = name[6 .. posAtmark];
         string domain = name[posAtmark+1 .. $-1];
@@ -406,7 +399,11 @@ private:
       }
 
       auto menu = new Menu;
-      menu.append(new MenuItem(bind(&UnmountMedia, _0, path).ptr(), "Unmount " ~ name, false));
+      menu.append(new MenuItem(
+                    delegate void(MenuItem item){
+                      UnmountMedia(item, path);
+                    },
+                    "Unmount " ~ name, false));
       menu.showAll();
       menu.popup(3, (new Event(cast(GdkEvent*)eb)).getTime());// 3 indicates "right click"
     }
@@ -416,9 +413,12 @@ private:
   void UnmountMedia(MenuItem item, string path)
   {
     // change directory of all pages showing dirs under "path"
+    //TODO
+    /+
     if(path.containsPattern("/.gvfs/sftp ")){
       page_list.NotifyFilerDisconnect(path, path);
     }
+    +/
     page_list.NotifyEscapeFromPath(path);
 
     if(!UnmountByPath(path)){// "path" not found in monitored volumes, just remove the "item"
@@ -459,3 +459,33 @@ private:
   }
   ///////////////////// callbacks
 }
+
+
+
+
+
+
+
+
+  template InsertOrRemove(string s, string booleanExpression)
+  {
+    const string InsertOrRemove =
+      "
+      if(" ~ booleanExpression ~ "){
+        if(item" ~ s ~ "_.getParent is null){
+          insert(item" ~ s ~ "_, numToolItemsShown_);
+        }
+        ++numToolItemsShown_;
+      }
+      else{
+        if(item" ~ s ~ "_.getParent !is null){
+          item" ~ s ~ "_.doref();
+          remove(item" ~ s ~ "_);
+        }
+      }";
+  }
+
+  template InsertOrRemove(string s)
+  {
+    const string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
+  }

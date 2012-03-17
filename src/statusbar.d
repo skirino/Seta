@@ -109,64 +109,8 @@ private:
   ToggleButton showLButton, showRButton;
   Note noteL_, noteR_;
 
-  template ConstructToggleButton(char l)
-  {
-    const string ConstructToggleButton =
-      "
-      show" ~ l ~ "Button = new ToggleButton(\"" ~ l ~ "\");
-      show" ~ l ~ "Button.setActive(1);
-      show" ~ l ~ "Button.setTooltipText(\"show/hide " ~ l ~ " pane\");
-      show" ~ l ~ "Button.addOnToggled(&Toggle" ~ l ~ ");
-      packEnd(show" ~ l ~ "Button, 0, 0, 0);
-      ";
-  }
-
-  template ToggleCallbackMixin(char l, char r)
-  {
-    const string ToggleCallbackMixin =
-      "void Toggle" ~ l ~ "(ToggleButton b)
-      {
-        if(show" ~ l ~ "Button.getActive() == 0){
-          note" ~ l ~ "_.hide();
-          if(show" ~ r ~ "Button.getActive() == 0){
-            show" ~ r ~ "Button.setActive(1);
-          }
-        }
-        else{
-          if(note" ~ l ~ "_.getNPages() == 0){
-            if('" ~ l ~ "' == 'L'){
-              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
-            }
-            else{
-              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryRight());
-            }
-          }
-          note" ~ l ~ "_.show();
-        }
-      }";
-  }
-
   mixin(ToggleCallbackMixin!('L', 'R'));
   mixin(ToggleCallbackMixin!('R', 'L'));
-
-  template MoveLRMixin(char l, char r)
-  {
-    const string MoveLRMixin =
-      "bool Move" ~ l ~ "()
-      {
-        if(show" ~ l ~ "Button.getActive() != 0){
-          if(show" ~ r ~ "Button.getActive() != 0){// both pane
-            show" ~ r ~ "Button.setActive(0);
-            return true;
-          }
-          // else : only l pane
-        }
-        else{// only r pane
-          show" ~ l ~ "Button.setActive(1);
-        }
-        return false;
-      }";
-  }
 
   mixin(MoveLRMixin!('L', 'R'));
   mixin(MoveLRMixin!('R', 'L'));
@@ -256,3 +200,63 @@ bool ExpandRightPane()
   return statusbarInstance.MoveR();
 }
 ///////////////////////// show/hide left/right pane
+
+
+
+
+  template ConstructToggleButton(char l)
+  {
+    const string ConstructToggleButton =
+      "
+      show" ~ l ~ "Button = new ToggleButton(\"" ~ l ~ "\");
+      show" ~ l ~ "Button.setActive(1);
+      show" ~ l ~ "Button.setTooltipText(\"show/hide " ~ l ~ " pane\");
+      show" ~ l ~ "Button.addOnToggled(&Toggle" ~ l ~ ");
+      packEnd(show" ~ l ~ "Button, 0, 0, 0);
+      ";
+  }
+
+  template ToggleCallbackMixin(char l, char r)
+  {
+    const string ToggleCallbackMixin =
+      "void Toggle" ~ l ~ "(ToggleButton b)
+      {
+        if(show" ~ l ~ "Button.getActive() == 0){
+          note" ~ l ~ "_.hide();
+          if(show" ~ r ~ "Button.getActive() == 0){
+            show" ~ r ~ "Button.setActive(1);
+          }
+        }
+        else{
+          if(note" ~ l ~ "_.getNPages() == 0){
+            if('" ~ l ~ "' == 'L'){
+              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
+            }
+            else{
+              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryRight());
+            }
+          }
+          note" ~ l ~ "_.show();
+        }
+      }";
+  }
+
+  template MoveLRMixin(char l, char r)
+  {
+    const string MoveLRMixin =
+      "bool Move" ~ l ~ "()
+      {
+        if(show" ~ l ~ "Button.getActive() != 0){
+          if(show" ~ r ~ "Button.getActive() != 0){// both pane
+            show" ~ r ~ "Button.setActive(0);
+            return true;
+          }
+          // else : only l pane
+        }
+        else{// only r pane
+          show" ~ l ~ "Button.setActive(1);
+        }
+        return false;
+      }";
+  }
+

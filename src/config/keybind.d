@@ -23,8 +23,9 @@ module config.keybind;
 private import gtk.AccelGroup;
 private import gdk.Keysyms;
 
-private import tango.text.Util;
-private import std.ctype;
+//private import tango.text.Util;
+private import std.string;
+private import std.ascii;
 
 private import utils.string_util;
 private import constants;
@@ -82,8 +83,8 @@ private KeyCode ParseKeyCode(string s, uint action)
   if(s.length > 0){// not empty
     AccelGroup.acceleratorParse(s, ret.keyval_, ret.state_);
     // if keyval_ is alphabet and SHIFT is pressed, keycode should be modified to uppercase
-    if(isalpha(ret.keyval_) && (ret.state_ & GdkModifierType.SHIFT_MASK)){
-      ret.keyval_ = toupper(ret.keyval_);
+    if(isAlpha(ret.keyval_) && (ret.state_ & GdkModifierType.SHIFT_MASK)){
+      ret.keyval_ = toUpper(ret.keyval_);
     }
   }
   else{// empty string
@@ -96,9 +97,17 @@ private KeyCode ParseKeyCode(string s, uint action)
 KeyCode[] ParseKeyCodeList(string s, uint action)
 {
   KeyCode[] ret;
-  string[] list = delimit(s, ",");
+
+  //TODO
+  //string[] list = delimit(s, ",");
+  string[] list = [s];
+
   foreach(x; list){
-    KeyCode code = ParseKeyCode(trim(x), action);
+
+    //TODO
+    //KeyCode code = ParseKeyCode(trim(x), action);
+    KeyCode code = ParseKeyCode(x, action);
+
     if(code.IsValid()){
       ret ~= code;
     }

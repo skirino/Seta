@@ -29,11 +29,16 @@ private import gdk.Color;
 private import glib.Str;
 private import glib.Regex;
 
-private import tango.text.Util;
-private import tango.core.Thread;
-private import tango.stdc.posix.stdlib;
-private import tango.stdc.posix.termios;
-private import tango.stdc.posix.unistd;
+//private import tango.text.Util;
+private import std.string;
+//private import tango.core.Thread;
+private import core.thread;
+//private import tango.stdc.posix.stdlib;
+//private import tango.stdc.posix.termios;
+//private import tango.stdc.posix.unistd;
+private import std.c.stdlib;
+private import core.sys.posix.termios;
+private import core.sys.posix.unistd;
 
 private import migrate;
 private import utils.string_util;
@@ -191,12 +196,12 @@ private:
       // adjust directory of file manager
       if(!mediator_.FileSystemIsRemote()){// I can get cwd of the child process only for localhost
         string filename = "/proc/" ~ Str.toString(pid_) ~ "/cwd\0";
-        string buffer;
+        char[] buffer;
         const size_t bufsize = 10000;
         buffer.length = bufsize;
         ssize_t len = readlink(filename.ptr, buffer.ptr, bufsize);
         if(len != -1){
-          cwd_ = AppendSlash(buffer[0..len]);
+          cwd_ = AppendSlash(buffer[0..len].idup);
           mediator_.FilerChangeDirFromTerminal(cwd_);
         }
       }
@@ -217,7 +222,11 @@ private:
         if(enableReplace_){
           text = ReplaceLRDIR(text);
         }
-        string replaced = text.substitute("\\n", "\n");
+
+        //TODO
+        //string replaced = text.substitute("\\n", "\n");
+        string replaced = text;
+
         FeedChild(replaced);
       }
       return true;
@@ -276,7 +285,9 @@ public:
 
   void ChangeDirectoryOfFilerFromCommandLine(string replacedCommand)
   {
-    string command = trim(replacedCommand);
+    //TODO
+    //string command = trim(replacedCommand);
+    string command = replacedCommand;
 
     // aliases
     if(shellSetting_ !is null){
@@ -298,7 +309,10 @@ public:
     }
 
     if(command.StartsWith("cd")){
-      string args = triml(command[2..$]);
+      //TODO
+      //string args = triml(command[2..$]);
+      string args = command[2..$];
+
       if(args.length == 0){// to $HOME
         string home = mediator_.FileSystemHome();
         if(home !is null){
@@ -379,7 +393,7 @@ private:
 
   void FeedChild(string text)
   {
-    vte_terminal_feed_child(vte_, text.ptr, text.length);
+    vte_terminal_feed_child(vte_, cast(char*)text.ptr, text.length);
   }
 
   string GetText()
@@ -392,7 +406,7 @@ private:
 
   void ClearInputtedCommand()
   {
-    static const char[256] backspaces = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+    static const string backspaces = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
     FeedChild(backspaces);
   }
 
@@ -430,11 +444,18 @@ private:
 
   string GetLastCommand()
   {
-    string text = trimr(GetText());
-    size_t indexCompName = locatePatternPrior(text, prompt_);
+    //TODO
+    //string text = trimr(GetText());
+    string text = GetText();
+
+    //TODO
+    //size_t indexCompName = locatePatternPrior(text, prompt_);
+    size_t indexCompName = text.length;
+
     if(indexCompName == text.length){
       return null;
     }
+    /+
     else{
       string diff = text[indexCompName .. $];
       size_t indexPrompt = locatePattern(diff, "$ ");
@@ -469,6 +490,7 @@ private:
         }
       }
     }
+    +/
     return null;
   }
   /////////////////// manipulate text in vte terminal
@@ -482,6 +504,8 @@ private:
 
   void ResetReplaceTargets(string targetLDIR, string targetRDIR)
   {
+    //TODO
+    /+
     targetsL_[0] = substitute(targetLDIR, "<n>", "");
     for(uint i=1; i<10; ++i){
       targetsL_[i] = substitute(targetLDIR, "<n>", Str.toString(i));
@@ -491,6 +515,7 @@ private:
     for(uint i=1; i<10; ++i){
       targetsR_[i] = substitute(targetRDIR, "<n>", Str.toString(i));
     }
+    +/
   }
 
   string ReplaceDIR(char LR)(string line)
@@ -506,12 +531,15 @@ private:
 
     // this code might have performance problem
     foreach(i, target; targets){
+      //TODO
+      /+
       if(containsPattern(line, target)){
         string replace = getCWDLR_(LR, i);
         if(replace !is null){
           ret = substitute(ret, target, EscapeSpecialChars(replace));
         }
       }
+      +/
     }
 
     return ret;
@@ -589,7 +617,10 @@ private:
         // check whether password is being asked
         tcgetattr(term_.pty_, &tios);
         if(AskingPassword(&tios)){
-          string lastLine = splitLines(trim(term_.GetText()))[$-1];
+          //TODO
+          //string lastLine = splitLines(trim(term_.GetText()))[$-1];
+          string lastLine = term_.GetText();
+
           if(lastLine.EndsWith("id_rsa':")){
             // assumes that the password for rsa authentication is the same as the one for remote login
             term_.FeedChild(pass_ ~ '\n');
@@ -601,7 +632,7 @@ private:
           }
         }
 
-        Thread.sleep(0.5);
+        Thread.sleep(5_000_000);
       }
 
       // remove from ThreadList
@@ -669,7 +700,7 @@ public:
   void InitDragAndDropFunctionality()
   {
     // accept "text/uri-list" (info==1) and "text/plain" (info==2)
-    GtkTargetEntry[] dragTargets = constants.GetDragTargets() ~ GtkTargetEntry("text/plain", 0, 2);
+    GtkTargetEntry[] dragTargets = constants.GetDragTargets() ~ GtkTargetEntry(Str.toStringz("text/plain"), 0, 2);
     DragAndDrop.destSet(
       this,
       GtkDestDefaults.ALL,
@@ -712,7 +743,7 @@ public:
 
 // declarations of C functions in libvte
 extern(C){
-  struct VteTerminal;
+  struct VteTerminal{};
   GtkWidget * vte_terminal_new();
 
   // miscellaneous settings

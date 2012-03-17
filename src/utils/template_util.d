@@ -21,18 +21,18 @@ MA 02110-1301 USA.
 module utils.template_util;
 
 
-template RuntimeDispatch1(char[] tmplt, char[] b, char[] args = "")
+template RuntimeDispatch1(string tmplt, string b, string args = "")
 {
-  const char[] RuntimeDispatch1 =
+  const string RuntimeDispatch1 =
     "
     ( " ~ b ~ " ? " ~ tmplt ~ "!(true)"  ~ args ~
     "           : " ~ tmplt ~ "!(false)" ~ args ~
     ")";
 }
 
-template RuntimeDispatch2(char[] tmplt, char[] b1, char[] b2, char[] args = "")
+template RuntimeDispatch2(string tmplt, string b1, string b2, string args = "")
 {
-  const char[] RuntimeDispatch2 =
+  const string RuntimeDispatch2 =
     "
     ( " ~ b1 ~ " ? (" ~ b2 ~ " ? " ~ tmplt ~ "!(true,  true)"  ~ args ~
     "                          : " ~ tmplt ~ "!(true,  false)" ~ args ~ ")" ~
@@ -41,9 +41,9 @@ template RuntimeDispatch2(char[] tmplt, char[] b1, char[] b2, char[] args = "")
     ")";
 }
 
-template RuntimeDispatch3(char[] tmplt, char[] b1, char[] b2, char[] b3, char[] args = "")
+template RuntimeDispatch3(string tmplt, string b1, string b2, string b3, string args = "")
 {
-  const char[] RuntimeDispatch3 =
+  const string RuntimeDispatch3 =
     "
     ( " ~ b1 ~ " ? (" ~ b2 ~ " ? (" ~ b3 ~ " ? " ~ tmplt ~ "!(true,  true,  true)"  ~ args ~
     "                                        : " ~ tmplt ~ "!(true,  true,  false)" ~ args ~ ")" ~
@@ -60,9 +60,9 @@ template RuntimeDispatch3(char[] tmplt, char[] b1, char[] b2, char[] b3, char[] 
 template FoldTupple(alias templateFun, s ...)
 {
   static if(s.length == 0){
-    const char[] FoldTupple = "";
+    const string FoldTupple = "";
   }
   else{
-    const char[] FoldTupple = templateFun!(s[0]) ~ FoldTupple!(templateFun, s[1 .. $]);
+    const string FoldTupple = templateFun!(s[0]) ~ FoldTupple!(templateFun, s[1 .. $]);
   }
 }

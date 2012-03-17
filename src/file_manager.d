@@ -35,7 +35,6 @@ private import gio.File;
 private import glib.Str;
 private import gtkc.gio;
 
-private import utils.bind;
 private import utils.string_util;
 private import constants;
 private import rcfile = config.rcfile;
@@ -379,7 +378,9 @@ public:
     auto menu = new Menu;
     foreach(n, l; list){
       string label = mediator_.FileSystemNativePath(l);
-      auto dlg = bind(&MoveNTimesAndChangeDir!(ForwardDirection), _0, n+1).ptr();
+      auto dlg = delegate void(MenuItem item){
+        MoveNTimesAndChangeDir!(ForwardDirection)(item, n+1);
+      };
       menu.append(new MenuItem(dlg, label, false));
     }
     menu.showAll();
@@ -419,12 +420,16 @@ public:
     string path = ParentDirectory(pwd);
     while(path != "/"){
       auto fullpath = mediator_.FileSystemMountedVFSPath(path);
-      auto dlg = bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
+      auto dlg = delegate void(MenuItem item){
+        PathButtonClicked(item, fullpath);
+      };
       menu.append(new MenuItem(dlg, path, false));
       path = ParentDirectory(path);
     }
     auto fullpath = mediator_.FileSystemMountedVFSPath("/");
-    auto dlg = bind(&PathButtonClicked!(MenuItem), _0, fullpath).ptr();
+    auto dlg = delegate void(MenuItem item){
+      PathButtonClicked(item, fullpath);
+    };
     menu.append(new MenuItem(dlg, "/", false));
 
     menu.showAll();

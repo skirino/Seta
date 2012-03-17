@@ -28,17 +28,17 @@ private import anything_cd.dir_list;
 
 
 ///////////// public interfaces of this module
-char[][] Get()
+string[] Get()
 {
   return instance_.list_.array();
 }
 
-void Push(char[] path)
+void Push(string path)
 {
   instance_.Push(path);
 }
 
-void Remove(char[] dir)
+void Remove(string dir)
 {
   instance_.Remove(dir);
 }
@@ -62,7 +62,7 @@ private DirHistory instance_;
 private class DirHistory : DirListBase
 {
 private:
-  char[] home_;
+  string home_;
 
 public:
   this()
@@ -74,12 +74,12 @@ public:
     Push(rcfile.GetInitialDirectoryRight());
   }
 
-  void Push(char[] path)
+  void Push(string path)
   {
     if(path.StartsWith(home_)){
       path = "~" ~ path[home_.length .. $];
     }
-    char[][] array = list_.array();
+    string[] array = list_.array();
 
     // check uniqueness of paths
     int index = -1;

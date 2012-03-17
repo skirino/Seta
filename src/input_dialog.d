@@ -25,7 +25,7 @@ private import gtk.Entry;
 private import gtk.Dialog;
 private import gtk.VBox;
 
-private import tango.text.Util;
+//private import tango.text.Util;
 
 private import utils.min_max;
 
@@ -67,7 +67,10 @@ string InputDialog(bool hideInput = false)(string title, string description, str
     });
 
   d.showAll();
-  entry.selectRegion(0, locatePrior(defaultValue, '.'));// do not select extension
+
+  //TODO
+  //entry.selectRegion(0, locatePrior(defaultValue, '.'));// do not select extension
+
   d.run();
   return ret;
 }
@@ -80,18 +83,18 @@ string InputDialog(bool hideInput = false)(string title, string description, str
 int ChooseDialog(uint numOptions)(string message, string[numOptions] labels)
 {
   static if(numOptions == 2){
-    const GtkResponseType[] indices = cast(GtkResponseType[])[0, 1];
+    GtkResponseType[] indices = cast(GtkResponseType[])[0, 1];
   }
   static if(numOptions == 3){
-    const GtkResponseType[] indices = cast(GtkResponseType[])[0, 1, 2];
+    GtkResponseType[] indices = cast(GtkResponseType[])[0, 1, 2];
   }
   static if(numOptions == 4){
-    const GtkResponseType[] indices = cast(GtkResponseType[])[0, 1, 2, 3];
+    GtkResponseType[] indices = cast(GtkResponseType[])[0, 1, 2, 3];
   }
 
   scope d = new Dialog;
   d.getContentArea.add(new Label(message, false));
-  d.addButtons(labels, indices);
+  d.addButtons(labels.dup, indices);
 
   int ret;
   d.addOnResponse(

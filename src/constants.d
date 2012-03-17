@@ -22,6 +22,7 @@ module constants;
 
 private import gtk.DragAndDrop;
 private import gio.ContentType;
+private import glib.Str;
 
 
 static const string[] ColumnTitles = ["name", "type", "size", "owner", "permissions", "last modified"];
@@ -59,7 +60,7 @@ void Init()
 {
   directoryTypeDescription = ContentType.getDescription("inode/directory");
 
-  dragTargets[0].target = "text/uri-list";
+  dragTargets[0].target = Str.toStringz("text/uri-list");
   dragTargets[0].flags  = 0;
   dragTargets[0].info   = 1;
 }

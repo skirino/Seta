@@ -27,9 +27,11 @@ private import gdk.Threads;
 private import gtk.Widget;
 private import gtk.TreeView;
 
-private import tango.text.Util;
-private import tango.core.Thread;
-private import tango.stdc.string;
+//private import tango.text.Util;
+//private import tango.core.Thread;
+private import core.thread;
+//private import tango.stdc.string;
+private import core.stdc.string;
 
 private import utils.vector;
 private import constants;
@@ -76,7 +78,8 @@ public:
     remote_ = remote;
     if(remote){
       // "owner::user" cannot be obtained from the GVFS, then switch to faster content-type
-      attributes_ = attr.substitute(",owner::user", "").substitute("standard::content-type", "standard::fast-content-type");
+      //TODO
+      //attributes_ = attr.substitute(",owner::user", "").substitute("standard::content-type", "standard::fast-content-type");
     }
     else{
       attributes_ = attr;
@@ -180,7 +183,9 @@ private:
     {
       string filterText_;
       bool opCall(DirEntry e){
-        return containsPattern(e.GetName(), filterText_);
+        //TODO
+        //return containsPattern(e.GetName(), filterText_);
+        return true;
       }
     }
 
@@ -190,7 +195,9 @@ private:
       bool opCall(DirEntry e)
       {
         string name = e.GetName();
-        return name[0] != '.' && name.containsPattern(filterText_);
+        //TODO
+        //return name[0] != '.' && name.containsPattern(filterText_);
+        return true;
       }
     }
 
@@ -424,7 +431,7 @@ private:
       }
     }
 
-    memcpy (tmp, base + a, (alim - a) * DirEntry.sizeof);
+    core.stdc.string.memcpy (tmp, base + a, (alim - a) * DirEntry.sizeof);
     return false;
   }
 
@@ -490,7 +497,7 @@ private:
           base[i++] = bb;
           b++;
           if (b == blim){
-            memcpy (base + i, tmp + t, (tlim - t) * DirEntry.sizeof);
+            core.stdc.string.memcpy (base + i, tmp + t, (tlim - t) * DirEntry.sizeof);
             break;
           }
           bb = base[b];

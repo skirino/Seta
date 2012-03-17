@@ -67,7 +67,8 @@ COBJS = C/workaround.o
 
 # dmd compiler, modify compiler outputs to enable 'next/previous-error' in *Compilation* buffer in Emacs
 all:
-	~/code/D/dsss/bin/dsss build | tr -d : | tr \(\) :
+	dmd -ofseta -L-lgtkd -L-lvte -L-ldl C/workaround.o anything_cd/*.d config/*.d fm/*.d term/*.d utils/*.d *.d
+#	~/code/D/dsss/bin/dsss build | tr -d : | tr \(\) :
 # gdc compiler
 #	/home/skirino/code/D/dsss/bin/dsss build
 

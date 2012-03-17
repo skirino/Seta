@@ -102,7 +102,7 @@ public:
 
   void opIndexAssign(T val, size_t i)
   {
-    return array_[i] = val;
+    array_[i] = val;
   }
 
   T[] opSlice(size_t i, size_t j)
@@ -159,4 +159,4 @@ private:
 }
 
 
-private Vector!(char[]) explicitInstantiationToAvoidLinkerError;
+private Vector!(string) explicitInstantiationToAvoidLinkerError;

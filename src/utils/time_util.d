@@ -20,18 +20,23 @@ MA 02110-1301 USA.
 
 module utils.time_util;
 
-private import tango.io.Stdout;
-private import tango.stdc.posix.sys.time;
+//private import tango.io.Stdout;
+//private import tango.stdc.posix.sys.time;
+private import std.stdio;
 
 
+
+//TODO
+/+
 scope class ScopeTimer
 {
 private:
   timeval start_;
-  const char[] message_;
+  ulong start_;
+  const string message_;
 
 public:
-  this(char[] message)
+  this(string message)
   {
     message_ = message;
     gettimeofday(&start_, null);
@@ -62,7 +67,7 @@ ulong GetCurrentTime()
 }
 
 
-char[] EpochTimeToString(ulong l)
+string EpochTimeToString(ulong l)
 {
   static char[16] ret;
 
@@ -84,7 +89,7 @@ char[] EpochTimeToString(ulong l)
   return ret[];// return slice of local buffer
 }
 
-char[] EpochTimeToStringSeconds(ulong l)
+string EpochTimeToStringSeconds(ulong l)
 {
   static char[14] ret;
 
@@ -104,6 +109,16 @@ char[] EpochTimeToStringSeconds(ulong l)
 
   return ret[];// return slice of local buffer
 }
++/
+ulong GetCurrentTime(){return 0;}
+string EpochTimeToString(ulong l){return "test";}
+string EpochTimeToStringSeconds(ulong l){return "test";}
+
+
+
+
+
+
 
 
 private static const char[4][201] YEAR_1900_TO_2100 =

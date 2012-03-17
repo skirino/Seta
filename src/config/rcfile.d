@@ -27,7 +27,8 @@ private import gio.File;
 private import gio.FileOutputStream;
 private import glib.Str;
 
-private import tango.text.Util;
+//private import tango.text.Util;
+private import std.string;
 
 private import migrate;
 private import utils.min_max;
@@ -307,7 +308,11 @@ void AddSSHHost(SSHConnection con)
   string s = con.toStr!(true)();
   if(instance_.hasKey("SSH", "Hosts")){
     string older = instance_.getString("SSH", "Hosts");
-    string newer = trim(older) ~ ',' ~ s;
+
+    //TODO
+    //string newer = trim(older) ~ ',' ~ s;
+    string newer = older ~ ',' ~ s;
+
     instance_.setString("SSH", "Hosts", newer);
   }
   else{
@@ -328,7 +333,11 @@ void RemoveSSHHost(SSHConnection con)
     string[] hosts = split(older, ",");
     string[] newhosts;
     foreach(host; hosts){
-      string temp = trim(host);
+
+      //TODO
+      //string temp = trim(host);
+      string temp = host;
+
       scope con2 = new SSHConnection(host);
       if(!con2.Equals(con)){
         newhosts ~= host;
@@ -495,7 +504,11 @@ private:
     // check if entry is an existing directory
     bool setHomeDirL = true;
     if(hasKey("Directories", "InitialDirectoryLeft")){
-      string initialDir = trim(getString("Directories", "InitialDirectoryLeft"));
+
+      //TODO
+      //string initialDir = trim(getString("Directories", "InitialDirectoryLeft"));
+      string initialDir = getString("Directories", "InitialDirectoryLeft");
+
       scope f = GetFileForDirectory(initialDir);
       if(f !is null && CanEnumerateChildren(f)){
         setHomeDirL = false;
@@ -508,7 +521,11 @@ private:
 
     bool setHomeDirR = true;
     if(hasKey("Directories", "InitialDirectoryRight")){
-      string initialDir = trim(getString("Directories", "InitialDirectoryRight"));
+
+      //TODO
+      //string initialDir = trim(getString("Directories", "InitialDirectoryRight"));
+      string initialDir = getString("Directories", "InitialDirectoryRight");
+
       scope f = GetFileForDirectory(initialDir);
       if(f !is null && CanEnumerateChildren(f)){
         setHomeDirR = false;
@@ -541,7 +558,7 @@ private:
       scope File f = File.parseName(filename_);
       scope FileOutputStream fs = f.replace(null, 1, GFileCreateFlags.NONE, null);
       uint len;
-      string contents = toData(len);
+      char[] contents = cast(char[]) toData(len);
       fs.writeAll(contents.ptr, contents.length, &len, null);
       fs.close(null);
     }

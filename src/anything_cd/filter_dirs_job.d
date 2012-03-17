@@ -22,9 +22,10 @@ module anything_cd.filter_dirs_job;
 
 private import gdk.Threads;
 
-private import tango.text.Util;
-private import tango.core.Thread;
-private import tango.text.Unicode;
+//private import tango.text.Util;
+//private import tango.core.Thread;
+private import core.thread;
+//private import tango.text.Unicode;
 
 private import utils.min_max;
 private import utils.string_util;
@@ -90,11 +91,17 @@ public:
     mixin(ReturnIfCanceled);
 
     string[] words = [];
+
+    //TODO
+    /+
     foreach(word; targetText_.toLower().delimit(" ")){
       if(word.length > 0){
         words ~= word;
       }
     }
+    +/
+    words = [targetText_];
+
 
     // process paths PER_PAGE and check cancel flag at start of page
     auto pathsFromHistory = new Vector!(string)(MaxNumberOfPathsFromHistory);
@@ -163,9 +170,13 @@ private:
 private bool containsStrings(string targetStr, string[] words)
 {
   bool ret = true;
+
+  //TODO
+  /+
   string str = targetStr.toLower();
   foreach(word; words){
     ret &= str.containsPattern(word);
   }
+  +/
   return ret;
 }

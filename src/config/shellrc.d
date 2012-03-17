@@ -20,7 +20,8 @@ MA 02110-1301 USA.
 
 module config.shellrc;
 
-private import tango.text.Util;
+//private import tango.text.Util;
+private import std.string;
 
 private import migrate;
 private import utils.string_util;
@@ -36,7 +37,7 @@ void Init()
 
 struct ChangeDirAlias
 {
-  char[] command_, path_;
+  string command_, path_;
 }
 
 
@@ -50,20 +51,26 @@ public:
   bool GetAutoCd(){return autoCd_;}
   ChangeDirAlias[] GetChangeDirAliases(){return cdAliases_;}
 
-  this(char[] home, char[] shell)
+  this(string home, string shell)
   {
     if(home.length == 0 || shell.length == 0){
       return;// there's nothing I can do
     }
 
+    //TODO
+    /+
     // obtain fullpaths to the shell's rc file
     uint possh    = shell.locatePattern("sh");
     uint posslash = shell.locatePrior('/', possh);
     if(possh == shell.length || posslash == shell.length){
       return;
     }
-    char[] shelltype = shell[posslash+1 .. possh+2];
-    char[][] filenames =
+    string shelltype = shell[posslash+1 .. possh+2];
+    +/
+    string shelltype = shell;
+
+
+    string[] filenames =
       [
         home ~ "/." ~ shelltype ~ "rc",               // ~/.bashrc, ~/.zshrc
         home ~ "/." ~ shelltype ~ "env",              // ~/.zshenv
@@ -73,36 +80,38 @@ public:
         "/etc/" ~ shelltype ~ '/' ~ shelltype ~ "env" // /etc/zsh/zshenv
       ];
 
-    bool[char[]] filesProcessed;
+    bool[string] filesProcessed;
 
     for(size_t i=0; i<filenames.length; ++i){
-      char[] filename = filenames[i];
+      string filename = filenames[i];
       if(!(filename in filesProcessed)){
         filesProcessed[filename] = true;
-        char[][] srcs = ReadFile(filename, home);
+        string[] srcs = ReadFile(filename, home);
         filenames ~= srcs;
       }
     }
   }
 
 private:
-  char[][] ReadFile(char[] filename, char[] home)
+  string[] ReadFile(string filename, string home)
   {
-    char[][] fileList;
+    string[] fileList;
 
-    EachLineInFile(filename, delegate bool(char[] line){
-        char[] l = trim(line);
+    //TODO
+    /+
+    EachLineInFile(filename, delegate bool(string line){
+        string l = trim(line);
 
         // search for lines such as "alias cdu='cd ..'"
         // assume Bourne-like shell
         if(l.StartsWith("alias ")){// alias command
-          char[] l2 = l[6 .. $];// line after "alias "
+          string l2 = l[6 .. $];// line after "alias "
           uint posequal = l2.locate('=');
           if(posequal != l2.length){// contains '='
-            char[] rhs = Extract1stArg(l2[posequal+2 .. $-1]);// rhs should be quoted by ' or ", remove them
+            string rhs = Extract1stArg(l2[posequal+2 .. $-1]);// rhs should be quoted by ' or ", remove them
             if(rhs.StartsWith("cd ")){
-              char[] command = l2[0 .. posequal];// lhs
-              char[] path = AppendSlash(trim(rhs[3 .. $]));// rhs after "cd " with last slash appended
+              string command = l2[0 .. posequal];// lhs
+              string path = AppendSlash(trim(rhs[3 .. $]));// rhs after "cd " with last slash appended
               cdAliases_ ~= ChangeDirAlias(command, path);
             }
           }
@@ -110,7 +119,7 @@ private:
 
         // search for "setopt auto_cd"
         if(l.StartsWith("setopt ")){
-          char[] l2 = triml(l[7 .. $]);
+          string l2 = triml(l[7 .. $]);
           if(l2 == "auto_cd"){// line after "setopt "
             autoCd_ = true;
           }
@@ -118,9 +127,9 @@ private:
 
         // "source" command
         if(l.StartsWith("source ")){
-          char[] args = triml(l[7 .. $]);
+          string args = triml(l[7 .. $]);
           // currently only 1 file (specified by the 1st argument) is processed
-          char[] arg = args.Extract1stArg().ExpandEnvVars();
+          string arg = args.Extract1stArg().ExpandEnvVars();
           if(arg.StartsWith("/")){
             fileList ~= arg;
           }
@@ -134,7 +143,7 @@ private:
 
         return true;// continue reading this file
       });
-
+    +/
     return fileList;
   }
 }

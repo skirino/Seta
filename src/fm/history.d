@@ -28,7 +28,7 @@ class DirHistory
 {
 private:
   static const int MaxHistory = 50;
-  char[][MaxHistory] dirs_;// ring buffer
+  string[MaxHistory] dirs_;// ring buffer
   int idxPWD_, bufferStart_, bufferEnd_;
 
   int Idx(int i)
@@ -45,9 +45,9 @@ private:
   }
 
 public:
-  this(char[] dir){Reset(dir);}
+  this(string dir){Reset(dir);}
 
-  void Reset(char[] dir)
+  void Reset(string dir)
   {
     bufferStart_ = 0;
     bufferEnd_ = 0;
@@ -55,9 +55,9 @@ public:
     dirs_[0] = dir;
   }
 
-  char[] GetPWD(){return dirs_[idxPWD_];}
+  string GetPWD(){return dirs_[idxPWD_];}
 
-  void Append(char[] dir)
+  void Append(string dir)
   {
     int next = Idx(idxPWD_ + 1);
 
@@ -87,7 +87,7 @@ public:
     }
   }
 
-  char[] GetDirNext(bool ForwardDirection)()
+  string GetDirNext(bool ForwardDirection)()
   {
     static if(ForwardDirection){
       if(idxPWD_ == bufferEnd_){
@@ -128,7 +128,7 @@ public:
     bufferEnd_ = Idx(bufferEnd_ - 1);
   }
 
-  char[][] Listup10(bool ForwardDirection)()
+  string[] Listup10(bool ForwardDirection)()
   {
     static if(ForwardDirection){
       const int shift = 1;
@@ -140,7 +140,7 @@ public:
     }
 
     int index = idxPWD_;
-    char[][] ret;
+    string[] ret;
 
     while(ret.length < 10 && index != last){
       index = Idx(index + shift);

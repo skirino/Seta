@@ -26,7 +26,8 @@ private import gtk.TreeIter;
 private import gtk.ListStore;
 private import gtk.CellRendererText;
 
-private import tango.text.Util;
+//private import tango.text.Util;
+private import std.string;
 
 private import utils.string_util;
 private import rcfile = config.rcfile;
@@ -78,7 +79,7 @@ public:
       TreeIter iter = new TreeIter;
       hostsStore_.append(iter);
 
-      string[] items = TrimAll(split!(char)(host, ":"));
+      string[] items = TrimAll(split(host, ":"));
       foreach(i, item; items){
         hostsStore_.setValue(iter, i, item);
       }

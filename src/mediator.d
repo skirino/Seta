@@ -57,13 +57,13 @@ public:
 
 
   /////////////////// SSH
-  void SSHConnectionSucceeded(char[] gvfsRoot, SSHConnection con)
+  void SSHConnectionSucceeded(string gvfsRoot, SSHConnection con)
   {
     // within GDK lock
-    char[] userDomain = con.GetUserDomain();
+    string userDomain = con.GetUserDomain();
 
     if(con.GetBothSFTPAndSSH()){
-      char[] password = con.getPassword();
+      string password = con.getPassword();
       if(password.length == 0){
         password = InputDialog!(true)("SSH", "The remote filesystem is already mounted by gvfs.\nInput password for SSH :");
         if(password.length == 0){// no valid password
@@ -86,11 +86,11 @@ public:
 
   /////////////////// interface to Page
   bool FilerIsVisible(){return page_.GetViewMode() != ViewMode.TERMINAL;}
-  char[] GetPageID(){return page_.GetTab().GetID();}
-  void UpdatePathLabel(char[] path, int numItems){page_.UpdatePathLabel(path, numItems);}
-  void SetHostLabel(char[] p){page_.SetHostLabel(p);}
-  char[] GetHostLabel(){return page_.GetHostLabel();}
-  char[] GetCWDOtherSide(){return page_.GetCWDOtherSide();}
+  string GetPageID(){return page_.GetTab().GetID();}
+  void UpdatePathLabel(string path, int numItems){page_.UpdatePathLabel(path, numItems);}
+  void SetHostLabel(string p){page_.SetHostLabel(p);}
+  string GetHostLabel(){return page_.GetHostLabel();}
+  string GetCWDOtherSide(){return page_.GetCWDOtherSide();}
   void CloseThisPage(){page_.CloseThisPage();}
   bool OnLeftSide(){return page_.OnLeftSide();}
   /////////////////// interface to Page
@@ -98,21 +98,21 @@ public:
 
 
   /////////////////// interface to FileManager
-  char[] FilerGetPWD(bool b){return filer_.GetPWD(b);}
-  void FilerAppendToHistory(char[] dir){filer_.AppendToHistory(dir);}
-  char[] FilerCDToPrevious()// for "cd -"
+  string FilerGetPWD(bool b){return filer_.GetPWD(b);}
+  void FilerAppendToHistory(string dir){filer_.AppendToHistory(dir);}
+  string FilerCDToPrevious()// for "cd -"
   {
-    char[] previous = filer_.GetPreviousDir();
+    string previous = filer_.GetPreviousDir();
     if(previous.length > 0){
       filer_.ChangeDirectory(previous, true, false);
     }
     return previous;
   }
-  bool FilerChangeDirectory(char[] p, bool appendHistory = true, bool notifyTerminal = true)
+  bool FilerChangeDirectory(string p, bool appendHistory = true, bool notifyTerminal = true)
   {
     return filer_.ChangeDirectory(p, appendHistory, notifyTerminal);
   }
-  bool FilerChangeDirFromTerminal(char[] path)
+  bool FilerChangeDirFromTerminal(string path)
   {
     if(filer_.ChangeDirectory(path, true, false)){
       PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to file manager(" ~ GetPageID() ~ ")");
@@ -122,7 +122,7 @@ public:
       return false;
     }
   }
-  void UpdateDirTree(char[] dirname)
+  void UpdateDirTree(string dirname)
   {
     filer_.UpdateDirTree(dirname);
   }
@@ -134,27 +134,27 @@ public:
 
 
   /////////////////// interface to Terminal
-  void TerminalChangeDirectoryFromFiler(char[] p)
+  void TerminalChangeDirectoryFromFiler(string p)
   {
     // remove "/home/username/.gvfs/sftp ..." from p and pass it to the terminal
-    char[] path = fsys_.NativePath(p);
+    string path = fsys_.NativePath(p);
     term_.ChangeDirectoryFromFiler(path);
     PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to terminal(" ~ GetPageID() ~ ")");
   }
-  void TerminalQuitSSH(char[] pwd){term_.QuitSSH(pwd);}
+  void TerminalQuitSSH(string pwd){term_.QuitSSH(pwd);}
   /////////////////// interface to Terminal
 
 
 
   /////////////////// interface to FileSystem
   bool FileSystemIsRemote(){return fsys_.remote_;}
-  char[] FileSystemRoot(){return fsys_.rootDir_;}
-  char[] FileSystemHome(){return fsys_.homeDir_;}
-  char[] FileSystemNewPath(){return fsys_.homeDir_ is null ? fsys_.rootDir_ : fsys_.homeDir_;}
-  char[] FileSystemParentDirectory(char[] p){return fsys_.ParentDirectory(p);}
-  char[] FileSystemNativePath(char[] p){return fsys_.NativePath(p);}
-  char[] FileSystemMountedVFSPath(char[] path){return fsys_.MountedVFSPath(path);}
-  char[] FileSystemSetLocal(){return fsys_.SetLocal();}
-  bool FileSystemLookingAtRemoteFS(char[] p){return fsys_.LookingAtRemoteFS(p);}
+  string FileSystemRoot(){return fsys_.rootDir_;}
+  string FileSystemHome(){return fsys_.homeDir_;}
+  string FileSystemNewPath(){return fsys_.homeDir_ is null ? fsys_.rootDir_ : fsys_.homeDir_;}
+  string FileSystemParentDirectory(string p){return fsys_.ParentDirectory(p);}
+  string FileSystemNativePath(string p){return fsys_.NativePath(p);}
+  string FileSystemMountedVFSPath(string path){return fsys_.MountedVFSPath(path);}
+  string FileSystemSetLocal(){return fsys_.SetLocal();}
+  bool FileSystemLookingAtRemoteFS(string p){return fsys_.LookingAtRemoteFS(p);}
   /////////////////// interface to FileSystem
 }

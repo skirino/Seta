@@ -20,7 +20,8 @@ MA 02110-1301 USA.
 
 module config.known_hosts;
 
-private import tango.text.Util;
+//private import tango.text.Util;
+private import std.string;
 
 private import utils.string_util;
 private import rcfile = config.rcfile;
@@ -34,12 +35,12 @@ private SSHConnection[] temporalHosts_;
 SSHConnection[] GetKnownHosts(){return registeredHosts_;}
 
 
-char[][] GetHostsStringList()
+string[] GetHostsStringList()
 {
   return ToStringArray(registeredHosts_);
 }
 
-void Register(char[][] list)
+void Register(string[] list)
 {
   registeredHosts_.length = 0;
   foreach(host; list){
@@ -61,15 +62,18 @@ void Unregister(SSHConnection con)
   registeredHosts_ = temp;
 }
 
-bool HostIsLoggedIn(char[] username, char[] domain)
+bool HostIsLoggedIn(string username, string domain)
 {
   auto con = Find(username, domain);
   return (con !is null) && (con.IsUsed());
 }
 
-void Disconnect(char[] userDomain)
+void Disconnect(string userDomain)
 {
-  size_t posAtmark = locate(userDomain, '@');
+  //TODO
+  //size_t posAtmark = locate(userDomain, '@');
+  size_t posAtmark = 7;
+
   assert(posAtmark != userDomain.length);
 
   auto con = Find(userDomain[0 .. posAtmark], userDomain[posAtmark+1 .. $]);
@@ -93,7 +97,7 @@ void AddNewHost(SSHConnection con, bool save)
   }
 }
 
-SSHConnection Find(char[] username, char[] domain)
+SSHConnection Find(string username, string domain)
 {
   // if the host has been registered, return it
   foreach(host; registeredHosts_){

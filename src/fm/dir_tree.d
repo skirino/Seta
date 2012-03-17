@@ -35,7 +35,7 @@ private import gio.File;
 private import gio.FileInfo;
 private import glib.GException;
 
-private import tango.text.Util;
+//private import tango.text.Util;
 
 private import utils.vector;
 private import utils.template_util;
@@ -558,6 +558,8 @@ public:
 
 private string NextChildDirectory(string fullpath, string parent)
 {
-  size_t end = locate(fullpath, '/', parent.length);
-  return fullpath[0 .. end+1];
+  //TODO
+  //size_t end = locate(fullpath, '/', parent.length);
+  //return fullpath[0 .. end+1];
+  return fullpath;
 }

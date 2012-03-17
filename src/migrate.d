@@ -20,26 +20,29 @@ MA 02110-1301 USA.
 
 module migrate;
 
-private import tango.sys.Environment;
+//private import tango.sys.Environment;
+private import std.process;
 
-char[] getenv(char[] key)
+string getenv(string key)
 {
-  return Environment.get(key);
+  return getenv(key);
+  //return Environment.get(key);
 }
 
-char[][char[]] getenvall()
+string[string] getenvall()
 {
-  return Environment.get();
+  //environment.toAA();
+  return null;
 }
 
 
 
-size_t findElement(T)(T[] ts, T target)
+size_t findElement(const string[] ss, const string target)
 {
-  foreach(i, t; ts){
-    if(t == target){
+  foreach(i, s; ss){
+    if(s == target){
       return i;
     }
   }
-  return ts.length;
+  return ss.length;
 }

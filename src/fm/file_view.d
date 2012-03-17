@@ -44,12 +44,12 @@ private import gio.DesktopAppInfo;
 private import glib.GException;
 private import gtkc.gtk;
 
-private import tango.text.Util;
-private import tango.core.Thread;
+//private import tango.text.Util;
+//private import tango.core.Thread;
+private import core.thread;
 private import std.c.stdlib;
 
 private import utils.min_max;
-private import utils.bind;
 private import utils.time_util;
 private import utils.string_util;
 private import utils.gio_util;
@@ -333,7 +333,7 @@ private:
         // For the thread to finish its work, releasing GDK lock is necessary here
         gdkThreadsLeave();
         Thread.yield();
-        Thread.sleep(0.05);
+        Thread.sleep(500_000);
         gdkThreadsEnter();
       }
     }
@@ -413,7 +413,7 @@ private:
       File f = File.parseName(parentPath);
       FileInfo info = f.queryInfo("standard::is-symlink,unix::mode,owner::user,time::modified", GFileQueryInfoFlags.NONE, null);
       store_.set(
-        iter, cols,
+        iter, cast(int[])cols,
         [PARENT_STRING,
          GetDirectoryTypeDescription(),
          PluralForm!(int, "item")(CountNumEntries(parentPath)),
@@ -452,7 +452,7 @@ private:
       foreach(p; eList_.GetDSorted()[numRowsNow_ .. upper]){
         store_.append(iter);
         store_.set(
-          iter, cols,
+          iter, cast(int[])cols,
           [p.GetName(), GetDirectoryTypeDescription(), p.GetDirSize(), p.GetOwner(),
            p.GetPermission(), p.GetModified(), colors[p.GetDirColorType()]]);
       }
@@ -469,7 +469,7 @@ private:
       foreach(p; eList_.GetFSorted()[numRowsNow_ - entDSize .. upper]){
         store_.append(iter);
         store_.set(
-          iter, cols,
+          iter, cast(int[])cols,
           [p.GetName(), p.GetType(), p.GetFileSize(), p.GetOwner(),
            p.GetPermission(), p.GetModified(), colors[p.GetFileColorType()]]);
       }
@@ -508,7 +508,8 @@ private:
 
   void InitFileInfoAttributes()
   {
-    fileInfoAttributes_ = necessaryAttributes_ ~ ',' ~ optionalAttributes_.join(",");
+    //TODO
+    //fileInfoAttributes_ = necessaryAttributes_ ~ ',' ~ optionalAttributes_.join(",");
   }
 
   void ResetFileInfoAttributes()
@@ -881,7 +882,9 @@ private:
     try{
       RightClickMenu menu = new RightClickMenu(
         this, pwd_, GetNameFromPath(path), GetSelectedFileNames(),
-        bind(&(mediator_.FilerChangeDirectory), _0, true, true).ptr());
+        delegate bool(string s){
+          return mediator_.FilerChangeDirectory(s, true, true);
+        });
 
       // Passing eb.button as the 1st argument of menu.popup() is problematic,
       // since in that case the submenu cannot be simply activated.
