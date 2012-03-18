@@ -21,18 +21,15 @@ MA 02110-1301 USA.
 module utils.time_util;
 
 //private import tango.io.Stdout;
-//private import tango.stdc.posix.sys.time;
+import core.stdc.time;
+private import core.sys.posix.sys.time;
 private import std.stdio;
 
 
-
-//TODO
-/+
 scope class ScopeTimer
 {
 private:
   timeval start_;
-  ulong start_;
   const string message_;
 
 public:
@@ -47,14 +44,18 @@ public:
     timeval end;
     gettimeofday(&end, null);
     if (end.tv_usec < start_.tv_usec){
-      Stdout(end.tv_sec - start_.tv_sec - 1)("seconds + ")
-        (1000000 + end.tv_usec - start_.tv_usec)("microseconds elapsed : ")
-        (message_).newline;
+      writefln(
+        "%d seconds + %d microseconds elapsed : %s",
+        end.tv_sec - start_.tv_sec - 1,
+        1000000 + end.tv_usec - start_.tv_usec,
+        message_);
     }
     else {
-      Stdout(end.tv_sec - start_.tv_sec)("seconds + ")
-        (end.tv_usec - start_.tv_usec)("microseconds elapsed : ")
-        (message_).newline;
+      writefln(
+        "%d seconds + %d microseconds elapsed : %s",
+        end.tv_sec - start_.tv_sec,
+        end.tv_usec - start_.tv_usec,
+        message_);
     }
   }
 }
@@ -62,63 +63,52 @@ public:
 
 ulong GetCurrentTime()
 {
-  ulong ret = tango.stdc.time.time(null);
-  return ret;
+  return time(null);
 }
 
 
 string EpochTimeToString(ulong l)
 {
-  static char[16] ret;
+  char[16] ret;
 
   tm st;
-  auto t = cast(tango.stdc.time.time_t) l;
-  tango.stdc.posix.time.localtime_r(&t, &st);
+  auto t = cast(time_t) l;
+  core.sys.posix.time.localtime_r(&t, &st);
 
   // 1900 + st.tm_year represents the year
-  ret[0..4] = YEAR_1900_TO_2100[st.tm_year];
+  ret[0..4] = YEAR_1900_TO_2100[st.tm_year].dup;
   ret[4] = '-';
-  ret[5..7] = ZERO_TO_61[st.tm_mon+1];
+  ret[5..7] = ZERO_TO_61[st.tm_mon+1].dup;
   ret[7] = '/';
-  ret[8..10] = ZERO_TO_61[st.tm_mday];
+  ret[8..10] = ZERO_TO_61[st.tm_mday].dup;
   ret[10] = ' ';
-  ret[11..13] = ZERO_TO_61[st.tm_hour];
+  ret[11..13] = ZERO_TO_61[st.tm_hour].dup;
   ret[13] = ':';
-  ret[14..16] = ZERO_TO_61[st.tm_min];
+  ret[14..16] = ZERO_TO_61[st.tm_min].dup;
 
-  return ret[];// return slice of local buffer
+  return ret[].idup;// return slice of local buffer
 }
 
 string EpochTimeToStringSeconds(ulong l)
 {
-  static char[14] ret;
+  char[14] ret;
 
   tm st;
-  auto t = cast(tango.stdc.time.time_t) l;
-  tango.stdc.posix.time.localtime_r(&t, &st);
+  auto t = cast(time_t) l;
+  core.sys.posix.time.localtime_r(&t, &st);
 
-  ret[0..2] = ZERO_TO_61[st.tm_mon+1];
+  ret[0..2] = ZERO_TO_61[st.tm_mon+1].dup;
   ret[2] = '/';
-  ret[3..5] = ZERO_TO_61[st.tm_mday];
+  ret[3..5] = ZERO_TO_61[st.tm_mday].dup;
   ret[5] = ' ';
-  ret[6..8] = ZERO_TO_61[st.tm_hour];
+  ret[6..8] = ZERO_TO_61[st.tm_hour].dup;
   ret[8] = ':';
-  ret[9..11] = ZERO_TO_61[st.tm_min];
+  ret[9..11] = ZERO_TO_61[st.tm_min].dup;
   ret[11] = ':';
-  ret[12..14] = ZERO_TO_61[st.tm_sec];
+  ret[12..14] = ZERO_TO_61[st.tm_sec].dup;
 
-  return ret[];// return slice of local buffer
+  return ret[].idup;// return slice of local buffer
 }
-+/
-ulong GetCurrentTime(){return 0;}
-string EpochTimeToString(ulong l){return "test";}
-string EpochTimeToStringSeconds(ulong l){return "test";}
-
-
-
-
-
-
 
 
 private static const char[4][201] YEAR_1900_TO_2100 =

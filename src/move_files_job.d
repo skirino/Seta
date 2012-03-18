@@ -87,9 +87,9 @@ string[] MakeURIList(string dir, string[] files)
 
 
 /////////////////////// cut(copy) and paste
-private bool     storedMove;
-private string   storedDir;
-private string[] storedFiles;
+private __gshared bool     storedMove;
+private __gshared string   storedDir;
+private __gshared string[] storedFiles;
 private const string URI_MOVE = "action:move";
 
 void PreparePaste(bool moveMode, string dir, string[] files, FileView sourceView)

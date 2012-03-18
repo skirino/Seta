@@ -308,11 +308,7 @@ void AddSSHHost(SSHConnection con)
   string s = con.toStr!(true)();
   if(instance_.hasKey("SSH", "Hosts")){
     string older = instance_.getString("SSH", "Hosts");
-
-    //TODO
-    //string newer = trim(older) ~ ',' ~ s;
-    string newer = older ~ ',' ~ s;
-
+    string newer = trim(older) ~ ',' ~ s;
     instance_.setString("SSH", "Hosts", newer);
   }
   else{
@@ -333,11 +329,7 @@ void RemoveSSHHost(SSHConnection con)
     string[] hosts = split(older, ",");
     string[] newhosts;
     foreach(host; hosts){
-
-      //TODO
-      //string temp = trim(host);
-      string temp = host;
-
+      host = trim(host);
       scope con2 = new SSHConnection(host);
       if(!con2.Equals(con)){
         newhosts ~= host;
@@ -396,7 +388,7 @@ mixin(GetKeybindInString!("Terminal", "InputUserDefinedText9"));
 
 
 
-private SetaRCFile instance_;
+private __gshared SetaRCFile instance_;
 
 class SetaRCFile : KeyFile
 {
@@ -504,11 +496,7 @@ private:
     // check if entry is an existing directory
     bool setHomeDirL = true;
     if(hasKey("Directories", "InitialDirectoryLeft")){
-
-      //TODO
-      //string initialDir = trim(getString("Directories", "InitialDirectoryLeft"));
-      string initialDir = getString("Directories", "InitialDirectoryLeft");
-
+      string initialDir = trim(getString("Directories", "InitialDirectoryLeft"));
       scope f = GetFileForDirectory(initialDir);
       if(f !is null && CanEnumerateChildren(f)){
         setHomeDirL = false;
@@ -521,11 +509,7 @@ private:
 
     bool setHomeDirR = true;
     if(hasKey("Directories", "InitialDirectoryRight")){
-
-      //TODO
-      //string initialDir = trim(getString("Directories", "InitialDirectoryRight"));
-      string initialDir = getString("Directories", "InitialDirectoryRight");
-
+      string initialDir = trim(getString("Directories", "InitialDirectoryRight"));
       scope f = GetFileForDirectory(initialDir);
       if(f !is null && CanEnumerateChildren(f)){
         setHomeDirR = false;

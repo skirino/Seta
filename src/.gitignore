@@ -1,2 +1,4 @@
 seta
 dsss_objs
+*.o
+**/*.o

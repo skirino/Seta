@@ -114,12 +114,12 @@ public:
     return th_.GetThreadListLabel(StartTimeStr());
   }
 
-  int opCmp(Object rhs){return cast(int)(timeStart_ - (cast(ThreadInfo)rhs).timeStart_);}
+  override int opCmp(Object rhs){return cast(int)(timeStart_ - (cast(ThreadInfo)rhs).timeStart_);}
 }
 
 
 // Global list of working threads. Only the main thread can safely modify the list.
-private Vector!(ThreadInfo) list;
+private __gshared Vector!(ThreadInfo) list;
 
 void Init()
 {

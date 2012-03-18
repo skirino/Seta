@@ -66,8 +66,6 @@ public:
     // read /etc/passwd
     string line = LineInFileWhichStartsWith(getUsername() ~ ':', gvfsRoot ~ "etc/passwd");
     if(line !is null){
-      //TODO
-      /+
       size_t end   = locatePrior(line, ':');
       size_t start = locatePrior(line, ':', end);
       string home  = line[start+1 .. end] ~ '/';
@@ -81,7 +79,6 @@ public:
 
         shellSetting_ = new shellrc.ShellSetting(homeDir_, shell);
       }
-      +/
     }
   }
 
@@ -135,10 +132,8 @@ public:
 
   this(string line)
   {
-    //TODO
-    //string[] userDomainHome = TrimAll(tango.text.Util.split!(char)(line, ":"));
-    //this(userDomainHome);
-    this([line]);
+    string[] userDomainHome = TrimAll(line.split(":"));
+    this(userDomainHome);
   }
 
   string GetUserDomain()

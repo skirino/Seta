@@ -77,9 +77,7 @@ public:
 
   bool LookingAtRemoteFS(string pwd)
   {
-    //TODO
-    //return remote_ || containsPattern(pwd, "/.gvfs/sftp");
-    return remote_;
+    return remote_ || containsPattern(pwd, "/.gvfs/sftp");
   }
 
   string ParentDirectory(string path)
@@ -115,16 +113,13 @@ private:
   string GetHomeDirFrom_etc_passwd(string username)
   {
     string line = LineInFileWhichStartsWith(username ~ ':', rootDir_ ~ "etc/passwd");
-    if(line !is null){
-      //TODO
-      //size_t end   = locatePrior(line, ':');
-      //size_t start = locatePrior(line, ':', end);
-      //return line[start+1 .. end] ~ '/';
-      return line;
-    }
-    else{
+    if(line is null){
       return null;
     }
+
+    size_t end   = locatePrior(line, ':');
+    size_t start = locatePrior(line, ':', end);
+    return line[start+1 .. end] ~ '/';
   }
 }
 

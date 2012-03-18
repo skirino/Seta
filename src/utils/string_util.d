@@ -58,8 +58,7 @@ string[] TrimAll(string[] l)
   string[] ret;
   ret.length = l.length;
   foreach(i, e; l){
-    //TODO
-    //ret[i] = trim(e);
+    ret[i] = trim(e);
   }
   return ret;
 }
@@ -83,7 +82,7 @@ int StrCmp(string s1, string s2)
 // width in pixel of a text displayed in a GtkLabel
 int GetTextWidth(string text)
 {
-  static Label l;
+  static __gshared Label l;
   if(l is null){
     l = new Label("");
   }
@@ -137,21 +136,16 @@ bool EndsWith(string s1, string s2)
 
 void EachLineInFile(string filename, bool delegate(string) f)
 {
-  //TODO
-  /+
   try{
-    scope file = new tango.io.device.File.File(filename);
-    scope lines = new Lines!(char)(file);
-    foreach(line; lines){
-      bool continueLoop = f(line);
+    scope file = File(filename);
+    foreach(line; file.byLine()){
+      bool continueLoop = f(line.idup);
       if(!continueLoop){
         break;
       }
     }
-    file.close();
   }
   catch(Exception ex){}// no such file or permission denied
-  +/
 }
 
 
@@ -197,13 +191,9 @@ string GetBasename(string path)
     return path;
   }
   else{
-    // TODO
-    /+
     size_t pos = locatePrior(path, '/', path.length-1);
     assert(pos != path.length);
     return path[pos+1..$];
-    +/
-    return null;
   }
 }
 
@@ -212,54 +202,50 @@ string ExpandPath(string path, string root)
 {
   assert(path[0] == '/');
   assert(path[$-1] == '/');
+  char[] ret = path.dup;
 
-  //TODO
-  /+
   // first obtain an absolute path from the root directory
   // replace "////..." to "/"
-  while(containsPattern(path, "//")){
-    path = substitute(path, "//", "/");
+  while(containsPattern(ret, "//")){
+    ret = substitute(ret, "//", "/");
   }
 
   // replace "/./" before "/../"
-  while(containsPattern(path, "/./")){
-    path = substitute(path, "/./", "/");
+  while(containsPattern(ret, "/./")){
+    ret = substitute(ret, "/./", "/");
   }
 
   // if "/path/to/somewhere/../" is found replace with its parent directory
   size_t pos;
-  while((pos = path.locatePattern("/../")) != path.length){
-    string parent = ParentDirectory(path[0..pos+1], root);
-    path = parent ~ path[pos+4..$];
+  while((pos = ret.locatePattern("/../")) != ret.length){
+    string parent = ParentDirectory(ret[0..pos+1].idup, root);
+    ret = parent ~ ret[pos+4..$];
   }
 
-  // now "path" becomes an absolute path.
+  // now "ret" becomes an absolute path.
   // next substitute escaped chars into original ones
-  path = UnescapeSpecialChars(path);
+  ret = UnescapeSpecialChars(ret.idup).dup;
 
-  // "path" should start with "root".
-  // if not, "path" is modified as "root" ~ "path"
-  if(!path.StartsWith(root)){
-    path = root[0 .. $-1] ~ path;// remove '/' at the last of "root"
+  // "ret" should start with "root".
+  // if not, "ret" is modified as "root" ~ "ret"
+  if(!ret.idup.StartsWith(root)){
+    ret = root[0 .. $-1] ~ ret;// remove '/' at the last of "root"
   }
 
-  return path;
-  +/
-  return path;
+  return ret.idup;
 }
 
 
 // backslash should be the first entry
-private static string SpecialChars = "\\!\"$&\'()~=|`{}[]*:;<>?, ";
+private static const string SpecialChars = "\\!\"$&\'()~=|`{}[]*:;<>?, ";
 
 string EscapeSpecialChars(string input)
 {
-  string ret = input;
+  char[] ret = input.dup;
   foreach(c; SpecialChars){
-    //TODO
-    //ret = substitute(ret, "" ~ c, "\\" ~ c);
+    ret = ret.substitute("" ~ c, "\\" ~ c);
   }
-  return ret;
+  return ret.idup;
 }
 
 
@@ -319,11 +305,9 @@ string Extract1stArg(string args)
   }
   else{
     size_t posSpace = FindUnescapedChar(replaced, ' ');
-    //TODO
-    //size_t posNewline = locate(replaced, '\n');
-    //size_t posSemicolon = FindUnescapedChar(replaced, ';');
-    //return replaced[0 .. Min(posSpace, posNewline, posSemicolon)];
-    return null;
+    size_t posNewline = locate(replaced, '\n');
+    size_t posSemicolon = FindUnescapedChar(replaced, ';');
+    return replaced[0 .. Min(posSpace, posNewline, posSemicolon)];
   }
 }
 
@@ -457,3 +441,210 @@ string RemovePercentBrace(string s)
 
   return ret;
 }
+
+
+
+
+// tango compatibility layer
+C[] triml(C)(C[] s)
+{
+  foreach(i, c; s){
+    if(!isWhite(c)){
+      return s[i .. $];
+    }
+  }
+  return "";
+}
+
+C[] trimr(C)(C[] s)
+{
+  for(int i=s.length-1; i>=0; --i){
+    if(!isWhite(s[i])){
+      return s[0 .. i+1];
+    }
+  }
+  return "";
+}
+
+C[] trim(C)(C[] s)
+{
+  return s.triml().trimr();
+}
+
+
+unittest
+{
+  assert("" == triml(""));
+  assert("" == trimr(""));
+  assert("" == trim(""));
+
+  string x = "abcあいう";
+  assert(x == x.triml());
+  assert(x == x.trimr());
+  assert(x == x.trim());
+
+  string y = "  abcあいう  ";
+  assert("abcあいう  " == y.triml());
+  assert("  abcあいう" == y.trimr());
+  assert("abcあいう"   == y.trim());
+
+  string z = "   ";
+  assert("", x.triml());
+  assert("", x.trimr());
+  assert("", x.trim());
+}
+
+
+
+C[] substitute(C)(const(C)[] s, const(C)[] from, const(C)[] to)
+{
+  if(from.length == 0){
+    return s.dup;
+  }
+
+  C[] p;
+  size_t istart = 0;
+  while(istart < s.length){
+    auto i = indexOf(s[istart .. s.length], from);
+    if(i == -1){
+      p ~= s[istart .. s.length];
+      break;
+    }
+    p ~= s[istart .. istart + i];
+    p ~= to;
+    istart += i + from.length;
+  }
+  return p;
+}
+
+unittest
+{
+  string x = "abcあいうabc123abc";
+  assert(x == x.substitute("",   "def"));
+  assert(x == x.substitute("nohit", "def"));
+
+  // Should accept both mutable and immutable strings
+  assert("defあいうdef123def", x    .substitute("abc",     "def"));
+  assert("defあいうdef123def", x.dup.substitute("abc",     "def"));
+  assert("defあいうdef123def", x    .substitute("abc".dup, "def"));
+  assert("defあいうdef123def", x.dup.substitute("abc".dup, "def"));
+  assert("defあいうdef123def", x    .substitute("abc".dup, "def".dup));
+  assert("defあいうdef123def", x.dup.substitute("abc".dup, "def".dup));
+
+  // Should substitute multibyte chars
+  assert("abcえおabc123abc", x.substitute("あいう", "えお"));
+}
+
+
+
+private immutable string LocateFunctionBody =
+"
+  if(start >= source.length)
+    return source.length;
+
+  auto i = source[start .. $].indexOf(match);
+  if(i == -1)
+    return source.length;
+  else
+    return i + start;
+";
+
+size_t locate(C1, C2)(const(C1)[] source, const(C2) match, size_t start = 0)
+{
+  mixin(LocateFunctionBody);
+}
+size_t locatePattern(C)(const(C)[] source, const(C)[] match, size_t start = 0)
+{
+  mixin(LocateFunctionBody);
+}
+
+unittest
+{
+  string x = "abcあいう123";
+  assert(0        == x.locate('a'));
+  assert(0        == x.dup.locate('a'));
+  assert(6        == x.locate('い')); // 'あ' is 3-byte character in UTF-8
+  assert(6        == x.dup.locate('い'));
+  assert(x.length == x.locate('x'));
+  assert(x.length == x.locate('x', 100));
+  assert(x.length == x.locate('a', 1));
+  assert(x.length == x.locate('a', 100));
+  assert(2        == x.locate('c', 1));
+
+  assert(0        == x.locatePattern("abc"));
+  assert(0        == x.dup.locatePattern("abc"));
+  assert(3        == x.locatePattern("あいう"));
+  assert(1        == x.locatePattern("bcあ"));
+  assert(x.length == x.locatePattern("xyz"));
+}
+
+
+
+private immutable string LocatePriorFunctionBody =
+"
+  if(start >= source.length)
+    start = source.length;
+
+  auto i = source[0 .. start].lastIndexOf(match);
+  if(i == -1)
+    return source.length;
+  else
+    return i;
+";
+
+size_t locatePrior(C1, C2)(const(C1)[] source, const(C2) match, size_t start = size_t.max)
+{
+  mixin(LocatePriorFunctionBody);
+}
+size_t locatePatternPrior(C)(const(C)[] source, const(C)[] match, size_t start = size_t.max)
+{
+  mixin(LocatePriorFunctionBody);
+}
+
+unittest
+{
+  string x = "abcあいう123";
+  assert(x.length == x.locatePrior('x'));
+  assert(x.length == x.dup.locatePrior('x'));
+  assert(x.length == x.locatePrior('x', 5));
+  assert(0        == x.locatePrior('a'));
+  assert(0        == x.locatePrior('a', 13));
+  assert(6        == x.locatePrior('い'));
+  assert(6        == x.locatePrior('い', 13));
+  assert(13       == x.locatePrior('2'));
+  assert(x.length == x.locatePrior('2', 13));
+
+  assert(0        == x.locatePatternPrior("abc"));
+  assert(0        == x.dup.locatePatternPrior("abc"));
+  assert(3        == x.locatePatternPrior("あいう"));
+  assert(1        == x.locatePatternPrior("bcあ"));
+  assert(x.length == x.locatePatternPrior("xyz"));
+}
+
+
+
+bool contains(C1, C2)(const(C1)[] source, const(C2) match)
+{
+  return source.locate(match) != source.length;
+}
+bool containsPattern(C)(const(C)[] source, const(C)[] match)
+{
+  return source.locatePattern(match) != source.length;
+}
+
+unittest
+{
+  string x = "abcあいう123";
+  assert(x.contains('a'));
+  assert(x.dup.contains('a'));
+  assert(x.contains('あ'));
+  assert(!x.contains('x'));
+
+  assert(x.containsPattern("abc"));
+  assert(x.dup.containsPattern("abc"));
+  assert(!x.containsPattern("xyz"));
+}
+
+
+
+

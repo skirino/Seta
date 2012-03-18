@@ -240,7 +240,7 @@ string FileSizeInStr(long n)
 
 string PermissionInStr(uint mode, bool isSymlink)
 {
-  static char[10] ret;
+  static __gshared char[10] ret;
 
   if(isSymlink){
     ret[0] = 'l';
@@ -252,23 +252,20 @@ string PermissionInStr(uint mode, bool isSymlink)
     ret[0] = '-';
   }
 
-  //TODO
-  /+
-  ret[1..4]  = RWX[(mode & S_IRWXU)/64];
+  ret[1..4]  = RWX[(mode & S_IRWXU)/64].dup;
   if(mode & S_ISUID){
     ret[3] = ret[3] == 'x' ? 's' : 'S';
   }
 
-  ret[4..7]  = RWX[(mode & S_IRWXG)/8];
+  ret[4..7]  = RWX[(mode & S_IRWXG)/8].dup;
   if(mode & S_ISGID){
     ret[6] = ret[6] == 'x' ? 's' : 'S';
   }
 
-  ret[7..10] = RWX[(mode & S_IRWXO)];
+  ret[7..10] = RWX[(mode & S_IRWXO)].dup;
   if(mode & S_ISVTX){
     ret[9] = ret[9] == 'x' ? 't' : 'T';
   }
-  +/
 
   return ret.idup;
 }

@@ -32,7 +32,7 @@ private import thread_list;
 private import seta_window;
 
 
-void Initialize()
+private void Initialize()
 {
   constants.Init();
   config.init.Init();
@@ -42,7 +42,7 @@ void Initialize()
 }
 
 
-void Finalize()
+private void Finalize()
 {
   thread_list.Finish();
   anything_cd.init.Finish();

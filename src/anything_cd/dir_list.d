@@ -26,6 +26,7 @@ private import gdk.Window;
 
 //private import tango.core.Thread;
 private import core.thread;
+import std.stdio;
 
 private import migrate;
 private import utils.vector;
@@ -55,7 +56,7 @@ void Scan()
 void Remove(string dir)
 {
   auto home = getenv("HOME");
-  if(dir.StartsWith(dir)){
+  if(dir.StartsWith(home)){
     dir = '~' ~ dir[home.length .. $];
   }
   instance_.Remove(dir);
@@ -74,8 +75,8 @@ void Finish()
 ///////////// public interfaces of this module
 
 
-private DirList instance_;
-private ScanHomeDirectoryJob thread_;
+private __gshared DirList instance_;
+private __gshared ScanHomeDirectoryJob thread_;
 
 
 class DirListBase
@@ -109,14 +110,10 @@ public:
 
   void Save()
   {
-    //TODO
-    /+
-    scope file = new tango.io.device.File.File(filename_, tango.io.device.File.File.WriteCreate);
+    scope file = File(filename_, "w");
     foreach(path; list_.array()){
-      file.write(path ~ '\n');
+      file.writeln(path);
     }
-    file.close();
-    +/
   }
 
   void Remove(string dir)
@@ -139,14 +136,14 @@ public:
     Load();
   }
 
-  void Save()
+  override void Save()
   {
     if(changed_){
       super.Save();
     }
   }
 
-  void Remove(string dir)
+  override void Remove(string dir)
   {
     super.Remove(dir);
     changed_ = true;

@@ -48,6 +48,7 @@ private import gtkc.gtk;
 //private import tango.core.Thread;
 private import core.thread;
 private import std.c.stdlib;
+import std.string;
 
 private import utils.min_max;
 private import utils.time_util;
@@ -508,8 +509,7 @@ private:
 
   void InitFileInfoAttributes()
   {
-    //TODO
-    //fileInfoAttributes_ = necessaryAttributes_ ~ ',' ~ optionalAttributes_.join(",");
+    fileInfoAttributes_ = necessaryAttributes_ ~ ',' ~ std.string.join(optionalAttributes_.dup, ",");
   }
 
   void ResetFileInfoAttributes()
@@ -914,7 +914,7 @@ private:
   ////////////////////// drag and drop
 private:
   DraggingState draggingState_;
-  static int dragStartButton_;
+  static __gshared int dragStartButton_;
   int dragStartX_;
   int dragStartY_;
   bool selectionDoneWhenPressed_;

@@ -48,6 +48,7 @@ private import gtk.Menu;
 private import gtk.MenuItem;
 
 //private import tango.text.Util;
+import std.string;
 
 private import utils.gio_util;
 private import utils.string_util;
@@ -161,13 +162,9 @@ private:
         foreach(code; codes){
           scope iter = keyStore_.append(categories_[x]);
           // set Action and Key
-
-          //TODO
-          /+
           keyStore_.set(iter, [1, 2], [key[key.locate('.')+1 .. $], code.toString()]);
           // set Key-cell to be editable
           keyStore_.setValue(iter, 3, 1);
-          +/
         }
       }
     }
@@ -485,9 +482,6 @@ private:
 
     // check whether replace targets have "<n>"
     string targetL = entReplaceTargetLeft_.getText();
-
-    //TODO
-    /+
     if(targetL.containsPattern("<n>")){
       changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetLeft" , targetL);
     }
@@ -501,7 +495,6 @@ private:
     else{
       PopupBox.error(targetR ~ " is neglected since the signature for replace should contain \"<n>\".", "");
     }
-    +/
 
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText1", entUserDefinedText1_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText2", entUserDefinedText2_.getText());
@@ -594,9 +587,6 @@ private:
     TreeIter iter = new TreeIter;
     iter.setModel(shortcutsStore_);
     if(shortcutsStore_.getIterFirst(iter)){// ListStore is not empty
-
-      //TODO
-      /+
       string[] invalidPaths;
       do{
         string label = trim(iter.getValueString(0));
@@ -621,7 +611,6 @@ private:
           (invalidPaths.length == 1 ? " does not exist and is" : " do not exist and are") ~
           " neglected.", "error");
       }
-      +/
     }
 
     rcfile.ResetShortcuts(list);
@@ -739,9 +728,6 @@ private:
     TreeIter iter = new TreeIter;
     iter.setModel(hostsStore_);
     if(hostsStore_.getIterFirst(iter)){// ListStore is not empty
-
-      //TODO
-      /+
       do{
         string[] items;
         for(uint i=0; i<5; ++i){
@@ -750,7 +736,6 @@ private:
         list ~= join(items, ":");
       }
       while(hostsStore_.iterNext(iter));
-      +/
     }
 
     rcfile.ResetRemoteHosts(list);

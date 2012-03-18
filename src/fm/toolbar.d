@@ -387,9 +387,7 @@ private:
 
       // if the remote host is still accessed via ssh, skip
       if(name.StartsWith("sftp (")){
-        //TODO
-        //size_t posAtmark = locate(name, '@');
-        size_t posAtmark = 7;
+        size_t posAtmark = locate(name, '@');
         assert(posAtmark != name.length);
         string user   = name[6 .. posAtmark];
         string domain = name[posAtmark+1 .. $-1];
@@ -413,12 +411,9 @@ private:
   void UnmountMedia(MenuItem item, string path)
   {
     // change directory of all pages showing dirs under "path"
-    //TODO
-    /+
     if(path.containsPattern("/.gvfs/sftp ")){
       page_list.NotifyFilerDisconnect(path, path);
     }
-    +/
     page_list.NotifyEscapeFromPath(path);
 
     if(!UnmountByPath(path)){// "path" not found in monitored volumes, just remove the "item"

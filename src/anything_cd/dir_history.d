@@ -56,7 +56,7 @@ void Finish()
 ///////////// public interfaces of this module
 
 
-private DirHistory instance_;
+private __gshared DirHistory instance_;
 
 
 private class DirHistory : DirListBase

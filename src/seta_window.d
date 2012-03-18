@@ -40,7 +40,7 @@ class SetaWindow : MainWindow
 {
   ///////////////////////// GUI stuff
 private:
-  static SetaWindow singleton_;
+  static __gshared SetaWindow singleton_;
 
   HPaned hpaned_;
   SetaStatusbar statusbar_;

@@ -97,17 +97,10 @@ private KeyCode ParseKeyCode(string s, uint action)
 KeyCode[] ParseKeyCodeList(string s, uint action)
 {
   KeyCode[] ret;
-
-  //TODO
-  //string[] list = delimit(s, ",");
-  string[] list = [s];
+  auto list = split(s, ",");
 
   foreach(x; list){
-
-    //TODO
-    //KeyCode code = ParseKeyCode(trim(x), action);
-    KeyCode code = ParseKeyCode(x, action);
-
+    KeyCode code = ParseKeyCode(trim(x), action);
     if(code.IsValid()){
       ret ~= code;
     }
@@ -155,7 +148,7 @@ private struct MapKeyAction
 }
 
 
-private MapKeyAction[4] keymaps;
+private __gshared MapKeyAction[4] keymaps;
 private const uint idxMainWindow  = 0;
 private const uint idxFileManager = 1;
 private const uint idxFileView    = 2;

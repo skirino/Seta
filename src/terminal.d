@@ -223,10 +223,7 @@ private:
           text = ReplaceLRDIR(text);
         }
 
-        //TODO
-        //string replaced = text.substitute("\\n", "\n");
-        string replaced = text;
-
+        string replaced = text.substitute("\\n", "\n").idup;
         FeedChild(replaced);
       }
       return true;
@@ -285,9 +282,7 @@ public:
 
   void ChangeDirectoryOfFilerFromCommandLine(string replacedCommand)
   {
-    //TODO
-    //string command = trim(replacedCommand);
-    string command = replacedCommand;
+    string command = trim(replacedCommand);
 
     // aliases
     if(shellSetting_ !is null){
@@ -309,9 +304,7 @@ public:
     }
 
     if(command.StartsWith("cd")){
-      //TODO
-      //string args = triml(command[2..$]);
-      string args = command[2..$];
+      string args = triml(command[2..$]);
 
       if(args.length == 0){// to $HOME
         string home = mediator_.FileSystemHome();
@@ -444,18 +437,12 @@ private:
 
   string GetLastCommand()
   {
-    //TODO
-    //string text = trimr(GetText());
-    string text = GetText();
-
-    //TODO
-    //size_t indexCompName = locatePatternPrior(text, prompt_);
-    size_t indexCompName = text.length;
+    string text = trimr(GetText());
+    size_t indexCompName = locatePatternPrior(text, prompt_);
 
     if(indexCompName == text.length){
       return null;
     }
-    /+
     else{
       string diff = text[indexCompName .. $];
       size_t indexPrompt = locatePattern(diff, "$ ");
@@ -490,7 +477,6 @@ private:
         }
       }
     }
-    +/
     return null;
   }
   /////////////////// manipulate text in vte terminal
@@ -504,18 +490,15 @@ private:
 
   void ResetReplaceTargets(string targetLDIR, string targetRDIR)
   {
-    //TODO
-    /+
-    targetsL_[0] = substitute(targetLDIR, "<n>", "");
+    targetsL_[0] = substitute(targetLDIR, "<n>", "").idup;
     for(uint i=1; i<10; ++i){
-      targetsL_[i] = substitute(targetLDIR, "<n>", Str.toString(i));
+      targetsL_[i] = substitute(targetLDIR, "<n>", Str.toString(i)).idup;
     }
 
-    targetsR_[0] = substitute(targetRDIR, "<n>", "");
+    targetsR_[0] = substitute(targetRDIR, "<n>", "").idup;
     for(uint i=1; i<10; ++i){
-      targetsR_[i] = substitute(targetRDIR, "<n>", Str.toString(i));
+      targetsR_[i] = substitute(targetRDIR, "<n>", Str.toString(i)).idup;
     }
-    +/
   }
 
   string ReplaceDIR(char LR)(string line)
@@ -531,15 +514,12 @@ private:
 
     // this code might have performance problem
     foreach(i, target; targets){
-      //TODO
-      /+
       if(containsPattern(line, target)){
         string replace = getCWDLR_(LR, i);
         if(replace !is null){
-          ret = substitute(ret, target, EscapeSpecialChars(replace));
+          ret = substitute(ret, target, EscapeSpecialChars(replace)).idup;
         }
       }
-      +/
     }
 
     return ret;
@@ -617,9 +597,7 @@ private:
         // check whether password is being asked
         tcgetattr(term_.pty_, &tios);
         if(AskingPassword(&tios)){
-          //TODO
-          //string lastLine = splitLines(trim(term_.GetText()))[$-1];
-          string lastLine = term_.GetText();
+          string lastLine = splitLines(trim(term_.GetText()))[$-1];
 
           if(lastLine.EndsWith("id_rsa':")){
             // assumes that the password for rsa authentication is the same as the one for remote login

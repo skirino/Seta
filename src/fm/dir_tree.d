@@ -558,8 +558,6 @@ public:
 
 private string NextChildDirectory(string fullpath, string parent)
 {
-  //TODO
-  //size_t end = locate(fullpath, '/', parent.length);
-  //return fullpath[0 .. end+1];
-  return fullpath;
+  size_t end = locate(fullpath, '/', parent.length);
+  return fullpath[0 .. end+1];
 }

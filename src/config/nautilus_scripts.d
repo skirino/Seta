@@ -34,7 +34,7 @@ class NautilusScript
 
   string GetPath(){return path_;}
   string GetName(){return GetBasename(path_);}
-  int opCmp(Object rhs)
+  override int opCmp(Object rhs)
   {
     return StrCmp(path_, (cast(NautilusScript)rhs).path_);
   }
@@ -75,7 +75,7 @@ class ScriptsDir
   }
 
   string GetName(){return GetBasename(path_);}
-  int opCmp(Object rhs)
+  override int opCmp(Object rhs)
   {
     return StrCmp(path_, (cast(ScriptsDir)rhs).path_);
   }
@@ -87,7 +87,7 @@ class ScriptsDir
 }
 
 
-private ScriptsDir top;
+private __gshared ScriptsDir top;
 ScriptsDir GetScriptsDirTop(){return top;}
 
 

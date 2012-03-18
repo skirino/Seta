@@ -33,7 +33,7 @@ private import thread_list;
 private import note;
 
 
-private SetaStatusbar statusbarInstance;
+private __gshared SetaStatusbar statusbarInstance;
 
 
 SetaStatusbar InitStatusbar(Note noteL, Note noteR)

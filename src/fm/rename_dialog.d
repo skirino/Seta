@@ -62,9 +62,7 @@ void RenameFiles(string dir, string[] infiles)
 {
   string[] files;
 
-  //TODO
-  //if(dir.containsPattern("/.gvfs/sftp")){// remote
-  if(false){// remote
+  if(dir.containsPattern("/.gvfs/sftp")){// remote
     // try renaming all files since "access::can-rename" is not accurate for remote files
     files = infiles;
   }
@@ -99,22 +97,16 @@ void RenameFiles(string dir, string[] infiles)
 
         // check whether "newname" contains slash or not
         if(file[$-1] == '/'){// directory
-          //TODO
-          /+
           if(newname[0 .. $-1].contains('/')){// && has slash
             PopupBox.error("Cannot rename " ~ file ~ " to " ~ newname, "error");
             continue;
           }
-          +/
         }
         else{// file
-          //TODO
-          /+
           if(newname.contains('/')){
             PopupBox.error("Cannot rename " ~ file ~ " to " ~ newname, "error");
             continue;
           }
-          +/
         }
 
         // now "newname" is free from slash-issue
@@ -359,8 +351,6 @@ private class RenameDialog : Dialog
     map_.textApp_ = eapp_.getText();
 
     // check slash
-    //TODO
-    /+
     if(map_.textSearch_.contains('/') ||
        map_.textReplace_.contains('/') ||
        map_.textPre_.contains('/') ||
@@ -368,7 +358,6 @@ private class RenameDialog : Dialog
       SetErrorLabel("Cannot rename: slashes are not supported");
       return;
     }
-    +/
 
     if(map_.textSearch_.length == 0){// no search & replace
       RenameForeach!(Default)();
@@ -461,21 +450,15 @@ private class RenameDialog : Dialog
         return ret;
       }
       else if(ReplaceType == ReplaceStringAll){
-        //TODO
-        //return substitute(name, textSearch_, textReplace_);
-        return name;
+        return substitute(name, textSearch_, textReplace_).idup;
       }
       else if(ReplaceType == ReplaceStringFirst ||
               ReplaceType == ReplaceStringLast){
         static if(ReplaceType == ReplaceStringFirst){
-          //TODO
-          //size_t idx = locatePattern(name, textSearch_);
-          size_t idx = name.length;
+          size_t idx = locatePattern(name, textSearch_);
         }
         else{// ReplaceStringLast
-          //TODO
-          //size_t idx = locatePatternPrior(name, textSearch_);
-          size_t idx = name.length;
+          size_t idx = locatePatternPrior(name, textSearch_);
         }
 
         if(idx == name.length){// no match
@@ -544,21 +527,15 @@ private class RenameDialog : Dialog
       string name = iter.getValueString(0);
       if(name[$-1] == '/'){
         newName = AppendSlash(newName);
-        //TODO
-        /+
         if(!newName[0 .. $-1].contains('/')){
           store_.setValue(iter, 1, newName);
         }
-        +/
       }
       else{
         newName = RemoveSlash(newName);
-        //TODO
-        /+
         if(!newName.contains('/')){
           store_.setValue(iter, 1, newName);
         }
-        +/
       }
     }
   }

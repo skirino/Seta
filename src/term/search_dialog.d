@@ -167,10 +167,10 @@ private:
 
 
   //////////////// remember settings used at last time
-  static string[] searchTextHistory = [];
-  static int ignoreCases = 0;
-  static int backwardDirection = 0;
-  static int overwrappedSearch = 0;
+  static __gshared string[] searchTextHistory = [];
+  static __gshared int ignoreCases = 0;
+  static __gshared int backwardDirection = 0;
+  static __gshared int overwrappedSearch = 0;
 
   void ApplySettings()
   {

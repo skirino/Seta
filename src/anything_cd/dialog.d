@@ -257,10 +257,7 @@ private:
   {
     WaitStopIfRunning();
 
-    //TODO
-    //string text = trim(entry_.getText());
-    string text = entry_.getText();
-
+    string text = entry_.getText().trim();
     if(text is null || text.length == 0){
       InitFilteredCandidates();
     }

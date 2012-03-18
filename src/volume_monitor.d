@@ -111,7 +111,7 @@ private:
   }
 }
 
-private MountedVolumeMonitor monitorInstance;
+private __gshared MountedVolumeMonitor monitorInstance;
 
 
 void Init()

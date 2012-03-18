@@ -26,6 +26,7 @@ private import gdk.Threads;
 //private import tango.core.Thread;
 private import core.thread;
 //private import tango.text.Unicode;
+import std.string;
 
 private import utils.min_max;
 private import utils.string_util;
@@ -91,17 +92,11 @@ public:
     mixin(ReturnIfCanceled);
 
     string[] words = [];
-
-    //TODO
-    /+
-    foreach(word; targetText_.toLower().delimit(" ")){
+    foreach(word; toLower(targetText_).split()){
       if(word.length > 0){
         words ~= word;
       }
     }
-    +/
-    words = [targetText_];
-
 
     // process paths PER_PAGE and check cancel flag at start of page
     auto pathsFromHistory = new Vector!(string)(MaxNumberOfPathsFromHistory);
@@ -115,7 +110,7 @@ public:
         size_t start = pageIndex * PER_PAGE;
         size_t end   = Min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
-          if(dirlist[i].containsStrings(words)){
+          if(dirlist[i].containsWords(words)){
             pathsFromHistory.append(dirlist[i]);
           }
         }
@@ -133,7 +128,7 @@ public:
         size_t start = pageIndex * PER_PAGE;
         size_t end   = Min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
-          if(dirlist[i].containsStrings(words)){
+          if(dirlist[i].containsWords(words)){
             pathsFromList.append(dirlist[i]);
           }
         }
@@ -167,16 +162,13 @@ private:
 }
 
 
-private bool containsStrings(string targetStr, string[] words)
+private bool containsWords(string targetStr, string[] words)
 {
-  bool ret = true;
-
-  //TODO
-  /+
   string str = targetStr.toLower();
   foreach(word; words){
-    ret &= str.containsPattern(word);
+    if(!str.containsPattern(word)){
+      return false;
+    }
   }
-  +/
-  return ret;
+  return true;
 }

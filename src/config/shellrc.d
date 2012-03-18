@@ -27,7 +27,7 @@ private import migrate;
 private import utils.string_util;
 
 
-private ShellSetting localhostShell_;
+private __gshared ShellSetting localhostShell_;
 ShellSetting GetLocalShellSetting(){return localhostShell_;}
 void Init()
 {
@@ -57,8 +57,6 @@ public:
       return;// there's nothing I can do
     }
 
-    //TODO
-    /+
     // obtain fullpaths to the shell's rc file
     uint possh    = shell.locatePattern("sh");
     uint posslash = shell.locatePrior('/', possh);
@@ -66,9 +64,6 @@ public:
       return;
     }
     string shelltype = shell[posslash+1 .. possh+2];
-    +/
-    string shelltype = shell;
-
 
     string[] filenames =
       [
@@ -97,8 +92,6 @@ private:
   {
     string[] fileList;
 
-    //TODO
-    /+
     EachLineInFile(filename, delegate bool(string line){
         string l = trim(line);
 
@@ -143,7 +136,6 @@ private:
 
         return true;// continue reading this file
       });
-    +/
     return fileList;
   }
 }

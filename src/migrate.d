@@ -25,14 +25,13 @@ private import std.process;
 
 string getenv(string key)
 {
-  return getenv(key);
+  return std.process.getenv(key);
   //return Environment.get(key);
 }
 
 string[string] getenvall()
 {
-  //environment.toAA();
-  return null;
+  return environment.toAA();
 }
 
 

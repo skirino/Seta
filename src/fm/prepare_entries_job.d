@@ -33,6 +33,7 @@ private import core.thread;
 //private import tango.stdc.string;
 private import core.stdc.string;
 
+private import utils.string_util;
 private import utils.vector;
 private import constants;
 private import fm.entry;
@@ -78,8 +79,7 @@ public:
     remote_ = remote;
     if(remote){
       // "owner::user" cannot be obtained from the GVFS, then switch to faster content-type
-      //TODO
-      //attributes_ = attr.substitute(",owner::user", "").substitute("standard::content-type", "standard::fast-content-type");
+      attributes_ = attr.substitute(",owner::user", "").substitute("standard::content-type", "standard::fast-content-type").idup;
     }
     else{
       attributes_ = attr;
@@ -183,9 +183,7 @@ private:
     {
       string filterText_;
       bool opCall(DirEntry e){
-        //TODO
-        //return containsPattern(e.GetName(), filterText_);
-        return true;
+        return containsPattern(e.GetName(), filterText_);
       }
     }
 
@@ -195,9 +193,7 @@ private:
       bool opCall(DirEntry e)
       {
         string name = e.GetName();
-        //TODO
-        //return name[0] != '.' && name.containsPattern(filterText_);
-        return true;
+        return name[0] != '.' && name.containsPattern(filterText_);
       }
     }
 

@@ -66,14 +66,14 @@ void Init()
 }
 
 
-private string directoryTypeDescription;
+private __gshared string directoryTypeDescription;
 string GetDirectoryTypeDescription()
 {
   return directoryTypeDescription;
 }
 
 
-private GtkTargetEntry[1] dragTargets;
+private __gshared GtkTargetEntry[1] dragTargets;
 GtkTargetEntry[] GetDragTargets()
 {
   return dragTargets;

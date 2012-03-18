@@ -29,8 +29,8 @@ private import ssh_connection;
 private import ssh_dialog;
 
 
-private SSHConnection[] registeredHosts_;
-private SSHConnection[] temporalHosts_;
+private __gshared SSHConnection[] registeredHosts_;
+private __gshared SSHConnection[] temporalHosts_;
 
 SSHConnection[] GetKnownHosts(){return registeredHosts_;}
 
@@ -70,10 +70,7 @@ bool HostIsLoggedIn(string username, string domain)
 
 void Disconnect(string userDomain)
 {
-  //TODO
-  //size_t posAtmark = locate(userDomain, '@');
-  size_t posAtmark = 7;
-
+  size_t posAtmark = locate(userDomain, '@');
   assert(posAtmark != userDomain.length);
 
   auto con = Find(userDomain[0 .. posAtmark], userDomain[posAtmark+1 .. $]);

@@ -27,6 +27,7 @@ private import gtk.VBox;
 
 //private import tango.text.Util;
 
+private import utils.string_util;
 private import utils.min_max;
 
 
@@ -68,8 +69,7 @@ string InputDialog(bool hideInput = false)(string title, string description, str
 
   d.showAll();
 
-  //TODO
-  //entry.selectRegion(0, locatePrior(defaultValue, '.'));// do not select extension
+  entry.selectRegion(0, locatePrior(defaultValue, '.'));// do not select extension
 
   d.run();
   return ret;

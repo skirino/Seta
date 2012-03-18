@@ -26,7 +26,7 @@ private import page;
 private import seta_window;
 
 
-private Page[] pages_;
+private __gshared Page[] pages_;
 
 
 void Register(Page p)
