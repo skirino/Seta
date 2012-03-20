@@ -27,6 +27,10 @@ private import gtk.HPaned;
 private import gtk.VBox;
 private import gdk.Event;
 
+private import gdk.Keysyms;
+private import core.memory;
+private import std.stdio;
+
 private import constants;
 private import rcfile = config.rcfile;
 private import config.dialog;
@@ -258,6 +262,17 @@ private:
   ///////////////////////// callback for keyboard shortcuts
   bool KeyPressed(GdkEventKey * ekey, Widget w)
   {
+    version(DEBUG){
+      // manually run GC
+      if(((ekey.state & (GdkModifierType.CONTROL_MASK | GdkModifierType.SHIFT_MASK)) != 0) &&
+         ekey.keyval == GdkKeysyms.GDK_G){
+        writefln("start GC");
+        GC.collect();
+        writefln("end GC");
+        return true;
+      }
+    }
+
     // called before the focused widget's callback
     switch(QueryMainWindowAction(ekey)){
 
@@ -378,6 +393,7 @@ private:
 
     case MainWindowAction.QuitApplication:
       Main.quit();
+      return true;
 
     default:
       return false;

@@ -103,7 +103,6 @@ public:
     selectedFileNames_ = selected;
     changeDir_ = changeDir;
     bool parentIncluded = (selected.length > 0) && (selected[0] == PARENT_STRING);
-
     super();
 
     if(selectedFileNames_.length > 0){

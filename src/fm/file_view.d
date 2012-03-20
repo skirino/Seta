@@ -647,66 +647,66 @@ private:
     addOnQueryTooltip(&TooltipCallback);
   }
 
+
   // callback to show tooltip for ellipsized texts or target paths of symlinks
   bool TooltipCallback(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
   {
     // show tooltip for ellipsized texts in NAME and TYPE column
-    TreeModelIF model;
     TreePath path;
-    TreeIter iter = new TreeIter;
+    scope iter = new TreeIter;
     iter.setModel(store_);
-    if(getTooltipContext(&x, &y, keyboardTip, model, path, iter)){
-      if(path !is null){
-        TreeViewColumn col = GetColAtPos(this, x, y);
-        string tooltipContent;
-        auto renderer = GetCellRendererFromCol(col);
-
-        ////////////////////// tooltip for long file name or type
-        {
-          // get actualWidth, widthNeeded for column (at this point not for cell)
-          int startPos, actualWidth;
-          col.cellGetPosition(renderer, startPos, actualWidth);
-          string text = GetValueString(iter, col);
-          int textWidth = GetTextWidth(text);
-          if(actualWidth < textWidth){// text in the cell is too long and thus ellipsized
-            tooltipContent ~= text;
-          }
-        }
-        //////////////////////
-
-        ////////////////////// tooltip for symlink target
-        int row = path.getIndices()[0];
-        if(row != 0){// exclude "../"
-          // Just after changing directory, "row" can be larger than the max index of entries.
-          // Exclude these cases.
-
-          if(row < 1 + eList_.NumEntriesSorted()){
-            DirEntry ent =
-              (row <= eList_.GetDSorted().size()) ? eList_.GetDSorted()[row-1] :
-                                                    eList_.GetFSorted()[row - 1 - eList_.GetDSorted().size];
-
-            if(ent.IsSymlink()){
-              File f = File.parseName(pwd_ ~ ent.GetName());
-              FileInfo info = f.queryInfo("standard::symlink-target", GFileQueryInfoFlags.NONE, null);
-              string linkTarget = "link to: " ~ info.getSymlinkTarget();
-              tooltipContent ~= tooltipContent.length > 0 ? '\n' ~ linkTarget : linkTarget;
-            }
-          }
-        }
-        //////////////////////
-
-        if(tooltipContent.length > 0){
-          Tooltip tip = new Tooltip(p);
-          tip.setText(tooltipContent);
-          setTooltipCell(tip, path, col, renderer);// set position for the tooltip to appear
-          return true;
-        }
-
-        path.free();
-      }
+    auto validContext = GetTooltipContext(this, &x, &y, keyboardTip, path, iter);
+    if(!validContext || path is null){
+      return false;
     }
 
-    // in the other cases tooltip should not appear
+    TreeViewColumn col = GetColAtPos(this, x, y);
+    string tooltipContent;
+    auto renderer = GetCellRendererFromCol(col);
+
+    ////////////////////// tooltip for long file name or file type
+    {
+      // get actualWidth, widthNeeded for column (at this point not for cell)
+      int startPos, actualWidth;
+      col.cellGetPosition(renderer, startPos, actualWidth);
+      string text = GetValueString(iter, col);
+      int textWidth = GetTextWidth(text);
+      if(actualWidth < textWidth){// text in the cell is too long and thus ellipsized
+        tooltipContent ~= text;
+      }
+    }
+    //////////////////////
+
+    ////////////////////// tooltip for symlink target
+    int row = path.getIndices()[0];
+    if(row != 0){// exclude "../"
+      // Just after changing directory, "row" can be larger than the max index of entries.
+      // Exclude these cases.
+
+      if(row < 1 + eList_.NumEntriesSorted()){
+        DirEntry ent =
+          (row <= eList_.GetDSorted().size()) ? eList_.GetDSorted()[row-1] :
+                                                eList_.GetFSorted()[row - 1 - eList_.GetDSorted().size];
+
+        if(ent.IsSymlink()){
+          File f = File.parseName(pwd_ ~ ent.GetName());
+          FileInfo info = f.queryInfo("standard::symlink-target", GFileQueryInfoFlags.NONE, null);
+          string linkTarget = "link to: " ~ info.getSymlinkTarget();
+          tooltipContent ~= tooltipContent.length > 0 ? '\n' ~ linkTarget : linkTarget;
+        }
+      }
+    }
+    //////////////////////
+
+    if(tooltipContent.length > 0){
+      Tooltip tip = new Tooltip(p);
+      tip.setText(tooltipContent);
+      setTooltipCell(tip, path, col, renderer);// set position for the tooltip to appear
+      path.free();
+      return true;
+    }
+
+    path.free();
     return false;
   }
   /////////////////////////// tooltip
@@ -717,7 +717,7 @@ private:
 private:
   string[] GetSelectedFileNames()
   {
-    TreeIter[] iters = getSelectedIters();
+    TreeIter[] iters = GetSelectedIters(getSelection(), store_);
     string[] ret;
     foreach(iter; iters){
       string name = GetNameFromIter(iter);
@@ -733,9 +733,7 @@ private:
     if(iter is null){
       return null;
     }
-    else{
-      return iter.getValueString(ColumnType.NAME);
-    }
+    return iter.getValueString(ColumnType.NAME);
   }
 
   string GetNameFromPath(TreePath path)
@@ -983,9 +981,8 @@ private:
           string namePath = GetNameFromPath(path);
           if(namePath != PARENT_STRING){
             // check "../" is not included in the selected files
-            TreeIter firstIter = getSelectedIter();
-            string firstRow = GetNameFromIter(firstIter);
-            if(firstRow != PARENT_STRING){
+            auto firstIter = GetIterFirst(store_);
+            if(selection.iterIsSelected(firstIter)){
               // prepare for dragging
               draggingState_ = DraggingState.PRESSED;
               dragStartButton_ = eb.button;
@@ -1008,7 +1005,6 @@ private:
 
       path.free();
     }
-
     return false;
   }
 

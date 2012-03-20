@@ -134,7 +134,7 @@ private:
     destroyed_ = true;
 
     if(responseID == GtkResponseType.GTK_RESPONSE_OK){
-      TreeIter iter = view_.getSelectedIter();
+      TreeIter iter = GetSelectedIter(view_.getSelection(), store_);
       if(iter !is null){
         dir_chosen_ = iter.getValueString(0);
       }
@@ -164,7 +164,7 @@ private:
     // C-n, Up / C-p, Down --> move cursor upward/downward
     if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_n) ||
        (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Up)){
-      scope iter = view_.getSelectedIter();
+      scope iter = GetSelectedIter(view_.getSelection(), store_);
       if(iter !is null){
         scope path = iter.getTreePath();
         path.next();
@@ -175,7 +175,7 @@ private:
     }
     else if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_p) ||
             (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Down)){
-      scope iter = view_.getSelectedIter();
+      scope iter = GetSelectedIter(view_.getSelection(), store_);
       if(iter !is null){
         scope path = iter.getTreePath();
         if(path.prev()){

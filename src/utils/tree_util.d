@@ -20,12 +20,16 @@ MA 02110-1301 USA.
 
 module utils.tree_util;
 
+private import glib.ListG;
 private import gtk.TreeView;
 private import gtk.TreeViewColumn;
 private import gtk.TreeModelIF;
 private import gtk.TreeIter;
 private import gtk.TreePath;
+private import gtk.TreeSelection;
 private import gtk.CellRenderer;
+private import gtkc.glib;
+private import gtkc.gtk;
 
 
 // convenience functions to wrap TreeView's API
@@ -108,3 +112,34 @@ CellRenderer GetCellRendererFromCol(TreeViewColumn col)
 }
 
 
+int GetTooltipContext(TreeView tv, int* x, int* y, int keyboardTip, out TreePath path, TreeIter iter)
+{
+  GtkTreePath* outpath = null;
+  auto p = gtk_tree_view_get_tooltip_context(tv.getTreeViewStruct(), x, y, keyboardTip, null, &outpath, iter.getTreeIterStruct());
+  path = new TreePath(outpath);
+  return p;
+}
+
+
+// Avoid GtkD's bug: Do not instantiate TreeModel!
+TreeIter[] GetSelectedIters(TreeSelection selec, TreeModelIF model)
+{
+  TreeIter[] iters;
+  GList* gList = gtk_tree_selection_get_selected_rows(selec.getTreeSelectionStruct(), null);
+  if (gList !is null){
+    scope list = new ListG(gList);
+    for(ListG node = list; node !is null; node = node.next()){
+      scope path = new TreePath(cast(GtkTreePath*)node.data());
+      iters ~= GetIter(model, path);
+      path.free();
+    }
+    list.free();
+  }
+  return iters;
+}
+
+TreeIter GetSelectedIter(TreeSelection selec, TreeModelIF model)
+{
+  auto iters = GetSelectedIters(selec, model);
+  return iters.length > 0 ? iters[0] : null;
+}
