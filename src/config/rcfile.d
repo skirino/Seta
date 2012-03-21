@@ -28,8 +28,8 @@ import gio.FileOutputStream;
 import glib.Str;
 
 import std.string;
+import std.process;
 
-import migrate;
 import utils.min_max;
 import utils.gio_util;
 import utils.string_util;

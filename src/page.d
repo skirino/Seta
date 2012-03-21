@@ -29,7 +29,8 @@ import gtk.Label;
 import gtk.Button;
 import gtk.Tooltip;
 
-import migrate;
+import std.process;
+
 import utils.string_util;
 import utils.gio_util;
 import constants;

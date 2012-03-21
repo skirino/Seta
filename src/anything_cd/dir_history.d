@@ -20,7 +20,8 @@ MA 02110-1301 USA.
 
 module anything_cd.dir_history;
 
-import migrate;
+import std.process;
+
 import utils.vector;
 import utils.string_util;
 import rcfile = config.rcfile;

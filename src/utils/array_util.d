@@ -18,28 +18,15 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module migrate;
+module utils.array_util;
 
-import std.process;
 
-string getenv(string key)
+bool Include(T)(const(T)[] array, const(T) elem)
 {
-  return std.process.getenv(key);
-}
-
-string[string] getenvall()
-{
-  return environment.toAA();
-}
-
-
-
-size_t findElement(const string[] ss, const string target)
-{
-  foreach(i, s; ss){
-    if(s == target){
-      return i;
+  foreach(t; array){
+    if(t == elem){
+      return true;
     }
   }
-  return ss.length;
+  return false;
 }

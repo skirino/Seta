@@ -35,10 +35,10 @@ import glib.ListG;
 import glib.GException;
 
 import std.c.stdlib;
+import std.process;
 import core.sys.posix.unistd;
 import core.sys.posix.sys.types;
 
-import migrate;
 import utils.string_util;
 import constants;
 import rcfile = config.rcfile;
@@ -324,7 +324,7 @@ private:
     string scriptPath = item.path_ ~ '\0';
 
     // environment variables
-    string[string] denv = getenvall();
+    string[string] denv = environment.toAA();
     char*[] envv;
     string[] keys = denv.keys;
     foreach(key; keys){

@@ -23,7 +23,8 @@ module config.nautilus_scripts;
 import gio.File;
 import gio.FileInfo;
 
-import migrate;
+import std.process;
+
 import utils.string_util;
 
 
@@ -98,4 +99,3 @@ void Init()
     top = null;
   }
 }
-

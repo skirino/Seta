@@ -30,12 +30,12 @@ import glib.Str;
 import glib.Regex;
 
 import std.string;
-import core.thread;
+import std.process;
 import std.c.stdlib;
+import core.thread;
 import core.sys.posix.termios;
 import core.sys.posix.unistd;
 
-import migrate;
 import utils.string_util;
 import constants;
 import rcfile = config.rcfile;
@@ -76,7 +76,7 @@ public:
 
     // Fork the child process.
     // Passing "argv" is essential when the default shell is zsh.
-    char *[2] argv = [Str.toStringz(migrate.getenv("SHELL")), null];
+    char *[2] argv = [Str.toStringz(std.process.getenv("SHELL")), null];
     // deprecated since 0.26
     pid_ = vte_terminal_fork_command(
       vte_, argv[0], argv.ptr, null,

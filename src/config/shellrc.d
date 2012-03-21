@@ -21,8 +21,8 @@ MA 02110-1301 USA.
 module config.shellrc;
 
 import std.string;
+import std.process;
 
-import migrate;
 import utils.string_util;
 
 

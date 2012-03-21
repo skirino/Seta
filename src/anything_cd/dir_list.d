@@ -25,9 +25,10 @@ import gdk.Threads;
 import gdk.Window;
 
 import core.thread;
+import std.process;
 import std.stdio;
 
-import migrate;
+import utils.array_util;
 import utils.vector;
 import utils.string_util;
 import utils.gio_util;
@@ -238,7 +239,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
         scope FileInfo info = new FileInfo(pinfo);
         if((info.getFileType() == GFileType.TYPE_DIRECTORY) && (info.getIsSymlink() == 0)){
           string name = info.getName();
-          if(ignoreDirs.findElement(name) == ignoreDirs.length){
+          if(ignoreDirs.Include(name)){
             dirs ~= name;
           }
         }
