@@ -33,7 +33,6 @@ import std.string;
 import std.process;
 import std.c.stdlib;
 import core.thread;
-import core.sys.posix.termios;
 import core.sys.posix.unistd;
 
 import utils.string_util;
@@ -42,6 +41,7 @@ import rcfile = config.rcfile;
 import config.keybind;
 import shellrc = config.shellrc;
 import term.search_dialog;
+import term.termios;
 import thread_list;
 import mediator;
 import ssh_connection;
@@ -68,7 +68,7 @@ public:
     super(cast(GtkWidget*)vte_);
     addOnKeyPress(&KeyPressed);
 
-    vte_terminal_set_scrollback_lines(vte_, 1000);
+    vte_terminal_set_scrollback_lines(vte_, -1);// infinite scrollback
     vte_terminal_set_audible_bell(vte_, 0);
 
     // transparent background
@@ -95,7 +95,7 @@ public:
                         cast(GCallback)(&CloseThisPageCallback),
                         cast(void*)mediator_, null, GConnectFlags.AFTER);
 
-    InitTermios();
+    InitTermios(pty_);
     InitDragAndDropFunctionality();
     shellSetting_ = shellrc.GetLocalShellSetting();
 
@@ -265,10 +265,7 @@ public:
   void ChangeDirectoryFromFiler(string dirpath)
   {
     cwd_ = dirpath;
-    termios tios;
-    tcgetattr(pty_, &tios);
-
-    if(ReadyToFeed(&tios)){
+    if(ReadyToFeed(pty_, mediator_.FileSystemIsRemote())){
       ClearInputtedCommand();
       string commandString = "cd " ~ EscapeSpecialChars(dirpath) ~ '\n';
       FeedChild(commandString);
@@ -398,38 +395,6 @@ private:
     FeedChild(backspaces);
   }
 
-  void InitTermios()
-  {
-    termios tios;
-    tcgetattr(pty_, &tios);
-    tios.c_iflag &= (~(0x02000 | 0x0800 | 0x02));
-    tcsetattr(pty_, TCSADRAIN, &tios);
-  }
-  bool ReadyToFeed(termios * tios)
-  {
-    const int IUTF8 = 0x4000;// = 2 ** 14, defined in /usr/include/bits/termios.h,
-    // which is not defined in phobos/tango
-
-    // check whether a command-line application is running inside the terminal
-    // at present only c_iflag and c_oflag are checked
-    if(mediator_.FileSystemIsRemote()){// ssh connecting
-      return (tios.c_iflag & (IUTF8 | IGNPAR)) && (tios.c_oflag == ONLCR);
-    }
-    else{
-      return
-        (tios.c_iflag & (IUTF8 | IXON) || // for bash
-         tios.c_iflag & (IUTF8 | IXON | ICRNL | INLCR)) // for zsh
-        &&
-        (tios.c_oflag == (ONLCR | OPOST));
-    }
-  }
-  bool AskingPassword(termios * tios)
-  {
-    // ECHO flag is off and ICANON flag is on
-    return (tios.c_lflag & ECHO  ) == 0 &&
-      (tios.c_lflag & ICANON) != 0;
-  }
-
   string GetLastCommand()
   {
     string text = trimr(GetText());
@@ -438,40 +403,40 @@ private:
     if(indexCompName == text.length){
       return null;
     }
-    else{
-      string diff = text[indexCompName .. $];
-      size_t indexPrompt = locatePattern(diff, "$ ");
-      if(indexPrompt == diff.length){
-        indexPrompt = locatePattern(diff, "# ");
-      }
-      if(indexPrompt == diff.length){
-        indexPrompt = locatePattern(diff, "% ");
-      }
 
-      if(indexPrompt != diff.length){// if "$ ", "# " or "% " is found
-        size_t posNewline = locate(diff, '\n');
-        if(indexPrompt+2 < posNewline){
-          string line = diff[indexPrompt+2 .. posNewline];
-          if(rprompt_.length > 0){
-            // if the last char is "]"
-            if(line[$-1] == rprompt_[$-1]){
-              // search for " [~"
-              size_t rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '~', line.length-1);
+    string diff = text[indexCompName .. $];
+    size_t indexPrompt = locatePattern(diff, "$ ");
+    if(indexPrompt == diff.length){
+      indexPrompt = locatePattern(diff, "# ");
+    }
+    if(indexPrompt == diff.length){
+      indexPrompt = locatePattern(diff, "% ");
+    }
 
-              // if not found, search for " [/"
-              if(rpromptStart == line.length){
-                rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '/', line.length-1);
-              }
+    if(indexPrompt != diff.length){// if "$ ", "# " or "% " is found
+      size_t posNewline = locate(diff, '\n');
+      if(indexPrompt+2 < posNewline){
+        string line = diff[indexPrompt+2 .. posNewline];
+        if(rprompt_.length > 0){
+          // if the last char is "]"
+          if(line[$-1] == rprompt_[$-1]){
+            // search for " [~"
+            size_t rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '~', line.length-1);
 
-              if(rpromptStart != line.length){
-                line = trimr(line[0 .. rpromptStart]);
-              }
+            // if not found, search for " [/"
+            if(rpromptStart == line.length){
+              rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '/', line.length-1);
+            }
+
+            if(rpromptStart != line.length){
+              line = trimr(line[0 .. rpromptStart]);
             }
           }
-          return line;
         }
+        return line;
       }
     }
+
     return null;
   }
   /////////////////// manipulate text in vte terminal
@@ -581,17 +546,13 @@ private:
 
     void Run()// in a temporary thread other than the main thread
     {
-      termios tios;
-
       // try to input password for 10 seconds
       for(int i=0; i<20; ++i){
         if(cancelled_){
           break;
         }
 
-        // check whether password is being asked
-        tcgetattr(term_.pty_, &tios);
-        if(AskingPassword(&tios)){
+        if(AskingPassword(term_.pty_)){
           string lastLine = splitLines(trim(term_.GetText()))[$-1];
 
           if(lastLine.EndsWith("id_rsa':")){
