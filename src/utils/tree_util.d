@@ -20,16 +20,16 @@ MA 02110-1301 USA.
 
 module utils.tree_util;
 
-private import glib.ListG;
-private import gtk.TreeView;
-private import gtk.TreeViewColumn;
-private import gtk.TreeModelIF;
-private import gtk.TreeIter;
-private import gtk.TreePath;
-private import gtk.TreeSelection;
-private import gtk.CellRenderer;
-private import gtkc.glib;
-private import gtkc.gtk;
+import glib.ListG;
+import gtk.TreeView;
+import gtk.TreeViewColumn;
+import gtk.TreeModelIF;
+import gtk.TreeIter;
+import gtk.TreePath;
+import gtk.TreeSelection;
+import gtk.CellRenderer;
+import gtkc.glib;
+import gtkc.gtk;
 
 
 // convenience functions to wrap TreeView's API

@@ -20,36 +20,36 @@ MA 02110-1301 USA.
 
 module file_manager;
 
-private import gtk.Widget;
-private import gtk.VBox;
-private import gtk.Entry;
-private import gtk.EditableIF;
-private import gtk.Button;
-private import gtk.ScrolledWindow;
-private import gtk.PopupBox;
-private import gtk.Menu;
-private import gtk.MenuItem;
-private import gtk.HPaned;
-private import gdk.Threads;
-private import gio.File;
-private import glib.Str;
-private import gtkc.gio;
+import gtk.Widget;
+import gtk.VBox;
+import gtk.Entry;
+import gtk.EditableIF;
+import gtk.Button;
+import gtk.ScrolledWindow;
+import gtk.PopupBox;
+import gtk.Menu;
+import gtk.MenuItem;
+import gtk.HPaned;
+import gdk.Threads;
+import gio.File;
+import glib.Str;
+import gtkc.gio;
 
-private import utils.string_util;
-private import constants;
-private import rcfile = config.rcfile;
-private import config.keybind;
-private import known_hosts = config.known_hosts;
-private import fm.file_view;
-private import fm.history;
-private import fm.toolbar;
-private import fm.dir_tree;
-private import thread_list;
-private import mediator;
-private import statusbar;
-private import volume_monitor;
-private import ssh_connection;
-private import ssh_dialog;
+import utils.string_util;
+import constants;
+import rcfile = config.rcfile;
+import config.keybind;
+import known_hosts = config.known_hosts;
+import fm.file_view;
+import fm.history;
+import fm.toolbar;
+import fm.dir_tree;
+import thread_list;
+import mediator;
+import statusbar;
+import volume_monitor;
+import ssh_connection;
+import ssh_dialog;
 
 
 class FileManager : VBox

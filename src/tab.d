@@ -20,14 +20,14 @@ MA 02110-1301 USA.
 
 module tab;
 
-private import gtk.Widget;
-private import gtk.Label;
-private import gtk.Button;
-private import gtk.Image;
-private import gtk.HBox;
-private import gtk.VBox;
-private import gtk.EventBox;
-private import glib.Str;
+import gtk.Widget;
+import gtk.Label;
+import gtk.Button;
+import gtk.Image;
+import gtk.HBox;
+import gtk.VBox;
+import gtk.EventBox;
+import glib.Str;
 
 
 // tab with close button

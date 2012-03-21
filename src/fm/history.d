@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module fm.history;
 
-private import anything_cd.dir_history;
+import anything_cd.dir_history;
 
 
 // history of directories visited by each page

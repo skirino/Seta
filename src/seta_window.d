@@ -20,24 +20,24 @@ MA 02110-1301 USA.
 
 module seta_window;
 
-private import gtk.MainWindow;
-private import gtk.Main;
-private import gtk.Widget;
-private import gtk.HPaned;
-private import gtk.VBox;
-private import gdk.Event;
+import gtk.MainWindow;
+import gtk.Main;
+import gtk.Widget;
+import gtk.HPaned;
+import gtk.VBox;
+import gdk.Event;
 
-private import gdk.Keysyms;
-private import core.memory;
-private import std.stdio;
+import gdk.Keysyms;
+import core.memory;
+import std.stdio;
 
-private import constants;
-private import rcfile = config.rcfile;
-private import config.dialog;
-private import config.keybind;
-private import anything_cd.dialog;
-private import statusbar;
-private import note;
+import constants;
+import rcfile = config.rcfile;
+import config.dialog;
+import config.keybind;
+import anything_cd.dialog;
+import statusbar;
+import note;
 
 
 class SetaWindow : MainWindow

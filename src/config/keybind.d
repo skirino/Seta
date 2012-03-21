@@ -20,16 +20,15 @@ MA 02110-1301 USA.
 
 module config.keybind;
 
-private import gtk.AccelGroup;
-private import gdk.Keysyms;
+import gtk.AccelGroup;
+import gdk.Keysyms;
 
-//private import tango.text.Util;
-private import std.string;
-private import std.ascii;
+import std.string;
+import std.ascii;
 
-private import utils.string_util;
-private import constants;
-private import rcfile = config.rcfile;
+import utils.string_util;
+import constants;
+import rcfile = config.rcfile;
 
 
 struct KeyCode

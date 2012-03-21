@@ -20,10 +20,10 @@ MA 02110-1301 USA.
 
 module utils.gio_util;
 
-private import gio.File;
-private import gio.FileInfo;
-private import gio.FileEnumerator;
-private import glib.GException;
+import gio.File;
+import gio.FileInfo;
+import gio.FileEnumerator;
+import glib.GException;
 
 
 File GetFileForDirectory(string dirname)

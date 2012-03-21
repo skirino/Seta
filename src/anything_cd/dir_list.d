@@ -20,21 +20,20 @@ MA 02110-1301 USA.
 
 module anything_cd.dir_list;
 
-private import gio.FileInfo;
-private import gdk.Threads;
-private import gdk.Window;
+import gio.FileInfo;
+import gdk.Threads;
+import gdk.Window;
 
-//private import tango.core.Thread;
-private import core.thread;
+import core.thread;
 import std.stdio;
 
-private import migrate;
-private import utils.vector;
-private import utils.string_util;
-private import utils.gio_util;
-private import thread_list;
-private import statusbar;
-private import anything_cd.dir_history;
+import migrate;
+import utils.vector;
+import utils.string_util;
+import utils.gio_util;
+import thread_list;
+import statusbar;
+import anything_cd.dir_history;
 
 
 ///////////// public interfaces of this module

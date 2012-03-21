@@ -20,8 +20,8 @@ MA 02110-1301 USA.
 
 module fm.entry_list;
 
-private import utils.vector;
-private import fm.entry;
+import utils.vector;
+import fm.entry;
 
 
 class EntryList

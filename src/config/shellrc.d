@@ -20,11 +20,10 @@ MA 02110-1301 USA.
 
 module config.shellrc;
 
-//private import tango.text.Util;
-private import std.string;
+import std.string;
 
-private import migrate;
-private import utils.string_util;
+import migrate;
+import utils.string_util;
 
 
 private __gshared ShellSetting localhostShell_;

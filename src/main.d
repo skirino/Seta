@@ -20,16 +20,16 @@ MA 02110-1301 USA.
 
 module main;
 
-private import gtk.Main;
-private import gthread.Thread;
-private import gdk.Threads;
+import gtk.Main;
+import gthread.Thread;
+import gdk.Threads;
 
-private import constants;
-private import config.init;
-private import anything_cd.init;
-private import volume_monitor;
-private import thread_list;
-private import seta_window;
+import constants;
+import config.init;
+import anything_cd.init;
+import volume_monitor;
+import thread_list;
+import seta_window;
 
 
 private void Initialize()

@@ -20,14 +20,13 @@ MA 02110-1301 USA.
 
 module ssh_connection;
 
-private import gtk.Window;
-private import gtk.MountOperation;
+import gtk.Window;
+import gtk.MountOperation;
 
-//private import tango.text.Util;
-private import std.string;
+import std.string;
 
-private import utils.string_util;
-private import shellrc = config.shellrc;
+import utils.string_util;
+import shellrc = config.shellrc;
 
 
 class SSHConnection : gtk.MountOperation.MountOperation
@@ -181,7 +180,7 @@ public:
     return ret;
   }
 
-  string toString()
+  override string toString()
   {
     return toStr!(true);
   }

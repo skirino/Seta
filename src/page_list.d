@@ -20,10 +20,10 @@ MA 02110-1301 USA.
 
 module page_list;
 
-private import gtk.PopupBox;
+import gtk.PopupBox;
 
-private import page;
-private import seta_window;
+import page;
+import seta_window;
 
 
 private __gshared Page[] pages_;

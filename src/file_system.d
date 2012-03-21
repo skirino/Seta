@@ -20,11 +20,9 @@ MA 02110-1301 USA.
 
 module file_system;
 
-//private import tango.text.Util;
-
-private import migrate;
-private import utils.string_util;
-private import utils.gio_util;
+import migrate;
+import utils.string_util;
+import utils.gio_util;
 
 
 class FileSystem

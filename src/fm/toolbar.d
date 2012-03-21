@@ -20,34 +20,32 @@ MA 02110-1301 USA.
 
 module fm.toolbar;
 
-private import gtk.Widget;
-private import gtk.Label;
-private import gtk.Entry;
-private import gtk.Button;
-private import gtk.ToggleButton;
-private import gtk.Menu;
-private import gtk.MenuItem;
-private import gtk.CheckMenuItem;
-private import gtk.Image;
-private import gtk.Toolbar;
-private import gtk.ToolItem;
-private import gtk.SeparatorToolItem;
-private import gtk.IconSize;
-private import gdk.Pixbuf;
-private import gdk.Event;
-private import glib.GException;
-private import glib.Str;
-private import glib.ListG;
+import gtk.Widget;
+import gtk.Label;
+import gtk.Entry;
+import gtk.Button;
+import gtk.ToggleButton;
+import gtk.Menu;
+import gtk.MenuItem;
+import gtk.CheckMenuItem;
+import gtk.Image;
+import gtk.Toolbar;
+import gtk.ToolItem;
+import gtk.SeparatorToolItem;
+import gtk.IconSize;
+import gdk.Pixbuf;
+import gdk.Event;
+import glib.GException;
+import glib.Str;
+import glib.ListG;
 
-//private import tango.text.Util;
-
-private import utils.template_util;
-private import utils.string_util;
-private import constants;
-private import rcfile = config.rcfile;
-private import config.known_hosts;
-private import file_manager;
-private import volume_monitor;
+import utils.template_util;
+import utils.string_util;
+import constants;
+import rcfile = config.rcfile;
+import config.known_hosts;
+import file_manager;
+import volume_monitor;
 
 
 class SetaToolbar : Toolbar

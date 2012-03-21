@@ -20,17 +20,16 @@ MA 02110-1301 USA.
 
 module config.hosts_view;
 
-private import gtk.TreeView;
-private import gtk.TreeViewColumn;
-private import gtk.TreeIter;
-private import gtk.ListStore;
-private import gtk.CellRendererText;
+import gtk.TreeView;
+import gtk.TreeViewColumn;
+import gtk.TreeIter;
+import gtk.ListStore;
+import gtk.CellRendererText;
 
-//private import tango.text.Util;
-private import std.string;
+import std.string;
 
-private import utils.string_util;
-private import rcfile = config.rcfile;
+import utils.string_util;
+import rcfile = config.rcfile;
 
 
 class HostView : TreeView

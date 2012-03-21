@@ -20,30 +20,28 @@ MA 02110-1301 USA.
 
 module fm.dir_tree;
 
-private import gtk.TreeView;
-private import gtk.TreeStore;
-private import gtk.TreeModelIF;
-private import gtk.TreeViewColumn;
-private import gtk.TreeIter;
-private import gtk.TreePath;
-private import gtk.CellRenderer;
-private import gtk.CellRendererText;
-private import gtk.Widget;
-private import gtk.DragAndDrop;
-private import gtk.Tooltip;
-private import gio.File;
-private import gio.FileInfo;
-private import glib.GException;
+import gtk.TreeView;
+import gtk.TreeStore;
+import gtk.TreeModelIF;
+import gtk.TreeViewColumn;
+import gtk.TreeIter;
+import gtk.TreePath;
+import gtk.CellRenderer;
+import gtk.CellRendererText;
+import gtk.Widget;
+import gtk.DragAndDrop;
+import gtk.Tooltip;
+import gio.File;
+import gio.FileInfo;
+import glib.GException;
 
-//private import tango.text.Util;
-
-private import utils.vector;
-private import utils.template_util;
-private import utils.gio_util;
-private import utils.string_util;
-private import utils.tree_util;
-private import fm.file_view;
-private import move_files_job;
+import utils.vector;
+import utils.template_util;
+import utils.gio_util;
+import utils.string_util;
+import utils.tree_util;
+import fm.file_view;
+import move_files_job;
 
 
 class DirTree : TreeView

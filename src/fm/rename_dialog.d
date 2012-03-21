@@ -20,42 +20,40 @@ MA 02110-1301 USA.
 
 module fm.rename_dialog;
 
-private import gtk.Dialog;
-private import gtk.Button;
-private import gtk.Entry;
-private import gtk.EditableIF;
-private import gtk.Label;
-private import gtk.Table;
-private import gtk.VBox;
-private import gtk.HBox;
-private import gtk.Widget;
-private import gtk.TreeView;
-private import gtk.TreeIter;
-private import gtk.TreePath;
-private import gtk.TreeModelIF;
-private import gtk.ListStore;
-private import gtk.TreeViewColumn;
-private import gtk.CellRenderer;
-private import gtk.CellRendererText;
-private import gtk.ScrolledWindow;
-private import gtk.Tooltip;
-private import gtk.PopupBox;
-private import gtk.HSeparator;
-private import gtk.ComboBox;
-private import gio.File;
-private import glib.GException;
-private import glib.Str;
-private import glib.Regex;
-private import gobject.Signals;
-private import pango.PgAttribute;
-private import pango.PgAttributeList;
+import gtk.Dialog;
+import gtk.Button;
+import gtk.Entry;
+import gtk.EditableIF;
+import gtk.Label;
+import gtk.Table;
+import gtk.VBox;
+import gtk.HBox;
+import gtk.Widget;
+import gtk.TreeView;
+import gtk.TreeIter;
+import gtk.TreePath;
+import gtk.TreeModelIF;
+import gtk.ListStore;
+import gtk.TreeViewColumn;
+import gtk.CellRenderer;
+import gtk.CellRendererText;
+import gtk.ScrolledWindow;
+import gtk.Tooltip;
+import gtk.PopupBox;
+import gtk.HSeparator;
+import gtk.ComboBox;
+import gio.File;
+import glib.GException;
+import glib.Str;
+import glib.Regex;
+import gobject.Signals;
+import pango.PgAttribute;
+import pango.PgAttributeList;
 
-//private import tango.text.Util;
-
-private import utils.string_util;
-private import utils.tree_util;
-private import input_dialog;
-private import statusbar;
+import utils.string_util;
+import utils.tree_util;
+import input_dialog;
+import statusbar;
 
 
 void RenameFiles(string dir, string[] infiles)

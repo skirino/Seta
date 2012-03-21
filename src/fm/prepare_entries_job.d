@@ -20,24 +20,21 @@ MA 02110-1301 USA.
 
 module fm.prepare_entries_job;
 
-private import gio.File;
-private import gio.FileInfo;
-private import gio.FileEnumerator;
-private import gdk.Threads;
-private import gtk.Widget;
-private import gtk.TreeView;
+import gio.File;
+import gio.FileInfo;
+import gio.FileEnumerator;
+import gdk.Threads;
+import gtk.Widget;
+import gtk.TreeView;
 
-//private import tango.text.Util;
-//private import tango.core.Thread;
-private import core.thread;
-//private import tango.stdc.string;
-private import core.stdc.string;
+import core.thread;
+import core.stdc.string;
 
-private import utils.string_util;
-private import utils.vector;
-private import constants;
-private import fm.entry;
-private import thread_list;
+import utils.string_util;
+import utils.vector;
+import constants;
+import fm.entry;
+import thread_list;
 
 
 class PrepareEntriesJob : Thread, StoppableOperationIF

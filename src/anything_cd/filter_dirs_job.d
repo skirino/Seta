@@ -20,20 +20,17 @@ MA 02110-1301 USA.
 
 module anything_cd.filter_dirs_job;
 
-private import gdk.Threads;
+import gdk.Threads;
 
-//private import tango.text.Util;
-//private import tango.core.Thread;
-private import core.thread;
-//private import tango.text.Unicode;
+import core.thread;
 import std.string;
 
-private import utils.min_max;
-private import utils.string_util;
-private import utils.vector;
-static private import anything_cd.dir_list;
-static private import anything_cd.dir_history;
-private import thread_list;
+import utils.min_max;
+import utils.string_util;
+import utils.vector;
+static import anything_cd.dir_list;
+static import anything_cd.dir_history;
+import thread_list;
 
 
 class FilterDirsJob : Thread, StoppableOperationIF

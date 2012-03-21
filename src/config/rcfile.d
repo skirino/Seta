@@ -20,27 +20,26 @@ MA 02110-1301 USA.
 
 module config.rcfile;
 
-private import glib.KeyFile;
-private import gtk.PopupBox;
-private import gdk.Color;
-private import gio.File;
-private import gio.FileOutputStream;
-private import glib.Str;
+import glib.KeyFile;
+import gtk.PopupBox;
+import gdk.Color;
+import gio.File;
+import gio.FileOutputStream;
+import glib.Str;
 
-//private import tango.text.Util;
-private import std.string;
+import std.string;
 
-private import migrate;
-private import utils.min_max;
-private import utils.gio_util;
-private import utils.string_util;
-private import constants;
-private import config.shellrc;
-private import config.nautilus_scripts;
-private import config.keybind;
-private import known_hosts = config.known_hosts;
-private import ssh_connection;
-private import page_list;
+import migrate;
+import utils.min_max;
+import utils.gio_util;
+import utils.string_util;
+import constants;
+import config.shellrc;
+import config.nautilus_scripts;
+import config.keybind;
+import known_hosts = config.known_hosts;
+import ssh_connection;
+import page_list;
 
 
 static const string SetaVersion = "0.6.1";

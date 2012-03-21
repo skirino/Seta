@@ -20,23 +20,23 @@ MA 02110-1301 USA.
 
 module term.search_dialog;
 
-private import gtk.Dialog;
-private import gtk.Widget;
-private import gtk.Label;
-private import gtk.VBox;
-private import gtk.HBox;
-private import gtk.Entry;
-private import gtk.EditableIF;
-private import gtk.ComboBox;
-private import gtk.ComboBoxEntry;
-private import gtk.CheckButton;
-private import gdk.Keysyms;
-private import glib.Regex;
-private import glib.GException;
+import gtk.Dialog;
+import gtk.Widget;
+import gtk.Label;
+import gtk.VBox;
+import gtk.HBox;
+import gtk.Entry;
+import gtk.EditableIF;
+import gtk.ComboBox;
+import gtk.ComboBoxEntry;
+import gtk.CheckButton;
+import gdk.Keysyms;
+import glib.Regex;
+import glib.GException;
 
-private import utils.string_util;
-private import config.keybind;
-private import terminal;
+import utils.string_util;
+import config.keybind;
+import terminal;
 
 
 void StartTerminalSearch(Terminal terminal)

@@ -20,13 +20,12 @@ MA 02110-1301 USA.
 
 module config.known_hosts;
 
-//private import tango.text.Util;
-private import std.string;
+import std.string;
 
-private import utils.string_util;
-private import rcfile = config.rcfile;
-private import ssh_connection;
-private import ssh_dialog;
+import utils.string_util;
+import rcfile = config.rcfile;
+import ssh_connection;
+import ssh_dialog;
 
 
 private __gshared SSHConnection[] registeredHosts_;

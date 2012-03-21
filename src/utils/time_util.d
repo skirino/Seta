@@ -20,10 +20,9 @@ MA 02110-1301 USA.
 
 module utils.time_util;
 
-//private import tango.io.Stdout;
 import core.stdc.time;
-private import core.sys.posix.sys.time;
-private import std.stdio;
+import core.sys.posix.sys.time;
+import std.stdio;
 
 
 scope class ScopeTimer

@@ -20,13 +20,13 @@ MA 02110-1301 USA.
 
 module note;
 
-private import gtk.Notebook;
-private import gtk.Widget;
+import gtk.Notebook;
+import gtk.Widget;
 
-private import rcfile = config.rcfile;
-private import page_list;
-private import page;
-private import seta_window;
+import rcfile = config.rcfile;
+import page_list;
+import page;
+import seta_window;
 
 
 class Note : Notebook

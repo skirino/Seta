@@ -20,44 +20,43 @@ MA 02110-1301 USA.
 
 module config.dialog;
 
-private import gtk.Dialog;
-private import gtk.Widget;
-private import gtk.Label;
-private import gtk.Notebook;
-private import gtk.PopupBox;
-private import gtk.Table;
-private import gtk.ScrolledWindow;
-private import gtk.FontButton;
-private import gtk.ColorButton;
-private import gdk.Color;
-private import gtk.SpinButton;
-private import gtk.Entry;
-private import gtk.CheckButton;
-private import gtk.Alignment;
-private import gtk.TreeView;
-private import gtk.TreeViewColumn;
-private import gtk.TreeIter;
-private import gtk.TreePath;
-private import gtk.ListStore;
-private import gtk.TreeStore;
-private import gtk.CellRendererText;
-private import gtk.CellRendererAccel;
-private import gdk.Keysyms;
-private import gtk.AccelGroup;
-private import gtk.Menu;
-private import gtk.MenuItem;
+import gtk.Dialog;
+import gtk.Widget;
+import gtk.Label;
+import gtk.Notebook;
+import gtk.PopupBox;
+import gtk.Table;
+import gtk.ScrolledWindow;
+import gtk.FontButton;
+import gtk.ColorButton;
+import gdk.Color;
+import gtk.SpinButton;
+import gtk.Entry;
+import gtk.CheckButton;
+import gtk.Alignment;
+import gtk.TreeView;
+import gtk.TreeViewColumn;
+import gtk.TreeIter;
+import gtk.TreePath;
+import gtk.ListStore;
+import gtk.TreeStore;
+import gtk.CellRendererText;
+import gtk.CellRendererAccel;
+import gdk.Keysyms;
+import gtk.AccelGroup;
+import gtk.Menu;
+import gtk.MenuItem;
 
-//private import tango.text.Util;
 import std.string;
 
-private import utils.gio_util;
-private import utils.string_util;
-private import utils.tree_util;
-private import constants;
-private import rcfile = config.rcfile;
-private import config.keybind;
-private import config.hosts_view;
-private import page_list;
+import utils.gio_util;
+import utils.string_util;
+import utils.tree_util;
+import constants;
+import rcfile = config.rcfile;
+import config.keybind;
+import config.hosts_view;
+import page_list;
 
 
 void StartConfigDialog()

@@ -20,18 +20,17 @@ MA 02110-1301 USA.
 
 module fm.entry;
 
-private import gio.FileInfo;
-private import gio.ContentType;
-private import glib.Str;
+import gio.FileInfo;
+import gio.ContentType;
+import glib.Str;
 
-//private import tango.stdc.posix.sys.stat;// for permission flags
-private import std.c.stdlib;
-private import core.sys.posix.sys.stat;
+import std.c.stdlib;
+import core.sys.posix.sys.stat;
 
-private import utils.time_util;
-private import utils.string_util;
-private import utils.gio_util;
-private import constants;
+import utils.time_util;
+import utils.string_util;
+import utils.gio_util;
+import constants;
 
 
 class DirEntry

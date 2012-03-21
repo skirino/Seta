@@ -20,10 +20,10 @@ MA 02110-1301 USA.
 
 module config.init;
 
-private import config.rcfile;
-private import config.keybind;
-private import config.shellrc;
-private import config.nautilus_scripts;
+import config.rcfile;
+import config.keybind;
+import config.shellrc;
+import config.nautilus_scripts;
 
 
 void Init()

@@ -20,37 +20,32 @@ MA 02110-1301 USA.
 
 module terminal;
 
-private import gtk.Widget;
-private import gtk.Selections;
-private import gtk.DragAndDrop;
-private import gobject.Signals;
-private import gdk.Threads;
-private import gdk.Color;
-private import glib.Str;
-private import glib.Regex;
+import gtk.Widget;
+import gtk.Selections;
+import gtk.DragAndDrop;
+import gobject.Signals;
+import gdk.Threads;
+import gdk.Color;
+import glib.Str;
+import glib.Regex;
 
-//private import tango.text.Util;
-private import std.string;
-//private import tango.core.Thread;
-private import core.thread;
-//private import tango.stdc.posix.stdlib;
-//private import tango.stdc.posix.termios;
-//private import tango.stdc.posix.unistd;
-private import std.c.stdlib;
-private import core.sys.posix.termios;
-private import core.sys.posix.unistd;
+import std.string;
+import core.thread;
+import std.c.stdlib;
+import core.sys.posix.termios;
+import core.sys.posix.unistd;
 
-private import migrate;
-private import utils.string_util;
-private import constants;
-private import rcfile = config.rcfile;
-private import config.keybind;
-private import shellrc = config.shellrc;
-private import term.search_dialog;
-private import thread_list;
-private import mediator;
-private import ssh_connection;
-private import move_files_job;
+import migrate;
+import utils.string_util;
+import constants;
+import rcfile = config.rcfile;
+import config.keybind;
+import shellrc = config.shellrc;
+import term.search_dialog;
+import thread_list;
+import mediator;
+import ssh_connection;
+import move_files_job;
 
 
 // wrapper class of VteTerminal widget
@@ -413,7 +408,7 @@ private:
   bool ReadyToFeed(termios * tios)
   {
     const int IUTF8 = 0x4000;// = 2 ** 14, defined in /usr/include/bits/termios.h,
-    // not defined in tango.stdc.posix.termios module
+    // which is not defined in phobos/tango
 
     // check whether a command-line application is running inside the terminal
     // at present only c_iflag and c_oflag are checked

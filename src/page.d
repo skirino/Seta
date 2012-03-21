@@ -20,25 +20,25 @@ MA 02110-1301 USA.
 
 module page;
 
-private import gtk.VBox;
-private import gtk.HBox;
-private import gtk.VPaned;
-private import gtk.ScrolledWindow;
-private import gtk.Widget;
-private import gtk.Label;
-private import gtk.Button;
-private import gtk.Tooltip;
+import gtk.VBox;
+import gtk.HBox;
+import gtk.VPaned;
+import gtk.ScrolledWindow;
+import gtk.Widget;
+import gtk.Label;
+import gtk.Button;
+import gtk.Tooltip;
 
-private import migrate;
-private import utils.string_util;
-private import utils.gio_util;
-private import constants;
-private import rcfile = config.rcfile;
-private import tab;
-private import terminal;
-private import file_manager;
-private import mediator;
-private import page_list;
+import migrate;
+import utils.string_util;
+import utils.gio_util;
+import constants;
+import rcfile = config.rcfile;
+import tab;
+import terminal;
+import file_manager;
+import mediator;
+import page_list;
 
 
 class Page : VBox

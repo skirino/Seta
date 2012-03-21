@@ -20,20 +20,16 @@ MA 02110-1301 USA.
 
 module utils.string_util;
 
-private import gtk.Label;
-private import glib.Str;
+import gtk.Label;
+import glib.Str;
 
-//private import tango.text.Util;
-private import std.string;
-//private import tango.io.device.File;
-//private import tango.io.stream.Lines;
-private import std.stdio;
-//private import tango.stdc.string;
-private import std.c.string;
-private import std.ascii;
+import std.string;
+import std.stdio;
+import std.c.string;
+import std.ascii;
 
-private import migrate;
-private import utils.min_max;
+import migrate;
+import utils.min_max;
 
 
 bool IsBlank(string s)

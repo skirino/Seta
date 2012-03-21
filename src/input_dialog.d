@@ -20,15 +20,13 @@ MA 02110-1301 USA.
 
 module input_dialog;
 
-private import gtk.Label;
-private import gtk.Entry;
-private import gtk.Dialog;
-private import gtk.VBox;
+import gtk.Label;
+import gtk.Entry;
+import gtk.Dialog;
+import gtk.VBox;
 
-//private import tango.text.Util;
-
-private import utils.string_util;
-private import utils.min_max;
+import utils.string_util;
+import utils.min_max;
 
 
 string InputDialog(bool hideInput = false)(string title, string description, string defaultValue = "")

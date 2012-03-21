@@ -20,11 +20,11 @@ MA 02110-1301 USA.
 
 module config.nautilus_scripts;
 
-private import gio.File;
-private import gio.FileInfo;
+import gio.File;
+import gio.FileInfo;
 
-private import migrate;
-private import utils.string_util;
+import migrate;
+import utils.string_util;
 
 
 class NautilusScript

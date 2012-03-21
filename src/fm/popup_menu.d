@@ -20,35 +20,34 @@ MA 02110-1301 USA.
 
 module fm.popup_menu;
 
-private import gtk.Menu;
-private import gtk.MenuItem;
-private import gtk.SeparatorMenuItem;
-private import gtk.CheckMenuItem;
-private import gtk.PopupBox;
-private import gtk.Widget;
-private import gio.File;
-private import gio.FileInfo;
-private import gio.AppInfoIF;
-private import gio.DesktopAppInfo;
-private import glib.Str;
-private import glib.ListG;
-private import glib.GException;
+import gtk.Menu;
+import gtk.MenuItem;
+import gtk.SeparatorMenuItem;
+import gtk.CheckMenuItem;
+import gtk.PopupBox;
+import gtk.Widget;
+import gio.File;
+import gio.FileInfo;
+import gio.AppInfoIF;
+import gio.DesktopAppInfo;
+import glib.Str;
+import glib.ListG;
+import glib.GException;
 
-//private import tango.stdc.posix.unistd;
-private import std.c.stdlib;
-private import core.sys.posix.unistd;
-private import core.sys.posix.sys.types;
+import std.c.stdlib;
+import core.sys.posix.unistd;
+import core.sys.posix.sys.types;
 
-private import migrate;
-private import utils.string_util;
-private import constants;
-private import rcfile = config.rcfile;
-private import config.dialog;
-private import scripts = config.nautilus_scripts;
-private import fm.file_view;
-private import fm.rename_dialog;
-private import move_files_job;
-private import input_dialog;
+import migrate;
+import utils.string_util;
+import constants;
+import rcfile = config.rcfile;
+import config.dialog;
+import scripts = config.nautilus_scripts;
+import fm.file_view;
+import fm.rename_dialog;
+import move_files_job;
+import input_dialog;
 
 
 void LaunchApp(AppInfoIF appInfo, File f)

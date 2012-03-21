@@ -20,29 +20,29 @@ MA 02110-1301 USA.
 
 module ssh_dialog;
 
-private import gtk.Widget;
-private import gtk.Dialog;
-private import gtk.Label;
-private import gtk.Entry;
-private import gtk.RadioButton;
-private import gtk.Menu;
-private import gtk.MenuItem;
-private import gtk.VBox;
-private import gtk.Table;
-private import gtk.HSeparator;
-private import gtk.ScrolledWindow;
-private import gtk.TreeIter;
-private import gtk.TreePath;
-private import gtk.TreeView;
-private import gtk.TreeViewColumn;
+import gtk.Widget;
+import gtk.Dialog;
+import gtk.Label;
+import gtk.Entry;
+import gtk.RadioButton;
+import gtk.Menu;
+import gtk.MenuItem;
+import gtk.VBox;
+import gtk.Table;
+import gtk.HSeparator;
+import gtk.ScrolledWindow;
+import gtk.TreeIter;
+import gtk.TreePath;
+import gtk.TreeView;
+import gtk.TreeViewColumn;
 
-private import utils.string_util;
-private import utils.tree_util;
-private import constants;
-private import rcfile = config.rcfile;
-private import config.known_hosts;
-private import config.hosts_view;
-private import ssh_connection;
+import utils.string_util;
+import utils.tree_util;
+import constants;
+import rcfile = config.rcfile;
+import config.known_hosts;
+import config.hosts_view;
+import ssh_connection;
 
 
 // Ask domain name of the remote host to be connected

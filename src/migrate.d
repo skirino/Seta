@@ -20,13 +20,11 @@ MA 02110-1301 USA.
 
 module migrate;
 
-//private import tango.sys.Environment;
-private import std.process;
+import std.process;
 
 string getenv(string key)
 {
   return std.process.getenv(key);
-  //return Environment.get(key);
 }
 
 string[string] getenvall()

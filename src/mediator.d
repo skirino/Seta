@@ -21,14 +21,14 @@ MA 02110-1301 USA.
 
 module mediator;
 
-private import constants;
-private import input_dialog;
-private import page;
-private import file_manager;
-private import terminal;
-private import file_system;
-private import ssh_connection;
-private import statusbar;
+import constants;
+import input_dialog;
+import page;
+import file_manager;
+import terminal;
+import file_system;
+import ssh_connection;
+import statusbar;
 
 
 class Mediator

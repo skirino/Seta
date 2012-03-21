@@ -20,28 +20,27 @@ MA 02110-1301 USA.
 
 module move_files_job;
 
-private import gtk.Selections;
-private import gtk.Clipboard;
-private import gdk.Threads;
-private import gio.File;
-private import gio.Cancellable;
-private import glib.GException;
-private import glib.Str;
-private import glib.URI;
-private import gtkc.gtk;
-private import gtkc.glib;
+import gtk.Selections;
+import gtk.Clipboard;
+import gdk.Threads;
+import gio.File;
+import gio.Cancellable;
+import glib.GException;
+import glib.Str;
+import glib.URI;
+import gtkc.gtk;
+import gtkc.glib;
 
-//private import tango.core.Thread;
-private import core.thread;
-private import std.c.stdlib;
+import core.thread;
+import std.c.stdlib;
 
-private import utils.gio_util;
-private import utils.string_util;
-private import constants;
-private import fm.file_view;
-private import thread_list;
-private import input_dialog;
-private import statusbar;
+import utils.gio_util;
+import utils.string_util;
+import constants;
+import fm.file_view;
+import thread_list;
+import input_dialog;
+import statusbar;
 
 
 

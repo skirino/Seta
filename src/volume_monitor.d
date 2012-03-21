@@ -20,15 +20,15 @@ MA 02110-1301 USA.
 
 module volume_monitor;
 
-private import gio.VolumeMonitor;
-private import gio.Mount;
-private import gio.MountIF;
-private import gtkc.gio;
-private import glib.ListG;
+import gio.VolumeMonitor;
+import gio.Mount;
+import gio.MountIF;
+import gtkc.gio;
+import glib.ListG;
 
-private import utils.string_util;
-private import statusbar;
-private import page_list;
+import utils.string_util;
+import statusbar;
+import page_list;
 
 
 private struct MountedVolumeMonitor

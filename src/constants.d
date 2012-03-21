@@ -20,9 +20,9 @@ MA 02110-1301 USA.
 
 module constants;
 
-private import gtk.DragAndDrop;
-private import gio.ContentType;
-private import glib.Str;
+import gtk.DragAndDrop;
+import gio.ContentType;
+import glib.Str;
 
 
 static const string[] ColumnTitles = ["name", "type", "size", "owner", "permissions", "last modified"];

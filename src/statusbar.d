@@ -20,17 +20,17 @@ MA 02110-1301 USA.
 
 module statusbar;
 
-private import gtk.Statusbar;
-private import gtk.ToggleButton;
-private import gtk.Arrow;
-private import gtk.Menu;
-private import gtk.MenuShell;
-private import gtk.MenuItem;
-private import gtkc.gtk;// for gtk_get_current_event_time()
+import gtk.Statusbar;
+import gtk.ToggleButton;
+import gtk.Arrow;
+import gtk.Menu;
+import gtk.MenuShell;
+import gtk.MenuItem;
+import gtkc.gtk;// for gtk_get_current_event_time()
 
-private import rcfile = config.rcfile;
-private import thread_list;
-private import note;
+import rcfile = config.rcfile;
+import thread_list;
+import note;
 
 
 private __gshared SetaStatusbar statusbarInstance;

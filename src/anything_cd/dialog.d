@@ -20,35 +20,33 @@ MA 02110-1301 USA.
 
 module anything_cd.dialog;
 
-private import gtk.Dialog;
-private import gtk.Widget;
-private import gtk.PopupBox;
-private import gtk.VBox;
-private import gtk.ScrolledWindow;
-private import gtk.Entry;
-private import gtk.EditableIF;
-private import gtk.TreeView;
-private import gtk.TreeViewColumn;
-private import gtk.TreeIter;
-private import gtk.TreePath;
-private import gtk.ListStore;
-private import gtk.CellRendererText;
-private import gdk.Threads;
-private import gdk.Keysyms;
-private import glib.Source;
+import gtk.Dialog;
+import gtk.Widget;
+import gtk.PopupBox;
+import gtk.VBox;
+import gtk.ScrolledWindow;
+import gtk.Entry;
+import gtk.EditableIF;
+import gtk.TreeView;
+import gtk.TreeViewColumn;
+import gtk.TreeIter;
+import gtk.TreePath;
+import gtk.ListStore;
+import gtk.CellRendererText;
+import gdk.Threads;
+import gdk.Keysyms;
+import glib.Source;
 
-//private import tango.text.Util;
-//private import tango.core.Thread;
-private import core.thread;
-private import std.string;
+import core.thread;
+import std.string;
 
-private import migrate;
-private import utils.min_max;
-private import utils.string_util;
-private import utils.tree_util;
-private import config.keybind;
-private import anything_cd.filter_dirs_job;
-private import page;
+import migrate;
+import utils.min_max;
+import utils.string_util;
+import utils.tree_util;
+import config.keybind;
+import anything_cd.filter_dirs_job;
+import page;
 
 
 ///////////// public interfaces of this module

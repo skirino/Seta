@@ -20,13 +20,13 @@ MA 02110-1301 USA.
 
 module thread_list;
 
-private import gdk.Window;
-private import gdk.Cursor;
-private import gtk.Main;
-private import gtk.PopupBox;
+import gdk.Window;
+import gdk.Cursor;
+import gtk.Main;
+import gtk.PopupBox;
 
-private import utils.vector;
-private import utils.time_util;
+import utils.vector;
+import utils.time_util;
 
 
 private enum ThreadInfoState

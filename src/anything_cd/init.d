@@ -20,8 +20,8 @@ MA 02110-1301 USA.
 
 module anything_cd.init;
 
-private import anything_cd.dir_list;
-private import anything_cd.dir_history;
+import anything_cd.dir_list;
+import anything_cd.dir_history;
 
 
 void Init()

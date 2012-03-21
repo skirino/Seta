@@ -20,11 +20,11 @@ MA 02110-1301 USA.
 
 module anything_cd.dir_history;
 
-private import migrate;
-private import utils.vector;
-private import utils.string_util;
-private import rcfile = config.rcfile;
-private import anything_cd.dir_list;
+import migrate;
+import utils.vector;
+import utils.string_util;
+import rcfile = config.rcfile;
+import anything_cd.dir_list;
 
 
 ///////////// public interfaces of this module
