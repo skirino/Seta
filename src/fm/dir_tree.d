@@ -282,10 +282,9 @@ private:
 
   bool TooltipCallback(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
   {
-    TreeModelIF model;
     TreePath path;
     TreeIter iter = new TreeIter;
-    if(0 != getTooltipContext(&x, &y, keyboardTip, model, path, iter)){
+    if(GetTooltipContext(this, &x, &y, keyboardTip, path, iter)){
       if(path !is null){
         CellRenderer renderer = GetCellRendererFromCol(col_);
         Tooltip tip = new Tooltip(p);

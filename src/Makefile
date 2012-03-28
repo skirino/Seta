@@ -1,10 +1,12 @@
-all:
-	dmd -O -ofseta -L-lgtkd -L-lvte -L-ldl C/workaround.o anything_cd/*.d config/*.d fm/*.d term/*.d utils/*.d *.d
+SRC = anything_cd/*.d config/*.d fm/*.d gtk/*.d term/*.d utils/*.d *.d
 
-debug:
-	dmd -g -version=DEBUG -ofseta -L-lgtkd -L-lvte -L-ldl C/workaround.o anything_cd/*.d config/*.d fm/*.d term/*.d utils/*.d *.d
+all: C/workaround.o
+	dmd -O -ofseta -L-lgtkd -L-lvte -L-ldl C/workaround.o ${SRC}
 
-cworkaround:
+debug: C/workaround.o
+	dmd -g -version=DEBUG -ofseta -L-lgtkd -L-lvte -L-ldl C/workaround.o ${SRC}
+
+C/workaround.o:
 	make -C ./C
 
 install:

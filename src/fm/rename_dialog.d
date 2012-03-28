@@ -52,6 +52,7 @@ import pango.PgAttributeList;
 
 import utils.string_util;
 import utils.tree_util;
+import gtk.combo_box_text;
 import input_dialog;
 import statusbar;
 
@@ -172,7 +173,7 @@ private class RenameDialog : Dialog
   ListStore store_;
   TreeViewColumn colOld_, colNew_;
   CellRendererText renderer_;
-  ComboBox comboBox_;
+  ComboBoxText comboBox_;
   Label lold_, lnew_, lpre_, lapp_, lerr_;
   Entry eold_, enew_, epre_, eapp_;
 
@@ -232,7 +233,7 @@ private class RenameDialog : Dialog
     HBox hbox = new HBox(0, 10);
     contentArea.packStart(hbox, 0, 0, 0);
 
-    comboBox_ = new ComboBox();// ComboBox containing texts
+    comboBox_ = new ComboBoxText();
     comboBox_.appendText("All Matches");
     comboBox_.appendText("First Match");
     comboBox_.appendText("Last Match");
@@ -479,11 +480,10 @@ private class RenameDialog : Dialog
   bool QueryTooltip(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
   {
     // obtain the cell where the mouse cursor is
-    TreeModelIF model;
     TreePath path;
     TreeIter iter = new TreeIter;
     iter.setModel(store_);
-    if(0 != view_.getTooltipContext(&x, &y, keyboardTip, model, path, iter)){
+    if(GetTooltipContext(view_, &x, &y, keyboardTip, path, iter)){
       if(path !is null){
         TreeViewColumn col = GetColAtPos(view_, x, y);
 
