@@ -1,4 +1,0 @@
-[main.d]
-target=seta
-buildflags=-O -release C/workaround.o -lltangobos -llvte -lldl
-
