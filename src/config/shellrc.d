@@ -118,8 +118,15 @@ private:
         }
 
         // "source" command
+        string args;
         if(l.StartsWith("source ")){
-          string args = triml(l[7 .. $]);
+          args = triml(l[7 .. $]);
+        }
+        else if(l.StartsWith(". ")){
+          args = triml(l[2 .. $]);
+        }
+
+        if(args !is null){
           // currently only 1 file (specified by the 1st argument) is processed
           string arg = args.Extract1stArg().ExpandEnvVars();
           if(arg.StartsWith("/")){
