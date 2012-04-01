@@ -21,12 +21,17 @@ MA 02110-1301 USA.
 module utils.array_util;
 
 
-bool Include(T)(const(T)[] array, const(T) elem)
+ptrdiff_t IndexOf(T)(const(T)[] array, const(T) elem)
 {
-  foreach(t; array){
+  foreach(i, t; array){
     if(t == elem){
-      return true;
+      return i;
     }
   }
-  return false;
+  return -1;
+}
+
+bool Contains(T)(const(T)[] array, const(T) elem)
+{
+  return IndexOf(array, elem) != array.length;
 }

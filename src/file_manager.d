@@ -376,7 +376,7 @@ public:
     }
 
     auto menu = new Menu;
-    foreach(n, l; list){
+    foreach(int n, l; list){
       string label = mediator_.FileSystemNativePath(l);
       auto dlg = delegate void(MenuItem item){
         MoveNTimesAndChangeDir!(ForwardDirection)(item, n+1);

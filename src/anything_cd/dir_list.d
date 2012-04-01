@@ -239,7 +239,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
         scope FileInfo info = new FileInfo(pinfo);
         if((info.getFileType() == GFileType.TYPE_DIRECTORY) && (info.getIsSymlink() == 0)){
           string name = info.getName();
-          if(ignoreDirs.Include(name)){
+          if(ignoreDirs.Contains(name)){
             dirs ~= name;
           }
         }

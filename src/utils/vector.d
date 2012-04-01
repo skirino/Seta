@@ -55,7 +55,7 @@ public:
     if(size_ == array_.length){
       enlarge();
     }
-    for(int i=size_-1; i>=0; --i){
+    for(ptrdiff_t i=size_-1; i>=0; --i){
       array_[i+1] = array_[i];
     }
     array_[0] = t;
@@ -88,7 +88,7 @@ public:
   void moveToHead(size_t index)
   {
     T t = array_[index];
-    for(int i=index-1; i>=0; --i){
+    for(ptrdiff_t i=index-1; i>=0; --i){
       array_[i+1] = array_[i];
     }
     array_[0] = t;

@@ -22,6 +22,7 @@ module anything_cd.dir_history;
 
 import std.process;
 
+import utils.array_util;
 import utils.vector;
 import utils.string_util;
 import rcfile = config.rcfile;
@@ -83,22 +84,15 @@ public:
     string[] array = list_.array();
 
     // check uniqueness of paths
-    int index = -1;
-    foreach(i, dir; array){
-      if(dir == path){
-        index = i;
-        break;
-      }
-    }
-
-    if(index == -1){// not found
+    auto idx = array.IndexOf(path);
+    if(idx == -1){// not found
       if(list_.size() == MAX){
         list_.pop();
       }
       list_.prepend(path);
     }
     else{// found
-      list_.moveToHead(index);
+      list_.moveToHead(idx);
     }
   }
 }

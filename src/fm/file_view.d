@@ -168,7 +168,7 @@ private:
 
   string GetValueString(TreeIter iter, TreeViewColumn col)
   {
-    foreach(i, c; cols_){
+    foreach(int i, c; cols_){
       if(c is col){
         return iter.getValueString(i);
       }
@@ -317,8 +317,8 @@ public:
 
   ///////////////////// listup in another thread
 private:
-  // number of rows (DirEntry's) present in the TreeView now
-  uint numRowsNow_;
+  // number of rows (DirEntry's) present in the TreeView
+  size_t numRowsNow_;
 
   PrepareEntriesJob prepareUpdateThread_;
 
@@ -398,7 +398,7 @@ private:
 
   void ResetRows()
   {
-    mediator_.UpdatePathLabel(pwd_, eList_.NumEntriesAll());
+    mediator_.UpdatePathLabel(pwd_, cast(int)eList_.NumEntriesAll());
 
     // cleanup
     store_.clear();

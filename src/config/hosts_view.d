@@ -79,7 +79,7 @@ public:
       hostsStore_.append(iter);
 
       string[] items = TrimAll(split(host, ":"));
-      foreach(i, item; items){
+      foreach(int i, item; items){
         hostsStore_.setValue(iter, i, item);
       }
     }

@@ -180,7 +180,7 @@ private class RenameDialog : Dialog
   this(string[] files)
   {
     super();
-    setTitle("Rename " ~ PluralForm!(uint, "file")(files.length));
+    setTitle("Rename " ~ PluralForm!(size_t, "file")(files.length));
     setDefaultSize(430, 450);
     addOnResponse(&Respond);
     auto contentArea = getContentArea();

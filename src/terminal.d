@@ -472,8 +472,8 @@ private:
 
     string ret = line;
 
-    // this code might have performance problem
-    foreach(i, target; targets){
+    // this code may have performance problem
+    foreach(int i, target; targets){
       if(containsPattern(line, target)){
         string replace = getCWDLR_(LR, i);
         if(replace !is null){
@@ -639,7 +639,7 @@ public:
       this,
       GtkDestDefaults.ALL,
       dragTargets.ptr,
-      dragTargets.length,
+      cast(int)dragTargets.length,
       GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
     addOnDragDataReceived(&DragDataReceived);
   }

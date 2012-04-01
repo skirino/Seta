@@ -192,7 +192,7 @@ private:
 
     TreeIter iter = new TreeIter;
     iter.setModel(keyStore_);
-    foreach(i, category; categories_){
+    foreach(int i, category; categories_){
       if(keyStore_.iterChildren(iter, category)){
         string categoryName = IndexToActionKey(i) ~ '.';
         string previousKey;

@@ -57,8 +57,8 @@ public:
     }
 
     // obtain fullpaths to the shell's rc file
-    uint possh    = shell.locatePattern("sh");
-    uint posslash = shell.locatePrior('/', possh);
+    size_t possh    = shell.locatePattern("sh");
+    size_t posslash = shell.locatePrior('/', possh);
     if(possh == shell.length || posslash == shell.length){
       return;
     }
@@ -78,7 +78,7 @@ public:
 
     for(size_t i=0; i<filenames.length; ++i){
       string filename = filenames[i];
-      if(!(filename in filesProcessed)){
+      if(filename !in filesProcessed){
         filesProcessed[filename] = true;
         string[] srcs = ReadFile(filename, home);
         filenames ~= srcs;
@@ -98,7 +98,7 @@ private:
         // assume Bourne-like shell
         if(l.StartsWith("alias ")){// alias command
           string l2 = l[6 .. $];// line after "alias "
-          uint posequal = l2.locate('=');
+          size_t posequal = l2.locate('=');
           if(posequal != l2.length){// contains '='
             string rhs = Extract1stArg(l2[posequal+2 .. $-1]);// rhs should be quoted by ' or ", remove them
             if(rhs.StartsWith("cd ")){

@@ -341,7 +341,7 @@ void RemoveSSHHost(SSHConnection con)
 
 void ResetRemoteHosts(string[] list)
 {
-  uint len;
+  size_t len;
   if(instance_.getStringList("SSH", "Hosts", len) != list){// has different value
     string s = join(list, ",");
     instance_.setString("SSH", "Hosts", NonnullString(s));
@@ -407,7 +407,7 @@ private:
     if(exist){
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
 
-      uint len;
+      size_t len;
       if(getGroups(len) == ["Version", "Layout", "Terminal", "Directories", "SSH", "Keybind"]){
         if(getString("Version", "Version") != SetaVersion){// .setarc is old
           changed_ = true;
@@ -540,7 +540,7 @@ private:
       // "scope" storage-class specifier is necessary to remove segfault at shutdown of Seta
       scope File f = File.parseName(filename_);
       scope FileOutputStream fs = f.replace(null, 1, GFileCreateFlags.NONE, null);
-      uint len;
+      size_t len;
       char[] contents = cast(char[]) toData(len);
       fs.writeAll(contents.ptr, contents.length, &len, null);
       fs.close(null);
@@ -619,7 +619,7 @@ private:
   string[] GetSSHHosts()
   {
     if(hasKey("SSH", "Hosts")){
-      uint len;
+      size_t len;
       return getStringList("SSH", "Hosts", len);
     }
     else{

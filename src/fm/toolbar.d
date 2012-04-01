@@ -52,7 +52,8 @@ class SetaToolbar : Toolbar
 {
 private:
   FileManager parent_;
-  uint numToolItemsShown_, numShortcuts_;
+  uint numToolItemsShown_;
+  size_t numShortcuts_;
 
   ToolItem itemBack_, itemForward_, itemUp_, itemRoot_, itemHome_, itemOtherSide_, itemRefresh_,
     itemSSH_, itemHidden_, itemDirTree_, itemSeparator1_, itemFilter_, itemSeparator2_;
@@ -74,7 +75,7 @@ public:
 
 
   ///////////////////// accessor
-  uint GetNumShortcuts(){return numShortcuts_;}
+  uint GetNumShortcuts(){return cast(uint)numShortcuts_;}
   Entry GetFilterEntry(){return filter_;}
 
   void ToggleShowHidden()
@@ -276,7 +277,7 @@ public:
       string path = paths[i];
       string baseName = GetBasename(path);
 
-      uint index = i + 1 + numShortcuts_;
+      size_t index = i + 1 + numShortcuts_;
       string label = index <= 9 ? "(" ~ Str.toString(index) ~ ") " ~ baseName : baseName;
       string tooltip = name ~ " (" ~ path ~ ')';
       AppendShortcutButton(
@@ -363,7 +364,7 @@ private:
     ListG list = getChildren();
 
     // skip default buttons
-    int i=0;
+    size_t i=0;
     while(list !is null){
       if(i == numToolItemsShown_){
         break;
@@ -455,15 +456,10 @@ private:
 
 
 
-
-
-
-
-
-  template InsertOrRemove(string s, string booleanExpression)
-  {
-    const string InsertOrRemove =
-      "
+template InsertOrRemove(string s, string booleanExpression)
+{
+  const string InsertOrRemove =
+    "
       if(" ~ booleanExpression ~ "){
         if(item" ~ s ~ "_.getParent is null){
           insert(item" ~ s ~ "_, numToolItemsShown_);
@@ -475,10 +471,11 @@ private:
           item" ~ s ~ "_.doref();
           remove(item" ~ s ~ "_);
         }
-      }";
-  }
+      }
+    ";
+}
 
-  template InsertOrRemove(string s)
-  {
-    const string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
-  }
+template InsertOrRemove(string s)
+{
+  const string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
+}

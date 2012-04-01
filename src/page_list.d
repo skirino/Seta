@@ -37,7 +37,7 @@ void Register(Page p)
 void Unregister(Page p)
 {
   int idx = -1;
-  foreach(i, page; pages_){
+  foreach(int i, page; pages_){
     if(page is p){
       idx = i;
       break;

@@ -33,7 +33,7 @@ string InputDialog(bool hideInput = false)(string title, string description, str
 {
   scope label = new Label(description, false);
   scope entry = new Entry(defaultValue);
-  entry.setWidthChars(Max(defaultValue.length, cast(size_t)20));// ensure width of "entry"
+  entry.setWidthChars(Max(cast(int)defaultValue.length, 20));// ensure width of "entry"
   static if(hideInput){
     entry.setVisibility(0);
   }
@@ -67,7 +67,7 @@ string InputDialog(bool hideInput = false)(string title, string description, str
 
   d.showAll();
 
-  entry.selectRegion(0, locatePrior(defaultValue, '.'));// do not select extension
+  entry.selectRegion(0, cast(int)locatePrior(defaultValue, '.'));// do not select extension
 
   d.run();
   return ret;

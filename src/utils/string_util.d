@@ -353,11 +353,17 @@ private string ReplaceQuotedArg(string args)
 
 private size_t ReverseCountBackslash(string s)
 {
-  int pos = s.length-1;
+  if(s.length == 0){
+    return 0;
+  }
+
+  size_t num = 0;
+  size_t pos = s.length-1;
   while(pos >= 0 && s[pos] == '\\'){
+    ++num;
     --pos;
   }
-  return s.length - 1 - pos;
+  return num;
 }
 
 
@@ -454,7 +460,7 @@ C[] triml(C)(C[] s)
 
 C[] trimr(C)(C[] s)
 {
-  for(int i=s.length-1; i>=0; --i){
+  for(ptrdiff_t i=s.length-1; i>=0; --i){
     if(!isWhite(s[i])){
       return s[0 .. i+1];
     }
