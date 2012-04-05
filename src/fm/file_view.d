@@ -980,7 +980,7 @@ private:
           if(namePath != PARENT_STRING){
             // check "../" is not included in the selected files
             auto firstIter = GetIterFirst(store_);
-            if(selection.iterIsSelected(firstIter)){
+            if(!selection.iterIsSelected(firstIter)){
               // prepare for dragging
               draggingState_ = DraggingState.PRESSED;
               dragStartButton_ = eb.button;
