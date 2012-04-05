@@ -491,9 +491,9 @@ unittest
   assert("abcあいう"   == y.trim());
 
   string z = "   ";
-  assert("", x.triml());
-  assert("", x.trimr());
-  assert("", x.trim());
+  assert("" == z.triml());
+  assert("" == z.trimr());
+  assert("" == z.trim());
 }
 
 
@@ -526,15 +526,15 @@ unittest
   assert(x == x.substitute("nohit", "def"));
 
   // Should accept both mutable and immutable strings
-  assert("defあいうdef123def", x    .substitute("abc",     "def"));
-  assert("defあいうdef123def", x.dup.substitute("abc",     "def"));
-  assert("defあいうdef123def", x    .substitute("abc".dup, "def"));
-  assert("defあいうdef123def", x.dup.substitute("abc".dup, "def"));
-  assert("defあいうdef123def", x    .substitute("abc".dup, "def".dup));
-  assert("defあいうdef123def", x.dup.substitute("abc".dup, "def".dup));
+  assert("defあいうdef123def" == x    .substitute("abc",     "def"));
+  assert("defあいうdef123def" == x.dup.substitute("abc",     "def"));
+  assert("defあいうdef123def" == x    .substitute("abc".dup, "def"));
+  assert("defあいうdef123def" == x.dup.substitute("abc".dup, "def"));
+  assert("defあいうdef123def" == x    .substitute("abc".dup, "def".dup));
+  assert("defあいうdef123def" == x.dup.substitute("abc".dup, "def".dup));
 
   // Should substitute multibyte chars
-  assert("abcえおabc123abc", x.substitute("あいう", "えお"));
+  assert("abcえおabc123abc" == x.substitute("あいう", "えお"));
 }
 
 
@@ -646,7 +646,3 @@ unittest
   assert(x.dup.containsPattern("abc"));
   assert(!x.containsPattern("xyz"));
 }
-
-
-
-

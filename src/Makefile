@@ -12,6 +12,10 @@ osx: C/workaround.o
 osx-debug: C/workaround.o
 	dmd -m32 -g -version=DEBUG -ofseta -L-L/opt/local/lib -L-lgtkd -L-lvte -L-lgtk-x11-2.0 C/workaround.o ${SRC}
 
+test: C/workaround.o
+	dmd -unittest -ofsetatest -L-L/opt/local/lib -L-lgtkd -L-lvte -L-ldl C/workaround.o ${SRC}
+	./setatest
+
 C/workaround.o:
 	make -C ./C
 
