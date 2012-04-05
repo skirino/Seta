@@ -50,29 +50,31 @@ class ScriptsDir
   this(string path)
   {
     path_ = AppendSlash(path);
-
     const string attributes = "standard::name,standard::type,access::can-execute";
-    scope enumerate = File.parseName(path_).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
 
-    GFileInfo * pinfo;
-    while((pinfo = enumerate.nextFile(null)) != null){
-      scope FileInfo info = new FileInfo(pinfo);
-      string name = path_ ~ info.getName();
+    try{
+      scope enumerate = File.parseName(path_).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
 
-      if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
-        dirs_ ~= new ScriptsDir(name);
-      }
-      else{// file
-        if(info.getAttributeBoolean("access::can-execute")){
-          scripts_ ~= new NautilusScript(name);
+      GFileInfo * pinfo;
+      while((pinfo = enumerate.nextFile(null)) != null){
+        scope FileInfo info = new FileInfo(pinfo);
+        string name = path_ ~ info.getName();
+
+        if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
+          dirs_ ~= new ScriptsDir(name);
+        }
+        else{// file
+          if(info.getAttributeBoolean("access::can-execute")){
+            scripts_ ~= new NautilusScript(name);
+          }
         }
       }
+
+      enumerate.close(null);
+      dirs_.sort;
+      scripts_.sort;
     }
-
-    enumerate.close(null);
-
-    dirs_.sort;
-    scripts_.sort;
+    catch(Exception ex){}// no such file or directory
   }
 
   string GetName(){return GetBasename(path_);}
