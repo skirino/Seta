@@ -24,6 +24,8 @@ import gtk.Main;
 import gthread.Thread;
 import gdk.Threads;
 
+import std.stdio;
+
 import constants;
 import config.init;
 import anything_cd.init;
@@ -52,6 +54,11 @@ private void Finalize()
 
 void main(string[] args)
 {
+  version(unittest){
+    writefln("All tests passed!");
+    return;
+  }
+
   // initialize libraries
   Thread.init(null);
   gdkThreadsInit();

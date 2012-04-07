@@ -1,19 +1,23 @@
 SRC = anything_cd/*.d config/*.d fm/*.d gtk/*.d term/*.d utils/*.d *.d
+INPUTS = C/workaround.o ${SRC}
+
+SYSTEM = $(shell uname -s)
+ifeq ("$(SYSTEM)", "Darwin")
+	DFLAGS = -m32
+	LINKOPTS = -L-lgtkd -L-lvte -L-L/opt/local/lib -L-lgtk-x11-2.0 -L-ldl
+else # assuming Linux
+	DFLAGS =
+	LINKOPTS = -L-lgtkd -L-lvte -L-ldl
+endif
 
 all: C/workaround.o
-	dmd -O -ofseta -L-lgtkd -L-lvte -L-ldl C/workaround.o ${SRC}
+	dmd ${DFLAGS} -O -ofseta ${LINKOPTS} ${INPUTS}
 
 debug: C/workaround.o
-	dmd -g -version=DEBUG -ofseta -L-lgtkd -L-lvte -L-ldl C/workaround.o ${SRC}
-
-osx: C/workaround.o
-	dmd -m32 -O -ofseta -L-L/opt/local/lib -L-lgtkd -L-lvte -L-lgtk-x11-2.0 C/workaround.o ${SRC}
-
-osx-debug: C/workaround.o
-	dmd -m32 -g -version=DEBUG -ofseta -L-L/opt/local/lib -L-lgtkd -L-lvte -L-lgtk-x11-2.0 C/workaround.o ${SRC}
+	dmd ${DFLAGS} -g -version=DEBUG -ofseta ${LINKOPTS} ${INPUTS}
 
 test: C/workaround.o
-	dmd -unittest -ofsetatest -L-L/opt/local/lib -L-lgtkd -L-lvte -L-ldl C/workaround.o ${SRC}
+	dmd ${DFLAGS} -unittest -ofsetatest ${LINKOPTS} ${INPUTS}
 	./setatest
 
 C/workaround.o:
@@ -24,7 +28,3 @@ install:
 	@install -m 644 ../debian/usr/share/applications/seta.desktop /usr/share/applications/
 	@install -m 644 ../debian/usr/share/pixmaps/seta/seta_show-hidden-files.svg /usr/share/pixmaps/
 	@install -m 644 ../debian/usr/share/pixmaps/seta/gnome-session-switch.svg /usr/share/pixmaps/
-
-.PHONY: clean
-clean:
-	rm -f $(OBJS) $(COBJS)
