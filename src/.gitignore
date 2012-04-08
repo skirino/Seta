@@ -1,5 +1,4 @@
 seta
 setatest
-dsss_objs
 *.o
 **/*.o
