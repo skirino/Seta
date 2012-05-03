@@ -55,8 +55,9 @@ public:
   static void Init()
   {
     singleton_ = new SetaWindow();
-    SetLayout();
-    singleton_.showAll();
+    SetLayout();// set parameters in rcfile
+    singleton_.showAll();// do size allocations and negotiations
+    SetLayout();// reset parameters and hide some of child widgets such as statusbar
 
     // set initial focus to lower left widget (terminal)
     singleton_.noteL_.GetCurrentPage().FocusShownWidget();
@@ -99,10 +100,10 @@ public:
 private:
   bool WindowDelete(Event e, Widget w)
   {
-    // For cleaner quit of Seta application,
+    // For clean shutdown of Seta application,
     // it turns out to be better here to return TRUE (stop propagating the delete signal).
-    // If the event is further propagated, the terminal in which Seta is started,
-    // does not temporarily catch any keypress events.
+    // If the event is further propagated, the terminal in which Seta is started
+    // cannot temporarily catch any keypress events.
     return true;
   }
 
