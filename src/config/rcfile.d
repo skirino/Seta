@@ -42,7 +42,7 @@ import ssh_connection;
 import page_list;
 
 
-static const string SetaVersion = "0.6.1";
+static const string SetaVersion = "0.6.2";
 
 void Init()
 {
