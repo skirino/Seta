@@ -28,6 +28,7 @@ import gdk.Threads;
 import gdk.Color;
 import glib.Str;
 import glib.Regex;
+import glib.Source;
 
 import std.string;
 import std.process;
@@ -93,7 +94,7 @@ public:
 
     Signals.connectData(vte_, "child-exited",
                         cast(GCallback)(&CloseThisPageCallback),
-                        cast(void*)mediator_, null, GConnectFlags.AFTER);
+                        cast(void*)this, null, GConnectFlags.AFTER);
 
     InitTermios(pty_);
     InitDragAndDropFunctionality();
@@ -122,12 +123,13 @@ public:
   }
 
 private:
-  extern(C) static void CloseThisPageCallback(VteTerminal * vte, void * data)
+  extern(C) static void CloseThisPageCallback(VteTerminal * vte, void * ptr)
   {
     // glib's callback does not grab GDK lock automatically
     gdkThreadsEnter();
-    Mediator m = cast(Mediator)data;
-    m.CloseThisPage();
+    auto t = cast(Terminal)ptr;
+    t.CancelSyncFilerDirCallback();
+    t.mediator_.CloseThisPage();
     gdkThreadsLeave();
   }
   //////////////////// GUI stuff
@@ -358,10 +360,12 @@ public:
 private:
   static const int PATH_MAX = 4096;// PATH_MAX in /usr/include/linux/limits.h
   char[] readlink_buffer_;
+  uint syncCallbackID_;
 
   void InitSyncFilerDirFunctionality()
   {
     readlink_buffer_.length = PATH_MAX + 1;
+    syncCallbackID_ = gdkThreadsAddTimeoutSeconds(2, &SyncFilerDirectoryByCwdCallback, cast(void*)this);
   }
 
   void SyncFilerDirectoryByCwd()
@@ -375,6 +379,18 @@ private:
         mediator_.FilerChangeDirFromTerminal(cwd_);
       }
     }
+  }
+
+  extern(C) static int SyncFilerDirectoryByCwdCallback(void * ptr)
+  {
+    auto t = cast(Terminal)ptr;
+    t.SyncFilerDirectoryByCwd();
+    return 1;// continues to call this function
+  }
+
+  void CancelSyncFilerDirCallback()
+  {
+    Source.remove(syncCallbackID_);
   }
   ////////////////// automatic sync of filer
 
