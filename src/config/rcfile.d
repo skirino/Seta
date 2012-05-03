@@ -587,6 +587,7 @@ private:
     mixin(InstallKeybind!("FileManagerAction.GoToDir9"        , "<Alt>9"));
 
     mixin(InstallKeybind!("FileViewAction.SelectAll"    , "<Control>a"));
+    mixin(InstallKeybind!("FileViewAction.UnselectAll"  , "<Control>g"));
     mixin(InstallKeybind!("FileViewAction.SelectRow"    , "space,<Control>space"));
     mixin(InstallKeybind!("FileViewAction.Cut"          , "<Control>x"));
     mixin(InstallKeybind!("FileViewAction.Copy"         , "<Control>c"));
@@ -828,7 +829,8 @@ FileManagerAction.GoToDir7=<Alt>7
 FileManagerAction.GoToDir8=<Alt>8
 FileManagerAction.GoToDir9=<Alt>9
 
-FileViewAction.SelectAll=<Control>a,<Shift><Control>a
+FileViewAction.SelectAll=<Control>a
+FileViewAction.UnselectAll=<Control>g
 FileViewAction.SelectRow=space,<Control>space
 FileViewAction.Cut=<Control>x,<Shift><Control>x
 FileViewAction.Copy=<Control>c,<Shift><Control>c

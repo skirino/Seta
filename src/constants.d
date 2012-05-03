@@ -127,6 +127,7 @@ enum FileManagerAction
 enum FileViewAction
 {
   SelectAll,
+  UnselectAll,
   SelectRow,
   Cut,
   Copy,

@@ -803,6 +803,10 @@ private:
       path.free();
       return true;
 
+    case FileViewAction.UnselectAll:
+      getSelection().unselectAll();
+      return true;
+
     case FileViewAction.SelectRow:
       TreePath path = GetPathAtCursor(this);
       if(path is null){
