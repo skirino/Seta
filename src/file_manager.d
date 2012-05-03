@@ -257,6 +257,7 @@ public:
     bool notifyTerminal = true)
   {
     if(view_.ChangeDirectory(dir, appendToHistory, notifyTerminal)){
+      anything_cd.dir_list.Add(dir);
       dirTree_.ChangeDirectory(dir);
       return true;
     }

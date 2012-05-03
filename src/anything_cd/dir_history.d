@@ -34,23 +34,19 @@ string[] Get()
 {
   return instance_.list_.array();
 }
-
-void Push(string path)
+void Add(string path)
 {
-  instance_.Push(path);
+  instance_.Add(path);
 }
-
 void Remove(string dir)
 {
   instance_.Remove(dir);
 }
 
-
 void Init()
 {
   instance_ = new DirHistory;
 }
-
 void Finish()
 {
   instance_.Save();
@@ -63,37 +59,12 @@ private __gshared DirHistory instance_;
 
 private class DirHistory : DirListBase
 {
-private:
-  string home_;
-
 public:
   this()
   {
-    home_ = getenv("HOME");
-    super(home_ ~ "/.seta_history");
+    super(getenv("HOME") ~ "/.seta_history");
     Load!(true)();
-    Push(rcfile.GetInitialDirectoryLeft());
-    Push(rcfile.GetInitialDirectoryRight());
-  }
-
-  void Push(string path)
-  {
-    if(path.StartsWith(home_)){
-      path = "~" ~ path[home_.length .. $];
-    }
-    string[] array = list_.array();
-
-    // check uniqueness of paths
-    auto idx = array.IndexOf(path);
-    if(idx == -1){// not found
-      if(list_.size() == MAX){
-        list_.pop();
-      }
-      list_.prepend(path);
-    }
-    else{// found
-      list_.moveToHead(idx);
-    }
+    Add(ReplaceHomeDir(rcfile.GetInitialDirectoryLeft()));
+    Add(ReplaceHomeDir(rcfile.GetInitialDirectoryRight()));
   }
 }
-

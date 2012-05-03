@@ -69,8 +69,6 @@ public:
 
     bufferEnd_ = idxPWD_ = next;
     dirs_[idxPWD_] = dir;
-
-    anything_cd.dir_history.Push(dir);
   }
 
   void GoNext(bool ForwardDirection)()
@@ -80,7 +78,7 @@ public:
         idxPWD_ = Idx(idxPWD_ + 1);
       }
     }
-    else{//back
+    else{// back
       if(idxPWD_ != bufferStart_){
         idxPWD_ = Idx(idxPWD_ - 1);
       }

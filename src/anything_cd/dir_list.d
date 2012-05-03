@@ -43,8 +43,6 @@ string[] Get()
   return instance_.list_.array();
 }
 
-bool Changed(){return instance_.changed_;}
-
 bool IsScanning(){return (thread_ !is null) && (thread_.isRunning());}
 
 void Scan()
@@ -53,12 +51,23 @@ void Scan()
   thread_.start();
 }
 
-void Remove(string dir)
+string ReplaceHomeDir(string dir)
 {
   auto home = getenv("HOME");
   if(dir.StartsWith(home)){
-    dir = '~' ~ dir[home.length .. $];
+    dir = "~" ~ dir[home.length .. $];
   }
+  return dir;
+}
+void Add(string dir)
+{
+  dir = ReplaceHomeDir(dir);
+  instance_.Add(dir);
+  anything_cd.dir_history.Add(dir);
+}
+void Remove(string dir)
+{
+  dir = ReplaceHomeDir(dir);
   instance_.Remove(dir);
   anything_cd.dir_history.Remove(dir);
 }
@@ -116,6 +125,21 @@ public:
     }
   }
 
+  void Add(string dir)
+  {
+    // check uniqueness of paths
+    auto idx = list_.array().IndexOf(dir);
+    if(idx == -1){// not found
+      if(list_.size() == MAX){
+        list_.pop();
+      }
+      list_.prepend(dir);
+    }
+    else{// found
+      list_.moveToHead(idx);
+    }
+  }
+
   void Remove(string dir)
   {
     list_.remove(dir);
@@ -125,28 +149,11 @@ public:
 
 private class DirList : DirListBase
 {
-private:
-  bool changed_;
-
 public:
   this()
   {
     super(getenv("HOME") ~ "/.seta_dirlist");
-    changed_ = false;
     Load();
-  }
-
-  override void Save()
-  {
-    if(changed_){
-      super.Save();
-    }
-  }
-
-  override void Remove(string dir)
-  {
-    super.Remove(dir);
-    changed_ = true;
   }
 }
 
@@ -195,7 +202,6 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     Unregister();
     if(!canceled_){
       instance_.list_.swap(v_);
-      instance_.changed_ = true;
       PushIntoStatusbar("Finished updating directory list.");
     }
     gdkThreadsLeave();
