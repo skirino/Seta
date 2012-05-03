@@ -115,10 +115,12 @@ public:
 
     auto appendPageButton = new Button(StockID.ADD, &AppendPage, true);
     appendPageButton.setTooltipText("Open new tab");
+    appendPageButton.setCanFocus(0);
     topBar_.packStart(appendPageButton, 0, 0, 0);
 
     auto viewModeButton = new Button(StockID.FULLSCREEN, &ViewModeButtonClicked, true);
     viewModeButton.setTooltipText("Switch view mode");
+    viewModeButton.setCanFocus(0);
     topBar_.packStart(viewModeButton, 0, 0, 0);
 
     // reset button size
