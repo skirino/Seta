@@ -309,7 +309,6 @@ private class RenameDialog : Dialog
       while(store_.iterNext(iter));
     }
     else{
-      assert(responseID == GtkResponseType.GTK_RESPONSE_CANCEL);
       ret_ = null;
     }
 
