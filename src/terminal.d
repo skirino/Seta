@@ -71,26 +71,16 @@ public:
 
     vte_terminal_set_scrollback_lines(vte_, -1);// infinite scrollback
     vte_terminal_set_audible_bell(vte_, 0);
-
-    // transparent background
     vte_terminal_set_background_transparent(vte_, 1);
 
     // Fork the child process.
     // Passing "argv" is essential when the default shell is zsh.
     char *[2] argv = [Str.toStringz(std.process.getenv("SHELL")), null];
-    // deprecated since 0.26
-    pid_ = vte_terminal_fork_command(
-      vte_, argv[0], argv.ptr, null,
-      Str.toStringz(initialDir), 0, 0, 0);
-    // since 0.26
-    //vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0, Str.toStringz(initialDir), argv.ptr, null,
-    //                               cast(GSpawnFlags)0, null, null, &pid_, null);
+    vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0, Str.toStringz(initialDir), argv.ptr, null,
+                                   cast(GSpawnFlags)0, null, null, &pid_, null);
 
-    // deprecated since 0.26
-    pty_ = vte_terminal_get_pty(vte_);
-    // since 0.26
-    //VtePty * ptyObj = vte_terminal_get_pty_object(vte_);
-    //pty_ = vte_pty_get_fd(ptyObj);
+    VtePty * ptyObj = vte_terminal_get_pty_object(vte_);
+    pty_ = vte_pty_get_fd(ptyObj);
 
     Signals.connectData(vte_, "child-exited",
                         cast(GCallback)(&CloseThisPageCallback),
@@ -750,17 +740,6 @@ extern(C){
                                            gboolean wrap_around);
 
   // process management
-  pid_t vte_terminal_fork_command(VteTerminal * terminal, // deprecated
-                                  char *command,
-                                  char **argv,
-                                  char **envv,
-                                  char *directory,
-                                  gboolean lastlog,
-                                  gboolean utmp,
-                                  gboolean wtmp);
-  int vte_terminal_get_pty(VteTerminal * terminal); // deprecated
-
-  // since 0.26
   enum VtePtyFlags;
   enum GSpawnFlags;
   alias int GPid;// the same type as pid_t
@@ -778,6 +757,5 @@ extern(C){
 
   struct VtePty;
   VtePty * vte_terminal_get_pty_object(VteTerminal *terminal);
-
   int vte_pty_get_fd(VtePty * pty);
 }
