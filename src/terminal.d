@@ -97,8 +97,9 @@ public:
 
     InitTermios(pty_);
     InitDragAndDropFunctionality();
-    shellSetting_ = shellrc.GetLocalShellSetting();
+    InitSyncFilerDirFunctionality();
 
+    shellSetting_ = shellrc.GetLocalShellSetting();
     ApplyPreferences();
   }
 
@@ -188,18 +189,7 @@ private:
       return true;
 
     case TerminalAction.SyncFilerPWD:
-      // adjust directory of file manager
-      if(!mediator_.FileSystemIsRemote()){// I can get cwd of the child process only for localhost
-        string filename = "/proc/" ~ Str.toString(pid_) ~ "/cwd\0";
-        char[] buffer;
-        const size_t bufsize = 10000;
-        buffer.length = bufsize;
-        ssize_t len = readlink(filename.ptr, buffer.ptr, bufsize);
-        if(len != -1){
-          cwd_ = AppendSlash(buffer[0..len].idup);
-          mediator_.FilerChangeDirFromTerminal(cwd_);
-        }
-      }
+      SyncFilerDirectoryByCwd();
       return true;
 
     case TerminalAction.InputUserDefinedText1,
@@ -258,6 +248,7 @@ public:
 
   ////////////////// traveling directory tree
 private:
+  string cwd_;
   string delegate(char, uint) getCWDLR_;
   Mediator mediator_;
 
@@ -363,11 +354,29 @@ public:
 
 
 
-  ////////////////////////// file/dir path
+  ////////////////// automatic sync of filer
 private:
-  string cwd_;
   static const int PATH_MAX = 4096;// PATH_MAX in /usr/include/linux/limits.h
-  ////////////////////////// file/dir path
+  char[] readlink_buffer_;
+
+  void InitSyncFilerDirFunctionality()
+  {
+    readlink_buffer_.length = PATH_MAX + 1;
+  }
+
+  void SyncFilerDirectoryByCwd()
+  {
+    // adjust directory of file manager
+    if(!mediator_.FileSystemIsRemote()){// cwd of the child process can be obtained only within localhost
+      string filename = "/proc/" ~ Str.toString(pid_) ~ "/cwd\0";
+      ssize_t len = readlink(filename.ptr, readlink_buffer_.ptr, readlink_buffer_.length);
+      if(len != -1){
+        cwd_ = AppendSlash(readlink_buffer_[0..len].idup);
+        mediator_.FilerChangeDirFromTerminal(cwd_);
+      }
+    }
+  }
+  ////////////////// automatic sync of filer
 
 
 
@@ -522,10 +531,11 @@ private:
       return lineNew;
     }
   }
+  /////////////////// replace $L(R)DIR
 
 
 
-  ///////////////////////// SSH
+  /////////////////// SSH
 private:
   class InputPassThread : Thread, StoppableOperationIF
   {
@@ -595,7 +605,6 @@ private:
   }
 
 
-
 public:
   void StartSSH(SSHConnection con)
   {
@@ -626,11 +635,11 @@ public:
     FeedChild("exit\n");
     cwd_ = pwd;
   }
-  ///////////////////////// SSH
+  /////////////////// SSH
 
 
 
-  ///////////////////////// drag and drop
+  /////////////////// drag and drop
   void InitDragAndDropFunctionality()
   {
     // accept "text/uri-list" (info==1) and "text/plain" (info==2)
@@ -669,7 +678,7 @@ public:
 
     grabFocus();
   }
-  ///////////////////////// drag and drop
+  /////////////////// drag and drop
 }
 
 
