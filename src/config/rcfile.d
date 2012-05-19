@@ -307,7 +307,7 @@ void AddSSHHost(SSHConnection con)
   string s = con.toStr!(true)();
   if(instance_.hasKey("SSH", "Hosts")){
     string older = instance_.getString("SSH", "Hosts");
-    string newer = trim(older) ~ ',' ~ s;
+    string newer = (trim(older).split(",") ~ s).join(",");
     instance_.setString("SSH", "Hosts", newer);
   }
   else{
