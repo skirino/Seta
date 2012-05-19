@@ -128,8 +128,22 @@ private:
 
   //////////////////// key pressed
 private:
+  /+
+   + It seems that the newer versions of VTE library calls parent widget's handlers
+   + for (at least) "key-press" and "key-release" events TWICE.
+   + Avoid processing the same event twice by remembering "time" field in GdkEventKey.
+   +/
+  uint lastKeyPressTime_ = 0;
+
   bool KeyPressed(GdkEventKey * ekey, Widget w)
   {
+    if(lastKeyPressTime_ == ekey.time){
+      return false;
+    }
+    else{
+      lastKeyPressTime_ = ekey.time;
+    }
+
     int q = QueryTerminalAction(ekey);
     switch(q){
 
