@@ -37,6 +37,7 @@ import core.thread;
 import core.sys.posix.unistd;
 
 import utils.string_util;
+import utils.unistd_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
@@ -363,25 +364,37 @@ public:
   ////////////////// automatic sync of filer
 private:
   static const int PATH_MAX = 4096;// PATH_MAX in /usr/include/linux/limits.h
-  char[] readlink_buffer_;
+  char[] readlinkBuffer_;
   uint syncCallbackID_;
 
   void InitSyncFilerDirFunctionality()
   {
-    readlink_buffer_.length = PATH_MAX + 1;
+    readlinkBuffer_.length = PATH_MAX + 1;
     syncCallbackID_ = gdkThreadsAddTimeoutSeconds(2, &SyncFilerDirectoryByCwdCallback, cast(void*)this);
+  }
+
+  string GetCWDFromProcFS()
+  {
+    string filename = "/proc/" ~ Str.toString(pid_) ~ "/cwd";
+    return ReadLink(filename, readlinkBuffer_);
   }
 
   void SyncFilerDirectoryByCwd()
   {
     // adjust directory of file manager
-    if(!mediator_.FileSystemIsRemote()){// cwd of the child process can be obtained only within localhost
-      string filename = "/proc/" ~ Str.toString(pid_) ~ "/cwd\0";
-      ssize_t len = readlink(filename.ptr, readlink_buffer_.ptr, readlink_buffer_.length);
-      if(len != -1){
-        cwd_ = AppendSlash(readlink_buffer_[0..len].idup);
-        mediator_.FilerChangeDirFromTerminal(cwd_);
-      }
+    if(mediator_.FileSystemIsRemote()){
+      return; // cwd of the child process can be obtained only within localhost
+    }
+
+    auto dirFromProc = GetCWDFromProcFS();
+    auto realPath = RealPath(cwd_, readlinkBuffer_);
+    if(dirFromProc.IsBlank() || realPath.IsBlank()){// cannot happen
+      return;
+    }
+
+    if(realPath != dirFromProc){
+      cwd_ = dirFromProc;
+      mediator_.FilerChangeDirFromTerminal(cwd_);
     }
   }
 

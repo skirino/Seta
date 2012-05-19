@@ -98,7 +98,7 @@ public:
 
 
   /////////////////// interface to FileManager
-  string FilerGetPWD(bool b){return filer_.GetPWD(b);}
+  string FilerGetPWD(bool onlyAfterGVFS = true){return filer_.GetPWD(onlyAfterGVFS);}
   void FilerAppendToHistory(string dir){filer_.AppendToHistory(dir);}
   string FilerCDToPrevious()// for "cd -"
   {
@@ -126,7 +126,7 @@ public:
   {
     filer_.UpdateDirTree(dirname);
   }
-  void FilerDisconnect(){filer_.Disconnect();}
+  void FilerDisconnect (){filer_.Disconnect();}
   void FilerFocusFilter(){filer_.FocusFilter();}
   void FilerClearFilter(){filer_.ClearFilter();}
   /////////////////// interface to FileManager

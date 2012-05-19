@@ -197,8 +197,13 @@ string GetBasename(string path)
 
 string ExpandPath(string path, string root)
 {
+  /+
+   + Canonicalize path by expanding "//", "." and "..".
+   + "realpath" cannot be used here since symlinks should not be expanded.
+   +/
   assert(path[0] == '/');
   assert(path[$-1] == '/');
+
   char[] ret = path.dup;
 
   // first obtain an absolute path from the root directory

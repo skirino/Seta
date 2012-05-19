@@ -22,7 +22,35 @@ module utils.unistd_util;
 
 import glib.Str;
 
+import std.string;
 import core.sys.posix.unistd;
+import core.sys.posix.stdlib;
+
+import utils.string_util;
+
+
+string ReadLink(const string path, char[] buffer)
+{
+  ssize_t len = readlink(Str.toStringz(path), buffer.ptr, buffer.length);
+  if(len != -1){
+    return AppendSlash(buffer[0 .. len].idup);
+  }
+  else{
+    return null;
+  }
+}
+
+
+string RealPath(const string path, char[] buffer)
+{
+  char * ptr = realpath(Str.toStringz(path), buffer.ptr);
+  if(ptr){
+    return AppendSlash(Str.toString(ptr));
+  }
+  else{
+    return null;
+  }
+}
 
 
 void ForkExec(string executablePath, string childDir, string[] args, string[string] envs)
