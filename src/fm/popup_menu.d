@@ -36,10 +36,10 @@ import glib.GException;
 
 import std.c.stdlib;
 import std.process;
-import core.sys.posix.unistd;
-import core.sys.posix.sys.types;
+import std.string;
 
 import utils.string_util;
+import utils.unistd_util;
 import constants;
 import rcfile = config.rcfile;
 import config.dialog;
@@ -321,47 +321,20 @@ private:
   void LaunchNautilusScript(MenuItem i)
   {
     auto item = cast(MenuItemWithScript)i;
-    string scriptPath = item.path_ ~ '\0';
 
-    // environment variables
-    string[string] denv = environment.toAA();
-    char*[] envv;
-    string[] keys = denv.keys;
-    foreach(key; keys){
-      envv ~= Str.toStringz(key ~ '=' ~ denv[key]);
-    }
-
+    string[string] envs = environment.toAA();
     // environment variables specific to nautilus-scripts
-    string currentURI = "NAUTILUS_SCRIPT_CURRENT_URI=file://" ~ RemoveSlash(pwd_) ~ '\0';
-
-    string selectedFilePaths = "NAUTILUS_SCRIPT_SELECTED_FILE_PATHS=";
-    string selectedURIs = "NAUTILUS_SCRIPT_SELECTED_URIS=";
+    envs["NAUTILUS_SCRIPT_CURRENT_URI"] = "file://" ~ RemoveSlash(pwd_);
+    string[] selectedFilePaths, selectedURIs;
     foreach(name; selectedFileNames_){
       string fullpath = pwd_ ~ name;
-      selectedFilePaths ~= fullpath ~ '\n';
-      selectedURIs      ~= "file://" ~ fullpath ~ '\n';
+      selectedFilePaths ~= fullpath;
+      selectedURIs      ~= "file://" ~ fullpath;
     }
-    selectedFilePaths ~= '\0';
-    selectedURIs      ~= '\0';
+    envs["NAUTILUS_SCRIPT_SELECTED_FILE_PATHS"] = selectedFilePaths.join("\n");
+    envs["NAUTILUS_SCRIPT_SELECTED_URIS"]       = selectedURIs.join("\n");
 
-    envv ~= cast(char*)currentURI.ptr;
-    envv ~= cast(char*)selectedFilePaths.ptr;
-    envv ~= cast(char*)selectedURIs.ptr;
-    envv ~= null;
-
-    // arguments
-    char*[] argv;
-    foreach(name; selectedFileNames_){
-      argv ~= Str.toStringz(name);
-    }
-    argv ~= null;
-
-    // fork-exec
-    pid_t p = fork();
-    if(p == 0){// child process
-      chdir(Str.toStringz(pwd_));
-      execve(scriptPath.ptr, argv.ptr, envv.ptr);
-    }
+    ForkExec(item.path_, pwd_, selectedFileNames_, envs);
   }
 
   class MenuItemWithScript : MenuItem
