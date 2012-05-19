@@ -260,13 +260,10 @@ public:
     rcfile.Shortcut[] shortcuts = rcfile.GetShortcuts();
     numShortcuts_ = shortcuts.length;
     foreach(i, shortcut; shortcuts){
-      string label = "(" ~ Str.toString(i+1) ~ ") " ~ shortcut.label_;
-      string dir = shortcut.path_;
-      AppendShortcutButton(
-        dir, label, dir,
-        delegate bool(GdkEventButton * eb, Widget w){
-          return RemoveShortcutPopup(eb, w, dir);
-        });
+      size_t index = i + 1;
+      string dir   = shortcut.path_;
+      string label = "(" ~ Str.toString(index) ~ ") " ~ shortcut.label_;
+      AppendShortcutToDirectoryButton(dir, label);
     }
 
     // mounted volumes
@@ -274,17 +271,11 @@ public:
     QueryMountedVolumes(names, paths);
 
     foreach(i, name; names){
-      string path = paths[i];
-      string baseName = GetBasename(path);
-
-      size_t index = i + 1 + numShortcuts_;
-      string label = index <= 9 ? "(" ~ Str.toString(index) ~ ") " ~ baseName : baseName;
-      string tooltip = name ~ " (" ~ path ~ ')';
-      AppendShortcutButton(
-        path, label, tooltip,
-        delegate bool(GdkEventButton * eb, Widget w){
-          return UnmountMediaPopup(eb, w, path, name);
-        });
+      string dir      = paths[i];
+      string baseName = GetBasename(dir);
+      size_t index    = i + 1 + numShortcuts_;
+      string label    = (index <= 9) ? "(" ~ Str.toString(index) ~ ") " ~ baseName : baseName;
+      AppendShortcutToMountedVolumeButton(dir, label, name);
     }
 
     showAll();
@@ -301,7 +292,29 @@ public:
   }
 
 private:
-  void AppendShortcutButton(
+  void AppendShortcutToDirectoryButton(
+    string dir,
+    string label)
+  {
+    auto dlgButtonPress = delegate bool(GdkEventButton * eb, Widget w){
+      return RemoveShortcutPopup(eb, w, dir);
+    };
+    AppendShortcutButtonBase(dir, label, dir, dlgButtonPress);
+  }
+
+  void AppendShortcutToMountedVolumeButton(
+    string dir,
+    string label,
+    string name)
+  {
+    string tooltip = name ~ " (" ~ dir ~ ')';
+    auto dlgButtonPress = delegate bool(GdkEventButton * eb, Widget w){
+      return UnmountMediaPopup(eb, w, dir, name);
+    };
+    AppendShortcutButtonBase(dir, label, tooltip, dlgButtonPress);
+  }
+
+  void AppendShortcutButtonBase(
     string path,
     string label,
     string tooltip,
@@ -316,9 +329,7 @@ private:
       delegate void(Button b){
         parent_.PathButtonClicked(b, path);
       });
-    if(dlgButtonPress !is null){// connect callback on right-clicking this button
-      b.addOnButtonPress(dlgButtonPress);
-    }
+    b.addOnButtonPress(dlgButtonPress);// connect callback on right-clicking this button
 
     auto item = new ToolItem;
     item.setSizeRequest(rcfile.GetWidthShortcutButton(), -1);
@@ -331,9 +342,7 @@ private:
         parent_.PathButtonClicked(item, path);
       },
       label ~ " (" ~ path ~ ')', false);
-    if(dlgButtonPress !is null){// connect callback on right-clicking this menuitem
-      menuItem.addOnButtonPress(dlgButtonPress);
-    }
+    menuItem.addOnButtonPress(dlgButtonPress);// connect callback on right-clicking this menuitem
     item.setProxyMenuItem(label, menuItem);
   }
 
@@ -383,7 +392,6 @@ private:
   bool UnmountMediaPopup(GdkEventButton * eb, Widget w, string path, string name)
   {
     if(eb.button == MouseButton.RIGHT){
-
       // if the remote host is still accessed via ssh, skip
       if(name.StartsWith("sftp (")){
         size_t posAtmark = locate(name, '@');

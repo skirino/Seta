@@ -109,10 +109,7 @@ public:
       hpaned_.setPosition(w);
     }
 
-    // toolbar
     toolbar_.SetLayout();
-
-    // FileView
     view_.SetLayout();
   }
 
