@@ -156,12 +156,12 @@ private:
     // Enter --> try to change directory
     if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
       Respond(GtkResponseType.GTK_RESPONSE_OK, this);
-      return false;
+      return true;
     }
 
     // C-n, Up / C-p, Down --> move cursor upward/downward
     if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_n) ||
-       (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Up)){
+       (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Down)){
       scope iter = GetSelectedIter(view_.getSelection(), store_);
       if(iter !is null){
         scope path = iter.getTreePath();
@@ -169,10 +169,11 @@ private:
         view_.setCursor(path, null, 0);
         view_.getSelection().selectPath(path);
         path.free();
+        return true;
       }
     }
     else if((state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_p) ||
-            (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Down)){
+            (state == 0                            && ekey.keyval == GdkKeysyms.GDK_Up)){
       scope iter = GetSelectedIter(view_.getSelection(), store_);
       if(iter !is null){
         scope path = iter.getTreePath();
@@ -181,12 +182,14 @@ private:
           view_.getSelection().selectPath(path);
         }
         path.free();
+        return true;
       }
     }
 
     // Cancel by C-g
     if(state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_g){
       Respond(GtkResponseType.GTK_RESPONSE_CANCEL, this);
+      return true;
     }
 
     return false;
