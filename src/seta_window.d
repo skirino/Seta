@@ -139,7 +139,7 @@ private:
         pageR.FocusLower();
       }
       ExpandRightPane();
-      ExpandRightPane();
+      ExpandRightPane();// expand twice in order to switch from left-pane-only mode to right-pane-only
     }
     else if(lr == 'R' && npagesR == 0){
       auto pageL = noteL_.GetCurrentPage();
@@ -150,9 +150,15 @@ private:
       ExpandLeftPane();
     }
     else{// each note has at least one page
-      if(WhichIsFocused() == FocusInMainWindow.NONE){// if no page has focus
-        note.GetCurrentPage().FocusLower();// move focus to the shown page
-      }
+      /+
+       + Work around bug: newly-focused terminal does not process key-press events
+       + after closing a page (VTE's bug?).
+       + Occurs with Mint Lisa but not with Ubuntu 11.10.
+       + Once focus filer, then terminal.
+       +/
+      auto page = note.GetCurrentPage();
+      page.FocusUpper();
+      page.FocusLower();
     }
   }
   ///////////////////////// GUI stuff
