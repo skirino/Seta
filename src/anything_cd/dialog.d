@@ -44,6 +44,7 @@ import std.process;
 import utils.min_max;
 import utils.string_util;
 import utils.tree_util;
+import utils.thread_util;
 import config.keybind;
 import anything_cd.filter_dirs_job;
 import page;
@@ -128,7 +129,7 @@ private:
   void Respond(int responseID, Dialog dialog)
   {
     CancelTimeoutCallback();
-    WaitStopIfRunning();
+    filterThread_.StopAndWait();
     destroyed_ = true;
 
     if(responseID == GtkResponseType.GTK_RESPONSE_OK){
@@ -240,23 +241,9 @@ private:
     return 0;
   }
 
-  void WaitStopIfRunning()
-  {
-    if(filterThread_ !is null && filterThread_.isRunning()){
-      filterThread_.Stop();
-
-      while(filterThread_.isRunning()){
-        gdkThreadsLeave();
-        Thread.yield();
-        Thread.sleep(500_000);
-        gdkThreadsEnter();
-      }
-    }
-  }
-
   void StartFiltering()
   {
-    WaitStopIfRunning();
+    filterThread_.StopAndWait();
 
     string text = entry_.getText().trim();
     if(text is null || text.length == 0){

@@ -38,6 +38,7 @@ import core.sys.posix.unistd;
 
 import utils.string_util;
 import utils.unistd_util;
+import utils.thread_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
@@ -609,7 +610,7 @@ private:
           }
         }
 
-        Thread.sleep(5_000_000);
+        SleepMillisecs(500);
       }
 
       // remove from ThreadList

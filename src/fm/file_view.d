@@ -53,6 +53,7 @@ import utils.time_util;
 import utils.string_util;
 import utils.gio_util;
 import utils.template_util;
+import utils.thread_util;
 import utils.tree_util;
 import utils.vector;
 import constants;
@@ -308,8 +309,7 @@ public:
     }
     contentsChanged_ = false;
 
-    // stop running thread
-    WaitStopIfRunning();
+    prepareUpdateThread_.StopAndWait();
   }
   ///////////////////// update driven by changes in directory
 
@@ -322,25 +322,9 @@ private:
 
   PrepareEntriesJob prepareUpdateThread_;
 
-  void WaitStopIfRunning()
-  {
-    if(prepareUpdateThread_ !is null && prepareUpdateThread_.isRunning()){
-      prepareUpdateThread_.Stop();
-
-      // wait for the end of the thread
-      while(prepareUpdateThread_.isRunning()){
-        // For the thread to finish its work, releasing GDK lock is necessary here
-        gdkThreadsLeave();
-        Thread.yield();
-        Thread.sleep(500_000);
-        gdkThreadsEnter();
-      }
-    }
-  }
-
   void EnumerateFilterSortSet(bool remote, string dir, File dirFile, bool appendToHistory, bool notifyTerminal)
   {
-    WaitStopIfRunning();
+    prepareUpdateThread_.StopAndWait();
 
     prepareUpdateThread_ =
       new PrepareEntriesJob(
@@ -355,7 +339,7 @@ private:
 
   void FilterSortSet()
   {
-    WaitStopIfRunning();
+    prepareUpdateThread_.StopAndWait();
 
     // Do not read the directory entries from disk,
     // reuse previous results (which are stored in entriesDAll_ and entriesFAll_)
