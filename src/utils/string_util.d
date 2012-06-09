@@ -378,7 +378,7 @@ private size_t FindUnescapedChar(string s, char target, size_t start = 0)
   for(size_t i=start; i<s.length; ++i){
     if(s[i] == target){
       if(i == 0 ||
-         ReverseCountBackslash(s[0 .. i-1]) % 2 == 1
+         ReverseCountBackslash(s[0 .. i-1]) % 2 == 0
         ){
         return i;
       }

@@ -326,7 +326,7 @@ public:
   void ChangeDirTo1stArg(string args)
   {
     string temp = Extract1stArg(args);
-    if(temp is null){
+    if(temp.IsBlank()){
       return;
     }
 
