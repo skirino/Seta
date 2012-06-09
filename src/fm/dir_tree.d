@@ -54,7 +54,7 @@ private:
   Vector!(string) workspace_;
   string delegate() getPWD_;
   bool delegate(string dirname) cdFileManager_;
-  int[string] openedDirs_;
+  bool[string] openedDirs_;
 
 public:
   this(
@@ -133,7 +133,7 @@ public:
 
   void ReconstructFromOpenedDirs()
   {
-    string[] keys = openedDirs_.keys;
+    auto keys = openedDirs_.keys;
     keys.sort.reverse;
 
     RemoveAll();
@@ -263,7 +263,7 @@ private:
 
   void RowExpanded(TreeIter iter, TreePath path, TreeView view)
   {
-    openedDirs_[GetFullPath(iter)] = 1;
+    openedDirs_[GetFullPath(iter)] = true;
   }
 
   void RowCollapsed(TreeIter iter, TreePath path, TreeView view)
