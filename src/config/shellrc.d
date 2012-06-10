@@ -100,11 +100,12 @@ private:
           string l2 = l[6 .. $];// line after "alias "
           size_t posequal = l2.locate('=');
           if(posequal != l2.length){// contains '='
-            string rhs = Extract1stArg(l2[posequal+2 .. $-1]);// rhs should be quoted by ' or ", remove them
-            if(rhs.StartsWith("cd ")){
-              string command = l2[0 .. posequal];// lhs
-              string path = AppendSlash(trim(rhs[3 .. $]));// rhs after "cd " with last slash appended
-              cdAliases_ ~= ChangeDirAlias(command, path);
+            string rhs = l2[posequal+1 .. $];
+            string originalCommand = trim(rhs[1 .. $-1]);// rhs should be quoted by ' or ", remove them
+            if(originalCommand.StartsWith("cd ")){
+              string aliasCommand = l2[0 .. posequal];// lhs
+              string path = Extract1stArg(originalCommand[3 .. $]).AppendSlash();
+              cdAliases_ ~= ChangeDirAlias(aliasCommand, path);
             }
           }
         }
