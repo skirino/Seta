@@ -33,6 +33,7 @@ import std.process;
 
 import utils.string_util;
 import utils.gio_util;
+import utils.min_max;
 import constants;
 import rcfile = config.rcfile;
 import tab;
@@ -77,6 +78,7 @@ public:
     appendPage_ = AppendPageCopy;
 
     super(0, 0);
+    addOnMap(&ResetLayoutOnMap);
     addOnUnrealize(&UnregisterFromPageList);
 
     // initialize children
@@ -156,10 +158,32 @@ public:
 
   void SetLayout()
   {
-    uint split = tab_.OnLeftSide() ? rcfile.GetSplitVLeft() : rcfile.GetSplitVRight();
-    paned_.setPosition(split);
+    if(!this.getRealized()){
+      // Just realize all children on startup.
+      uint split = rcfile.GetWindowSizeV() / 2;
+      paned_.setPosition(split);
+    }
+    else{
+      uint split = tab_.OnLeftSide() ? rcfile.GetSplitVLeft() : rcfile.GetSplitVRight();
+      if(split == 0){
+        TerminalMode();
+      }
+      else if(split == rcfile.GetWindowSizeV()){
+        FilerMode();
+      }
+      else{
+        BothMode();
+        paned_.setPosition(split);
+      }
+    }
   }
 
+  private void ResetLayoutOnMap(Widget w)
+  {
+    // After "realize" of this page and its child widgets,
+    // set layout again in order to set proper mode_ of this page.
+    SetLayout();
+  }
 
 
   bool OnLeftSide(){return tab_.OnLeftSide();}
@@ -228,11 +252,18 @@ public:
   }
 
 private:
+  void SetLastSplitPosition()
+  {
+    uint pos = paned_.getPosition();
+    auto windowHeight = rcfile.GetWindowSizeV();
+    lastSplitPosition_ = Max(Min(pos, 9*windowHeight/10), windowHeight/10);
+  }
+
   void TerminalMode()
   {
     if(mode_ != ViewMode.TERMINAL){
       if(mode_ == ViewMode.BOTH){
-        lastSplitPosition_ = paned_.getPosition();
+        SetLastSplitPosition();
       }
       mode_ = ViewMode.TERMINAL;
       swTerm_.showAll();
@@ -245,7 +276,7 @@ private:
   {
     if(mode_ != ViewMode.FILER){
       if(mode_ == ViewMode.BOTH){
-        lastSplitPosition_ = paned_.getPosition();
+        SetLastSplitPosition();
       }
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.FILER;
