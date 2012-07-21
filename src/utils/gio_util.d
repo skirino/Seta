@@ -79,3 +79,11 @@ bool CanEnumerateChildren(File dir)
   }
 }
 
+bool CanEnumerateChildren(string dir)
+{
+  auto f = GetFileForDirectory(dir);
+  if(f is null){
+    return false;
+  }
+  return CanEnumerateChildren(f);
+}

@@ -28,6 +28,8 @@ import gio.FileOutputStream;
 import glib.Str;
 
 import std.string;
+import std.array;
+import std.algorithm;
 import std.process;
 
 import utils.min_max;
@@ -42,7 +44,7 @@ import ssh_connection;
 import page_list;
 
 
-static const string SetaVersion = "0.6.2";
+static const string SetaVersion = "0.6.3";
 
 void Init()
 {
@@ -175,8 +177,11 @@ string GetUserDefinedText(int index)
 ///////////////// [Directories]
 private const string SeparatorShortcutList = "_///_";
 private const string SeparatorShortcut = "_//_";
-string GetInitialDirectoryLeft (){return instance_.getString("Directories", "InitialDirectoryLeft");}
-string GetInitialDirectoryRight(){return instance_.getString("Directories", "InitialDirectoryRight");}
+
+string[] GetInitialDirectoriesLeft (){return instance_.getStringList("Directories", "InitialDirectoriesLeft");}
+string[] GetInitialDirectoriesRight(){return instance_.getStringList("Directories", "InitialDirectoriesRight");}
+string GetInitialDirectoryLeft (){return GetInitialDirectoriesLeft ()[0];}
+string GetInitialDirectoryRight(){return GetInitialDirectoriesRight()[0];}
 
 struct Shortcut
 {
@@ -341,8 +346,7 @@ void RemoveSSHHost(SSHConnection con)
 
 void ResetRemoteHosts(string[] list)
 {
-  size_t len;
-  if(instance_.getStringList("SSH", "Hosts", len) != list){// has different value
+  if(instance_.getStringList("SSH", "Hosts") != list){// has different value
     string s = join(list, ",");
     instance_.setString("SSH", "Hosts", NonnullString(s));
     instance_.changed_ = true;
@@ -493,31 +497,8 @@ private:
 
     // [Directories]
     // check if entry is an existing directory
-    bool setHomeDirL = true;
-    if(hasKey("Directories", "InitialDirectoryLeft")){
-      string initialDir = trim(getString("Directories", "InitialDirectoryLeft"));
-      scope f = GetFileForDirectory(initialDir);
-      if(f !is null && CanEnumerateChildren(f)){
-        setHomeDirL = false;
-      }
-    }
-    if(setHomeDirL){
-      changed_ = true;
-      setString("Directories", "InitialDirectoryLeft", AppendSlash(getenv("HOME")));
-    }
-
-    bool setHomeDirR = true;
-    if(hasKey("Directories", "InitialDirectoryRight")){
-      string initialDir = trim(getString("Directories", "InitialDirectoryRight"));
-      scope f = GetFileForDirectory(initialDir);
-      if(f !is null && CanEnumerateChildren(f)){
-        setHomeDirR = false;
-      }
-    }
-    if(setHomeDirR){
-      changed_ = true;
-      setString("Directories", "InitialDirectoryRight", AppendSlash(getenv("HOME")));
-    }
+    InitInitialDirectories("InitialDirectoriesLeft");
+    InitInitialDirectories("InitialDirectoriesRight");
 
     mixin(SetDefaultValue!("String", "Directories", "Shortcuts", "\"\""));
 
@@ -617,15 +598,36 @@ private:
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText9", "<Alt>9"));
   }
 
+  void InitInitialDirectories(string key)
+  {
+    string[] initialDirs;
+    if(hasKey("Directories", key)){
+      auto dirs = getStringList("Directories", key);
+      auto existingDirs = dirs.map!(trim).map!(AppendSlash).filter!(CanEnumerateChildren);
+      initialDirs = array(existingDirs);
+      if(dirs != initialDirs){
+        changed_ = true;
+        setStringList("Directories", key, initialDirs);
+      }
+    }
+    if(initialDirs.length == 0){
+      changed_ = true;
+      setStringList("Directories", key, [AppendSlash(getenv("HOME"))]);
+    }
+  }
+
+  string[] getStringList(string group, string key)
+  {
+    if(hasKey(group, key)){
+      size_t len;
+      return super.getStringList(group, key, len);
+    }
+    return null;
+  }
+
   string[] GetSSHHosts()
   {
-    if(hasKey("SSH", "Hosts")){
-      size_t len;
-      return getStringList("SSH", "Hosts", len);
-    }
-    else{
-      return null;
-    }
+    return getStringList("SSH", "Hosts");
   }
 }
 
@@ -675,6 +677,7 @@ private template ResetValue(string type, string Type)
 mixin(ResetValue!("int", "Integer"));
 mixin(ResetValue!("bool", "Boolean"));
 mixin(ResetValue!("double", "Double"));
+mixin(ResetValue!("string[]", "StringList"));
 mixin("private " ~ ResetValue!("string", "String"));// use ResetStringz instead
 
 bool ResetStringz(string group, string key, string val)
@@ -751,7 +754,7 @@ ColorBackground=#000000
 Font=Monospace 11
 
 ### Transparency of terminal background, 0.0 (opaque) to 1.0 (transparent)
-BackgroundTransparency=0.0
+BackgroundTransparency=0.3
 
 ### Hints for Seta to extract argument for \"cd\" command which is used for synchronization of directory
 # PROMPT <username>@<machine name>
@@ -774,8 +777,8 @@ UserDefinedText9=
 
 
 [Directories]
-# InitialDirectoryLeft(Right)=/home/xxx/
-# Shortcuts=[<label for directory1>,]<path to favorite directory1>, ...
+# InitialDirectoriesLeft(Right)=/home/xxx/, ...
+# Shortcuts=[<label for directory1>_//_]<path to directory1>, ...
 Shortcuts=
 
 

@@ -77,8 +77,16 @@ public:
       {
         noteL_ = new Note('L', this);
         noteR_ = new Note('R', this);
-        noteL_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
-        noteR_.AppendNewPage(rcfile.GetInitialDirectoryRight());
+
+        string[] dirsL = rcfile.GetInitialDirectoriesLeft();
+        foreach(dir; dirsL){
+          noteL_.AppendNewPage(dir);
+        }
+        string[] dirsR = rcfile.GetInitialDirectoriesRight();
+        foreach(dir; dirsR){
+          noteR_.AppendNewPage(dir);
+        }
+
         hpaned_.pack1(noteL_, 1, 0);
         hpaned_.pack2(noteR_, 1, 0);
       }

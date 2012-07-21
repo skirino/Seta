@@ -231,13 +231,12 @@ private:
     }
   }
 
-  // right click menu
+  // for right click menu
   bool KeybindButtonPress(GdkEventButton * eb, Widget w)
   {
     if(eb.window != keybinds_.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-
     if(eb.button != MouseButton.RIGHT){// not right button
       return false;
     }
@@ -515,9 +514,9 @@ private:
 
   ///////////////////// [Directories]
   Table pageDirectories_;
-  Entry initialDirLEntry_, initialDirREntry_, sshOptionEntry_;
-  TreeView shortcuts_;
-  ListStore shortcutsStore_;
+  Entry sshOptionEntry_;
+  TreeView shortcuts_, initialDirsL_, initialDirsR_;
+  ListStore shortcutsStore_, initialDirsLStore_, initialDirsRStore_;
 
   void InitDirectoriesPage()
   {
@@ -525,31 +524,58 @@ private:
 
     uint row = 0;
 
-    AttachSectionLabel(pageDirectories_, row++, "Miscellaneous");
+    AttachSectionLabel(pageDirectories_, row++, "Directories shown on start-up on the left pane");
+    InitInitialDirTreeView!('L')(row++, initialDirsL_, initialDirsLStore_);
 
-    initialDirLEntry_ = new Entry(NonnullString(rcfile.GetInitialDirectoryLeft()));
-    AttachPairWidget(pageDirectories_, row++, "Initial directory for left pane:  ", initialDirLEntry_);
-
-    initialDirREntry_ = new Entry(NonnullString(rcfile.GetInitialDirectoryRight()));
-    AttachPairWidget(pageDirectories_, row++, "Initial directory for right pane: ", initialDirREntry_);
-
-    sshOptionEntry_ = new Entry(NonnullString(rcfile.GetSSHOption()));
-    AttachPairWidget(pageDirectories_, row++, "Command-line option for SSH: ", sshOptionEntry_);
+    AttachSectionLabel(pageDirectories_, row++, "Directories shown on start-up on the right pane");
+    InitInitialDirTreeView!('R')(row++, initialDirsR_, initialDirsRStore_);
 
     AttachSectionLabel(pageDirectories_, row++, "Directory shortcuts");
-    InitShortcutsTreeView(row);
+    InitShortcutsTreeView(row++);
 
     AttachSectionLabel(pageDirectories_, row++, "Registered SSH hosts");
-    InitSSHPage(row);
+    InitSSHPage(row++);
+    sshOptionEntry_ = new Entry(NonnullString(rcfile.GetSSHOption()));
+    AttachPairWidget(pageDirectories_, row++, "Command-line option for SSH: ", sshOptionEntry_);
   }
 
-  void InitShortcutsTreeView(ref uint row)
+  void InitInitialDirTreeView(char lr)(uint row, ref TreeView view, ref ListStore store)
+  {
+    view = new TreeView;
+    view.setSizeRequest(-1, 160);
+    view.setReorderable(1);
+    view.addOnButtonPress(delegate bool(GdkEventButton * eb, Widget w){
+        return ShowAppendRemoveMenu(eb, w, view, store);
+      });
+    AppendWithScrolledWindow(pageDirectories_, row, view);
+
+    auto rend = new CellRendererText;
+    rend.setProperty("editable", 1);
+    rend.addOnEdited(&(CellEdited!(0, "initialDirs" ~ lr ~ "Store_", "AppendSlash")));
+    auto col = new TreeViewColumn("path", rend, "text", 0);
+    col.setResizable(1);
+    view.appendColumn(col);
+
+    store = new ListStore([GType.STRING]);
+    view.setModel(store);
+
+    auto source = lr == 'L' ? rcfile.GetInitialDirectoriesLeft() : rcfile.GetInitialDirectoriesRight();
+    foreach(dir; source){
+      TreeIter iter = new TreeIter;
+      store.append(iter);
+      store.setValue(iter, 0, dir);
+    }
+  }
+
+  void InitShortcutsTreeView(uint row)
   {
     shortcuts_ = new TreeView;
     shortcuts_.setSizeRequest(-1, 160);
     shortcuts_.setReorderable(1);
-    shortcuts_.addOnButtonPress(&ShortcutsButtonPress);
-    AppendWithScrolledWindow(pageDirectories_, row++, shortcuts_);
+    shortcuts_.addOnButtonPress(delegate bool(GdkEventButton * eb, Widget w){
+        return ShowAppendRemoveMenu(eb, w, shortcuts_, shortcutsStore_);
+      });
+    AppendWithScrolledWindow(pageDirectories_, row, shortcuts_);
 
     auto rendLabel = new CellRendererText;
     rendLabel.setProperty("editable", 1);
@@ -579,39 +605,46 @@ private:
 
   void ApplyChangesInDirectories()
   {
-    rcfile.ResetStringz("Directories", "InitialDirectoryLeft",  AppendSlash(initialDirLEntry_.getText()));
-    rcfile.ResetStringz("Directories", "InitialDirectoryRight", AppendSlash(initialDirREntry_.getText()));
+    ApplyChangesInInitialDirectories(initialDirsLStore_, "InitialDirectoriesLeft");
+    ApplyChangesInInitialDirectories(initialDirsRStore_, "InitialDirectoriesRight");
+    ApplyChangesInShortcuts();
+  }
 
+  void ApplyChangesInInitialDirectories(ListStore store, string key)
+  {
+    string[] dirs;
+    TreeIter iter = new TreeIter;
+    iter.setModel(store);
+    if(store.getIterFirst(iter)){// ListStore is not empty
+      do{
+        auto dir = AppendSlash(trim(iter.getValueString(0)));
+        if(CanEnumerateChildren(dir)){
+          dirs ~= dir;
+        }
+      }
+      while(store.iterNext(iter));
+    }
+    rcfile.ResetStringList("Directories", key, dirs);
+  }
+
+  void ApplyChangesInShortcuts()
+  {
     rcfile.Shortcut[] list;
     TreeIter iter = new TreeIter;
     iter.setModel(shortcutsStore_);
     if(shortcutsStore_.getIterFirst(iter)){// ListStore is not empty
-      string[] invalidPaths;
       do{
         string label = trim(iter.getValueString(0));
         string path  = trim(iter.getValueString(1));
         if(label.length == 0){
           label = GetBasename(path);
         }
-
-        if(DirectoryExists(path)){
+        if(CanEnumerateChildren(path)){
           list ~= rcfile.Shortcut(label, path);
-        }
-        else{
-          invalidPaths ~= path;
         }
       }
       while(shortcutsStore_.iterNext(iter));
-
-      if(invalidPaths.length > 0){
-        string temp = join(invalidPaths, ", ");
-        PopupBox.error(
-          temp ~
-          (invalidPaths.length == 1 ? " does not exist and is" : " do not exist and are") ~
-          " neglected.", "error");
-      }
     }
-
     rcfile.ResetShortcuts(list);
   }
 
@@ -628,25 +661,24 @@ private:
     }
   }
 
-  // right click menu
-  bool ShortcutsButtonPress(GdkEventButton * eb, Widget w)
+  // for right click menu
+  bool ShowAppendRemoveMenu(GdkEventButton * eb, Widget w, TreeView view, ListStore store)
   {
-    if(eb.window != shortcuts_.getBinWindow().getWindowStruct()){// header is clicked
+    if(eb.window != view.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-
     if(eb.button != MouseButton.RIGHT){// not right button
       return false;
     }
 
-    TreePath path = GetPathAtPos(shortcuts_, eb.x, eb.y);
+    TreePath path = GetPathAtPos(view, eb.x, eb.y);
     TreeIter iter;
     if(path !is null){// there is a row at cursor
-      iter = GetIter(shortcutsStore_, path);
+      iter = GetIter(store, path);
       path.free();
     }
 
-    auto menu = new AppendRemoveMenu(shortcuts_, shortcutsStore_, iter);
+    auto menu = new AppendRemoveMenu(view, store, iter);
     menu.popup(0, eb.time);
 
     return false;
@@ -702,11 +734,13 @@ private:
   HostView hosts_;
   ListStore hostsStore_;
 
-  void InitSSHPage(ref uint row)
+  void InitSSHPage(uint row)
   {
     hosts_ = new HostView;
     hosts_.setReorderable(1);
-    hosts_.addOnButtonPress(&HostsButtonPress);
+    hosts_.addOnButtonPress(delegate bool(GdkEventButton * eb, Widget w){
+        return ShowAppendRemoveMenu(eb, w, hosts_, hostsStore_);
+      });
 
     hosts_.SetEditable(
       &CellEdited!(0, "hostsStore_"),
@@ -716,7 +750,7 @@ private:
       &CellEdited!(4, "hostsStore_"));
 
     hostsStore_ = hosts_.GetListStore();
-    AppendWithScrolledWindow(pageDirectories_, row++, hosts_);
+    AppendWithScrolledWindow(pageDirectories_, row, hosts_);
   }
 
   void ApplyChangesInSSH()
@@ -738,30 +772,6 @@ private:
     }
 
     rcfile.ResetRemoteHosts(list);
-  }
-
-  // right click menu
-  bool HostsButtonPress(GdkEventButton * eb, Widget w)
-  {
-    if(eb.window != hosts_.getBinWindow().getWindowStruct()){// header is clicked
-      return false;
-    }
-
-    if(eb.button != MouseButton.RIGHT){// not right button
-      return false;
-    }
-
-    TreePath path = GetPathAtPos(hosts_, eb.x, eb.y);
-    TreeIter iter;
-    if(path !is null){// there is a row at cursor
-      iter = GetIter(hostsStore_, path);
-      path.free();
-    }
-
-    auto menu = new AppendRemoveMenu(hosts_, hostsStore_, iter);
-    menu.popup(0, eb.time);
-
-    return false;
   }
   ///////////////////// [SSH]
 

@@ -1,6 +1,6 @@
 Package: seta
 Section: Gnome Desktop Environment
-Version: 0.6.2
+Version: 0.6.3
 Priority: optional
 Architecture: i386
 Essential: no

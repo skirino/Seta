@@ -168,7 +168,7 @@ public:
       if(split == 0){
         TerminalMode();
       }
-      else if(split == rcfile.GetWindowSizeV()){
+      else if(split >= rcfile.GetWindowSizeV()){
         FilerMode();
       }
       else{
