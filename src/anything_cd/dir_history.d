@@ -64,7 +64,5 @@ public:
   {
     super(getenv("HOME") ~ "/.seta_history");
     Load!(true)();
-    Add(ReplaceHomeDir(rcfile.GetInitialDirectoryLeft()));
-    Add(ReplaceHomeDir(rcfile.GetInitialDirectoryRight()));
   }
 }

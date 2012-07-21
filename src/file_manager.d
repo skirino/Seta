@@ -329,8 +329,8 @@ public:
   {
     string pwd = hist_.GetPWD();
     if(pwd.StartsWith(path)){// inside the mounted volume
-      string dir = mediator_.OnLeftSide() ? rcfile.GetInitialDirectoryLeft() : rcfile.GetInitialDirectoryRight();
-      ChangeDirectory(dir);
+      string defaultDir = mediator_.OnLeftSide() ? rcfile.GetInitialDirectoryLeft() : rcfile.GetInitialDirectoryRight();
+      ChangeDirectory(defaultDir);
     }
 
     // notify directory tree

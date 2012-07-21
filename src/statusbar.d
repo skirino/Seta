@@ -230,10 +230,10 @@ bool ExpandRightPane()
         else{
           if(note" ~ l ~ "_.getNPages() == 0){
             if('" ~ l ~ "' == 'L'){
-              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryLeft());
+              note" ~ l ~ "_.AppendNewPage();
             }
             else{
-              note" ~ l ~ "_.AppendNewPage(rcfile.GetInitialDirectoryRight());
+              note" ~ l ~ "_.AppendNewPage();
             }
           }
           note" ~ l ~ "_.show();

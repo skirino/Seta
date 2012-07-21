@@ -73,26 +73,29 @@ public:
     setTabLabelPacking(page, 1, 1, GtkPackType.START);
     page.show();
   }
+  void AppendNewPage()
+  {
+    AppendNewPage(GetInitialDirectoryBySide());
+  }
 
   void AppendPageCopy()
   {
     auto p = GetCurrentPage();
-    string initialDir;
-    if(p.LookingAtRemoteDir()){
-      if(side_ == 'L'){
-        initialDir = rcfile.GetInitialDirectoryLeft();
-      }
-      else{
-        initialDir = rcfile.GetInitialDirectoryRight();
-      }
-    }
-    else{
-      initialDir = p.GetCWD();
-    }
+    string initialDir = p.LookingAtRemoteDir() ? GetInitialDirectoryBySide() : p.GetCWD();
     AppendNewPage(initialDir);
   }
 
 private:
+  string GetInitialDirectoryBySide()
+  {
+    if(side_ == 'L'){
+      return rcfile.GetInitialDirectoryLeft();
+    }
+    else{
+      return rcfile.GetInitialDirectoryRight();
+    }
+  }
+
   void LabelAllPages(Widget w, uint u, Notebook note)
   {
     uint num = getNPages();
