@@ -281,14 +281,13 @@ public:
         if(command == cdAlias.command_){
           string path =
             cdAlias.path_[0] == '/' ? cdAlias.path_ :
+            cdAlias.path_[0] == '~' ? ExpandPath(mediator_.FileSystemHome()[0..$-1] ~ cdAlias.path_[1..$], mediator_.FileSystemRoot()) :
                                       ExpandPath(cwd_ ~ cdAlias.path_, mediator_.FileSystemRoot());
-
           if(path !is null){
             if(mediator_.FilerChangeDirFromTerminal(path)){
               cwd_ = mediator_.FileSystemNativePath(path);
             }
           }
-
           return;
         }
       }
