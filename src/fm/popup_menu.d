@@ -364,7 +364,7 @@ void MakeDirectory(string pwd)
         newdir.makeDirectory(null);
       }
       catch(GException ex){
-        PopupBox.error(ex.toString(), "error");
+        PopupBox.error(ex.msg, "error");
       }
     }
   }
@@ -386,7 +386,7 @@ void DeleteFiles(bool toTrash)(string pwd, string[] names)
       }
     }
     catch(GException ex){
-      PopupBox.error(ex.toString(), "error");
+      PopupBox.error(ex.msg, "error");
     }
   }
 }

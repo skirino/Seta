@@ -192,7 +192,7 @@ public:
       Update(pwd_);
     }
     catch(GException ex){// "pwd_" does not exist in the file system!
-      PopupBox.error(ex.toString() ~ "\nMove to its parent directory.", "error");
+      PopupBox.error(ex.msg ~ "\nMove to its parent directory.", "error");
 
       string parent = mediator_.FileSystemParentDirectory(pwd_);
       while(true){

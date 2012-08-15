@@ -33,6 +33,8 @@ import gtk.CheckButton;
 import gdk.Keysyms;
 import glib.Regex;
 import glib.GException;
+import pango.PgAttribute;
+import pango.PgAttributeList;
 
 import utils.string_util;
 import config.keybind;
@@ -41,7 +43,7 @@ import terminal;
 
 void StartTerminalSearch(Terminal terminal)
 {
-  scope d = new TerminalSearchDialog(terminal);
+  auto d = new TerminalSearchDialog(terminal);
   d.showAll();
   d.run();
 }
@@ -50,10 +52,13 @@ void StartTerminalSearch(Terminal terminal)
 private class TerminalSearchDialog : Dialog
 {
 private:
+  immutable int RESPONSE_ID_SEARCH = 1;
+
   Terminal terminal_;
   Regex re_;
   Entry e_;
   ComboBoxEntry cb_;
+  Label reErrorLabel_;
   Widget searchButton_;
   CheckButton ignoreCases_;
   CheckButton backwardDirection_;
@@ -78,6 +83,13 @@ public:
     l.setMnemonicWidget(cb_);
     contentArea.packStart(hbox, 0, 0, 5);
 
+    reErrorLabel_ = new Label("");
+    reErrorLabel_.setEllipsize(PangoEllipsizeMode.END);
+    auto attrs = new PgAttributeList;
+    attrs.insert(PgAttribute.foregroundNew(65535, 0, 0));
+    reErrorLabel_.setAttributes(attrs);
+    contentArea.packStart(reErrorLabel_, 0, 0, 0);
+
     ignoreCases_ = new CheckButton("_Ignore cases");
     contentArea.packStart(ignoreCases_, 0, 0, 0);
 
@@ -88,7 +100,7 @@ public:
     contentArea.packStart(overwrappedSearch_, 0, 0, 0);
 
     addButton(StockID.CLOSE, GtkResponseType.GTK_RESPONSE_DELETE_EVENT);
-    searchButton_ = addButton(StockID.FIND,  1);
+    searchButton_ = addButton(StockID.FIND, RESPONSE_ID_SEARCH);
 
     ApplySettings();
   }
@@ -109,20 +121,23 @@ private:
       RestoreSettings();
       destroy();
     }
-    else if(responseID == 1){
+    else if(responseID == RESPONSE_ID_SEARCH){
       Search();
     }
   }
 
   void Search()
   {
-    terminal_.SetOverwrappedSearch(overwrappedSearch_.getActive());
+    if(re_ is null){
+      return;
+    }
 
-    if(backwardDirection_.getActive() == 0){
-      terminal_.SearchNext();
+    terminal_.SetOverwrappedSearch(overwrappedSearch_.getActive());
+    if(backwardDirection_.getActive()){
+      terminal_.SearchPrevious();
     }
     else{
-      terminal_.SearchPrevious();
+      terminal_.SearchNext();
     }
 
     // prepend or reorder the search text
@@ -137,7 +152,6 @@ private:
     }
     else{
       searchButton_.setSensitive(1);
-      terminal_.SetSearchRegexp(re_);
     }
   }
 
@@ -158,9 +172,12 @@ private:
         (ignoreCases_.getActive() == 0) ? GRegexCompileFlags.MULTILINE :
                                           GRegexCompileFlags.MULTILINE | GRegexCompileFlags.CASELESS;
       re_ = new Regex(text, compileFlags, cast(GRegexMatchFlags)0);
+      terminal_.SetSearchRegexp(re_);
+      reErrorLabel_.setText("");
     }
     catch(GException ex){
       re_ = null;
+      reErrorLabel_.setText(ex.msg);
     }
   }
 
@@ -168,9 +185,9 @@ private:
 
   //////////////// remember settings used at last time
   static __gshared string[] searchTextHistory = [];
-  static __gshared int ignoreCases = 0;
+  static __gshared int ignoreCases       = 1;
   static __gshared int backwardDirection = 0;
-  static __gshared int overwrappedSearch = 0;
+  static __gshared int overwrappedSearch = 1;
 
   void ApplySettings()
   {

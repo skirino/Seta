@@ -141,7 +141,7 @@ void RenameFiles(string dir, string[] infiles)
           ++num;
         }
         catch(GException ex){
-          int x = ChooseDialog!(2)(ex.toString(), ["_Skip this file", "_Cancel all"]);
+          int x = ChooseDialog!(2)(ex.msg, ["_Skip this file", "_Cancel all"]);
           if(x == -1 || x == 1){
             break;
           }
@@ -330,7 +330,7 @@ private class RenameDialog : Dialog
     lerr_.setText(message);//"<span foreground=\"red\"> " ~ message ~ " </span>");
     lerr_.setTooltipText(message);
 
-    if(message == ""){
+    if(message.IsBlank()){
       ok_.setSensitive(1);
     }
     else{// there is something wrong, forbid to rename
@@ -369,7 +369,7 @@ private class RenameDialog : Dialog
         map_.re_ = new Regex(map_.textSearch_, cast(GRegexCompileFlags)0, cast(GRegexMatchFlags)0);
       }
       catch(GException ex){// failed to compile regexp, e.g. just after inputting '('
-        SetErrorLabel(ex.toString());
+        SetErrorLabel(ex.msg);
         return;
       }
 
@@ -381,8 +381,8 @@ private class RenameDialog : Dialog
           int x;
           Regex.checkReplacement(map_.textReplace_, x);
         }
-        catch(GException ex){// replace string is invalid
-          SetErrorLabel(ex.toString());
+        catch(GException ex){
+          SetErrorLabel(ex.msg);
           return;
         }
         RenameForeach!(ReplaceRegexp)();
