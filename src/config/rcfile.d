@@ -580,6 +580,8 @@ private:
     mixin(InstallKeybind!("FileViewAction.FocusFilter"  , "<Control>f"));
     mixin(InstallKeybind!("FileViewAction.ClearFilter"  , "<Shift><Control>f"));
 
+    mixin(InstallKeybind!("TerminalAction.ScrollUp"      , "<Shift><Control>p"));
+    mixin(InstallKeybind!("TerminalAction.ScrollDown"    , "<Shift><Control>n"));
     mixin(InstallKeybind!("TerminalAction.Copy"          , "<Shift><Control>c"));
     mixin(InstallKeybind!("TerminalAction.Paste"         , "<Shift><Control>v"));
     mixin(InstallKeybind!("TerminalAction.PasteFilePaths", "<Shift><Control>y"));
@@ -845,6 +847,8 @@ FileViewAction.MoveToTrash=F8
 FileViewAction.FocusFilter=<Control>f
 FileViewAction.ClearFilter=<Shift><Control>f
 
+TerminalAction.ScrollUp=<Shift><Control>p
+TerminalAction.ScrollDown=<Shift><Control>n
 TerminalAction.Copy=<Shift><Control>c
 TerminalAction.Paste=<Shift><Control>v
 TerminalAction.PasteFilePaths=<Shift><Control>y
@@ -862,6 +866,4 @@ TerminalAction.InputUserDefinedText7=<Alt>7
 TerminalAction.InputUserDefinedText8=<Alt>8
 TerminalAction.InputUserDefinedText9=<Alt>9
 
-
 ";
-

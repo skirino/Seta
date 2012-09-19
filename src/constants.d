@@ -142,6 +142,8 @@ enum FileViewAction
 
 enum TerminalAction
 {
+  ScrollUp,
+  ScrollDown,
   Enter,
   Replace,
   Copy,

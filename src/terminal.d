@@ -23,6 +23,7 @@ module terminal;
 import gtk.Widget;
 import gtk.Selections;
 import gtk.DragAndDrop;
+import gtk.ScrolledWindow;
 import gobject.Signals;
 import gdk.Threads;
 import gdk.Color;
@@ -40,6 +41,7 @@ import utils.string_util;
 import utils.unistd_util;
 import utils.thread_util;
 import constants;
+import gtk.scrolled_window;
 import rcfile = config.rcfile;
 import config.keybind;
 import shellrc = config.shellrc;
@@ -151,6 +153,14 @@ private:
 
     case -1:
       return false;
+
+    case TerminalAction.ScrollUp:
+      (cast(ScrolledWindow)getParent()).ScrollUp();
+      return true;
+
+    case TerminalAction.ScrollDown:
+      (cast(ScrolledWindow)getParent()).ScrollDown();
+      return true;
 
     case TerminalAction.Enter:
       // if necessary send command for change directory
