@@ -37,11 +37,11 @@ import std.c.stdlib;
 import utils.gio_util;
 import utils.string_util;
 import constants;
+import desktop_notification;
 import fm.file_view;
 import thread_list;
 import input_dialog;
 import statusbar;
-
 
 
 string[] GetFilesFromStrv(char ** curis)
@@ -281,26 +281,37 @@ private:
     Register();
   }
 
+  string NotificationMessage()
+  {
+    if(numTransferred_ == 0){
+      return "Canceled " ~ moving;
+    }
+    else if(numTransferred_ == files_.length){// all
+      return "Finished " ~
+        moving ~
+        ' ' ~
+        PluralForm!(uint, "item")(numTransferred_) ~
+        ' ' ~
+        GetToDestDir();
+    }
+    else if(mode_ == PasteModeFlags.CANCEL_ALL){// stopped by the user
+      return "Canceled " ~
+        moving ~
+        " after finishing " ~
+        GetRatioItems();
+    }
+    else{// part of files have been transferred
+      return "Finished " ~ moving ~ ' ' ~ GetRatioItems() ~ ' ' ~ GetToDestDir();
+    }
+  }
+
   void NotifyFinish()
   {
     // inside gdk lock
 
-    // send message to statusbar and update FileView if appropriate
-    if(numTransferred_ == 0){
-      PushIntoStatusbar("Canceled " ~ moving);
-    }
-    else if(numTransferred_ == files_.length){// all
-      PushIntoStatusbar(
-        "Finished " ~ moving ~ ' ' ~ PluralForm!(uint, "item")(numTransferred_) ~ ' ' ~ GetToDestDir());
-    }
-    else if(mode_ == PasteModeFlags.CANCEL_ALL){// stopped by the user
-      PushIntoStatusbar(
-        "Canceled " ~ moving ~ " after finishing " ~ GetRatioItems());
-    }
-    else{// part of files have been transferred
-      PushIntoStatusbar(
-        "Finished " ~ moving ~ ' ' ~ GetRatioItems() ~ ' ' ~ GetToDestDir());
-    }
+    auto message = NotificationMessage();
+    PushIntoStatusbar(message);
+    desktop_notification.Notify(message);
 
     if(numTransferred_ > 0){
       // notify the source side to Update
@@ -466,4 +477,3 @@ extern(C) {
   GdkDragAction  ExtractSuggestedAction(GdkDragContext * context);
 }
 //////////////////////// interface to C
-

@@ -76,7 +76,10 @@ public:
     remote_ = remote;
     if(remote){
       // "owner::user" cannot be obtained from the GVFS, then switch to faster content-type
-      attributes_ = attr.substitute(",owner::user", "").substitute("standard::content-type", "standard::fast-content-type").idup;
+      attributes_ = attr
+        .substitute(",owner::user", "")
+        .substitute("standard::content-type", "standard::fast-content-type")
+        .idup;
     }
     else{
       attributes_ = attr;
