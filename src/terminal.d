@@ -636,7 +636,7 @@ private:
 
     string GetThreadListLabel(string startTime)
     {
-      return "Waiting for password  query from " ~ host_ ~ " (" ~ startTime ~ ')';
+      return "Waiting for password query from " ~ host_ ~ " (" ~ startTime ~ ')';
     }
 
     string GetStopDialogLabel(string startTime)

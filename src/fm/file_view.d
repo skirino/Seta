@@ -255,18 +255,16 @@ private:
     FileView view = cast(FileView)ptr;
     if(view !is null && view.contentsChanged_){
       if(view.isRubberBandingActive()){// Updating contents of TreeView during rubber banding is problematic
-        return 1;// this function will be repeatedly called until FALSE is returned
+        return 1;// will be repeatedly called until FALSE is returned
       }
-      else{
-        // contents-change should not cancel user's request for "change directory"
-        if(view.prepareUpdateThread_ !is null && view.prepareUpdateThread_.isRunning()){// not updating
-          return 1;
-        }
-        else{
-          view.TryUpdate();
-          view.mediator_.UpdateDirTree(view.pwd_);
-        }
+
+      // contents-change should not cancel user's request for "change directory"
+      if(view.prepareUpdateThread_ !is null && view.prepareUpdateThread_.isRunning()){// not updating
+        return 1;// will be repeatedly called until FALSE is returned
       }
+
+      view.TryUpdate();
+      view.mediator_.UpdateDirTree(view.pwd_);
     }
     return 0;
   }
