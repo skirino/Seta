@@ -404,11 +404,10 @@ private:
       }
 
       auto menu = new Menu;
-      menu.append(new MenuItem(
-                    delegate void(MenuItem item){
-                      UnmountMedia(item, path);
-                    },
-                    "Unmount " ~ name, false));
+      auto dlg = delegate void(MenuItem item){
+        UnmountMedia(item, path);
+      };
+      menu.append(new MenuItem(dlg, "Unmount " ~ name, false));
       menu.showAll();
       menu.popup(3, (new Event(cast(GdkEvent*)eb)).getTime());// 3 indicates "right click"
     }
@@ -423,11 +422,9 @@ private:
     }
     page_list.NotifyEscapeFromPath(path);
 
-    if(!UnmountByPath(path)){// "path" not found in monitored volumes, just remove the "item"
-      remove(item);
-    }
+    UnmountByPath(path);
 
-    // move focus to the file manager, since the focused button will go away by removing the shortcut
+    // move focus to the file manager, since the focused button will go away
     parent_.GrabFocus();
   }
   ///////////////////// mounted volume buttons

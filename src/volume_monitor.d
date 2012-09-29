@@ -25,10 +25,13 @@ import gio.Mount;
 import gio.MountIF;
 import gtkc.gio;
 import glib.ListG;
+import glib.Timeout;
+
+import std.algorithm;
 
 import utils.string_util;
-import statusbar;
 import page_list;
+import statusbar;
 
 
 private struct MountedVolumeMonitor
@@ -138,20 +141,79 @@ string GetPathToNthVolume(size_t n)
 }
 
 
-bool UnmountByPath(string path)
+
+// Unmount mouted volume
+const int STATE_IDLE    = 0;
+const int STATE_FAILED  = 1;
+const int STATE_RUNNING = 2;
+const int STATE_FINISH  = 3;
+const int MAX_FAILED_COUNT = 10;
+
+struct UnmountOperationArgs
+{
+  int state_;
+  int failedCount_;
+  string path_;
+}
+__gshared UnmountOperationArgs[] argsArray;
+
+void UnmountByPath(string path)
+{
+  // Clear previously used elements in argsArray in case all elements are STATE_FINISH.
+  if(all!"a.state_ == 3"(argsArray)){
+    argsArray = [];
+  }
+
+  // Transfer ownership of local var to argsArray
+  argsArray ~= UnmountOperationArgs(STATE_IDLE, 0, path);
+  Timeout.add(500, &UnmountCallback, cast(void*)(&argsArray[$-1]));
+}
+
+extern(C) int UnmountCallback(void * data)
+{
+  auto args = cast(UnmountOperationArgs*)data;
+  switch(args.state_){
+  case STATE_IDLE:
+    args.state_ = STATE_RUNNING;
+    StartUnmountOperation(args);
+    return 1;
+  case STATE_RUNNING:
+    return 1;
+  case STATE_FAILED:
+    if(args.failedCount_ < MAX_FAILED_COUNT){// retry
+      args.state_ = STATE_IDLE;
+      return 1;
+    } else {// quit
+      args.state_ = STATE_FINISH;
+      return 0;
+    }
+  default:// case STATE_FINISH:
+    return 0;
+  }
+}
+
+void StartUnmountOperation(UnmountOperationArgs * args)
 {
   ListG list = monitorInstance.volumeMonitor_.getMounts();
-
-  while(list !is null){
+  while(list){
     auto mount = new Mount(cast(GMount*)list.data());
-    string volumePath = mount.getRoot().getPath() ~ '/';
-    if(volumePath == path){// found
-      mount.unmountWithOperation(GMountUnmountFlags.NONE, null, null, null, null);
-      return true;
+    string mountPoint = mount.getRoot().getPath() ~ '/';
+    if(mountPoint == args.path_){// found
+      mount.unmountWithOperation(GMountUnmountFlags.NONE, null, null,
+                                 cast(GAsyncReadyCallback)&UnmountReadyCallback,
+                                 cast(void*)(args));
     }
     list = list.next();
   }
+}
 
-  // "path" not found
-  return false;
+extern(C) void UnmountReadyCallback(GMount * mount, GAsyncResult * res, void * data)
+{
+  auto args = cast(UnmountOperationArgs*)data;
+  if(g_mount_unmount_with_operation_finish(mount, res, null)){
+    args.state_ = STATE_FINISH;
+  } else {
+    args.state_ = STATE_FAILED;
+    args.failedCount_++;
+  }
 }
