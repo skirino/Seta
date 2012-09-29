@@ -61,9 +61,9 @@ public:
   Vector!(DirEntry) GetDFiltered(){return dFiltered_;}
   Vector!(DirEntry) GetFFiltered(){return fFiltered_;}
 
-  size_t NumEntriesAll()
+  long NumEntriesAll()
   {
-    return dAll_.size() + fAll_.size();
+    return cast(long)(dAll_.size() + fAll_.size());
   }
 
   size_t NumEntriesSorted()

@@ -87,7 +87,7 @@ public:
   /////////////////// interface to Page
   bool FilerIsVisible(){return page_.GetViewMode() != ViewMode.TERMINAL;}
   string GetPageID(){return page_.GetTab().GetID();}
-  void UpdatePathLabel(string path, int numItems){page_.UpdatePathLabel(path, numItems);}
+  void UpdatePathLabel(string path, long numItems){page_.UpdatePathLabel(path, numItems);}
   void SetHostLabel(string p){page_.SetHostLabel(p);}
   string GetHostLabel(){return page_.GetHostLabel();}
   string GetCWDOtherSide(){return page_.GetCWDOtherSide();}

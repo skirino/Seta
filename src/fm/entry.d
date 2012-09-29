@@ -183,12 +183,12 @@ mixin(CompareIntegerFuncMixin!("LastModified", "lastModified_"));
 
 
 
-int CountNumEntries(string dirname)
+long CountNumEntries(string dirname)
 {
   scope f = GetFileForDirectory(dirname);
   if(f !is null){
     try{
-      int num = 0;
+      long num = 0;
       scope enumerate = f.enumerateChildren("", GFileQueryInfoFlags.NONE, null);
       GFileInfo * p;
       while((p = enumerate.nextFile(null)) != null){

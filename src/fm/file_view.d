@@ -382,7 +382,7 @@ private:
 
   void ResetRows()
   {
-    mediator_.UpdatePathLabel(pwd_, cast(int)eList_.NumEntriesAll());
+    mediator_.UpdatePathLabel(pwd_, eList_.NumEntriesAll());
 
     // cleanup
     store_.clear();
@@ -399,7 +399,7 @@ private:
         iter, cast(int[])cols,
         [PARENT_STRING,
          GetDirectoryTypeDescription(),
-         PluralForm!(int, "item")(CountNumEntries(parentPath)),
+         PluralForm!(long, "item")(CountNumEntries(parentPath)),
          info.getAttributeString("owner::user"),
          PermissionInStr(info.getAttributeUint32("unix::mode"), info.getIsSymlink() != 0),
          EpochTimeToString(info.getAttributeUint64("time::modified")),

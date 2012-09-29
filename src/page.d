@@ -191,12 +191,12 @@ public:
   Terminal GetTerminal(){return terminal_;}
   Tab GetTab(){return tab_;}
 
-  void UpdatePathLabel(string path, uint numItems)
+  void UpdatePathLabel(string path, long numItems)
   {
     string nativePath=mediator_.FileSystemNativePath(path);
     pwdLabel_.setText(mediator_.FileSystemNativePath(path));
     tab_.SetPath(path);
-    itemsLabel_.setText(PluralForm!(uint, "item")(numItems));
+    itemsLabel_.setText(PluralForm!(long, "item")(numItems));
   }
 
   void SetHostLabel(string h)
