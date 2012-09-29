@@ -23,6 +23,7 @@ module desktop_notification;
 import glib.Str;
 
 import deimos.notify.notify;
+import config.rcfile;
 
 
 void Init()
@@ -37,7 +38,9 @@ void Finish()
 
 void Notify(string message)
 {
-  auto n = notify_notification_new(Str.toStringz("Seta"), Str.toStringz(message), null);
-  notify_notification_set_timeout(n, 3000);
-  notify_notification_show(n, null);
+  if(GetUseDesktopNotification()){
+    auto n = notify_notification_new(Str.toStringz("Seta"), Str.toStringz(message), null);
+    notify_notification_set_timeout(n, GetNotifyExpiresInMSec());
+    notify_notification_show(n, null);
+  }
 }

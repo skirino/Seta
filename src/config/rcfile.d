@@ -141,6 +141,9 @@ mixin(GetString!("Layout", "ColorDirectory"));
 mixin(GetString!("Layout", "ColorFile"));
 mixin(GetString!("Layout", "ColorSymlink"));
 mixin(GetString!("Layout", "ColorExecutable"));
+
+mixin(GetBoolean!("UseDesktopNotification"));
+mixin(GetUint!("NotifyExpiresInMSec"));
 ///////////////// [Layout]
 
 
@@ -466,6 +469,9 @@ private:
     mixin(SetDefaultValue!("String", "Layout", "ColorSymlink",    "\"#20B0E0\""));
     mixin(SetDefaultValue!("String", "Layout", "ColorExecutable", "\"#228B22\""));
 
+    mixin(SetDefaultValue!("Boolean", "Layout", "UseDesktopNotification", "false"));
+    mixin(SetDefaultValue!("Integer", "Layout", "NotifyExpiresInMSec", "3000"));
+
     // [Terminal]
     GdkColor colorTest;
     if(!hasKey("Terminal", "ColorForeground") ||
@@ -742,6 +748,8 @@ ColorFile=#000000
 ColorSymlink=#20B0E0
 ColorExecutable=#228B22
 
+UseDesktopNotification=false
+NotifyExpiresInMSec=3000
 
 
 [Terminal]

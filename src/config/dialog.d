@@ -299,11 +299,12 @@ private:
   // toolbar
   CheckButton cbShowBackButton_, cbShowForwardButton_, cbShowUpButton_, cbShowRootButton_, cbShowHomeButton_,
     cbShowOtherSideButton_, cbShowRefreshButton_, cbShowSSHButton_, cbShowHiddenButton_, cbShowDirTreeButton_,
-    cbShowFilter_;
+    cbShowFilter_, cbUseDesktopNotification_;
   SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
 
   // main widgets
-  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_;
+  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_,
+    sbNotifyExpiresInMSec_;
 
   // row colors
   ColorButton cbColorDirectory_, cbColorFile_, cbColorSymlink_, cbColorExecutable_;
@@ -353,6 +354,10 @@ private:
     mixin(AddSpinButton!("Layout", "SplitVRight", "0, 5000, 10", "Height of the upper half on the right side: "));
     mixin(AddSpinButton!("Layout", "WindowSizeH", "10, 5000, 10", "Horizontal size of the main window: "));
     mixin(AddSpinButton!("Layout", "WindowSizeV", "10, 5000, 10", "Vertical size of the main window: "));
+
+    AttachSectionLabel(pageLayout_, row++, "Desktop notification");
+    mixin(AddCheckButton!("Layout", "UseDesktopNotification", "Notify finish of async file transfer using desktop-notification"));
+    mixin(AddSpinButton!("Layout", "NotifyExpiresInMSec", "0, 30000, 100", "Expiration time on a notification (in milliseconds): "));
   }
 
   void ApplyChangesInLayout()
@@ -393,6 +398,9 @@ private:
     mixin(CheckSpinButton!("SplitVRight"));
     mixin(CheckSpinButton!("WindowSizeH"));
     mixin(CheckSpinButton!("WindowSizeV"));
+
+    mixin(CheckCheckButton!("Layout", "UseDesktopNotification"));
+    mixin(CheckSpinButton!("NotifyExpiresInMSec"));
 
     if(changed){
       page_list.NotifySetLayout();
