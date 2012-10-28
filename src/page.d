@@ -317,6 +317,11 @@ public:
     return mediator_.FileSystemRoot();
   }
 
+  bool FileSystemIsRemote()
+  {
+    return mediator_.FileSystemIsRemote();
+  }
+
   string GetCWD()
   {
     // if remote, return locally-mounted path

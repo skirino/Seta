@@ -390,7 +390,11 @@ private:
       if(note is null){
         return false;
       }
-      StartChangeDirDialog(note.GetCurrentPage());
+      auto page = note.GetCurrentPage();
+      if(page.FileSystemIsRemote()){
+        return false;
+      }
+      StartChangeDirDialog(page);
       return true;
 
     case MainWindowAction.ShowConfigDialog:
