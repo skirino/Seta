@@ -30,6 +30,7 @@ import gtk.EditableIF;
 import gtk.ComboBox;
 import gtk.ComboBoxEntry;
 import gtk.CheckButton;
+import gtk.ToggleButton;
 import gdk.Keysyms;
 import glib.Regex;
 import glib.GException;
@@ -78,7 +79,7 @@ public:
     hbox.packStart(l, 0, 0, 5);
 
     cb_ = new ComboBoxEntry;
-    cb_.addOnChanged(&SearchTextChanged);
+    cb_.addOnChanged(&SearchTextChanged!(ComboBox));
     hbox.packStart(cb_, 0, 0, 0);
     l.setMnemonicWidget(cb_);
     contentArea.packStart(hbox, 0, 0, 5);
@@ -91,6 +92,7 @@ public:
     contentArea.packStart(reErrorLabel_, 0, 0, 0);
 
     ignoreCases_ = new CheckButton("_Ignore cases");
+    ignoreCases_.addOnToggled(&SearchTextChanged!(ToggleButton));
     contentArea.packStart(ignoreCases_, 0, 0, 0);
 
     backwardDirection_ = new CheckButton("_Backward search");
@@ -144,7 +146,7 @@ private:
     cb_.prependOrReplaceText(cb_.getActiveText());
   }
 
-  void SearchTextChanged(ComboBox cb)
+  void SearchTextChanged(T)(T t)
   {
     BuildRegexp();
     if(re_ is null){
