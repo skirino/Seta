@@ -166,6 +166,8 @@ private:
     auto text = cb_.getActiveText();
     if(IsBlank(text)){
       re_ = null;
+      reErrorLabel_.setText("");
+      reErrorLabel_.setTooltipText("");
       return;
     }
 
@@ -176,10 +178,12 @@ private:
       re_ = new Regex(text, compileFlags, cast(GRegexMatchFlags)0);
       terminal_.SetSearchRegexp(re_);
       reErrorLabel_.setText("");
+      reErrorLabel_.setTooltipText("");
     }
     catch(GException ex){
       re_ = null;
       reErrorLabel_.setText(ex.msg);
+      reErrorLabel_.setTooltipText(ex.msg);
     }
   }
 
