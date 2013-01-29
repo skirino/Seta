@@ -313,32 +313,28 @@ private:
       if(note is null){
         return false;
       }
-      else{
-        if(note.getCurrentPage() == note.getNPages() - 1){// last page
-          note.setCurrentPage(0);// move to the 1st page
-        }
-        else{
-          note.nextPage();
-        }
-        note.GetCurrentPage().FocusShownWidget();
-        return true;
+      if(note.getCurrentPage() == note.getNPages() - 1){// last page
+        note.setCurrentPage(0);// move to the 1st page
       }
+      else{
+        note.nextPage();
+      }
+      note.GetCurrentPage().FocusShownWidget();
+      return true;
 
     case MainWindowAction.MoveToPreviousPage:
       auto note = GetFocusedNote();
       if(note is null){
         return false;
       }
-      else{
-        if(note.getCurrentPage() == 0){// 1st page
-          note.setCurrentPage(note.getNPages() - 1);// move to the last page
-        }
-        else{
-          note.prevPage();
-        }
-        note.GetCurrentPage().FocusShownWidget();
-        return true;
+      if(note.getCurrentPage() == 0){// 1st page
+        note.setCurrentPage(note.getNPages() - 1);// move to the last page
       }
+      else{
+        note.prevPage();
+      }
+      note.GetCurrentPage().FocusShownWidget();
+      return true;
 
     case MainWindowAction.SwitchViewMode:
       auto note = GetFocusedNote();
