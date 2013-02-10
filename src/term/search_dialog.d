@@ -63,7 +63,6 @@ private:
   Widget searchButton_;
   CheckButton ignoreCases_;
   CheckButton backwardDirection_;
-  CheckButton overwrappedSearch_;
 
 public:
   this(Terminal terminal)
@@ -98,9 +97,6 @@ public:
     backwardDirection_ = new CheckButton("_Backward search");
     contentArea.packStart(backwardDirection_, 0, 0, 0);
 
-    overwrappedSearch_ = new CheckButton("_Overwrapped search");
-    contentArea.packStart(overwrappedSearch_, 0, 0, 0);
-
     addButton(StockID.CLOSE, GtkResponseType.GTK_RESPONSE_DELETE_EVENT);
     searchButton_ = addButton(StockID.FIND, RESPONSE_ID_SEARCH);
 
@@ -134,7 +130,6 @@ private:
       return;
     }
 
-    terminal_.SetOverwrappedSearch(overwrappedSearch_.getActive());
     if(backwardDirection_.getActive()){
       terminal_.SearchPrevious();
     }
@@ -193,7 +188,6 @@ private:
   static __gshared string[] searchTextHistory = [];
   static __gshared int ignoreCases       = 1;
   static __gshared int backwardDirection = 0;
-  static __gshared int overwrappedSearch = 1;
 
   void ApplySettings()
   {
@@ -204,7 +198,6 @@ private:
 
     ignoreCases_.setActive(ignoreCases);
     backwardDirection_.setActive(backwardDirection);
-    overwrappedSearch_.setActive(overwrappedSearch);
   }
 
   void RestoreSettings()
@@ -227,7 +220,6 @@ private:
 
     ignoreCases = ignoreCases_.getActive();
     backwardDirection = backwardDirection_.getActive();
-    overwrappedSearch = overwrappedSearch_.getActive();
   }
 }
 

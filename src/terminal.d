@@ -108,6 +108,7 @@ public:
 
     vte_terminal_set_font_from_string(vte_, Str.toStringz(rcfile.GetFont()));
     vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());
+    vte_terminal_search_set_wrap_around(vte_, 1);
 
     // to extract last command and replace $L(R)DIR
     prompt_  = rcfile.GetPROMPT();
@@ -254,11 +255,6 @@ public:
   void SearchPrevious()
   {
     vte_terminal_search_find_previous(vte_);
-  }
-
-  void SetOverwrappedSearch(int i)
-  {
-    vte_terminal_search_set_wrap_around(vte_, i);
   }
   ////////////////// search
 
