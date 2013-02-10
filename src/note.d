@@ -23,6 +23,7 @@ module note;
 import gtk.Notebook;
 import gtk.Widget;
 
+import constants;
 import rcfile = config.rcfile;
 import page_list;
 import page;
@@ -68,9 +69,7 @@ public:
       &mainWin_.AppendPageCopy,// not "&AppendPageCopy", since pages can be dragged onto the other Notebook
       &mainWin_.ClosePage);
     appendPage(page, page.GetTab());
-    setTabReorderable(page, 1);
-    setTabDetachable(page, 1);
-    setTabLabelPacking(page, 1, 1, GtkPackType.START);
+    SetupPage(page);
     page.show();
   }
   void AppendNewPage()
@@ -85,7 +84,30 @@ public:
     AppendNewPage(initialDir);
   }
 
+  void MoveCurrentPageTo(Direction d)()
+  {
+    auto index = getCurrentPage();
+    auto page  = cast(Page)getNthPage(index);
+    static if(d == Direction.LEFT){
+      auto newIndex = index - 1;
+    }
+    else{
+      auto newIndex = (index == getNPages() - 1) ? 0 : index + 1;
+    }
+    removePage(index);
+    insertPage(page, page.GetTab(), newIndex);
+    SetupPage(page);
+    setCurrentPage(newIndex);
+  }
+
 private:
+  void SetupPage(Page page)
+  {
+    setTabReorderable(page, 1);
+    setTabDetachable(page, 1);
+    setTabLabelPacking(page, 1, 1, GtkPackType.START);
+  }
+
   string GetInitialDirectoryBySide()
   {
     if(side_ == 'L'){

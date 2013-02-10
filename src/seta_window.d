@@ -336,6 +336,22 @@ private:
       note.GetCurrentPage().FocusShownWidget();
       return true;
 
+    case MainWindowAction.MoveThisPageToLeft:
+      auto note = GetFocusedNote();
+      if(note is null){
+        return false;
+      }
+      note.MoveCurrentPageTo!(Direction.LEFT)();
+      return true;
+
+    case MainWindowAction.MoveThisPageToRight:
+      auto note = GetFocusedNote();
+      if(note is null){
+        return false;
+      }
+      note.MoveCurrentPageTo!(Direction.RIGHT)();
+      return true;
+
     case MainWindowAction.SwitchViewMode:
       auto note = GetFocusedNote();
       if(note is null){
