@@ -32,6 +32,8 @@ enum FileColorType {Directory, File, SymLink, Executable}
 
 enum Direction {UP, DOWN, LEFT, RIGHT}
 
+enum Order {FORWARD, BACKWARD}
+
 enum FocusInPage {NONE, UPPER, LOWER}
 
 enum FocusInMainWindow {NONE, LEFT, RIGHT}

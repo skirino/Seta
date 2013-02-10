@@ -37,6 +37,7 @@ import glib.GException;
 import pango.PgAttribute;
 import pango.PgAttributeList;
 
+import constants;
 import utils.string_util;
 import config.keybind;
 import terminal;
@@ -53,16 +54,17 @@ void StartTerminalSearch(Terminal terminal)
 private class TerminalSearchDialog : Dialog
 {
 private:
-  immutable int RESPONSE_ID_SEARCH = 1;
+  immutable int RESPONSE_ID_SEARCH_FORWARD  = 1;
+  immutable int RESPONSE_ID_SEARCH_BACKWARD = 2;
 
   Terminal terminal_;
   Regex re_;
   Entry e_;
   ComboBoxEntry cb_;
   Label reErrorLabel_;
-  Widget searchButton_;
+  Widget searchForwardButton_;
+  Widget searchBackwardButton_;
   CheckButton ignoreCases_;
-  CheckButton backwardDirection_;
 
 public:
   this(Terminal terminal)
@@ -94,11 +96,9 @@ public:
     ignoreCases_.addOnToggled(&SearchTextChanged!(ToggleButton));
     contentArea.packStart(ignoreCases_, 0, 0, 0);
 
-    backwardDirection_ = new CheckButton("_Backward search");
-    contentArea.packStart(backwardDirection_, 0, 0, 0);
-
     addButton(StockID.CLOSE, GtkResponseType.GTK_RESPONSE_DELETE_EVENT);
-    searchButton_ = addButton(StockID.FIND, RESPONSE_ID_SEARCH);
+    searchBackwardButton_ = addButton(StockID.MEDIA_PREVIOUS, RESPONSE_ID_SEARCH_BACKWARD);
+    searchForwardButton_  = addButton(StockID.MEDIA_NEXT,     RESPONSE_ID_SEARCH_FORWARD);
 
     ApplySettings();
   }
@@ -119,22 +119,25 @@ private:
       RestoreSettings();
       destroy();
     }
-    else if(responseID == RESPONSE_ID_SEARCH){
+    else if(responseID == RESPONSE_ID_SEARCH_FORWARD){
       Search();
+    }
+    else if(responseID == RESPONSE_ID_SEARCH_BACKWARD){
+      Search!(Order.BACKWARD)();
     }
   }
 
-  void Search()
+  void Search(Order o = Order.FORWARD)()
   {
     if(re_ is null){
       return;
     }
 
-    if(backwardDirection_.getActive()){
-      terminal_.SearchPrevious();
-    }
-    else{
+    static if(o == Order.FORWARD){
       terminal_.SearchNext();
+    }
+    else {
+      terminal_.SearchPrevious();
     }
 
     // prepend or reorder the search text
@@ -145,10 +148,12 @@ private:
   {
     BuildRegexp();
     if(re_ is null){
-      searchButton_.setSensitive(0);
+      searchForwardButton_ .setSensitive(0);
+      searchBackwardButton_.setSensitive(0);
     }
     else{
-      searchButton_.setSensitive(1);
+      searchForwardButton_ .setSensitive(1);
+      searchBackwardButton_.setSensitive(1);
     }
   }
 
@@ -187,7 +192,6 @@ private:
   //////////////// remember settings used at last time
   static __gshared string[] searchTextHistory = [];
   static __gshared int ignoreCases       = 1;
-  static __gshared int backwardDirection = 0;
 
   void ApplySettings()
   {
@@ -195,9 +199,7 @@ private:
       cb_.appendText(text);
     }
     cb_.setActive(0);
-
     ignoreCases_.setActive(ignoreCases);
-    backwardDirection_.setActive(backwardDirection);
   }
 
   void RestoreSettings()
@@ -217,9 +219,6 @@ private:
       previous = text;
       ++index;
     }
-
     ignoreCases = ignoreCases_.getActive();
-    backwardDirection = backwardDirection_.getActive();
   }
 }
-
