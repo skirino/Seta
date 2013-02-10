@@ -275,6 +275,12 @@ private:
 
 
   ///////////////////////// callback for keyboard shortcuts
+  static const string FocusedNoteOrReturnFalse =
+    "auto note = GetFocusedNote();
+    if(note is null){
+      return false;
+    }";
+
   bool KeyPressed(GdkEventKey * ekey, Widget w)
   {
     version(DEBUG){
@@ -309,10 +315,7 @@ private:
       }
 
     case MainWindowAction.MoveToNextPage:
-      auto note = GetFocusedNote();
-      if(note is null){
-        return false;
-      }
+      mixin(FocusedNoteOrReturnFalse);
       if(note.getCurrentPage() == note.getNPages() - 1){// last page
         note.setCurrentPage(0);// move to the 1st page
       }
@@ -323,10 +326,7 @@ private:
       return true;
 
     case MainWindowAction.MoveToPreviousPage:
-      auto note = GetFocusedNote();
-      if(note is null){
-        return false;
-      }
+      mixin(FocusedNoteOrReturnFalse);
       if(note.getCurrentPage() == 0){// 1st page
         note.setCurrentPage(note.getNPages() - 1);// move to the last page
       }
@@ -337,26 +337,17 @@ private:
       return true;
 
     case MainWindowAction.MoveThisPageToLeft:
-      auto note = GetFocusedNote();
-      if(note is null){
-        return false;
-      }
+      mixin(FocusedNoteOrReturnFalse);
       note.MoveCurrentPageTo!(Direction.LEFT)();
       return true;
 
     case MainWindowAction.MoveThisPageToRight:
-      auto note = GetFocusedNote();
-      if(note is null){
-        return false;
-      }
+      mixin(FocusedNoteOrReturnFalse);
       note.MoveCurrentPageTo!(Direction.RIGHT)();
       return true;
 
     case MainWindowAction.SwitchViewMode:
-      auto note = GetFocusedNote();
-      if(note is null){
-        return false;
-      }
+      mixin(FocusedNoteOrReturnFalse);
       auto page = note.GetCurrentPage();
       page.ViewModeButtonClicked(null);
       return true;
@@ -398,10 +389,7 @@ private:
       return true;
 
     case MainWindowAction.ShowChangeDirDialog:
-      auto note = GetFocusedNote();
-      if(note is null){
-        return false;
-      }
+      mixin(FocusedNoteOrReturnFalse);
       auto page = note.GetCurrentPage();
       if(page.FileSystemIsRemote()){
         return false;
