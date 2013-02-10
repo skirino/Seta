@@ -122,4 +122,3 @@ public:
     setTooltipText(p);
   }
 }
-

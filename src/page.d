@@ -186,15 +186,15 @@ public:
   }
 
 
-  bool OnLeftSide(){return tab_.OnLeftSide();}
+  bool        OnLeftSide    (){return tab_.OnLeftSide();}
   FileManager GetFileManager(){return filer_;}
-  Terminal GetTerminal(){return terminal_;}
-  Tab GetTab(){return tab_;}
+  Terminal    GetTerminal   (){return terminal_;}
+  Tab         GetTab        (){return tab_;}
 
   void UpdatePathLabel(string path, long numItems)
   {
-    string nativePath=mediator_.FileSystemNativePath(path);
-    pwdLabel_.setText(mediator_.FileSystemNativePath(path));
+    string nativePath = mediator_.FileSystemNativePath(path);
+    pwdLabel_.setText(nativePath);
     tab_.SetPath(path);
     itemsLabel_.setText(PluralForm!(long, "item")(numItems));
   }
