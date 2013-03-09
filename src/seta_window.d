@@ -25,6 +25,7 @@ import gtk.Main;
 import gtk.Widget;
 import gtk.HPaned;
 import gtk.VBox;
+import gtk.PopupBox;
 import gdk.Event;
 
 import gdk.Keysyms;
@@ -411,7 +412,9 @@ private:
       return true;
 
     case MainWindowAction.QuitApplication:
-      Main.quit();
+      if(PopupBox.yesNo("Quit Seta?", "")){
+        Main.quit();
+      }
       return true;
 
     default:
