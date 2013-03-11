@@ -62,6 +62,8 @@ private:
   // just to have reference to the tab widget
   Tab tab_;
 
+  bool mapped_ = false;
+
 public:
   this(char side,
        string initialDir,
@@ -78,7 +80,7 @@ public:
     appendPage_ = AppendPageCopy;
 
     super(0, 0);
-    addOnMap(&ResetLayoutOnMap);
+    addOnMap(&ResetLayoutOnFirstMap);
     addOnUnrealize(&UnregisterFromPageList);
 
     // initialize children
@@ -178,11 +180,16 @@ public:
     }
   }
 
-  private void ResetLayoutOnMap(Widget w)
+
+  private void ResetLayoutOnFirstMap(Widget w)
   {
+    // Avoid errors due to "unrealized widgets";
     // After "realize" of this page and its child widgets,
     // set layout again in order to set proper mode_ of this page.
-    SetLayout();
+    if(!mapped_){
+      mapped_ = true;
+      SetLayout();
+    }
   }
 
 
