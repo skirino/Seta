@@ -348,16 +348,6 @@ private:
       note.GetCurrentPage().FocusShownWidget();
       return true;
 
-    case MainWindowAction.MoveThisPageToLeft:
-      mixin(FocusedNoteOrReturnFalse);
-      note.MoveCurrentPageTo!(Direction.LEFT)();
-      return true;
-
-    case MainWindowAction.MoveThisPageToRight:
-      mixin(FocusedNoteOrReturnFalse);
-      note.MoveCurrentPageTo!(Direction.RIGHT)();
-      return true;
-
     case MainWindowAction.SwitchViewMode:
       mixin(FocusedNoteOrReturnFalse);
       auto page = note.GetCurrentPage();

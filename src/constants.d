@@ -88,8 +88,6 @@ enum MainWindowAction
   CreateNewPage,
   MoveToNextPage,
   MoveToPreviousPage,
-  MoveThisPageToLeft,
-  MoveThisPageToRight,
   SwitchViewMode,
   CloseThisPage,
   MoveFocusUp,
