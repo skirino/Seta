@@ -158,12 +158,7 @@ public:
 
   void SetLayout()
   {
-    if(!this.getRealized()){
-      // Just realize all children on startup.
-      uint split = rcfile.GetWindowSizeV() / 2;
-      paned_.setPosition(split);
-    }
-    else{
+    if(this.getRealized()){
       uint split = tab_.OnLeftSide() ? rcfile.GetSplitVLeft() : rcfile.GetSplitVRight();
       if(split == 0){
         TerminalMode();
@@ -175,6 +170,11 @@ public:
         BothMode();
         paned_.setPosition(split);
       }
+    }
+    else{
+      // Just realize all children on startup.
+      uint split = rcfile.GetWindowSizeV() / 2;
+      paned_.setPosition(split);
     }
   }
 
