@@ -91,6 +91,7 @@ enum MainWindowAction
   MoveThisPageToLeft,
   MoveThisPageToRight,
   SwitchViewMode,
+  CloseThisPage,
   MoveFocusUp,
   MoveFocusDown,
   MoveFocusLeft,

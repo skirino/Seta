@@ -542,6 +542,7 @@ private:
     mixin(InstallKeybind!("MainWindowAction.MoveThisPageToLeft" , "<Alt><Shift><Control>less"));
     mixin(InstallKeybind!("MainWindowAction.MoveThisPageToRight", "<Alt><Shift><Control>greater"));
     mixin(InstallKeybind!("MainWindowAction.SwitchViewMode"     , "<Shift><Control>x"));
+    mixin(InstallKeybind!("MainWindowAction.CloseThisPage"      , "<Shift><Control>d"));
     mixin(InstallKeybind!("MainWindowAction.MoveFocusUp"        , "<Shift><Control>k"));
     mixin(InstallKeybind!("MainWindowAction.MoveFocusDown"      , "<Shift><Control>j"));
     mixin(InstallKeybind!("MainWindowAction.MoveFocusLeft"      , "<Shift><Control>h"));
@@ -813,6 +814,7 @@ MainWindowAction.MoveToPreviousPage=<Shift><Control>Tab,<Shift><Control>less
 MainWindowAction.MoveThisPageToLeft=<Alt><Shift><Control>less
 MainWindowAction.MoveThisPageToRight=<Alt><Shift><Control>greater
 MainWindowAction.SwitchViewMode=<Shift><Control>x
+MainWindowAction.CloseThisPage=<Shift><Control>d
 MainWindowAction.MoveFocusUp=<Shift><Control>k
 MainWindowAction.MoveFocusDown=<Shift><Control>j
 MainWindowAction.MoveFocusLeft=<Shift><Control>h

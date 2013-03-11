@@ -136,8 +136,8 @@ private:
     note.GetNthPage(num-1).PrepareDestroy();
     note.removePage(num-1);
 
-    int npagesL = noteL_.getNPages();
-    int npagesR = noteR_.getNPages();
+    immutable int npagesL = noteL_.getNPages();
+    immutable int npagesR = noteR_.getNPages();
 
     if(npagesL == 0 && npagesR == 0){
       Main.quit();
@@ -169,6 +169,17 @@ private:
       page.FocusUpper();
       page.FocusLower();
     }
+  }
+
+  void CloseThisPage()
+  {
+    auto note = GetFocusedNote();
+    if(note is null){
+      return;
+    }
+    immutable char lr = (note is noteL_) ? 'L' : 'R';
+    immutable n = note.getCurrentPage();
+    ClosePage(lr, n);
   }
   ///////////////////////// GUI stuff
 
@@ -351,6 +362,10 @@ private:
       mixin(FocusedNoteOrReturnFalse);
       auto page = note.GetCurrentPage();
       page.ViewModeButtonClicked(null);
+      return true;
+
+    case MainWindowAction.CloseThisPage:
+      CloseThisPage();
       return true;
 
     case MainWindowAction.MoveFocusUp:
