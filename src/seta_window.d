@@ -179,7 +179,7 @@ private:
     }
     immutable char lr = (note is noteL_) ? 'L' : 'R';
     immutable n = note.getCurrentPage();
-    ClosePage(lr, n);
+    ClosePage(lr, n + 1);
   }
   ///////////////////////// GUI stuff
 
