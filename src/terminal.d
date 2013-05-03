@@ -470,10 +470,13 @@ private:
           if(line[$-1] == rprompt_[$-1]){
             // search for " [~"
             size_t rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '~', line.length-1);
-
-            // if not found, search for " [/"
+            // search for " [/"
             if(rpromptStart == line.length){
               rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '/', line.length-1);
+            }
+            // search for " [..."
+            if(rpromptStart == line.length){
+              rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ "...", line.length-1);
             }
 
             if(rpromptStart != line.length){
