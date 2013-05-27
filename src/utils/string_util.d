@@ -32,7 +32,7 @@ import std.process;
 import utils.min_max;
 
 
-bool IsBlank(string s)
+pure bool IsBlank(string s)
 {
   return (s is null) || (s.length == 0);
 }
@@ -50,7 +50,7 @@ string[] ToStringArray(T)(T[] array)
 }
 
 
-string[] TrimAll(string[] l)
+pure string[] TrimAll(string[] l)
 {
   string[] ret;
   ret.length = l.length;
@@ -62,7 +62,7 @@ string[] TrimAll(string[] l)
 
 
 // fast strcmp for D strings
-int StrCmp(string s1, string s2)
+pure int StrCmp(string s1, string s2)
 {
   auto len = s1.length;
   if (s2.length < len){
@@ -90,7 +90,7 @@ int GetTextWidth(string text)
 }
 
 
-string NonnullString(string s)
+pure string NonnullString(string s)
 {
   return s is null ? "" : s;
 }
@@ -113,7 +113,7 @@ string PluralForm(INT, string singularForm, string pluralForm = singularForm ~ "
 }
 
 
-bool StartsWith(string s1, string s2)
+pure bool StartsWith(string s1, string s2)
 {
   if(s1.length >= s2.length){
     return s1[0 .. s2.length] == s2;
@@ -122,7 +122,7 @@ bool StartsWith(string s1, string s2)
 }
 
 
-bool EndsWith(string s1, string s2)
+pure bool EndsWith(string s1, string s2)
 {
   if(s1.length >= s2.length){
     return s1[$-s2.length .. $] == s2;
@@ -160,7 +160,7 @@ string LineInFileWhichStartsWith(string phrase, string filename)
 }
 
 
-string AppendSlash(string s)
+pure string AppendSlash(string s)
 {
   if(s is null){
     return "/";
@@ -171,7 +171,7 @@ string AppendSlash(string s)
 }
 
 
-string RemoveSlash(string s)
+pure string RemoveSlash(string s)
 {
   if(s[$-1] == '/'){
     return s[0..$-1];
@@ -182,7 +182,7 @@ string RemoveSlash(string s)
 }
 
 
-string GetBasename(string path)
+pure string GetBasename(string path)
 {
   if(path == "/"){
     return path;
@@ -195,7 +195,7 @@ string GetBasename(string path)
 }
 
 
-string ExpandPath(string path, string root)
+pure string ExpandPath(string path, string root)
 {
   /+
    + Canonicalize path by expanding "//", "." and "..".
@@ -239,9 +239,9 @@ string ExpandPath(string path, string root)
 
 
 // backslash should be the first entry
-private static const string SpecialChars = "\\!\"$&\'()~=|`{}[]*:;<>?, ";
+private immutable string SpecialChars = "\\!\"$&\'()~=|`{}[]*:;<>?, ";
 
-string EscapeSpecialChars(string input)
+pure string EscapeSpecialChars(string input)
 {
   char[] ret = input.dup;
   foreach(c; SpecialChars){
@@ -251,7 +251,7 @@ string EscapeSpecialChars(string input)
 }
 
 
-string UnescapeSpecialChars(string input)
+pure string UnescapeSpecialChars(string input)
 {
   string ret;
   for(int i=0; i<input.length; ++i){
@@ -282,7 +282,7 @@ string UnescapeSpecialChars(string input)
 
 
 // not to go beyond root directory of filesystem
-string ParentDirectory(string dir, string root = "/")
+pure string ParentDirectory(string dir, string root = "/")
 {
   if(dir == "/" || dir == root){
     return root;
@@ -357,7 +357,7 @@ private string ReplaceQuotedArg(string args)
 }
 
 
-private size_t ReverseCountBackslash(string s)
+pure private size_t ReverseCountBackslash(string s)
 {
   if(s.length == 0){
     return 0;
@@ -373,7 +373,7 @@ private size_t ReverseCountBackslash(string s)
 }
 
 
-private size_t FindUnescapedChar(string s, char target, size_t start = 0)
+pure private size_t FindUnescapedChar(string s, char target, size_t start = 0)
 {
   for(size_t i=start; i<s.length; ++i){
     if(s[i] == target){
@@ -416,7 +416,7 @@ string ExpandEnvVars(string arg)
 }
 
 
-string RemovePercentBrace(string s)
+pure string RemovePercentBrace(string s)
 {
   int open = 0;
   string ret;
