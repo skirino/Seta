@@ -25,36 +25,88 @@ import gio.ContentType;
 import glib.Str;
 
 
-static const string[] ColumnTitles = ["name", "type", "size", "owner", "permissions", "last modified"];
-enum ColumnType {NAME, TYPE, SIZE, OWNER, PERMISSIONS, LAST_MODIFIED, COLOR}
+immutable string PARENT_STRING = "../";
 
-enum FileColorType {Directory, File, SymLink, Executable}
+immutable string[] COLUMN_TITLES = [
+  "name",
+  "type",
+  "size",
+  "owner",
+  "permissions",
+  "last modified"];
 
-enum Direction {UP, DOWN, LEFT, RIGHT}
+enum ColumnType
+{
+  NAME,
+  TYPE,
+  SIZE,
+  OWNER,
+  PERMISSIONS,
+  LAST_MODIFIED,
+  COLOR,
+}
 
-enum Order {FORWARD, BACKWARD}
+enum FileColorType
+{
+  Directory,
+  File,
+  SymLink,
+  Executable,
+}
 
-enum FocusInPage {NONE, UPPER, LOWER}
+enum Direction
+{
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT,
+}
 
-enum FocusInMainWindow {NONE, LEFT, RIGHT}
+enum Order
+{
+  FORWARD,
+  BACKWARD,
+}
 
-enum ViewMode {TERMINAL, FILER, BOTH}
+enum FocusInPage
+{
+  NONE,
+  UPPER,
+  LOWER,
+}
+
+enum FocusInMainWindow
+{
+  NONE,
+  LEFT,
+  RIGHT,
+}
+
+enum ViewMode
+{
+  TERMINAL,
+  FILER,
+  BOTH,
+}
 
 enum MouseButton{
-  LEFT=1,
-  MIDDLE=2,
-  RIGHT=3
+  LEFT   = 1,
+  MIDDLE = 2,
+  RIGHT  = 3,
 }
 
-enum DraggingState {NEUTRAL, PRESSED, DRAGGING}
-
-enum PasteModeFlags {
-  CANCEL_ALL=0,
-  MULTIPLE=1,
-  ASK=2
+enum DraggingState
+{
+  NEUTRAL,
+  PRESSED,
+  DRAGGING,
 }
 
-static const string PARENT_STRING = "../";
+enum PasteModeFlags{
+  CANCEL_ALL = 0,
+  MULTIPLE   = 1,
+  ASK        = 2,
+}
 
 
 
@@ -99,7 +151,7 @@ enum MainWindowAction
   ShowChangeDirDialog,
   ShowConfigDialog,
   ToggleFullscreen,
-  QuitApplication
+  QuitApplication,
 }
 
 enum FileManagerAction
@@ -124,7 +176,7 @@ enum FileManagerAction
   GoToDir6,
   GoToDir7,
   GoToDir8,
-  GoToDir9
+  GoToDir9,
 }
 
 enum FileViewAction
@@ -140,7 +192,7 @@ enum FileViewAction
   MakeDirectory,
   MoveToTrash,
   FocusFilter,
-  ClearFilter
+  ClearFilter,
 }
 
 enum TerminalAction
@@ -164,6 +216,5 @@ enum TerminalAction
   InputUserDefinedText6,
   InputUserDefinedText7,
   InputUserDefinedText8,
-  InputUserDefinedText9
+  InputUserDefinedText9,
 }
-

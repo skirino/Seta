@@ -157,7 +157,7 @@ private:
   TreeViewColumn SetupNewColumn(ColumnType id)
   {
     auto renderer = new CellRendererText;
-    TreeViewColumn col = new TreeViewColumn(ColumnTitles[id], renderer, "text", id);
+    TreeViewColumn col = new TreeViewColumn(COLUMN_TITLES[id], renderer, "text", id);
     col.addAttribute(renderer, "foreground", ColumnType.COLOR);
     col.setSizing(GtkTreeViewColumnSizing.FIXED);
     col.setFixedWidth(50);// minimum width
