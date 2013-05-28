@@ -43,7 +43,7 @@ string InputDialog(bool hideInput = false)(string title, string description, str
 
   string ret;
   entry.addOnActivate(delegate void(Entry e){
-      d.response(GtkResponseType.GTK_RESPONSE_OK);
+      d.response(GtkResponseType.OK);
     });
 
   scope box = new VBox(0, 5);
@@ -51,16 +51,16 @@ string InputDialog(bool hideInput = false)(string title, string description, str
   box.add(entry);
   d.getContentArea.add(box);
   d.addButtons(["OK"                           , "_cancel"],
-               [GtkResponseType.GTK_RESPONSE_OK, GtkResponseType.GTK_RESPONSE_CANCEL]);
+               [GtkResponseType.OK, GtkResponseType.CANCEL]);
 
   d.addOnResponse(
     delegate void(int responseID, Dialog dialog)
     {
-      if(responseID == GtkResponseType.GTK_RESPONSE_OK){
+      if(responseID == GtkResponseType.OK){
         ret = entry.getText();
         d.destroy();
       }
-      else if(responseID == GtkResponseType.GTK_RESPONSE_CANCEL){
+      else if(responseID == GtkResponseType.CANCEL){
         d.destroy();
       }
     });
@@ -97,7 +97,7 @@ int ChooseDialog(uint numOptions)(string message, string[numOptions] labels)
   int ret;
   d.addOnResponse(
     delegate void(int responseID, Dialog dialog){
-      if(responseID == GtkResponseType.GTK_RESPONSE_DELETE_EVENT){
+      if(responseID == GtkResponseType.DELETE_EVENT){
         responseID = -1;
       }
       ret = responseID;

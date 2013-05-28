@@ -77,9 +77,9 @@ private class ConfigDialog : Dialog
     setDefaultSize(640, 600);
     addOnResponse(&Respond);
 
-    addButton(StockID.CANCEL, GtkResponseType.GTK_RESPONSE_CANCEL);
-    addButton(StockID.APPLY, GtkResponseType.GTK_RESPONSE_APPLY);
-    addButton(StockID.OK, GtkResponseType.GTK_RESPONSE_OK);
+    addButton(StockID.CANCEL, GtkResponseType.CANCEL);
+    addButton(StockID.APPLY,  GtkResponseType.APPLY);
+    addButton(StockID.OK,     GtkResponseType.OK);
 
     note_ = new Notebook;
     note_.setScrollable(1);
@@ -787,7 +787,7 @@ private:
 
   void Respond(int responseID, Dialog dialog)
   {
-    if(responseID == GtkResponseType.GTK_RESPONSE_OK || responseID == GtkResponseType.GTK_RESPONSE_APPLY){
+    if(responseID == GtkResponseType.OK || responseID == GtkResponseType.APPLY){
       ApplyChangesInKeybind();
       ApplyChangesInLayout();
       ApplyChangesInTerminal();
@@ -796,7 +796,7 @@ private:
       rcfile.Write();
     }
 
-    if(responseID != GtkResponseType.GTK_RESPONSE_APPLY){
+    if(responseID != GtkResponseType.APPLY){
       destroy();
     }
   }

@@ -185,8 +185,8 @@ private class RenameDialog : Dialog
     addOnResponse(&Respond);
     auto contentArea = getContentArea();
 
-    cancel_ = addButton("_Cancel", GtkResponseType.GTK_RESPONSE_CANCEL);
-    ok_     = addButton("_Rename", GtkResponseType.GTK_RESPONSE_OK);
+    cancel_ = addButton("_Cancel", GtkResponseType.CANCEL);
+    ok_     = addButton("_Rename", GtkResponseType.OK);
 
     // setup TreeView
     auto win = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
@@ -301,7 +301,7 @@ private class RenameDialog : Dialog
 
   void Respond(int responseID, Dialog dialog)
   {
-    if(responseID == GtkResponseType.GTK_RESPONSE_OK){
+    if(responseID == GtkResponseType.OK){
       TreeIter iter = GetIterFirst(store_);
       do{
         ret_ ~= iter.getValueString(1);

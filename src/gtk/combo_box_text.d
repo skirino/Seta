@@ -45,15 +45,6 @@ class ComboBoxText : ComboBox
 
   public this(GtkComboBoxText * obj)
   {
-    if(obj is null){
-      this = null;
-      return;
-    }
-    void * ptr = getDObject(cast(GObject*)obj);
-    if(ptr !is null){
-      this = cast(ComboBoxText)ptr;
-      return;
-    }
     super(cast(GtkComboBox*)obj);
     this.gtkComboBoxText = obj;
   }

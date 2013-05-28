@@ -96,7 +96,7 @@ public:
     ignoreCases_.addOnToggled(&SearchTextChanged!(ToggleButton));
     contentArea.packStart(ignoreCases_, 0, 0, 0);
 
-    addButton(StockID.CLOSE, GtkResponseType.GTK_RESPONSE_DELETE_EVENT);
+    addButton(StockID.CLOSE, GtkResponseType.DELETE_EVENT);
     searchBackwardButton_ = addButton(StockID.MEDIA_PREVIOUS, RESPONSE_ID_SEARCH_BACKWARD);
     searchForwardButton_  = addButton(StockID.MEDIA_NEXT,     RESPONSE_ID_SEARCH_FORWARD);
 
@@ -115,7 +115,7 @@ private:
 
   void Respond(int responseID, Dialog dialog)
   {
-    if(responseID == GtkResponseType.GTK_RESPONSE_DELETE_EVENT){
+    if(responseID == GtkResponseType.DELETE_EVENT){
       RestoreSettings();
       destroy();
     }

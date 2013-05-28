@@ -1095,8 +1095,8 @@ private:
       Widget sourceWidget = dnd.getSourceWidget();
 
       // if dropped on a row for a directory, set "destDir" to the path to that directory
-      if(pos == GtkTreeViewDropPosition.GTK_TREE_VIEW_DROP_INTO_OR_BEFORE ||
-         pos == GtkTreeViewDropPosition.GTK_TREE_VIEW_DROP_INTO_OR_AFTER){
+      if(pos == GtkTreeViewDropPosition.INTO_OR_BEFORE ||
+         pos == GtkTreeViewDropPosition.INTO_OR_AFTER){
         if(path !is null){
           string name = GetNameFromPath(path);
           if(sourceWidget is this && name[$-1] == '/' && getSelection().pathIsSelected(path)){

@@ -111,8 +111,8 @@ public:
     contentArea.packStart(entry_, 0, 0, 5);
 
     addButton(StockID.REFRESH, SCAN_FILESYSTEM);
-    addButton(StockID.CANCEL,  GtkResponseType.GTK_RESPONSE_CANCEL);
-    addButton(StockID.OK,      GtkResponseType.GTK_RESPONSE_OK);
+    addButton(StockID.CANCEL,  GtkResponseType.CANCEL);
+    addButton(StockID.OK,      GtkResponseType.OK);
 
     entry_.grabFocus();
 
@@ -132,7 +132,7 @@ private:
     filterThread_.StopAndWait();
     destroyed_ = true;
 
-    if(responseID == GtkResponseType.GTK_RESPONSE_OK){
+    if(responseID == GtkResponseType.OK){
       TreeIter iter = GetSelectedIter(view_.getSelection(), store_);
       if(iter !is null){
         dir_chosen_ = iter.getValueString(0);
@@ -156,7 +156,7 @@ private:
 
     // Enter --> try to change directory
     if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
-      Respond(GtkResponseType.GTK_RESPONSE_OK, this);
+      Respond(GtkResponseType.OK, this);
       return true;
     }
 
@@ -189,7 +189,7 @@ private:
 
     // Cancel by C-g
     if(state == GdkModifierType.CONTROL_MASK && ekey.keyval == GdkKeysyms.GDK_g){
-      Respond(GtkResponseType.GTK_RESPONSE_CANCEL, this);
+      Respond(GtkResponseType.CANCEL, this);
       return true;
     }
 
@@ -199,7 +199,7 @@ private:
   void RowActivated(TreePath path, TreeViewColumn col, TreeView view)
   {
     view_.getSelection().selectPath(path);
-    Respond(GtkResponseType.GTK_RESPONSE_OK, this);
+    Respond(GtkResponseType.OK, this);
   }
   //////////////////// event handlers
 

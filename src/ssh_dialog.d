@@ -142,8 +142,8 @@ class StartSSHDialog : Dialog
     sw.add(hosts);
     contentArea.add(sw);
 
-    addButton("_Cancel", GtkResponseType.GTK_RESPONSE_CANCEL);
-    addButton("_OK", GtkResponseType.GTK_RESPONSE_OK);
+    addButton("_Cancel", GtkResponseType.CANCEL);
+    addButton("_OK",     GtkResponseType.OK);
 
     // focus first row of "hosts"
     hosts.grabFocus();
@@ -157,7 +157,7 @@ class StartSSHDialog : Dialog
 
   void ActivateEntry(Entry e)
   {
-    response(GtkResponseType.GTK_RESPONSE_OK);
+    response(GtkResponseType.OK);
   }
 
   bool SetDefaultFromUsername(GdkEventFocus * ef, Widget w)
@@ -173,7 +173,7 @@ class StartSSHDialog : Dialog
   void RowActivated(TreePath path, TreeViewColumn col, TreeView view)
   {
     SetRowContents(path, view);
-    response(GtkResponseType.GTK_RESPONSE_OK);
+    response(GtkResponseType.OK);
   }
 
   void CursorChanged(TreeView view)
@@ -229,7 +229,7 @@ class StartSSHDialog : Dialog
   void ConnectCallback(MenuItem item)
   {
     SetRowContents(iterCursor);
-    response(GtkResponseType.GTK_RESPONSE_OK);
+    response(GtkResponseType.OK);
   }
 
   void UnregisterCallback(MenuItem item)
@@ -246,7 +246,7 @@ class StartSSHDialog : Dialog
 
   void Respond(int responseID, Dialog dialog)
   {
-    if(responseID == GtkResponseType.GTK_RESPONSE_OK){// connect to the host inputted in Entry widgets
+    if(responseID == GtkResponseType.OK){// connect to the host inputted in Entry widgets
       string username = entry1.getText();
       string domain   = entry2.getText();
       if(username.length > 0 && domain.length > 0){
