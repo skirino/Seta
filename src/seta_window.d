@@ -20,6 +20,9 @@ MA 02110-1301 USA.
 
 module seta_window;
 
+import core.memory;
+import std.stdio;
+
 import gtk.MainWindow;
 import gtk.Main;
 import gtk.Widget;
@@ -27,10 +30,7 @@ import gtk.HPaned;
 import gtk.VBox;
 import gtk.PopupBox;
 import gdk.Event;
-
 import gdk.Keysyms;
-import core.memory;
-import std.stdio;
 
 import constants;
 import rcfile = config.rcfile;

@@ -20,12 +20,12 @@ MA 02110-1301 USA.
 
 module fm.entry;
 
+import std.c.stdlib;
+import core.sys.posix.sys.stat;
+
 import gio.FileInfo;
 import gio.ContentType;
 import glib.Str;
-
-import std.c.stdlib;
-import core.sys.posix.sys.stat;
 
 import utils.time_util;
 import utils.string_util;

@@ -33,7 +33,7 @@ private enum ThreadInfoState
 {
   INVALID,
   RUNNING,
-  STOPPED
+  STOPPED,
 }
 
 template ListedOperationT()

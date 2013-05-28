@@ -20,14 +20,14 @@ MA 02110-1301 USA.
 
 module utils.string_util;
 
-import gtk.Label;
-import glib.Str;
-
 import std.string;
 import std.stdio;
 import std.c.string;
 import std.ascii;
 import std.process;
+
+import gtk.Label;
+import glib.Str;
 
 import utils.min_max;
 

@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module desktop_notification;
 
-import glib.Str;
+import std.string;
 
 import deimos.notify.notify;
 import config.rcfile;
@@ -28,7 +28,7 @@ import config.rcfile;
 
 void Init()
 {
-  notify_init(Str.toStringz("Seta"));
+  notify_init(toStringz("Seta"));
 }
 
 void Finish()
@@ -39,7 +39,7 @@ void Finish()
 void Notify(string message)
 {
   if(GetUseDesktopNotification()){
-    auto n = notify_notification_new(Str.toStringz("Seta"), Str.toStringz(message), null);
+    auto n = notify_notification_new(toStringz("Seta"), toStringz(message), null);
     notify_notification_set_timeout(n, GetNotifyExpiresInMSec());
     notify_notification_show(n, null);
   }

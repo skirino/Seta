@@ -20,18 +20,18 @@ MA 02110-1301 USA.
 
 module utils.unistd_util;
 
-import glib.Str;
-
 import std.string;
 import core.sys.posix.unistd;
 import core.sys.posix.stdlib;
+
+import glib.Str;
 
 import utils.string_util;
 
 
 string ReadLink(const string path, char[] buffer)
 {
-  ssize_t len = readlink(Str.toStringz(path), buffer.ptr, buffer.length);
+  ssize_t len = readlink(toStringz(path), buffer.ptr, buffer.length);
   if(len != -1){
     return AppendSlash(buffer[0 .. len].idup);
   }
@@ -43,7 +43,7 @@ string ReadLink(const string path, char[] buffer)
 
 string RealPath(const string path, char[] buffer)
 {
-  char * ptr = realpath(Str.toStringz(path), buffer.ptr);
+  char * ptr = realpath(toStringz(path), buffer.ptr);
   if(ptr){
     return AppendSlash(Str.toString(ptr));
   }
@@ -55,21 +55,21 @@ string RealPath(const string path, char[] buffer)
 
 void ForkExec(string executablePath, string childDir, string[] args, string[string] envs)
 {
-  char*[] argv, envv;
+  immutable(char)*[] argv, envv;
 
   foreach(arg; args){
-    argv ~= Str.toStringz(arg);
+    argv ~= toStringz(arg);
   }
   argv ~= null;
 
   foreach(key; envs.keys){
-    envv ~= Str.toStringz(key ~ '=' ~ envs[key]);
+    envv ~= toStringz(key ~ '=' ~ envs[key]);
   }
   envv ~= null;
 
   pid_t p = fork();
   if(p == 0){// child process
-    chdir(Str.toStringz(childDir));
-    execve(Str.toStringz(executablePath), argv.ptr, envv.ptr);
+    chdir(toStringz(childDir));
+    execve(toStringz(executablePath), argv.ptr, envv.ptr);
   }
 }

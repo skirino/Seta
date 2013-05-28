@@ -20,6 +20,10 @@ MA 02110-1301 USA.
 
 module anything_cd.dialog;
 
+import core.thread;
+import std.string;
+import std.process;
+
 import gtk.Dialog;
 import gtk.Widget;
 import gtk.PopupBox;
@@ -36,10 +40,6 @@ import gtk.CellRendererText;
 import gdk.Threads;
 import gdk.Keysyms;
 import glib.Source;
-
-import core.thread;
-import std.string;
-import std.process;
 
 import utils.min_max;
 import utils.string_util;

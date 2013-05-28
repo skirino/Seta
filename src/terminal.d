@@ -20,6 +20,12 @@ MA 02110-1301 USA.
 
 module terminal;
 
+import std.string;
+import std.process;
+import std.c.stdlib;
+import core.thread;
+import core.sys.posix.unistd;
+
 import gtk.Widget;
 import gtk.Selections;
 import gtk.DragAndDrop;
@@ -30,12 +36,6 @@ import gdk.Color;
 import glib.Str;
 import glib.Regex;
 import glib.Source;
-
-import std.string;
-import std.process;
-import std.c.stdlib;
-import core.thread;
-import core.sys.posix.unistd;
 
 import utils.string_util;
 import utils.unistd_util;

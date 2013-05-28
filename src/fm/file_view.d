@@ -20,6 +20,10 @@ MA 02110-1301 USA.
 
 module fm.file_view;
 
+import core.thread;
+import std.c.stdlib;
+import std.string;
+
 import gtk.TreeView;
 import gtk.Widget;
 import gtk.ListStore;
@@ -43,10 +47,6 @@ import gio.FileMonitor;
 import gio.DesktopAppInfo;
 import glib.GException;
 import gtkc.gtk;
-
-import core.thread;
-import std.c.stdlib;
-import std.string;
 
 import utils.min_max;
 import utils.time_util;

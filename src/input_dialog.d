@@ -75,8 +75,8 @@ string InputDialog(bool hideInput = false)(string title, string description, str
 
 
 // return -1 on clicking close button
-//        0  on clicking 1st button
-//        1  on clicking 2nd button
+//         0 on clicking 1st button
+//         1 on clicking 2nd button
 //        ...
 int ChooseDialog(uint numOptions)(string message, string[numOptions] labels)
 {

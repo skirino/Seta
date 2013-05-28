@@ -20,9 +20,10 @@ MA 02110-1301 USA.
 
 module constants;
 
+import std.string;
+
 import gtk.DragAndDrop;
 import gio.ContentType;
-import glib.Str;
 
 
 immutable string PARENT_STRING = "../";
@@ -114,7 +115,7 @@ void Init()
 {
   directoryTypeDescription = ContentType.getDescription("inode/directory");
 
-  dragTargets[0].target = Str.toStringz("text/uri-list");
+  dragTargets[0].target = cast(char*)toStringz("text/uri-list");
   dragTargets[0].flags  = 0;
   dragTargets[0].info   = 1;
 }

@@ -20,6 +20,9 @@ MA 02110-1301 USA.
 
 module move_files_job;
 
+import core.thread;
+import std.c.stdlib;
+
 import gtk.Selections;
 import gtk.Clipboard;
 import gdk.Threads;
@@ -30,9 +33,6 @@ import glib.Str;
 import glib.URI;
 import gtkc.gtk;
 import gtkc.glib;
-
-import core.thread;
-import std.c.stdlib;
 
 import utils.gio_util;
 import utils.string_util;
@@ -265,10 +265,10 @@ private:
   this(string[] files, string sourceDir, FileView sourceView, string destDir, FileView destView)
   {
     super(&Start);
-    files_ = files;
-    destDir_ = destDir;
-    destView_ = destView;
-    sourceDir_ = sourceDir;
+    files_      = files;
+    destDir_    = destDir;
+    destView_   = destView;
+    sourceDir_  = sourceDir;
     sourceView_ = sourceView;
 
     // still within the main thread
@@ -474,6 +474,6 @@ extern(C) {
   // one cannot access to members in C structs
   // since they are defined as empty structs in GtkD
   // and thus D compiler cannot know correct memory offset
-  GdkDragAction  ExtractSuggestedAction(GdkDragContext * context);
+  GdkDragAction ExtractSuggestedAction(GdkDragContext * context);
 }
 //////////////////////// interface to C

@@ -20,17 +20,17 @@ MA 02110-1301 USA.
 
 module config.rcfile;
 
+import std.string;
+import std.array;
+import std.algorithm;
+import std.process;
+
 import glib.KeyFile;
 import gtk.PopupBox;
 import gdk.Color;
 import gio.File;
 import gio.FileOutputStream;
 import glib.Str;
-
-import std.string;
-import std.array;
-import std.algorithm;
-import std.process;
 
 import utils.min_max;
 import utils.gio_util;

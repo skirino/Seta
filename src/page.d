@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module page;
 
+import std.process;
+
 import gtk.VBox;
 import gtk.HBox;
 import gtk.VPaned;
@@ -28,8 +30,6 @@ import gtk.Widget;
 import gtk.Label;
 import gtk.Button;
 import gtk.Tooltip;
-
-import std.process;
 
 import utils.string_util;
 import utils.gio_util;

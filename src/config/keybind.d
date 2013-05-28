@@ -20,11 +20,11 @@ MA 02110-1301 USA.
 
 module config.keybind;
 
-import gtk.AccelGroup;
-import gdk.Keysyms;
-
 import std.string;
 import std.ascii;
+
+import gtk.AccelGroup;
+import gdk.Keysyms;
 
 import utils.string_util;
 import constants;

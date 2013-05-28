@@ -60,9 +60,9 @@ template RuntimeDispatch3(string tmplt, string b1, string b2, string b3, string 
 template FoldTupple(alias templateFun, s ...)
 {
   static if(s.length == 0){
-    const string FoldTupple = "";
+    immutable string FoldTupple = "";
   }
   else{
-    const string FoldTupple = templateFun!(s[0]) ~ FoldTupple!(templateFun, s[1 .. $]);
+    immutable string FoldTupple = templateFun!(s[0]) ~ FoldTupple!(templateFun, s[1 .. $]);
   }
 }

@@ -312,7 +312,7 @@ private static const char[4][201] YEAR_1900_TO_2100 =
     "2097",
     "2098",
     "2099",
-    "2100"
+    "2100",
     ];
 
 private static const char[2][61] ZERO_TO_61=
@@ -377,6 +377,6 @@ private static const char[2][61] ZERO_TO_61=
     "57",
     "58",
     "59",
-    "60"
+    "60",
     ];
 

@@ -20,10 +20,10 @@ MA 02110-1301 USA.
 
 module ssh_connection;
 
+import std.string;
+
 import gtk.Window;
 import gtk.MountOperation;
-
-import std.string;
 
 import utils.string_util;
 import shellrc = config.shellrc;

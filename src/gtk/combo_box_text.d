@@ -20,13 +20,13 @@ MA 02110-1301 USA.
 
 module gtk.combo_box_text;
 
+import std.stdio;
+
 public import gtkc.gtktypes;
 import gtkc.gtk;
 import glib.Str;
 import glib.ConstructionException;
 import gtk.ComboBox;
-
-import std.stdio;
 
 
 class ComboBoxText : ComboBox

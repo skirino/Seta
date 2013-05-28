@@ -20,6 +20,10 @@ MA 02110-1301 USA.
 
 module fm.popup_menu;
 
+import std.c.stdlib;
+import std.process;
+import std.string;
+
 import gtk.Menu;
 import gtk.MenuItem;
 import gtk.SeparatorMenuItem;
@@ -30,13 +34,8 @@ import gio.File;
 import gio.FileInfo;
 import gio.AppInfoIF;
 import gio.DesktopAppInfo;
-import glib.Str;
 import glib.ListG;
 import glib.GException;
-
-import std.c.stdlib;
-import std.process;
-import std.string;
 
 import utils.string_util;
 import utils.unistd_util;

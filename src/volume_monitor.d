@@ -20,14 +20,14 @@ MA 02110-1301 USA.
 
 module volume_monitor;
 
+import std.algorithm;
+
 import gio.VolumeMonitor;
 import gio.Mount;
 import gio.MountIF;
 import gtkc.gio;
 import glib.ListG;
 import glib.Timeout;
-
-import std.algorithm;
 
 import utils.string_util;
 import page_list;

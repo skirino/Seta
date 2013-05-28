@@ -20,13 +20,13 @@ MA 02110-1301 USA.
 
 module anything_cd.dir_list;
 
-import gio.FileInfo;
-import gdk.Threads;
-import gdk.Window;
-
 import core.thread;
 import std.process;
 import std.stdio;
+
+import gio.FileInfo;
+import gdk.Threads;
+import gdk.Window;
 
 import utils.array_util;
 import utils.vector;

@@ -20,10 +20,10 @@ MA 02110-1301 USA.
 
 module anything_cd.filter_dirs_job;
 
-import gdk.Threads;
-
 import core.thread;
 import std.string;
+
+import gdk.Threads;
 
 import utils.min_max;
 import utils.string_util;

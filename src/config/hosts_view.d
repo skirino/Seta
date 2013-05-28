@@ -20,13 +20,13 @@ MA 02110-1301 USA.
 
 module config.hosts_view;
 
+import std.string;
+
 import gtk.TreeView;
 import gtk.TreeViewColumn;
 import gtk.TreeIter;
 import gtk.ListStore;
 import gtk.CellRendererText;
-
-import std.string;
 
 import utils.string_util;
 import rcfile = config.rcfile;

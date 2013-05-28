@@ -20,14 +20,14 @@ MA 02110-1301 USA.
 
 module utils.thread_util;
 
-import gdk.Threads;
-
 import core.thread;
+
+import gdk.Threads;
 
 
 void SleepMillisecs(uint msecs)
 {
-  Thread.sleep( dur!("msecs")(msecs) );
+  Thread.sleep(dur!("msecs")(msecs));
 }
 
 

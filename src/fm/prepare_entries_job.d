@@ -20,15 +20,15 @@ MA 02110-1301 USA.
 
 module fm.prepare_entries_job;
 
+import core.thread;
+import core.stdc.string;
+
 import gio.File;
 import gio.FileInfo;
 import gio.FileEnumerator;
 import gdk.Threads;
 import gtk.Widget;
 import gtk.TreeView;
-
-import core.thread;
-import core.stdc.string;
 
 import utils.string_util;
 import utils.vector;

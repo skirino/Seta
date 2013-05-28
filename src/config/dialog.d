@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module config.dialog;
 
+import std.string;
+
 import gtk.Dialog;
 import gtk.Widget;
 import gtk.Label;
@@ -46,8 +48,6 @@ import gdk.Keysyms;
 import gtk.AccelGroup;
 import gtk.Menu;
 import gtk.MenuItem;
-
-import std.string;
 
 import utils.gio_util;
 import utils.string_util;

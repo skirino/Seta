@@ -20,10 +20,10 @@ MA 02110-1301 USA.
 
 module config.nautilus_scripts;
 
+import std.process;
+
 import gio.File;
 import gio.FileInfo;
-
-import std.process;
 
 import utils.string_util;
 
