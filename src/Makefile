@@ -3,10 +3,10 @@ INPUTS = C/workaround.o ${SRC}
 
 SYSTEM = $(shell uname -s)
 ifeq ("$(SYSTEM)", "Darwin")
-	DFLAGS = -m32
+	DFLAGS = -m32 -w
 	LINKOPTS = -L-lgtkd -L-lvte -L-L/opt/local/lib -L-lgtk-x11-2.0 -L-ldl
 else # assuming Linux
-	DFLAGS = -Iextern/libnotify/
+	DFLAGS = -Iextern/libnotify/ -w
 	LINKOPTS = -L-lgtkd-1 -L-lvte -L-ldl -L-lnotify
 endif
 
