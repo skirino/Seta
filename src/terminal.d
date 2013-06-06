@@ -22,6 +22,8 @@ module terminal;
 
 import std.string;
 import std.process;
+import std.conv;
+import std.exception;
 import std.c.stdlib;
 import core.thread;
 import core.sys.posix.unistd;
@@ -78,10 +80,12 @@ public:
     vte_terminal_set_background_transparent(vte_, 1);
 
     // Fork the child process.
-    // Passing "argv" is essential when the default shell is zsh.
-    char *[2] argv = [Str.toStringz(std.process.getenv("SHELL")), null];
-    vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0, Str.toStringz(initialDir), argv.ptr, null,
-                                   cast(GSpawnFlags)0, null, null, &pid_, null);
+    const(char)*[2] argv = [environment["SHELL"].toStringz, null];
+    GError *e;
+    auto success = vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0,
+                                                  Str.toStringz(initialDir), argv.ptr, null,
+                                                  cast(GSpawnFlags)0, null, null, &pid_, &e);
+    enforce(success, text("!!! [Seta] Failed to fork shell process : ", Str.toString(e.message)));
 
     VtePty * ptyObj = vte_terminal_get_pty_object(vte_);
     pty_ = vte_pty_get_fd(ptyObj);
@@ -782,9 +786,9 @@ extern(C){
   alias extern(C) void function(gpointer user_data) GSpawnChildSetupFunc;
   gboolean vte_terminal_fork_command_full(VteTerminal *terminal,
                                           VtePtyFlags pty_flags,
-                                          char *working_directory,
-                                          char **argv,
-                                          char **envv,
+                                          const(char) *working_directory,
+                                          const(char)**argv,
+                                          const(char)**envv,
                                           GSpawnFlags spawn_flags,
                                           GSpawnChildSetupFunc child_setup,
                                           gpointer child_setup_data,
