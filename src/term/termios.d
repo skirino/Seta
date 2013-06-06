@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module term.termios;
 
 import core.sys.posix.termios;
+import std.stdio;
 
 
 /+
@@ -82,22 +83,28 @@ void InitTermios(int pty)
 
 bool ReadyToFeed(int pty, bool remote)
 {
+  // Check whether a command-line application is running inside the terminal;
+  // At present only c_iflag and c_oflag are checked.
+  return remote ? ReadyToFeedRemote(pty) : ReadyToFeedLocal(pty);
+}
+
+private bool ReadyToFeedRemote(int pty)
+{
   termios tios;
   tcgetattr(pty, &tios);
+  return (tios.c_iflag & (IUTF8 | IGNPAR)) &&
+         (tios.c_oflag == ONLCR);
 
-  // check whether a command-line application is running inside the terminal
-  // at present only c_iflag and c_oflag are checked
-  if(remote){// ssh connecting
-    return (tios.c_iflag & (IUTF8 | IGNPAR)) &&
-           (tios.c_oflag == ONLCR);
-  }
-  else{
-    return
-      (tios.c_iflag & (IUTF8 | IXON                ) || // bash
-       tios.c_iflag & (IUTF8 | IXON | ICRNL | INLCR) )  // zsh
-      &&
-      (tios.c_oflag == (ONLCR | OPOST));
-  }
+}
+private bool ReadyToFeedLocal(int pty)
+{
+  termios tios;
+  tcgetattr(pty, &tios);
+  return
+    (tios.c_iflag & (IUTF8 | IXON                ) || // bash
+     tios.c_iflag & (IUTF8 | IXON | ICRNL | INLCR) )  // zsh
+     &&
+    (tios.c_oflag == (ONLCR | OPOST));
 }
 
 bool AskingPassword(int pty)
