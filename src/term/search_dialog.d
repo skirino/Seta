@@ -54,8 +54,11 @@ void StartTerminalSearch(Terminal terminal)
 private class TerminalSearchDialog : Dialog
 {
 private:
-  immutable int RESPONSE_ID_SEARCH_FORWARD  = 1;
-  immutable int RESPONSE_ID_SEARCH_BACKWARD = 2;
+  enum ResponseID
+  {
+    SEARCH_FORWARD  = 1,
+    SEARCH_BACKWARD = 2,
+  }
 
   Terminal terminal_;
   Regex re_;
@@ -97,8 +100,8 @@ public:
     contentArea.packStart(ignoreCases_, 0, 0, 0);
 
     addButton(StockID.CLOSE, GtkResponseType.DELETE_EVENT);
-    searchBackwardButton_ = addButton(StockID.MEDIA_PREVIOUS, RESPONSE_ID_SEARCH_BACKWARD);
-    searchForwardButton_  = addButton(StockID.MEDIA_NEXT,     RESPONSE_ID_SEARCH_FORWARD);
+    searchBackwardButton_ = addButton(StockID.MEDIA_PREVIOUS, SEARCH_BACKWARD);
+    searchForwardButton_  = addButton(StockID.MEDIA_NEXT,     SEARCH_FORWARD);
 
     ApplySettings();
   }
@@ -119,10 +122,10 @@ private:
       RestoreSettings();
       destroy();
     }
-    else if(responseID == RESPONSE_ID_SEARCH_FORWARD){
+    else if(responseID == SEARCH_FORWARD){
       Search();
     }
-    else if(responseID == RESPONSE_ID_SEARCH_BACKWARD){
+    else if(responseID == SEARCH_BACKWARD){
       Search!(Order.BACKWARD)();
     }
   }

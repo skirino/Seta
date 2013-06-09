@@ -123,7 +123,7 @@ public:
 
   //////////////////// event handlers
 private:
-  private const int SCAN_FILESYSTEM = 1;// custom response ID
+  static immutable int SCAN_FILESYSTEM = 1;// custom response ID
   string dir_chosen_;
 
   void Respond(int responseID, Dialog dialog)
