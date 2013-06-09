@@ -59,21 +59,21 @@ void main(string[] args)
 {
   version(unittest){
     writeln("All tests passed!");
-    return;
   }
+  else{
+    // initialize libraries
+    threadsInit();
+    Main.init(args);
+    threadsEnter();
 
-  // initialize libraries
-  threadsInit();
-  Main.init(args);
-  threadsEnter();
+    // initialize Seta utilities
+    Initialize();
 
-  // initialize Seta utilities
-  Initialize();
+    SetaWindow.Init();
+    Main.run();
 
-  SetaWindow.Init();
-  Main.run();
+    Finalize();
 
-  Finalize();
-
-  threadsLeave();
+    threadsLeave();
+  }
 }

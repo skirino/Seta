@@ -7,7 +7,7 @@ ifeq ("$(SYSTEM)", "Darwin")
 	LINKOPTS = -L-lgtkd -L-lvte -L-L/opt/local/lib -L-lgtk-x11-2.0 -L-ldl
 else # assuming Linux
 	DFLAGS = -Iextern/libnotify/ -w
-	LINKOPTS = -L-lgtkd-1 -L-lvte -L-ldl -L-lnotify
+	LINKOPTS = -L-lgtkd-2 -L-lvte2_90 -L-ldl -L-lnotify
 endif
 
 all: C/workaround.o
