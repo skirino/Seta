@@ -413,22 +413,20 @@ private:
     bool exist = Exists(filename_);
     if(exist){
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
-
-      size_t len;
-      if(getGroups(len) == ["Version", "Layout", "Terminal", "Directories", "SSH", "Keybind"]){
+      if(getGroups() == ["Version", "Layout", "Terminal", "Directories", "SSH", "Keybind"]){
         if(getString("Version", "Version") != SetaVersion){// .setarc is old
           changed_ = true;
           setString("Version", "Version", SetaVersion);
         }
       }
       else{// .setarc is old (<= 0.4.0) or there's something wrong with .setarc
-        loadFromData(defaultContents, defaultContents.length, GKeyFileFlags.KEEP_COMMENTS);
+        loadFromData(defaultContents, GKeyFileFlags.KEEP_COMMENTS);
         changed_ = true;
         PopupBox.information("Your configuration file may be older than the application or may be broken.\nStarts with default settings.", "");
       }
     }
     else{
-      loadFromData(defaultContents, defaultContents.length, GKeyFileFlags.KEEP_COMMENTS);
+      loadFromData(defaultContents, GKeyFileFlags.KEEP_COMMENTS);
       changed_ = true;
     }
 
@@ -527,8 +525,8 @@ private:
       // "scope" storage-class specifier is necessary to remove segfault at shutdown of Seta
       scope File f = File.parseName(filename_);
       scope FileOutputStream fs = f.replace(null, 1, GFileCreateFlags.NONE, null);
+      char[] contents = cast(char[]) toData();
       size_t len;
-      char[] contents = cast(char[]) toData(len);
       fs.writeAll(contents.ptr, contents.length, &len, null);
       fs.close(null);
     }
@@ -628,8 +626,7 @@ private:
   string[] getStringList(string group, string key)
   {
     if(hasKey(group, key)){
-      size_t len;
-      return super.getStringList(group, key, len);
+      return super.getStringList(group, key);
     }
     return null;
   }
