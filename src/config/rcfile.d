@@ -473,7 +473,7 @@ private:
     mixin(SetDefaultValue!("Integer", "Layout", "NotifyExpiresInMSec", "3000"));
 
     // [Terminal]
-    GdkColor colorTest;
+    auto colorTest = new Color;
     if(!hasKey("Terminal", "ColorForeground") ||
        !Color.parse(getString("Terminal", "ColorForeground"), colorTest)){
       setString("Terminal", "ColorForeground", "#000000");

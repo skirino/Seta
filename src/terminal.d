@@ -104,10 +104,11 @@ public:
   void ApplyPreferences()
   {
     // appearance
-    GdkColor colorFore, colorBack;
+    auto colorFore = new Color;
+    auto colorBack = new Color;
     Color.parse(rcfile.GetColorForeground(), colorFore);
     Color.parse(rcfile.GetColorBackground(), colorBack);
-    vte_terminal_set_colors(vte_, &colorFore, &colorBack, null, 0);
+    vte_terminal_set_colors(vte_, colorFore.getGdkColorStruct(), colorBack.getGdkColorStruct(), null, 0);
 
     vte_terminal_set_font_from_string(vte_, Str.toStringz(rcfile.GetFont()));
     vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());

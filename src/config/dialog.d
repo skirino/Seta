@@ -846,9 +846,9 @@ private template AddColorButton(string group, string key, string explanation)
   const string AddColorButton =
     "
     {
-      GdkColor color;
+      auto color = new Color;
       Color.parse(rcfile.Get" ~ key ~ "(), color);
-      cb" ~ key ~ "_ = new ColorButton(new Color(&color));
+      cb" ~ key ~ "_ = new ColorButton(color);
       AttachPairWidget(page" ~ group ~ "_, row++, \"" ~ explanation ~ "\", cb" ~ key ~ "_);
     }
     ";
@@ -858,9 +858,9 @@ private template CheckColorButton(string group, string key)
   const string CheckColorButton =
     "
     {
-      Color temp = new Color;
-      cb" ~ key ~ "_.getColor(temp);
-      changed |= rcfile.ResetStringz(\"" ~ group ~ "\", \"" ~ key ~ "\", temp.toString());
+      Color color = new Color;
+      cb" ~ key ~ "_.getColor(color);
+      changed |= rcfile.ResetStringz(\"" ~ group ~ "\", \"" ~ key ~ "\", color.toString());
     }
     ";
 }
