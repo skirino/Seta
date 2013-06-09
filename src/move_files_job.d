@@ -23,7 +23,6 @@ module move_files_job;
 import core.thread;
 import std.c.stdlib;
 
-import gtk.Selections;
 import gtk.Clipboard;
 import gdk.Threads;
 import gio.File;

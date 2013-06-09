@@ -36,7 +36,6 @@ import gtk.CellRendererText;
 import gtk.PopupBox;
 import gtk.Tooltip;
 import gtk.DragAndDrop;
-import gtk.Selections;
 import gtk.TargetList;
 import gdk.Event;
 import gdk.Threads;

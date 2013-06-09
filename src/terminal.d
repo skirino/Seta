@@ -29,7 +29,6 @@ import core.thread;
 import core.sys.posix.unistd;
 
 import gtk.Widget;
-import gtk.Selections;
 import gtk.DragAndDrop;
 import gtk.ScrolledWindow;
 import gobject.Signals;
