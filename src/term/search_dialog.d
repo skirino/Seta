@@ -28,7 +28,6 @@ import gtk.HBox;
 import gtk.Entry;
 import gtk.EditableIF;
 import gtk.ComboBox;
-import gtk.ComboBoxEntry;
 import gtk.CheckButton;
 import gtk.ToggleButton;
 import gdk.Keysyms;
@@ -63,7 +62,7 @@ private:
   Terminal terminal_;
   Regex re_;
   Entry e_;
-  ComboBoxEntry cb_;
+  ComboBox cb_;
   Label reErrorLabel_;
   Widget searchForwardButton_;
   Widget searchBackwardButton_;
@@ -82,7 +81,7 @@ public:
     auto l = new Label("_Search for: ");
     hbox.packStart(l, 0, 0, 5);
 
-    cb_ = new ComboBoxEntry;
+    cb_ = new ComboBox;
     cb_.addOnChanged(&SearchTextChanged!(ComboBox));
     hbox.packStart(cb_, 0, 0, 0);
     l.setMnemonicWidget(cb_);

@@ -20,6 +20,7 @@ MA 02110-1301 USA.
 
 module gtk.combo_box_text;
 
+/+
 import std.stdio;
 
 public import gtkc.gtktypes;
@@ -77,3 +78,4 @@ extern(C){
   void                gtk_combo_box_text_append_text      (GtkComboBoxText *combo_box,
                                                            const gchar *text);
 }
++/

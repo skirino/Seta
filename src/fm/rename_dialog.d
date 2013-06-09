@@ -41,7 +41,7 @@ import gtk.ScrolledWindow;
 import gtk.Tooltip;
 import gtk.PopupBox;
 import gtk.HSeparator;
-import gtk.ComboBox;
+import gtk.ComboBoxText;
 import gio.File;
 import glib.GException;
 import glib.Str;
@@ -52,7 +52,6 @@ import pango.PgAttributeList;
 
 import utils.string_util;
 import utils.tree_util;
-import gtk.combo_box_text;
 import input_dialog;
 import statusbar;
 
