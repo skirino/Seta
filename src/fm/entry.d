@@ -251,17 +251,17 @@ string PermissionInStr(uint mode, bool isSymlink)
     ret[0] = '-';
   }
 
-  ret[1..4]  = RWX[(mode & S_IRWXU)/64].dup;
+  ret[1..4]  = RWX[(mode & S_IRWXU)/64][];
   if(mode & S_ISUID){
     ret[3] = ret[3] == 'x' ? 's' : 'S';
   }
 
-  ret[4..7]  = RWX[(mode & S_IRWXG)/8].dup;
+  ret[4..7]  = RWX[(mode & S_IRWXG)/8][];
   if(mode & S_ISGID){
     ret[6] = ret[6] == 'x' ? 's' : 'S';
   }
 
-  ret[7..10] = RWX[(mode & S_IRWXO)].dup;
+  ret[7..10] = RWX[(mode & S_IRWXO)][];
   if(mode & S_ISVTX){
     ret[9] = ret[9] == 'x' ? 't' : 'T';
   }

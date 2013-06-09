@@ -75,15 +75,15 @@ string EpochTimeToString(ulong l)
   core.sys.posix.time.localtime_r(&t, &st);
 
   // 1900 + st.tm_year represents the year
-  ret[0..4] = YEAR_1900_TO_2100[st.tm_year].dup;
+  ret[0..4] = YEAR_1900_TO_2100[st.tm_year][];
   ret[4] = '-';
-  ret[5..7] = ZERO_TO_61[st.tm_mon+1].dup;
+  ret[5..7] = ZERO_TO_61[st.tm_mon+1][];
   ret[7] = '/';
-  ret[8..10] = ZERO_TO_61[st.tm_mday].dup;
+  ret[8..10] = ZERO_TO_61[st.tm_mday][];
   ret[10] = ' ';
-  ret[11..13] = ZERO_TO_61[st.tm_hour].dup;
+  ret[11..13] = ZERO_TO_61[st.tm_hour][];
   ret[13] = ':';
-  ret[14..16] = ZERO_TO_61[st.tm_min].dup;
+  ret[14..16] = ZERO_TO_61[st.tm_min][];
 
   return ret[].idup;// return slice of local buffer
 }
@@ -96,15 +96,15 @@ string EpochTimeToStringSeconds(ulong l)
   auto t = cast(time_t) l;
   core.sys.posix.time.localtime_r(&t, &st);
 
-  ret[0..2] = ZERO_TO_61[st.tm_mon+1].dup;
+  ret[0..2] = ZERO_TO_61[st.tm_mon+1][];
   ret[2] = '/';
-  ret[3..5] = ZERO_TO_61[st.tm_mday].dup;
+  ret[3..5] = ZERO_TO_61[st.tm_mday][];
   ret[5] = ' ';
-  ret[6..8] = ZERO_TO_61[st.tm_hour].dup;
+  ret[6..8] = ZERO_TO_61[st.tm_hour][];
   ret[8] = ':';
-  ret[9..11] = ZERO_TO_61[st.tm_min].dup;
+  ret[9..11] = ZERO_TO_61[st.tm_min][];
   ret[11] = ':';
-  ret[12..14] = ZERO_TO_61[st.tm_sec].dup;
+  ret[12..14] = ZERO_TO_61[st.tm_sec][];
 
   return ret[].idup;// return slice of local buffer
 }
