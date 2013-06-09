@@ -274,7 +274,7 @@ private:
       mode_ = ViewMode.TERMINAL;
       swTerm_.showAll();
       MoveFocusPosition();
-      filer_.hideAll();
+      filer_.hide();
     }
   }
 
@@ -288,7 +288,7 @@ private:
       mode_ = ViewMode.FILER;
       filer_.ShowAll();
       MoveFocusPosition();
-      swTerm_.hideAll();
+      swTerm_.hide();
       if(needUpdate){// Update AFTER changing the mode
         filer_.Update();
       }

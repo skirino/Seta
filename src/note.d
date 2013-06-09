@@ -44,7 +44,7 @@ public:
 
     super();
     setScrollable(1);
-    setGroup(cast(void*)mainWin_);
+    setGroupName("Seta notebook");
     addOnPageAdded(&PageAdded);
     addOnPageRemoved(&LabelAllPages);
     addOnPageReordered(&LabelAllPages);
@@ -70,7 +70,7 @@ public:
     appendPage(page, page.GetTab());
     setTabReorderable(page, 1);
     setTabDetachable(page, 1);
-    setTabLabelPacking(page, 1, 1, GtkPackType.START);
+//    setTabLabelPacking(page, 1, 1, GtkPackType.START);
     page.show();
   }
   void AppendNewPage()

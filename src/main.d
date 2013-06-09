@@ -63,7 +63,6 @@ void main(string[] args)
   }
 
   // initialize libraries
-  Thread.init(null);
   threadsInit();
   Main.init(args);
   threadsEnter();

@@ -104,7 +104,7 @@ public:
     if(w == 0){
       // set default split position to avoid allocating too much or too little
       hpaned_.setPosition(120);
-      swTree_.hideAll();
+      swTree_.hide();
     }
     else{
       hpaned_.setPosition(w);
@@ -118,7 +118,7 @@ public:
   {
     // necessary to make togglebutton consistent
     if(rcfile.GetWidthDirectoryTree() == 0){
-      swTree_.hideAll();
+      swTree_.hide();
     }
     else{
       toolbar_.DirTreeSetActive();
@@ -479,7 +479,7 @@ public:
       swTree_.showAll();
     }
     else{
-      swTree_.hideAll();
+      swTree_.hide();
     }
   }
 
