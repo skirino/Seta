@@ -436,7 +436,7 @@ private class RenameDialog : Dialog
     string SearchReplace(int ReplaceType)(string name)
     {
       static if(ReplaceType == ReplaceRegexp){
-        return re_.replace(name, name.length, 0, textReplace_, cast(GRegexMatchFlags)0);
+        return re_.replace(name, 0, textReplace_, cast(GRegexMatchFlags)0);
       }
       else if(ReplaceType == RemoveRegexp){
         // take split-join approach since there seems to be no direct way to remove matches in glib.Regex
