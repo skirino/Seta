@@ -30,6 +30,7 @@ import gtk.SeparatorMenuItem;
 import gtk.CheckMenuItem;
 import gtk.PopupBox;
 import gtk.Widget;
+import gdk.Event;
 import gio.File;
 import gio.FileInfo;
 import gio.AppInfoIF;
@@ -243,7 +244,7 @@ private:
     submenuItem_.setActive(setDefaultApp_);
   }
 
-  bool SubmenuItemClicked(GdkEventButton * eb, Widget w)
+  bool SubmenuItemClicked(Event e, Widget w)
   {
     setDefaultApp_ = !setDefaultApp_;
     submenuItem_.setActive(setDefaultApp_);

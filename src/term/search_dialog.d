@@ -27,10 +27,11 @@ import gtk.VBox;
 import gtk.HBox;
 import gtk.Entry;
 import gtk.EditableIF;
-import gtk.ComboBox;
+import gtk.ComboBoxText;
 import gtk.CheckButton;
 import gtk.ToggleButton;
 import gdk.Keysyms;
+import gdk.Event;
 import glib.Regex;
 import glib.GException;
 import pango.PgAttribute;
@@ -62,7 +63,7 @@ private:
   Terminal terminal_;
   Regex re_;
   Entry e_;
-  ComboBox cb_;
+  ComboBoxText cb_;
   Label reErrorLabel_;
   Widget searchForwardButton_;
   Widget searchBackwardButton_;
@@ -81,8 +82,8 @@ public:
     auto l = new Label("_Search for: ");
     hbox.packStart(l, 0, 0, 5);
 
-    cb_ = new ComboBox;
-    cb_.addOnChanged(&SearchTextChanged!(ComboBox));
+    cb_ = new ComboBoxText;
+    cb_.addOnChanged(&SearchTextChanged!(ComboBoxText));
     hbox.packStart(cb_, 0, 0, 0);
     l.setMnemonicWidget(cb_);
     contentArea.packStart(hbox, 0, 0, 5);
@@ -99,15 +100,16 @@ public:
     contentArea.packStart(ignoreCases_, 0, 0, 0);
 
     addButton(StockID.CLOSE, GtkResponseType.DELETE_EVENT);
-    searchBackwardButton_ = addButton(StockID.MEDIA_PREVIOUS, SEARCH_BACKWARD);
-    searchForwardButton_  = addButton(StockID.MEDIA_NEXT,     SEARCH_FORWARD);
+    searchBackwardButton_ = addButton(StockID.MEDIA_PREVIOUS, ResponseID.SEARCH_BACKWARD);
+    searchForwardButton_  = addButton(StockID.MEDIA_NEXT,     ResponseID.SEARCH_FORWARD);
 
     ApplySettings();
   }
 
 private:
-  bool KeyPressed(GdkEventKey * ekey, Widget w)
+  bool KeyPressed(Event e, Widget w)
   {
+    auto ekey = e.key();
     if(TurnOffLockFlags(ekey.state) == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
       Search();
       return true;
@@ -121,10 +123,10 @@ private:
       RestoreSettings();
       destroy();
     }
-    else if(responseID == SEARCH_FORWARD){
+    else if(responseID == ResponseID.SEARCH_FORWARD){
       Search();
     }
-    else if(responseID == SEARCH_BACKWARD){
+    else if(responseID == ResponseID.SEARCH_BACKWARD){
       Search!(Order.BACKWARD)();
     }
   }

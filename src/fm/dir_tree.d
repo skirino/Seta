@@ -283,14 +283,13 @@ private:
     }
   }
 
-  bool TooltipCallback(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
+  bool TooltipCallback(int x, int y, int keyboardTip, Tooltip tip, Widget w)
   {
     TreePath path;
     TreeIter iter = new TreeIter;
     if(GetTooltipContext(this, &x, &y, keyboardTip, path, iter)){
       if(path !is null){
         CellRenderer renderer = GetCellRendererFromCol(col_);
-        Tooltip tip = new Tooltip(p);
         tip.setText(GetFullPath(iter));
         setTooltipCell(tip, path, null, renderer);
         path.free();

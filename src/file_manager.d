@@ -31,6 +31,7 @@ import gtk.Menu;
 import gtk.MenuItem;
 import gtk.HPaned;
 import gdk.Threads;
+import gdk.Event;
 import gio.File;
 import glib.Str;
 import gtkc.gio;
@@ -162,8 +163,10 @@ public:
 
   //////////////////////// key pressed
 private:
-  bool KeyPressed(GdkEventKey * ekey, Widget w)
+  bool KeyPressed(Event e, Widget w)
   {
+    auto ekey = e.key();
+
     int q = QueryFileManagerAction(ekey);
     switch(q){
 
@@ -361,9 +364,9 @@ public:
       }
     }
   }
-  bool PopupDirHistoryMenu(bool ForwardDirection)(
-    GdkEventButton * eb, Widget w)
+  bool PopupDirHistoryMenu(bool ForwardDirection)(Event e, Widget w)
   {
+    auto eb = e.button();
     if(eb.button != MouseButton.RIGHT){
       return false;
     }
@@ -403,8 +406,9 @@ public:
       ChangeDirectory(parent);
     }
   }
-  bool PopupGoupMenu(GdkEventButton * eb, Widget w)
+  bool PopupGoupMenu(Event e, Widget w)
   {
+    auto eb = e.button();
     if(eb.button != MouseButton.RIGHT){
       return false;
     }

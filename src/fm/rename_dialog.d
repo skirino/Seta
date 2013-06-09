@@ -42,6 +42,7 @@ import gtk.Tooltip;
 import gtk.PopupBox;
 import gtk.HSeparator;
 import gtk.ComboBoxText;
+import gdk.Event;
 import gio.File;
 import glib.GException;
 import glib.Str;
@@ -475,7 +476,7 @@ private class RenameDialog : Dialog
 
 
   //////////////////// tooltip for long contents
-  bool QueryTooltip(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
+  bool QueryTooltip(int x, int y, int keyboardTip, Tooltip tip, Widget w)
   {
     // obtain the cell where the mouse cursor is
     TreePath path;
@@ -495,7 +496,6 @@ private class RenameDialog : Dialog
         int textWidth = GetTextWidth(text);
 
         if(actualWidth < textWidth){// text is too long
-          Tooltip tip = new Tooltip(p);
           tip.setText(text);
           view_.setTooltipCell(tip, path, col, renderer);
           path.free();
@@ -543,7 +543,7 @@ private class RenameDialog : Dialog
 
   // to ensure that the cell contents is modified on focus-out
   string pathStringLast_;
-  bool FocusOut(GdkEventFocus * ef, Widget w)
+  bool FocusOut(Event e, Widget w)
   {
     Entry ent = cast(Entry)w;
     // this can cause "EditedNewName" to be called twice (here and by "edited" signal), but no problem

@@ -628,7 +628,7 @@ private:
 
 
   // callback to show tooltip for ellipsized texts or target paths of symlinks
-  bool TooltipCallback(int x, int y, int keyboardTip, GtkTooltip * p, Widget w)
+  bool TooltipCallback(int x, int y, int keyboardTip, Tooltip tip, Widget w)
   {
     // show tooltip for ellipsized texts in NAME and TYPE column
     TreePath path;
@@ -678,7 +678,6 @@ private:
     //////////////////////
 
     if(tooltipContent.length > 0){
-      Tooltip tip = new Tooltip(p);
       tip.setText(tooltipContent);
       setTooltipCell(tip, path, col, renderer);// set position for the tooltip to appear
       path.free();
@@ -764,8 +763,10 @@ private:
     }
   }
 
-  bool KeyPressed(GdkEventKey * ekey, Widget w)
+  bool KeyPressed(Event e, Widget w)
   {
+    auto ekey = e.key();
+
     switch(QueryFileViewAction(ekey)){
 
     case -1:
@@ -876,8 +877,7 @@ private:
       else{
         // get position for popup menu
         GdkRectangle * ptr = new GdkRectangle;
-        Rectangle rect = new Rectangle(ptr);
-        getCellArea(path, cols_[ColumnType.NAME], rect);
+        getCellArea(path, cols_[ColumnType.NAME], *ptr);
         int x, y;
         convertBinWindowToWidgetCoords(ptr.x, ptr.y, x, y);
         translateCoordinates(getToplevel(), x, y, ptr.x, ptr.y);
@@ -920,8 +920,10 @@ private:
   }
 
   // handles row selections and stores the position of the cursor for drag start
-  bool ButtonPressed(GdkEventButton * eb, Widget treeView)
+  bool ButtonPressed(Event e, Widget treeView)
   {
+    auto eb = e.button();
+
     if(eb.window != getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
@@ -992,8 +994,10 @@ private:
   }
 
   // selection handling, right click menu and end of dragging
-  bool ButtonReleased(GdkEventButton * eb, Widget w)
+  bool ButtonReleased(Event e, Widget w)
   {
+    auto eb = e.button();
+
     if(draggingState_ != DraggingState.DRAGGING){// released before starting drag
       if(eb.button == MouseButton.LEFT || eb.button == MouseButton.MIDDLE){
         if(!(eb.state & GdkModifierType.SHIFT_MASK || eb.state & GdkModifierType.CONTROL_MASK)){// Shift or Ctrl is not pressed
@@ -1037,8 +1041,10 @@ private:
   // Check whether the left or middle button has been pressed
   // and whether the distance covered is larger than the threshold value.
   // If true, start dragging.
-  bool MotionNotify(GdkEventMotion * em, Widget w)
+  bool MotionNotify(Event e, Widget w)
   {
+    auto em = e.motion();
+
     if(draggingState_ == DraggingState.PRESSED){
       if(DragAndDrop.checkThreshold(this, dragStartX_, dragStartY_,
                                     cast(int)em.x, cast(int)em.y)){

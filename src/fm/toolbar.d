@@ -203,7 +203,7 @@ private:
     string tooltip,
     void delegate(Button) dlg,
     void delegate(MenuItem) dlg2,
-    bool delegate(GdkEventButton*, Widget) dlg3 = null)
+    bool delegate(Event, Widget) dlg3 = null)
   {
     auto b = new Button;
     b.setRelief(GtkReliefStyle.NONE);
@@ -296,8 +296,8 @@ private:
     string dir,
     string label)
   {
-    auto dlgButtonPress = delegate bool(GdkEventButton * eb, Widget w){
-      return RemoveShortcutPopup(eb, w, dir);
+    auto dlgButtonPress = delegate bool(Event e, Widget w){
+      return RemoveShortcutPopup(e.button(), w, dir);
     };
     AppendShortcutButtonBase(dir, label, dir, dlgButtonPress);
   }
@@ -308,8 +308,8 @@ private:
     string name)
   {
     string tooltip = name ~ " (" ~ dir ~ ')';
-    auto dlgButtonPress = delegate bool(GdkEventButton * eb, Widget w){
-      return UnmountMediaPopup(eb, w, dir, name);
+    auto dlgButtonPress = delegate bool(Event e, Widget w){
+      return UnmountMediaPopup(e.button(), w, dir, name);
     };
     AppendShortcutButtonBase(dir, label, tooltip, dlgButtonPress);
   }
@@ -318,7 +318,7 @@ private:
     string path,
     string label,
     string tooltip,
-    bool delegate(GdkEventButton*, Widget) dlgButtonPress = null)
+    bool delegate(Event, Widget) dlgButtonPress = null)
   {
     auto child = new Label(label, false);
     child.setEllipsize(PangoEllipsizeMode.END);
