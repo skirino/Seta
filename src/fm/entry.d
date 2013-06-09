@@ -217,20 +217,19 @@ string FileSizeInStr(long n)
     return Str.toString(cast(ulong)n) ~ " B";
   }
   else{
-    string buffer;
-    const size_t buflen = 4;
-    buffer.length = buflen;
+    char[] buffer;
+    buffer.length = 4;
 
     if(n < mega){
-      string sizeStr = Str.asciiFormatd(buffer, buflen, "%3.1f", 1.0*n/kilo);
+      string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/kilo);
       return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " KB";
     }
     else if(n < giga){
-      string sizeStr = Str.asciiFormatd(buffer, buflen, "%3.1f", 1.0*n/mega);
+      string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/mega);
       return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " MB";
     }
     else{
-      string sizeStr = Str.asciiFormatd(buffer, buflen, "%3.1f", 1.0*n/giga);
+      string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/giga);
       return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " GB";
     }
   }

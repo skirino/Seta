@@ -239,7 +239,7 @@ private class RenameDialog : Dialog
     comboBox_.appendText("Last Match");
     comboBox_.appendText("Regular Expression");
     comboBox_.setActive(idxComboBox);
-    comboBox_.addOnChanged(&EntriesChanged!(ComboBox));
+    comboBox_.addOnChanged(&EntriesChanged!(ComboBoxText));
     hbox.packStart(comboBox_, 0, 0, 0);
 
     lerr_ = new Label("");
