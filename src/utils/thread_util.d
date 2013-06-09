@@ -34,10 +34,10 @@ void SleepMillisecs(uint msecs)
 private void WaitWithGDKLock(Thread t)
 {
   while(t.isRunning()){
-    gdkThreadsLeave();
+    threadsLeave();
     Thread.yield();
     SleepMillisecs(50);
-    gdkThreadsEnter();
+    threadsEnter();
   }
 }
 

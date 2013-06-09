@@ -198,13 +198,13 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
   {
     ScanOneDirectory(home_);
 
-    gdkThreadsEnter();
+    threadsEnter();
     Unregister();
     if(!canceled_){
       instance_.list_.swap(v_);
       PushIntoStatusbar("Finished updating directory list.");
     }
-    gdkThreadsLeave();
+    threadsLeave();
   }
 
   void AppendOneDirectory(string path)

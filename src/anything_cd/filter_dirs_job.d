@@ -139,20 +139,20 @@ public:
     mixin(ReturnIfCanceled);
 
     // notify finish
-    gdkThreadsEnter();
+    threadsEnter();
     Unregister();
     callbackSuccess_(pathsFromHistory.array(), pathsFromList.array());
-    gdkThreadsLeave();
+    threadsLeave();
   }
 
 
 private:
   static const string ReturnIfCanceled =
     "if(canceled_){
-      gdkThreadsEnter();
+      threadsEnter();
       Unregister();
       callbackCancel_();
-      gdkThreadsLeave();
+      threadsLeave();
       return;
     }
     ";

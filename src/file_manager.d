@@ -587,7 +587,7 @@ private:
     void * data)
   {
     // need GDK lock to call gtk functions
-    gdkThreadsEnter();
+    threadsEnter();
     SFTPMountStarter arg = cast(SFTPMountStarter)data;
     arg.Unregister();
 
@@ -606,7 +606,7 @@ private:
         PushIntoStatusbar("Failed to establish SSH/SFTP connection");
       }
     }
-    gdkThreadsLeave();
+    threadsLeave();
   }
 
   class SFTPMountStarter : ListedOperationIF

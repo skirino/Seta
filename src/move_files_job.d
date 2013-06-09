@@ -354,9 +354,9 @@ private:
         static if(!move){// copy mode, ask new name
           string defaultValue = (name[$-1] == '/' ? name[0..$-1] : name) ~ "(copy)";
 
-          gdkThreadsEnter();
+          threadsEnter();
           string newBasename = InputDialog("copy", "New name: ", defaultValue);
-          gdkThreadsLeave();
+          threadsLeave();
 
           if(newBasename.length == 0){// no valid input is returned (CANCEL is pressed)
             break;
@@ -382,9 +382,9 @@ private:
       }
     }
 
-    gdkThreadsEnter();// grab gdk lock here to avoid repeating getting/releasing
+    threadsEnter();// grab gdk lock here to avoid repeating getting/releasing
     NotifyFinish();
-    gdkThreadsLeave();
+    threadsLeave();
   }
 
   bool Transfer1(string oldname, string newname)
@@ -394,14 +394,14 @@ private:
       int x;
       string message = GetBasename(newname) ~ " exists. Overwrite?";
 
-      gdkThreadsEnter();
+      threadsEnter();
       if(mode_ & PasteModeFlags.MULTIPLE){
         x = ChooseDialog!(4)(message, ["_OK", "_Skip this file", "Overwrite _all", "_Cancel all"]);
       }
       else{
         x = ChooseDialog!(2)(message, ["_OK", "_Cancel"]);
       }
-      gdkThreadsLeave();
+      threadsLeave();
 
       if(x == -1 || x == 1 || x == 3){// invalid, "cancel" or "cancel all"
         doPaste = false;

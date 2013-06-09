@@ -107,9 +107,9 @@ private:
 
   static const string ReturnProcess =
     "
-    gdkThreadsEnter();
+    threadsEnter();
     Unregister();
-    gdkThreadsLeave();
+    threadsLeave();
     return;
     ";
   static const string ReturnIfCanceled =
@@ -310,10 +310,10 @@ private:
   // on finish
   void NotifyFinish()
   {
-    gdkThreadsEnter();
+    threadsEnter();
     Unregister();
     setRowsCallback_(remote_, dir_, pwdFile_);
-    gdkThreadsLeave();
+    threadsLeave();
   }
   /////////////// inside worker thread
 

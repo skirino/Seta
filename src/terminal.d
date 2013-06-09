@@ -125,11 +125,11 @@ private:
   extern(C) static void CloseThisPageCallback(VteTerminal * vte, void * ptr)
   {
     // glib's callback does not grab GDK lock automatically
-    gdkThreadsEnter();
+    threadsEnter();
     auto t = cast(Terminal)ptr;
     t.CancelSyncFilerDirCallback();
     t.mediator_.CloseThisPage();
-    gdkThreadsLeave();
+    threadsLeave();
   }
   //////////////////// GUI stuff
 
@@ -380,7 +380,7 @@ private:
   void InitSyncFilerDirFunctionality()
   {
     readlinkBuffer_.length = PATH_MAX + 1;
-    syncCallbackID_ = gdkThreadsAddTimeoutSeconds(2, &SyncFilerDirectoryByCwdCallback, cast(void*)this);
+    syncCallbackID_ = threadsAddTimeoutSeconds(2, &SyncFilerDirectoryByCwdCallback, cast(void*)this);
   }
 
   string GetCWDFromProcFS()
@@ -626,9 +626,9 @@ private:
       }
 
       // remove from ThreadList
-      gdkThreadsEnter();
+      threadsEnter();
       Unregister();
-      gdkThreadsLeave();
+      threadsLeave();
     }
 
     void Stop()

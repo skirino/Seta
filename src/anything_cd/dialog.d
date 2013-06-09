@@ -215,7 +215,7 @@ private:
 
   void CancelTimeoutCallback()
   {
-    // cancel previous gdkThreadsAddTimeout to wait for an idle time (0.5 second)
+    // cancel previous threadsAddTimeout to wait for an idle time (0.5 second)
     if(sourceID_ > 0){
       Source.remove(sourceID_);
     }
@@ -229,7 +229,7 @@ private:
     else{
       textChanged_ = true;
     }
-    sourceID_ = gdkThreadsAddTimeout(IdleTimeToStartScanInMillis, &SearchDirsCallback, cast(void*)this);
+    sourceID_ = threadsAddTimeout(IdleTimeToStartScanInMillis, &SearchDirsCallback, cast(void*)this);
   }
 
   extern(C) static int SearchDirsCallback(void * ptr)

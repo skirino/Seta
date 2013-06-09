@@ -273,7 +273,7 @@ private:
   {
     if(!contentsChanged_){
       contentsChanged_ = true;
-      gdkThreadsAddTimeout(500, &UpdateCallback, cast(void*)this);
+      threadsAddTimeout(500, &UpdateCallback, cast(void*)this);
     }
   }
 
@@ -407,7 +407,7 @@ private:
     // set entries to ListStore
     AppendRows(1000, colors, iter);// append up to 1000 rows
     if(numRowsNow_ < eList_.NumEntriesSorted()){// if there are remaining rows to be added
-      gdkThreadsAddIdle(&AppendRowsAtIdle, cast(void*)this);
+      threadsAddIdle(&AppendRowsAtIdle, cast(void*)this);
     }
   }
 

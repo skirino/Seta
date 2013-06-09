@@ -64,9 +64,9 @@ void main(string[] args)
 
   // initialize libraries
   Thread.init(null);
-  gdkThreadsInit();
+  threadsInit();
   Main.init(args);
-  gdkThreadsEnter();
+  threadsEnter();
 
   // initialize Seta utilities
   Initialize();
@@ -76,5 +76,5 @@ void main(string[] args)
 
   Finalize();
 
-  gdkThreadsLeave();
+  threadsLeave();
 }
