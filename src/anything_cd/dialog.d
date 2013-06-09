@@ -39,6 +39,7 @@ import gtk.ListStore;
 import gtk.CellRendererText;
 import gdk.Threads;
 import gdk.Keysyms;
+import gdk.Event;
 import glib.Source;
 
 import utils.min_max;
@@ -150,9 +151,10 @@ private:
     destroy();
   }
 
-  bool KeyPressed(GdkEventKey * ekey, Widget w)
+  bool KeyPressed(Event e, Widget w)
   {
-    GdkModifierType state = TurnOffLockFlags(ekey.state);
+    auto ekey  = e.key();
+    auto state = TurnOffLockFlags(ekey.state);
 
     // Enter --> try to change directory
     if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return){

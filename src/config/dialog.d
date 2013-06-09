@@ -44,10 +44,11 @@ import gtk.ListStore;
 import gtk.TreeStore;
 import gtk.CellRendererText;
 import gtk.CellRendererAccel;
-import gdk.Keysyms;
 import gtk.AccelGroup;
 import gtk.Menu;
 import gtk.MenuItem;
+import gdk.Keysyms;
+import gdk.Event;
 
 import utils.gio_util;
 import utils.string_util;
@@ -232,8 +233,10 @@ private:
   }
 
   // for right click menu
-  bool KeybindButtonPress(GdkEventButton * eb, Widget w)
+  bool KeybindButtonPress(Event e, Widget w)
   {
+    auto eb = e.button();
+
     if(eb.window != keybinds_.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
@@ -552,8 +555,8 @@ private:
     view = new TreeView;
     view.setSizeRequest(-1, 160);
     view.setReorderable(1);
-    view.addOnButtonPress(delegate bool(GdkEventButton * eb, Widget w){
-        return ShowAppendRemoveMenu(eb, w, view, store);
+    view.addOnButtonPress(delegate bool(Event e, Widget w){
+        return ShowAppendRemoveMenu(e, w, view, store);
       });
     AppendWithScrolledWindow(pageDirectories_, row, view);
 
@@ -580,8 +583,8 @@ private:
     shortcuts_ = new TreeView;
     shortcuts_.setSizeRequest(-1, 160);
     shortcuts_.setReorderable(1);
-    shortcuts_.addOnButtonPress(delegate bool(GdkEventButton * eb, Widget w){
-        return ShowAppendRemoveMenu(eb, w, shortcuts_, shortcutsStore_);
+    shortcuts_.addOnButtonPress(delegate bool(Event e, Widget w){
+        return ShowAppendRemoveMenu(e, w, shortcuts_, shortcutsStore_);
       });
     AppendWithScrolledWindow(pageDirectories_, row, shortcuts_);
 
@@ -670,8 +673,9 @@ private:
   }
 
   // for right click menu
-  bool ShowAppendRemoveMenu(GdkEventButton * eb, Widget w, TreeView view, ListStore store)
+  bool ShowAppendRemoveMenu(Event e, Widget w, TreeView view, ListStore store)
   {
+    auto eb = e.button();
     if(eb.window != view.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
@@ -746,8 +750,8 @@ private:
   {
     hosts_ = new HostView;
     hosts_.setReorderable(1);
-    hosts_.addOnButtonPress(delegate bool(GdkEventButton * eb, Widget w){
-        return ShowAppendRemoveMenu(eb, w, hosts_, hostsStore_);
+    hosts_.addOnButtonPress(delegate bool(Event e, Widget w){
+        return ShowAppendRemoveMenu(e, w, hosts_, hostsStore_);
       });
 
     hosts_.SetEditable(

@@ -31,6 +31,7 @@ import gtk.CellRendererText;
 import gtk.Widget;
 import gtk.DragAndDrop;
 import gtk.Tooltip;
+import gdk.Event;
 import gio.File;
 import gio.FileInfo;
 import glib.GException;
@@ -234,8 +235,10 @@ private:
     }
   }
 
-  bool ButtonRelease(GdkEventButton * eb, Widget w)
+  bool ButtonRelease(Event e, Widget w)
   {
+    auto eb = e.button();
+
     TreePath path = GetPathAtPos(this, eb.x, eb.y);
     if(path is null){
       return false;

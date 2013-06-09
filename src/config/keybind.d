@@ -25,6 +25,7 @@ import std.ascii;
 
 import gtk.AccelGroup;
 import gdk.Keysyms;
+import gdk.Event;
 
 import utils.string_util;
 import constants;
