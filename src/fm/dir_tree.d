@@ -443,9 +443,8 @@ private:
     File f = File.parseName(fullpath);
     try{
       scope enumerate = f.enumerateChildren("standard::name,standard::type", GFileQueryInfoFlags.NONE, null);
-      GFileInfo * pinfo;
-      while((pinfo = enumerate.nextFile(null)) != null){
-        scope info = new FileInfo(pinfo);
+      FileInfo info;
+      while((info = enumerate.nextFile(null)) !is null){
         if(info.getFileType() == GFileType.TYPE_DIRECTORY){
           string name = info.getName();
           static if(!showHiddenFiles){

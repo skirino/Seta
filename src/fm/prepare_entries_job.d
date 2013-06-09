@@ -134,12 +134,11 @@ private:
     // this code should be surrounded by try statement
     scope enumerate = pwdFile_.enumerateChildren(attributes_, GFileQueryInfoFlags.NONE, null);
 
-    GFileInfo * pinfo;
+    FileInfo info;
     if(remote_){// remote
-      while((pinfo = enumerate.nextFile(null)) != null){
+      while((info = enumerate.nextFile(null)) !is null){
         mixin(CloseAndReturnIfCanceled);
 
-        scope FileInfo info = new FileInfo(pinfo);
         if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
           entriesDAll_.append(new DirEntry(info, 0));
         }
@@ -149,10 +148,9 @@ private:
       }
     }
     else{// local
-      while((pinfo = enumerate.nextFile(null)) != null){
+      while((info = enumerate.nextFile(null)) !is null){
         mixin(CloseAndReturnIfCanceled);
 
-        scope FileInfo info = new FileInfo(pinfo);
         if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
           entriesDAll_.append(new DirEntry(info, dir_));
         }

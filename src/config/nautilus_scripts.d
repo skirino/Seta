@@ -55,9 +55,8 @@ class ScriptsDir
     try{
       scope enumerate = File.parseName(path_).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
 
-      GFileInfo * pinfo;
-      while((pinfo = enumerate.nextFile(null)) != null){
-        scope FileInfo info = new FileInfo(pinfo);
+      FileInfo info;
+      while((info = enumerate.nextFile(null)) !is null){
         string name = path_ ~ info.getName();
 
         if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory

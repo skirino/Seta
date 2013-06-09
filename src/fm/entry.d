@@ -190,8 +190,8 @@ long CountNumEntries(string dirname)
     try{
       long num = 0;
       scope enumerate = f.enumerateChildren("", GFileQueryInfoFlags.NONE, null);
-      GFileInfo * p;
-      while((p = enumerate.nextFile(null)) != null){
+      FileInfo info;
+      while((info = enumerate.nextFile(null)) !is null){
         ++num;
       }
       enumerate.close(null);
