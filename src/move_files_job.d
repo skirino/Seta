@@ -24,6 +24,7 @@ import core.thread;
 import std.c.stdlib;
 
 import gtk.Clipboard;
+import gtk.SelectionData;
 import gdk.Threads;
 import gio.File;
 import gio.Cancellable;
@@ -121,7 +122,7 @@ private extern(C) void ClipboardGetFun(
   if(storedFiles.length > 0){
     string[] uris = storedMove ? [URI_MOVE] : [];
     uris ~= MakeURIList(storedDir, storedFiles);
-    Selections.dataSetUris(selection, uris);
+    (new SelectionData(selection)).dataSetUris(uris);
   }
 }
 

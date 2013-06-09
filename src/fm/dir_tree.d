@@ -31,7 +31,9 @@ import gtk.CellRendererText;
 import gtk.Widget;
 import gtk.DragAndDrop;
 import gtk.Tooltip;
+import gtk.SelectionData;
 import gdk.Event;
+import gdk.DragContext;
 import gio.File;
 import gio.FileInfo;
 import glib.GException;
@@ -509,20 +511,20 @@ private:
   }
 
   void DragDataReceived(
-    GdkDragContext * context, int x, int y,
-    GtkSelectionData * selection, uint info, uint time, Widget w)
+    DragContext context, int x, int y,
+    SelectionData selection, uint info, uint time, Widget w)
   {
     TreePath path;
     GtkTreeViewDropPosition pos;
     getDestRowAtPos(x, y, path, pos);
-    DragAndDrop dnd = new DragAndDrop(context);
+    DragAndDrop dnd = new DragAndDrop(context.getDragContextStruct());
 
     if(path !is null){// destination exists
       TreeIter iter = GetIter(store_, path);
       path.free();
       string fullpath = GetFullPath(iter);
-      string[] files = GetFilesFromSelection(selection);
-      GdkDragAction action = ExtractSuggestedAction(context);// initialize it as given by GdkDragContext
+      string[] files = GetFilesFromSelection(selection.getSelectionDataStruct());
+      GdkDragAction action = ExtractSuggestedAction(context.getDragContextStruct());// initialize it as given by GdkDragContext
 
       TransferFiles(action, files, cast(FileView)dnd.getSourceWidget(), fullpath);
     }

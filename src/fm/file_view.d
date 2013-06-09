@@ -37,9 +37,11 @@ import gtk.PopupBox;
 import gtk.Tooltip;
 import gtk.DragAndDrop;
 import gtk.TargetList;
+import gtk.SelectionData;
 import gdk.Event;
 import gdk.Threads;
 import gdk.Rectangle;
+import gdk.DragContext;
 import gio.File;
 import gio.FileInfo;
 import gio.FileMonitor;
@@ -1073,23 +1075,23 @@ private:
     }
   }
 
-  void DragDataGet(GdkDragContext * context, GtkSelectionData * selection, uint info, uint time, Widget w)
+  void DragDataGet(DragContext context, SelectionData selection, uint info, uint time, Widget w)
   {
     // prepare items that will be moved/copied
     string[] filenames = GetSelectedFileNames();
     if(filenames.length > 0){
-      Selections.dataSetUris(selection, MakeURIList(pwd_, filenames));
+      selection.dataSetUris(MakeURIList(pwd_, filenames));
     }
     draggingState_ = DraggingState.NEUTRAL;
   }
 
   // do move or copy dragged items
   void DragDataReceived(
-    GdkDragContext * context, int x, int y,
-    GtkSelectionData * selection, uint info, uint time, Widget w)
+    DragContext context, int x, int y,
+    SelectionData selection, uint info, uint time, Widget w)
   {
-    DragAndDrop dnd = new DragAndDrop(context);
-    string[] files = GetFilesFromSelection(selection);
+    DragAndDrop dnd = new DragAndDrop(context.getDragContextStruct());
+    string[] files = GetFilesFromSelection(selection.getSelectionDataStruct());
 
     if(files.length > 0){
       // determine "destDir"
@@ -1119,7 +1121,7 @@ private:
         }
       }
 
-      GdkDragAction action = ExtractSuggestedAction(context);
+      GdkDragAction action = ExtractSuggestedAction(context.getDragContextStruct());
       TransferFiles(action, files, cast(FileView)sourceWidget, destDir, this);// cast may fail and null may be passed
 
       finish:

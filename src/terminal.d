@@ -31,10 +31,12 @@ import core.sys.posix.unistd;
 import gtk.Widget;
 import gtk.DragAndDrop;
 import gtk.ScrolledWindow;
+import gtk.SelectionData;
 import gobject.Signals;
 import gdk.Threads;
 import gdk.Color;
 import gdk.Event;
+import gdk.DragContext;
 import glib.Str;
 import glib.Regex;
 import glib.Source;
@@ -109,7 +111,7 @@ public:
     auto colorBack = new Color;
     Color.parse(rcfile.GetColorForeground(), colorFore);
     Color.parse(rcfile.GetColorBackground(), colorBack);
-    vte_terminal_set_colors(vte_, colorFore.getGdkColorStruct(), colorBack.getGdkColorStruct(), null, 0);
+    vte_terminal_set_colors(vte_, colorFore.getColorStruct(), colorBack.getColorStruct(), null, 0);
 
     vte_terminal_set_font_from_string(vte_, Str.toStringz(rcfile.GetFont()));
     vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());
@@ -695,18 +697,17 @@ public:
     DragAndDrop.destSet(
       this,
       GtkDestDefaults.ALL,
-      dragTargets.ptr,
-      cast(int)dragTargets.length,
+      dragTargets,
       GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
     addOnDragDataReceived(&DragDataReceived);
   }
 
   void DragDataReceived(
-    GdkDragContext * context, int x, int y,
-    GtkSelectionData * selection, uint info, uint time, Widget w)
+    DragContext context, int x, int y,
+    SelectionData selection, uint info, uint time, Widget w)
   {
     if(info == 1){// URI list
-      string[] paths = GetFilesFromSelection(selection);
+      string[] paths = GetFilesFromSelection(selection.getSelectionDataStruct());
       if(paths.length > 0){
         string s = " ";
         foreach(path; paths){
@@ -716,12 +717,12 @@ public:
       }
     }
     else if(info == 2){// plain text, feed the original text
-      char * cstr = Selections.dataGetText(selection);
+      char * cstr = selection.dataGetText();
       string str = Str.toString(cstr);
       FeedChild(str);
     }
 
-    auto dnd = new DragAndDrop(context);
+    auto dnd = new DragAndDrop(context.getDragContextStruct());
     dnd.finish(1, 0, 0);
 
     grabFocus();
