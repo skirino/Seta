@@ -35,6 +35,7 @@ import gtk.TreeIter;
 import gtk.TreePath;
 import gtk.TreeView;
 import gtk.TreeViewColumn;
+import gdk.Event;
 
 import utils.string_util;
 import utils.tree_util;
@@ -160,7 +161,7 @@ class StartSSHDialog : Dialog
     response(GtkResponseType.OK);
   }
 
-  bool SetDefaultFromUsername(GdkEventFocus * ef, Widget w)
+  bool SetDefaultFromUsername(Event e, Widget w)
   {
     string username = entry1.getText();
     if(username.length > 0){
@@ -197,12 +198,13 @@ class StartSSHDialog : Dialog
     entry5.setText(NonnullString(iter.getValueString(4)));
   }
 
-  bool ButtonPress(GdkEventButton * eb, Widget w)
+  bool ButtonPress(Event e, Widget w)
   {
+    auto eb = e.button();
+
     if(eb.window != hosts.getBinWindow().getWindowStruct()){// header is clicked
       return false;
     }
-
     if(eb.button != MouseButton.RIGHT){// not right button
       return false;
     }

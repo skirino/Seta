@@ -27,6 +27,7 @@ import gtk.Image;
 import gtk.HBox;
 import gtk.VBox;
 import gtk.EventBox;
+import gdk.Event;
 import glib.Str;
 
 
@@ -79,8 +80,9 @@ public:
   }
 
 private:
-  bool ButtonPressed(GdkEventButton * eb, Widget w)
+  bool ButtonPressed(Event e, Widget w)
   {
+    auto eb = e.button();
     if(eb.button == 2){// middle button, close the page associated this tab
       CloseThisPage();
       return true;

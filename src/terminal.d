@@ -34,6 +34,7 @@ import gtk.ScrolledWindow;
 import gobject.Signals;
 import gdk.Threads;
 import gdk.Color;
+import gdk.Event;
 import glib.Str;
 import glib.Regex;
 import glib.Source;
@@ -144,8 +145,9 @@ private:
    +/
   uint lastKeyPressTime_ = 0;
 
-  bool KeyPressed(GdkEventKey * ekey, Widget w)
+  bool KeyPressed(Event e, Widget w)
   {
+    auto ekey = e.key();
     if(lastKeyPressTime_ == ekey.time){
       return false;
     }

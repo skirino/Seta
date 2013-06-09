@@ -293,8 +293,10 @@ private:
       return false;
     }";
 
-  bool KeyPressed(GdkEventKey * ekey, Widget w)
+  bool KeyPressed(Event e, Widget w)
   {
+    auto ekey = e.key();
+
     version(DEBUG){
       // manually run GC
       if((ekey.state == (GdkModifierType.CONTROL_MASK | GdkModifierType.SHIFT_MASK)) &&
@@ -434,9 +436,10 @@ private:
 private:
   bool isFullscreen_;
 
-  bool WindowStateChangedCallback(GdkEventWindowState * e, Widget w)
+  bool WindowStateChangedCallback(Event e, Widget w)
   {
-    isFullscreen_ = (GdkWindowState.FULLSCREEN & e.newWindowState) != 0;
+    auto ewin = e.windowState();
+    isFullscreen_ = (GdkWindowState.FULLSCREEN & ewin.newWindowState) != 0;
     return false;
   }
   ///////////////////////// toggle fullscreen
