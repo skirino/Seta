@@ -6,5 +6,5 @@ else
 endif
 
 default: workaround.c
-	gcc ${CFLAGS} -c `pkg-config --cflags gtk+-2.0` workaround.c
+	gcc ${CFLAGS} -c `pkg-config --cflags gtk+-3.0` workaround.c
 

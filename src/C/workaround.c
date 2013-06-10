@@ -33,7 +33,5 @@ GtkClipboard * GetDefaultClipboard()
 // accessor for GdkDragContext
 GdkDragAction ExtractSuggestedAction(GdkDragContext * context)
 {
-  return context->suggested_action;// deprecated direct access to field
-  // since 2.22
-  //return gdk_drag_context_get_suggested_action(context);
+  return gdk_drag_context_get_suggested_action(context);
 }
