@@ -299,7 +299,7 @@ private:
 
     version(DEBUG){
       // manually run GC
-      if((ekey.state == (GdkModifierType.CONTROL_MASK | GdkModifierType.SHIFT_MASK)) &&
+      if(TurnOffLockFlags(ekey.state) == (GdkModifierType.CONTROL_MASK | GdkModifierType.SHIFT_MASK) &&
          ekey.keyval == GdkKeysyms.GDK_G){
         writefln("start GC");
         GC.collect();
