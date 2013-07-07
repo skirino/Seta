@@ -330,29 +330,29 @@ private:
     mixin(AddColorButton!("Layout", "ColorFile",       "Color for the others: "));
 
     AttachSectionLabel(pageLayout_, row++, "Toolbar");
-    mixin(AddCheckButton!("Layout", "ShowBackButton", "Show 'go back' button"));
-    mixin(AddCheckButton!("Layout", "ShowForwardButton", "Show 'go forward' button"));
-    mixin(AddCheckButton!("Layout", "ShowUpButton", "Show 'go up' button"));
-    mixin(AddCheckButton!("Layout", "ShowRootButton", "Show 'go to root directory' button"));
-    mixin(AddCheckButton!("Layout", "ShowHomeButton", "Show 'go to home directory' button"));
+    mixin(AddCheckButton!("Layout", "ShowBackButton",      "Show 'go back' button"));
+    mixin(AddCheckButton!("Layout", "ShowForwardButton",   "Show 'go forward' button"));
+    mixin(AddCheckButton!("Layout", "ShowUpButton",        "Show 'go up' button"));
+    mixin(AddCheckButton!("Layout", "ShowRootButton",      "Show 'go to root directory' button"));
+    mixin(AddCheckButton!("Layout", "ShowHomeButton",      "Show 'go to home directory' button"));
     mixin(AddCheckButton!("Layout", "ShowOtherSideButton", "Show 'go to directory shown in the other pane' button"));
-    mixin(AddCheckButton!("Layout", "ShowRefreshButton", "Show 'refresh' button"));
-    mixin(AddCheckButton!("Layout", "ShowSSHButton", "Show 'SSH' button"));
-    mixin(AddCheckButton!("Layout", "ShowHiddenButton", "Show 'show/hide hidden files' button"));
-    mixin(AddCheckButton!("Layout", "ShowDirTreeButton", "Show 'show/hide directory tree' button"));
-    mixin(AddCheckButton!("Layout", "ShowFilter", "Show filter box"));
+    mixin(AddCheckButton!("Layout", "ShowRefreshButton",   "Show 'refresh' button"));
+    mixin(AddCheckButton!("Layout", "ShowSSHButton",       "Show 'SSH' button"));
+    mixin(AddCheckButton!("Layout", "ShowHiddenButton",    "Show 'show/hide hidden files' button"));
+    mixin(AddCheckButton!("Layout", "ShowDirTreeButton",   "Show 'show/hide directory tree' button"));
+    mixin(AddCheckButton!("Layout", "ShowFilter",          "Show filter box"));
 
-    mixin(AddSpinButton!("Layout", "WidthFilterEntry", "0, 200, 1", "Width of filter box in toolbar: "));
+    mixin(AddSpinButton!("Layout", "WidthFilterEntry",    "0, 200, 1", "Width of filter box in toolbar: "));
     mixin(AddSpinButton!("Layout", "WidthShortcutButton", "0, 200, 1", "Width of shortcut buttons in toolbar: "));
 
     AttachSectionLabel(pageLayout_, row++, "Other widgets");
     mixin(AddSpinButton!("Layout", "WidthDirectoryTree", "0, 500, 1", "Default width of directory tree widget (0 to hide): "));
-    mixin(AddSpinButton!("Layout", "HeightStatusbar", "0, 100, 1", "Height of the statusbar (0 to hide): "));
+    mixin(AddSpinButton!("Layout", "HeightStatusbar",    "0, 100, 1", "Height of the statusbar (0 to hide): "));
 
     AttachSectionLabel(pageLayout_, row++, "Sizes of main widgets");
-    mixin(AddSpinButton!("Layout", "SplitH", "0, 5000, 10", "Width of the left half: "));
-    mixin(AddSpinButton!("Layout", "SplitVLeft" , "0, 5000, 10", "Height of the upper half on the left side: "));
-    mixin(AddSpinButton!("Layout", "SplitVRight", "0, 5000, 10", "Height of the upper half on the right side: "));
+    mixin(AddSpinButton!("Layout", "SplitH",      "0, 5000, 10",  "Width of the left half: "));
+    mixin(AddSpinButton!("Layout", "SplitVLeft" , "0, 5000, 10",  "Height of the upper half on the left side: "));
+    mixin(AddSpinButton!("Layout", "SplitVRight", "0, 5000, 10",  "Height of the upper half on the right side: "));
     mixin(AddSpinButton!("Layout", "WindowSizeH", "10, 5000, 10", "Horizontal size of the main window: "));
     mixin(AddSpinButton!("Layout", "WindowSizeV", "10, 5000, 10", "Vertical size of the main window: "));
 
