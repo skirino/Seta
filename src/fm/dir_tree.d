@@ -230,10 +230,8 @@ private:
       else{
         // does not have any children at this time, rescan
         mixin(RuntimeDispatch1!("ScanChildren", "showHidden_", "(iter, fullpath)") ~ ';');
-
         expandRow(p, 0);
       }
-      p.free();
     }
   }
 
@@ -247,8 +245,6 @@ private:
     }
 
     TreeIter iter = GetIter(store_, path);
-    path.free();
-
     string fullpath = GetFullPath(iter);
     TryGoToDirectory(fullpath);
     return false;
@@ -294,7 +290,6 @@ private:
         CellRenderer renderer = GetCellRendererFromCol(col_);
         tip.setText(GetFullPath(iter));
         setTooltipCell(tip, path, null, renderer);
-        path.free();
         return true;
       }
     }
@@ -390,7 +385,6 @@ private:
           TreeIter iter = GetIterOpened(key);
           TreePath path = iter.getTreePath();
           collapseRow(path);
-          path.free();
         }
       }
     }
@@ -496,7 +490,6 @@ private:
     TreePath path = store_.getPath(iter);
     setCursor(path, null, 0);
     scrollToCell(path, null, 1, 0.5, 0.0);
-    path.free();
   }
 
 
@@ -521,7 +514,6 @@ private:
 
     if(path !is null){// destination exists
       TreeIter iter = GetIter(store_, path);
-      path.free();
       string fullpath = GetFullPath(iter);
       string[] files = GetFilesFromSelection(selection.getSelectionDataStruct());
       GdkDragAction action = ExtractSuggestedAction(context.getDragContextStruct());// initialize it as given by GdkDragContext

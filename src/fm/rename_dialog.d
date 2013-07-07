@@ -292,7 +292,6 @@ private class RenameDialog : Dialog
       TreeIter iter1st = GetIterFirst(store_);
       TreePath path = iter1st.getTreePath();
       view_.setCursor(path, colNew_, 1);// start editing
-      path.free();
     }
     else{// multiple files
       eold_.grabFocus();
@@ -498,14 +497,10 @@ private class RenameDialog : Dialog
         if(actualWidth < textWidth){// text is too long
           tip.setText(text);
           view_.setTooltipCell(tip, path, col, renderer);
-          path.free();
           return true;
         }
-
-        path.free();
       }
     }
-
     return false;
   }
   //////////////////// tooltip for long contents

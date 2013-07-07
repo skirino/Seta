@@ -150,9 +150,7 @@ class StartSSHDialog : Dialog
     hosts.grabFocus();
     TreeIter iter = GetIterFirst(hosts.getModel());
     if(iter !is null){
-      TreePath path = iter.getTreePath();
-      hosts.setCursor(path, null, 0);
-      path.free();
+      hosts.setCursor(iter.getTreePath(), null, 0);
     }
   }
 
@@ -179,9 +177,7 @@ class StartSSHDialog : Dialog
 
   void CursorChanged(TreeView view)
   {
-    TreePath path = GetPathAtCursor(view);
-    SetRowContents(path, view);
-    path.free();
+    SetRowContents(GetPathAtCursor(view), view);
   }
 
   void SetRowContents(TreePath path, TreeView view)
@@ -213,10 +209,7 @@ class StartSSHDialog : Dialog
     if(path is null){// empty space
       return false;
     }
-
-    // set TreeIter
     iterCursor = GetIter(hosts.getModel(), path);
-    path.free();
 
     // menu for "Connect", "Unregister"
     auto menu = new Menu;

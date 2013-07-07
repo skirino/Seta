@@ -171,7 +171,6 @@ private:
         path.next();
         view_.setCursor(path, null, 0);
         view_.getSelection().selectPath(path);
-        path.free();
         return true;
       }
     }
@@ -184,7 +183,6 @@ private:
           view_.setCursor(path, null, 0);
           view_.getSelection().selectPath(path);
         }
-        path.free();
         return true;
       }
     }

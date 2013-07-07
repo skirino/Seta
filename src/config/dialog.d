@@ -250,9 +250,7 @@ private:
     if(path is null){// empty space is clicked
       return false;
     }
-
     TreeIter iter = GetIter(keyStore_, path);
-    path.free();
 
     // show menu for "Clear" and "Add"
     auto menu = new KeybindMenu(keyStore_, iter);
@@ -683,16 +681,9 @@ private:
       return false;
     }
 
-    TreePath path = GetPathAtPos(view, eb.x, eb.y);
-    TreeIter iter;
-    if(path !is null){// there is a row at cursor
-      iter = GetIter(store, path);
-      path.free();
-    }
-
+    auto iter = store.GetIter(GetPathAtPos(view, eb.x, eb.y));
     auto menu = new AppendRemoveMenu(view, store, iter);
     menu.popup(0, eb.time);
-
     return false;
   }
 
@@ -730,7 +721,6 @@ private:
       // select the new row
       TreePath path = next.getTreePath();
       view_.setCursor(path, null, 1);
-      path.free();
     }
 
     void Remove(MenuItem item)

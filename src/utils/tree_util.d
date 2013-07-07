@@ -131,9 +131,8 @@ TreeIter[] GetSelectedIters(TreeSelection selec, TreeModelIF model)
   if (gList !is null){
     scope list = new ListG(gList);
     for(ListG node = list; node !is null; node = node.next()){
-      scope path = new TreePath(cast(GtkTreePath*)node.data());
+      auto path = new TreePath(cast(GtkTreePath*)node.data());
       iters ~= GetIter(model, path);
-      path.free();
     }
     list.free();
   }

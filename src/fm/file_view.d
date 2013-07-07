@@ -614,7 +614,6 @@ private:
     path.next();
     setCursor(path, null, 0);
     getSelection().unselectPath(path);
-    path.free();
   }
   ////////////////////// manipulation of focus
 
@@ -682,11 +681,8 @@ private:
     if(tooltipContent.length > 0){
       tip.setText(tooltipContent);
       setTooltipCell(tip, path, col, renderer);// set position for the tooltip to appear
-      path.free();
       return true;
     }
-
-    path.free();
     return false;
   }
   /////////////////////////// tooltip
@@ -784,7 +780,6 @@ private:
       selection.selectAll();
       TreePath path = new TreePath(true);
       selection.unselectPath(path);// unselect 1st row
-      path.free();
       return true;
 
     case FileViewAction.UnselectAll:
@@ -804,7 +799,6 @@ private:
         else{
           selection.selectPath(path);
         }
-        path.free();
         return true;
       }
 
@@ -827,9 +821,6 @@ private:
         getSelection().selectPath(path);
       }
       PopupFilerMenu!(true)(path, ekey.time);
-      if(path !is null){
-        path.free();
-      }
       return true;
 
     case FileViewAction.Rename:
@@ -948,17 +939,13 @@ private:
       }
 
       PopupFilerMenu(path, eb.time);
-
-      // prevent default handler to unselect selected rows other than "path"
-      if(path !is null) path.free();
-      return true;
+      return true;// prevent default handler to unselect selected rows other than "path"
     }
 
     if(path !is null){
       if(eb.button == MouseButton.LEFT && Event.isDoubleClick(eb)){// when double-clicked, activate the clicked row
         draggingState_ = DraggingState.NEUTRAL;
         RowActivated(path, null, this);
-        path.free();
         return true;
       }
       else if(eb.button == MouseButton.LEFT || eb.button == MouseButton.MIDDLE){
@@ -980,17 +967,13 @@ private:
 
           // returning false here will unselect the selected rows
           // and avoid rubber banding
-          path.free();
           return true;
         }
         else{// if not selected, pass control to the default handler
           selectionDoneWhenPressed_ = true;
-          path.free();
           return false;// default handler will select the clicked row
         }
       }
-
-      path.free();
     }
     return false;
   }
@@ -1013,7 +996,6 @@ private:
                 selection.selectPath(path);
                 setCursor(path, null, 0);
               }
-              path.free();
             }
           }
         }
@@ -1026,7 +1008,6 @@ private:
               if(selection.pathIsSelected(path)){
                 selection.unselectPath(path);
               }
-              path.free();
             }
           }
         }
@@ -1106,11 +1087,7 @@ private:
          pos == GtkTreeViewDropPosition.INTO_OR_AFTER){
         if(path !is null){
           string name = GetNameFromPath(path);
-          if(sourceWidget is this && name[$-1] == '/' && getSelection().pathIsSelected(path)){
-            // dropped position is included in the selection, do nothing
-            goto finish;
-          }
-          else{
+          if(sourceWidget !is this || name[$-1] != '/' || !getSelection().pathIsSelected(path)){
             if(name == PARENT_STRING){// drop on "../"
               destDir = mediator_.FileSystemParentDirectory(pwd_);
             }
@@ -1123,9 +1100,6 @@ private:
 
       GdkDragAction action = ExtractSuggestedAction(context.getDragContextStruct());
       TransferFiles(action, files, cast(FileView)sourceWidget, destDir, this);// cast may fail and null may be passed
-
-      finish:
-      if(path !is null) path.free();
     }
 
     dnd.finish(1, 0, 0);
