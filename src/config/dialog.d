@@ -31,7 +31,6 @@ import gtk.Table;
 import gtk.ScrolledWindow;
 import gtk.FontButton;
 import gtk.ColorButton;
-import gdk.Color;
 import gtk.SpinButton;
 import gtk.Entry;
 import gtk.CheckButton;
@@ -49,6 +48,7 @@ import gtk.Menu;
 import gtk.MenuItem;
 import gdk.Keysyms;
 import gdk.Event;
+import gdk.Color;
 
 import utils.gio_util;
 import utils.string_util;
@@ -75,7 +75,7 @@ private class ConfigDialog : Dialog
   this()
   {
     super();
-    setDefaultSize(640, 600);
+    setDefaultSize(800, 720);
     addOnResponse(&Respond);
 
     addButton(StockID.CANCEL, GtkResponseType.CANCEL);
@@ -84,6 +84,7 @@ private class ConfigDialog : Dialog
 
     note_ = new Notebook;
     note_.setScrollable(1);
+    note_.setVexpand(1);
     getContentArea().add(note_);
 
     InitLayoutPage();
@@ -551,7 +552,7 @@ private:
   void InitInitialDirTreeView(char lr)(uint row, ref TreeView view, ref ListStore store)
   {
     view = new TreeView;
-    view.setSizeRequest(-1, 160);
+    view.setVexpand(1);
     view.setReorderable(1);
     view.addOnButtonPress(delegate bool(Event e, Widget w){
         return ShowAppendRemoveMenu(e, w, view, store);
@@ -579,7 +580,7 @@ private:
   void InitShortcutsTreeView(uint row)
   {
     shortcuts_ = new TreeView;
-    shortcuts_.setSizeRequest(-1, 160);
+    shortcuts_.setVexpand(1);
     shortcuts_.setReorderable(1);
     shortcuts_.addOnButtonPress(delegate bool(Event e, Widget w){
         return ShowAppendRemoveMenu(e, w, shortcuts_, shortcutsStore_);
@@ -739,6 +740,7 @@ private:
   void InitSSHPage(uint row)
   {
     hosts_ = new HostView;
+    hosts_.setVexpand(1);
     hosts_.setReorderable(1);
     hosts_.addOnButtonPress(delegate bool(Event e, Widget w){
         return ShowAppendRemoveMenu(e, w, hosts_, hostsStore_);

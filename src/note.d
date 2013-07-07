@@ -22,6 +22,7 @@ module note;
 
 import gtk.Notebook;
 import gtk.Widget;
+import gobject.Value;
 
 import rcfile = config.rcfile;
 import page_list;
@@ -70,7 +71,12 @@ public:
     appendPage(page, page.GetTab());
     setTabReorderable(page, 1);
     setTabDetachable(page, 1);
-//    setTabLabelPacking(page, 1, 1, GtkPackType.START);
+
+    auto v = (new Value).init(GType.BOOLEAN);
+    v.setBoolean(true);
+    childSetProperty(page, "tab-expand", v);
+    childSetProperty(page, "tab-fill",   v);
+
     page.show();
   }
   void AppendNewPage()
