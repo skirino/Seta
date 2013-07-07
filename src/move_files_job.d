@@ -105,7 +105,7 @@ void PreparePaste(bool moveMode, string dir, string[] files, FileView sourceView
   if(numItems > 0){
     storedMove  = moveMode;
     storedDir   = dir;
-    auto cl = new Clipboard(GetDefaultClipboard());
+    auto cl = DefaultClipboard();
     cl.setWithOwner(GetDragTargets(), &ClipboardGetFun, &ClipboardClearFun, sourceView);
 
     // send message to statusbar
@@ -134,7 +134,7 @@ private extern(C) void ClipboardClearFun(
 
 bool CanPaste()
 {
-  auto cl = new Clipboard(GetDefaultClipboard());
+  auto cl = DefaultClipboard();
   return cl.waitIsUrisAvailable() != 0;
 }
 
@@ -467,6 +467,11 @@ private:
 
 
 //////////////////////// interface to C (workaround for GtkD)
+Clipboard DefaultClipboard()
+{
+  return new Clipboard(GetDefaultClipboard());
+}
+
 extern(C) {
   // GdkAtom GDK_SELECTION_CLIPBOARD is not available from D
   GtkClipboard * GetDefaultClipboard();
