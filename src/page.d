@@ -25,7 +25,7 @@ import std.process;
 import gtk.VBox;
 import gtk.HBox;
 import gtk.VPaned;
-import gtk.ScrolledWindow;
+import gtk.VScrollbar;
 import gtk.Widget;
 import gtk.Label;
 import gtk.Button;
@@ -56,7 +56,7 @@ private:
 
   VPaned paned_;
   FileManager filer_;
-  ScrolledWindow swTerm_;// to resize Terminal widget
+  HBox termWithScrollbar_;
   Terminal terminal_;
 
   // just to have reference to the tab widget
@@ -98,10 +98,11 @@ public:
     {
       paned_.pack1(filer_, 1, 0);
 
-      // AUTOMATIC is a workaround to resize horizontally; not for horizontal scrolling
-      swTerm_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
-      swTerm_.add(terminal_);
-      paned_.pack2(swTerm_, 1, 0);
+      termWithScrollbar_ = new HBox(0, 0);
+      termWithScrollbar_.packStart(terminal_, true, true, 0);
+      auto vscrollbar = new VScrollbar(terminal_.getVadjustment());
+      termWithScrollbar_.packStart(vscrollbar, false, false, 0);
+      paned_.pack2(termWithScrollbar_, 1, 0);
     }
     packStart(paned_,  1, 1, 0);
 
@@ -272,7 +273,7 @@ private:
         SetLastSplitPosition();
       }
       mode_ = ViewMode.TERMINAL;
-      swTerm_.showAll();
+      termWithScrollbar_.showAll();
       MoveFocusPosition();
       filer_.hide();
     }
@@ -288,7 +289,7 @@ private:
       mode_ = ViewMode.FILER;
       filer_.showAll();
       MoveFocusPosition();
-      swTerm_.hide();
+      termWithScrollbar_.hide();
       if(needUpdate){// Update AFTER changing the mode
         filer_.Update();
       }
@@ -301,7 +302,7 @@ private:
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.BOTH;
       filer_.showAll();
-      swTerm_.showAll();
+      termWithScrollbar_.showAll();
       MoveFocusPosition();
       paned_.setPosition(lastSplitPosition_);
       if(needUpdate){// Update AFTER changing the mode

@@ -24,6 +24,7 @@ import std.string;
 import std.process;
 import std.conv;
 import std.exception;
+import std.algorithm;
 import std.c.stdlib;
 import core.thread;
 import core.sys.posix.unistd;
@@ -31,6 +32,8 @@ import core.sys.posix.unistd;
 import gtk.Widget;
 import gtk.DragAndDrop;
 import gtk.ScrolledWindow;
+import gtk.ScrollableIF;
+import gtk.ScrollableT;
 import gtk.SelectionData;
 import gobject.Signals;
 import gdk.Threads;
@@ -45,7 +48,6 @@ import utils.string_util;
 import utils.unistd_util;
 import utils.thread_util;
 import constants;
-import gtk.scrolled_window;
 import rcfile = config.rcfile;
 import config.keybind;
 import shellrc = config.shellrc;
@@ -58,8 +60,11 @@ import move_files_job;
 
 
 // wrapper class of VteTerminal widget
-class Terminal : Widget
+class Terminal : Widget, ScrollableIF
 {
+  override void* getStruct(){return vte_;}
+  mixin ScrollableT!(VteTerminal);
+
   //////////////////// GUI stuff
 private:
   VteTerminal * vte_;
@@ -70,7 +75,7 @@ public:
   this(Mediator mediator, string initialDir, string delegate(char, uint) getCWDLR)
   {
     mediator_ = mediator;
-    cwd_ = initialDir;
+    cwd_      = initialDir;
     getCWDLR_ = getCWDLR;
 
     vte_ = cast(VteTerminal*)vte_terminal_new();
@@ -164,11 +169,15 @@ private:
       return false;
 
     case TerminalAction.ScrollUp:
-      (cast(ScrolledWindow)getParent()).ScrollUp();
+      auto adj = getVadjustment();
+      auto value = max(adj.getLower(), adj.getValue() - 1);
+      adj.setValue(value);
       return true;
 
     case TerminalAction.ScrollDown:
-      (cast(ScrolledWindow)getParent()).ScrollDown();
+      auto adj = getVadjustment();
+      auto value = min(adj.getUpper() - adj.getPageSize(), adj.getValue() + 1);
+      adj.setValue(value);
       return true;
 
     case TerminalAction.Enter:
