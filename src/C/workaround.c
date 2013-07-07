@@ -18,20 +18,11 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-
 #include <gtk/gtk.h>
 
-
 // accessor to the default clipboard
-// (GDK_SELECTION_CLIPBOARD cannot be accessed in D)
+// (GDK_SELECTION_CLIPBOARD is a macro and cannot be accessed in D)
 GtkClipboard * GetDefaultClipboard()
 {
   return gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
-}
-
-
-// accessor for GdkDragContext
-GdkDragAction ExtractSuggestedAction(GdkDragContext * context)
-{
-  return gdk_drag_context_get_suggested_action(context);
 }

@@ -470,10 +470,5 @@ private:
 extern(C) {
   // GdkAtom GDK_SELECTION_CLIPBOARD is not available from D
   GtkClipboard * GetDefaultClipboard();
-
-  // one cannot access to members in C structs
-  // since they are defined as empty structs in GtkD
-  // and thus D compiler cannot know correct memory offset
-  GdkDragAction ExtractSuggestedAction(GdkDragContext * context);
 }
 //////////////////////// interface to C

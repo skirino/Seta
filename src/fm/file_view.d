@@ -1097,7 +1097,7 @@ private:
         }
       }
 
-      GdkDragAction action = ExtractSuggestedAction(context.getDragContextStruct());
+      GdkDragAction action = context.getSuggestedAction();
       TransferFiles(action, files, cast(FileView)sourceWidget, destDir, this);// cast may fail and null may be passed
     }
 
