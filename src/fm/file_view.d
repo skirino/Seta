@@ -265,7 +265,6 @@ private:
       }
 
       view.TryUpdate();
-      view.mediator_.UpdateDirTree(view.pwd_);
     }
     return 0;
   }

@@ -286,7 +286,7 @@ private:
       }
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.FILER;
-      filer_.ShowAll();
+      filer_.showAll();
       MoveFocusPosition();
       swTerm_.hide();
       if(needUpdate){// Update AFTER changing the mode
@@ -300,7 +300,7 @@ private:
     if(mode_ != ViewMode.BOTH){
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.BOTH;
-      filer_.ShowAll();
+      filer_.showAll();
       swTerm_.showAll();
       MoveFocusPosition();
       paned_.setPosition(lastSplitPosition_);

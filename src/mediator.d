@@ -122,10 +122,6 @@ public:
       return false;
     }
   }
-  void UpdateDirTree(string dirname)
-  {
-    filer_.UpdateDirTree(dirname);
-  }
   void FilerDisconnect (){filer_.Disconnect();}
   void FilerFocusFilter(){filer_.FocusFilter();}
   void FilerClearFilter(){filer_.ClearFilter();}

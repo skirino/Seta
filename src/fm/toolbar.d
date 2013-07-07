@@ -56,12 +56,10 @@ private:
   size_t numShortcuts_;
 
   ToolItem itemBack_, itemForward_, itemUp_, itemRoot_, itemHome_, itemOtherSide_, itemRefresh_,
-    itemSSH_, itemHidden_, itemDirTree_, itemSeparator1_, itemFilter_, itemSeparator2_;
+    itemSSH_, itemHidden_, itemSeparator1_, itemFilter_, itemSeparator2_;
   Entry filter_;
   ToggleButton showHiddenButton_;
   CheckMenuItem showHiddenMenuItem_;
-  ToggleButton dirTreeButton_;
-  CheckMenuItem dirTreeMenuItem_;
 
 public:
   this(FileManager fm)
@@ -82,18 +80,6 @@ public:
   {
     showHiddenButton_.setActive(showHiddenButton_.getActive() == 0);
   }
-  void DirTreeSetActive()
-  {
-    dirTreeButton_.setActive(true);
-  }
-  bool DirTreeGetActive()
-  {
-    return dirTreeButton_.getActive() != 0;
-  }
-  void ToggleShowDirTree()
-  {
-    dirTreeButton_.setActive(dirTreeButton_.getActive() == 0);
-  }
   ///////////////////// accessor
 
 
@@ -101,11 +87,9 @@ public:
   ///////////////////// Layout
   void SetLayout()
   {
-    dirTreeButton_.setActive(rcfile.GetWidthDirectoryTree() > 0);
-
     // buttons in toolbar
     numToolItemsShown_ = 0;
-    mixin(FoldTupple!(InsertOrRemove, "Back", "Forward", "Up", "Root", "Home", "OtherSide", "Refresh", "SSH", "Hidden", "DirTree"));
+    mixin(FoldTupple!(InsertOrRemove, "Back", "Forward", "Up", "Root", "Home", "OtherSide", "Refresh", "SSH", "Hidden"));
     mixin(InsertOrRemove!("Separator1", "rcfile.GetShowFilter()"));
     mixin(InsertOrRemove!("Filter",     "rcfile.GetShowFilter()"));
     mixin(InsertOrRemove!("Separator2", "numToolItemsShown_ > 0"));
@@ -164,12 +148,6 @@ private:
                                                     &HiddenClickedMenuItem,
                                                     showHiddenMenuItem_);
     showHiddenButton_ = cast(ToggleButton) itemHidden_.getChild();
-
-    itemDirTree_ = ConstructToolItemWithToggleButton(LoadImage(StockID.INDENT), "Show/hide directory tree pane",
-                                                     &DirTreeButtonClicked,
-                                                     &DirTreeButtonClickedMenuItem,
-                                                     dirTreeMenuItem_);
-    dirTreeButton_ = cast(ToggleButton) itemDirTree_.getChild();
 
     itemSeparator1_ = new SeparatorToolItem;
 
@@ -443,18 +421,6 @@ private:
     bool b = showHiddenMenuItem_.getActive() != 0;
     parent_.SetShowHidden(b);
     showHiddenButton_.setActive(b);
-  }
-  void DirTreeButtonClicked(ToggleButton b)
-  {
-    bool show = dirTreeButton_.getActive() != 0;
-    parent_.SetShowDirTree(show);
-    dirTreeMenuItem_.setActive(show);
-  }
-  void DirTreeButtonClickedMenuItem(CheckMenuItem i)
-  {
-    bool show = dirTreeMenuItem_.getActive() != 0;
-    parent_.SetShowDirTree(show);
-    dirTreeButton_.setActive(show);
   }
   ///////////////////// callbacks
 }

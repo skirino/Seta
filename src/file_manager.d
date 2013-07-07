@@ -29,7 +29,6 @@ import gtk.ScrolledWindow;
 import gtk.PopupBox;
 import gtk.Menu;
 import gtk.MenuItem;
-import gtk.HPaned;
 import gdk.Threads;
 import gdk.Event;
 import gio.File;
@@ -44,7 +43,6 @@ import known_hosts = config.known_hosts;
 import fm.file_view;
 import fm.history;
 import fm.toolbar;
-import fm.dir_tree;
 import thread_list;
 import mediator;
 import statusbar;
@@ -59,9 +57,7 @@ class FileManager : VBox
 private:
   Mediator mediator_;
   SetaToolbar toolbar_;
-  HPaned hpaned_;
   ScrolledWindow swTree_;
-  DirTree dirTree_;
   ScrolledWindow swView_;
   FileView view_;
 
@@ -72,57 +68,25 @@ public:
     mediator_ = mediator;
     hist_ = new DirHistory(initialDir);
     view_ = new FileView(mediator_);
-    dirTree_ = new DirTree(&(hist_.GetPWD), &ChangeDirectoryFromDirTree);
 
     super(0, 0);
     addOnKeyPress(&KeyPressed);
-    addOnRealize(&Realize);
 
     toolbar_ = new SetaToolbar(this);
     packStart(toolbar_, 0, 0, 0);
 
-    hpaned_ = new HPaned;
-    {
-      // TreeView does not need Viewport. just use add()
-      swTree_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
-      swTree_.add(dirTree_);
-      hpaned_.pack1(swTree_, 1, 0);
-
-      swView_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
-      swView_.add(view_);
-      hpaned_.pack2(swView_, 1, 0);
-    }
-    packStart(hpaned_, 1, 1, 0);
+    // TreeView does not need Viewport. just use add()
+    swView_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
+    swView_.add(view_);
+    packStart(swView_, 1, 1, 0);
 
     SetLayout();
   }
 
   void SetLayout()
   {
-    // width of the dirTree
-    uint w = rcfile.GetWidthDirectoryTree();
-    if(w == 0){
-      // set default split position to avoid allocating too much or too little
-      hpaned_.setPosition(120);
-      swTree_.hide();
-    }
-    else{
-      hpaned_.setPosition(w);
-    }
-
     toolbar_.SetLayout();
     view_.SetLayout();
-  }
-
-  void Realize(Widget w)
-  {
-    // necessary to make togglebutton consistent
-    if(rcfile.GetWidthDirectoryTree() == 0){
-      swTree_.hide();
-    }
-    else{
-      toolbar_.DirTreeSetActive();
-    }
   }
 
   void PrepareDestroy()
@@ -136,20 +100,6 @@ public:
   //////////////////////// view mode
 public:
   void Update(){view_.TryUpdate();}// called when switching from TERMINAL mode to FILER mode
-
-  void ShowAll()
-  {
-    if(toolbar_.DirTreeGetActive()){
-      showAll();
-    }
-    else{
-      // show all except directory tree pane
-      show();
-      toolbar_.showAll();
-      hpaned_.show();
-      swView_.showAll();
-    }
-  }
   //////////////////////// view mode
 
 
@@ -209,10 +159,6 @@ private:
       toolbar_.ToggleShowHidden();
       return true;
 
-    case FileManagerAction.ShowDirTree:
-      toolbar_.ToggleShowDirTree();
-      return true;
-
     case FileManagerAction.SyncTerminalPWD:
       mediator_.TerminalChangeDirectoryFromFiler(hist_.GetPWD());
       return true;
@@ -258,7 +204,6 @@ public:
   {
     if(view_.ChangeDirectory(dir, appendToHistory, notifyTerminal)){
       anything_cd.dir_list.Add(dir);
-      dirTree_.ChangeDirectory(dir);
       return true;
     }
     else{
@@ -274,21 +219,11 @@ private:
       ChangeDirectory(path);
     }
   }
-
-  bool ChangeDirectoryFromDirTree(string dirname)
-  {
-    if(view_.ChangeDirectory(dirname, true, true)){
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
   /////////////////////// traveling directory tree
 
 
 
-  ////////////////////// history of directories
+  /////////////////////// history of directories
 private:
   DirHistory hist_;
 
@@ -312,17 +247,7 @@ public:
   {
     hist_.Append(dir);
   }
-  ////////////////////// history of directories
-
-
-
-  /////////////////////// directory tree
-public:
-  void UpdateDirTree(string dirname)
-  {
-    dirTree_.Update(dirname);
-  }
-  /////////////////////// directory tree
+  /////////////////////// history of directories
 
 
 
@@ -335,9 +260,6 @@ public:
       string defaultDir = mediator_.OnLeftSide() ? rcfile.GetInitialDirectoryLeft() : rcfile.GetInitialDirectoryRight();
       ChangeDirectory(defaultDir);
     }
-
-    // notify directory tree
-    dirTree_.RemoveUnmountedPath(path);
   }
   /////////////////////// called for all pages in PageList
 
@@ -459,7 +381,6 @@ public:
   void RefreshClicked(ArgType)(ArgType b)
   {
     view_.TryUpdate();
-    dirTree_.ReconstructFromOpenedDirs();
   }
 
   // filter
@@ -471,16 +392,6 @@ public:
   void SetShowHidden(bool b)
   {
     view_.SetShowHidden(b);
-    dirTree_.SetShowHidden(b);
-  }
-  void SetShowDirTree(bool b)
-  {
-    if(b){
-      swTree_.showAll();
-    }
-    else{
-      swTree_.hide();
-    }
   }
 
   // shortcut buttons
@@ -548,7 +459,6 @@ public:
     mediator_.SetHostLabel("localhost");
     hist_.Reset(pwd);
     view_.ChangeDirectory(pwd);
-    dirTree_.QuitSSH(pwd);
     ReconstructShortcuts();
   }
 
@@ -567,13 +477,11 @@ public:
     view_.ChangeDirectory(newpath);
 
     if(con.GetBothSFTPAndSSH()){
-      dirTree_.StartSSH(gvfsRoot, newpath);
       hist_.Reset(newpath);
       toolbar_.ClearShortcuts();
       con.IncrementUseCount();
     }
     else{
-      dirTree_.ChangeDirectory(newpath);
       hist_.Append(newpath);
       mediator_.TerminalChangeDirectoryFromFiler(newpath);
     }
