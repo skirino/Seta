@@ -296,11 +296,11 @@ private:
   ///////////////////// [Layout]
   Table pageLayout_;
   SpinButton sbWidthType_, sbWidthSize_, sbWidthOwner_, sbWidthPermissions_, sbWidthLastModified_;
-  SpinButton sbWidthDirectoryTree_, sbHeightStatusbar_;
+  SpinButton sbHeightStatusbar_;
 
   // toolbar
   CheckButton cbShowBackButton_, cbShowForwardButton_, cbShowUpButton_, cbShowRootButton_, cbShowHomeButton_,
-    cbShowOtherSideButton_, cbShowRefreshButton_, cbShowSSHButton_, cbShowHiddenButton_, cbShowDirTreeButton_,
+    cbShowOtherSideButton_, cbShowRefreshButton_, cbShowSSHButton_, cbShowHiddenButton_,
     cbShowFilter_, cbUseDesktopNotification_;
   SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
 
@@ -340,15 +340,13 @@ private:
     mixin(AddCheckButton!("Layout", "ShowRefreshButton",   "Show 'refresh' button"));
     mixin(AddCheckButton!("Layout", "ShowSSHButton",       "Show 'SSH' button"));
     mixin(AddCheckButton!("Layout", "ShowHiddenButton",    "Show 'show/hide hidden files' button"));
-    mixin(AddCheckButton!("Layout", "ShowDirTreeButton",   "Show 'show/hide directory tree' button"));
     mixin(AddCheckButton!("Layout", "ShowFilter",          "Show filter box"));
 
     mixin(AddSpinButton!("Layout", "WidthFilterEntry",    "0, 200, 1", "Width of filter box in toolbar: "));
     mixin(AddSpinButton!("Layout", "WidthShortcutButton", "0, 200, 1", "Width of shortcut buttons in toolbar: "));
 
     AttachSectionLabel(pageLayout_, row++, "Other widgets");
-    mixin(AddSpinButton!("Layout", "WidthDirectoryTree", "0, 500, 1", "Default width of directory tree widget (0 to hide): "));
-    mixin(AddSpinButton!("Layout", "HeightStatusbar",    "0, 100, 1", "Height of the statusbar (0 to hide): "));
+    mixin(AddSpinButton!("Layout", "HeightStatusbar", "0, 100, 1", "Height of the statusbar (0 to hide): "));
 
     AttachSectionLabel(pageLayout_, row++, "Sizes of main widgets");
     mixin(AddSpinButton!("Layout", "SplitH",      "0, 5000, 10",  "Width of the left half: "));
@@ -386,13 +384,11 @@ private:
     mixin(CheckCheckButton!("Layout", "ShowRefreshButton"));
     mixin(CheckCheckButton!("Layout", "ShowSSHButton"));
     mixin(CheckCheckButton!("Layout", "ShowHiddenButton"));
-    mixin(CheckCheckButton!("Layout", "ShowDirTreeButton"));
     mixin(CheckCheckButton!("Layout", "ShowFilter"));
 
     mixin(CheckSpinButton!("WidthFilterEntry"));
     mixin(CheckSpinButton!("WidthShortcutButton"));
 
-    mixin(CheckSpinButton!("WidthDirectoryTree"));
     mixin(CheckSpinButton!("HeightStatusbar"));
 
     mixin(CheckSpinButton!("SplitH"));

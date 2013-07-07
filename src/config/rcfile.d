@@ -97,12 +97,10 @@ mixin(GetBoolean!("ShowOtherSideButton"));
 mixin(GetBoolean!("ShowRefreshButton"));
 mixin(GetBoolean!("ShowSSHButton"));
 mixin(GetBoolean!("ShowHiddenButton"));
-mixin(GetBoolean!("ShowDirTreeButton"));
 mixin(GetBoolean!("ShowFilter"));
 
 mixin(GetUint!("WidthShortcutButton"));
 mixin(GetUint!("WidthFilterEntry"));
-mixin(GetUint!("WidthDirectoryTree"));
 mixin(GetUint!("WidthType"));
 mixin(GetUint!("WidthSize"));
 mixin(GetUint!("WidthOwner"));
@@ -113,7 +111,6 @@ uint[] GetWidths()
 {
   int widthName = Max(10,
                       instance_.getInteger("Layout", "SplitH") - 40 -
-                      instance_.getInteger("Layout", "WidthDirectoryTree") -
                       instance_.getInteger("Layout", "WidthType") -
                       instance_.getInteger("Layout", "WidthSize") -
                       instance_.getInteger("Layout", "WidthOwner") -
@@ -447,12 +444,10 @@ private:
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowRefreshButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowSSHButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowHiddenButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowDirTreeButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowFilter", "true"));
 
     mixin(SetDefaultValue!("Integer", "Layout", "WidthFilterEntry",    "120"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthShortcutButton", "80"));
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthDirectoryTree",  "0"));
 
     mixin(SetDefaultValue!("Integer", "Layout", "WidthType", "120"));
     mixin(SetDefaultValue!("Integer", "Layout", "WidthSize", "70"));
@@ -559,7 +554,6 @@ private:
     mixin(InstallKeybind!("FileManagerAction.Refresh"         , "F5"));
     mixin(InstallKeybind!("FileManagerAction.StartSSH"        , "<Alt>s,<Shift><Control>s"));
     mixin(InstallKeybind!("FileManagerAction.ShowHidden"      , "<Alt>period"));
-    mixin(InstallKeybind!("FileManagerAction.ShowDirTree"     , "<Alt>semicolon"));
     mixin(InstallKeybind!("FileManagerAction.SyncTerminalPWD" , "<Alt>c,<Shift><Control>c"));
     mixin(InstallKeybind!("FileManagerAction.GoToChild"       , "<Alt>n,<Shift><Control>n,<Alt>Down"));
     mixin(InstallKeybind!("FileManagerAction.GoToDir1"        , "<Alt>1"));
@@ -725,12 +719,10 @@ ShowOtherSideButton=true
 ShowRefreshButton=true
 ShowSSHButton=true
 ShowHiddenButton=true
-ShowDirTreeButton=true
 ShowFilter=true
 
 WidthShortcutButton=80
 WidthFilterEntry=120
-WidthDirectoryTree=0
 
 ### Widths of columns in filer (columns whose width=0 will not be shown)
 WidthType=120
@@ -828,7 +820,6 @@ FileManagerAction.GoToDirOtherSide=<Alt>o,<Shift><Control>o
 FileManagerAction.Refresh=F5
 FileManagerAction.StartSSH=<Alt>s,<Shift><Control>s
 FileManagerAction.ShowHidden=<Alt>period
-FileManagerAction.ShowDirTree=<Alt>semicolon
 FileManagerAction.SyncTerminalPWD=<Alt>c,<Shift><Control>c
 FileManagerAction.GoToChild=<Alt>n,<Shift><Control>n,<Alt>Down
 FileManagerAction.GoToDir1=<Alt>1
