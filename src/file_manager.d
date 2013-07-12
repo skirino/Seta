@@ -145,10 +145,6 @@ private:
       HomeClicked(null);
       return true;
 
-    case FileManagerAction.GoToDirOtherSide:
-      MoveToDirOtherSide(null);
-      return true;
-
     case FileManagerAction.Refresh:
       RefreshClicked!(Button)(null);
       return true;

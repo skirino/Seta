@@ -345,6 +345,11 @@ public:
   {
     return mediator_.FileSystemLookingAtRemoteFS(filer_.GetPWD(false));
   }
+
+  void ChangeDirectoryToPage(Page page)
+  {
+    filer_.ChangeDirectory(page.GetCWD());
+  }
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
 
 

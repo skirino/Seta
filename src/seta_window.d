@@ -396,6 +396,18 @@ private:
       }
       return true;
 
+    case MainWindowAction.GoToDirOtherSide:
+      auto f = WhichIsFocused();
+      auto pageL = noteL_.GetCurrentPage();
+      auto pageR = noteR_.GetCurrentPage();
+      if(f == FocusInMainWindow.NONE || pageL is null || pageR is null)
+        return false;
+      if(f == FocusInMainWindow.LEFT)
+        pageL.ChangeDirectoryToPage(pageR);
+      else
+        pageR.ChangeDirectoryToPage(pageL);
+      return true;
+
     case MainWindowAction.ShowChangeDirDialog:
       mixin(FocusedNoteOrReturnFalse);
       auto page = note.GetCurrentPage();

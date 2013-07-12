@@ -540,6 +540,7 @@ private:
     mixin(InstallKeybind!("MainWindowAction.MoveFocusRight"     , "<Shift><Control>l"));
     mixin(InstallKeybind!("MainWindowAction.ExpandLeftPane"     , "<Shift><Control>Left"));
     mixin(InstallKeybind!("MainWindowAction.ExpandRightPane"    , "<Shift><Control>Right"));
+    mixin(InstallKeybind!("MainWindowAction.GoToDirOtherSide"   , "<Alt>o,<Shift><Control>o"));
     mixin(InstallKeybind!("MainWindowAction.ShowChangeDirDialog", "<Shift><Control>plus"));
     mixin(InstallKeybind!("MainWindowAction.ShowConfigDialog"   , "<Shift><Control>Escape"));
     mixin(InstallKeybind!("MainWindowAction.ToggleFullscreen"   , "F11"));
@@ -550,7 +551,6 @@ private:
     mixin(InstallKeybind!("FileManagerAction.GoToParent"      , "<Alt>p,<Shift><Control>p,<Alt>Up"));
     mixin(InstallKeybind!("FileManagerAction.GoToRoot"        , "<Alt>r"));
     mixin(InstallKeybind!("FileManagerAction.GoToHome"        , "<Alt>h"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDirOtherSide", "<Alt>o,<Shift><Control>o"));
     mixin(InstallKeybind!("FileManagerAction.Refresh"         , "F5"));
     mixin(InstallKeybind!("FileManagerAction.StartSSH"        , "<Alt>s,<Shift><Control>s"));
     mixin(InstallKeybind!("FileManagerAction.ShowHidden"      , "<Alt>period"));
@@ -806,6 +806,7 @@ MainWindowAction.MoveFocusLeft=<Shift><Control>h
 MainWindowAction.MoveFocusRight=<Shift><Control>l
 MainWindowAction.ExpandLeftPane=<Shift><Control>Left
 MainWindowAction.ExpandRightPane=<Shift><Control>Right
+MainWindowAction.GoToDirOtherSide=<Alt>o,<Shift><Control>o
 MainWindowAction.ShowChangeDirDialog=<Shift><Control>plus
 MainWindowAction.ShowConfigDialog=<Shift><Control>Escape
 MainWindowAction.ToggleFullscreen=F11
@@ -816,7 +817,6 @@ FileManagerAction.GoToNext=<Alt>f,<Alt>Right
 FileManagerAction.GoToParent=<Alt>p,<Shift><Control>p,<Alt>Up
 FileManagerAction.GoToRoot=<Alt>r
 FileManagerAction.GoToHome=<Alt>h
-FileManagerAction.GoToDirOtherSide=<Alt>o,<Shift><Control>o
 FileManagerAction.Refresh=F5
 FileManagerAction.StartSSH=<Alt>s,<Shift><Control>s
 FileManagerAction.ShowHidden=<Alt>period
