@@ -50,6 +50,7 @@ private:
   Mediator mediator_;
 
   HBox topBar_;
+  Button appendPageButton_;
   Label hostLabel_;
   Label pwdLabel_;
   Label itemsLabel_;
@@ -118,10 +119,9 @@ public:
     // set button size
     Button.setIconSize(GtkIconSize.MENU);
 
-    auto appendPageButton = new Button(StockID.ADD, &AppendPage, true);
-    appendPageButton.setTooltipText("Open new tab");
-    appendPageButton.setCanFocus(0);
-    topBar_.packStart(appendPageButton, 0, 0, 0);
+    appendPageButton_ = new Button(StockID.ADD, &AppendPage, true);
+    appendPageButton_.setTooltipText("Open new tab");
+    topBar_.packStart(appendPageButton_, 0, 0, 0);
 
     auto viewModeButton = new Button(StockID.FULLSCREEN, &ViewModeButtonClicked, true);
     viewModeButton.setTooltipText("Switch view mode");
@@ -352,25 +352,25 @@ public:
   ///////////////////////// manipulation of focus
   FocusInPage WhichIsFocused()
   {
-    // Widget.hasFocus() doesn't work on Ubuntu 9.04 (gtk+-2.16 does not have gtk_widget_has_focus()).
-    // The following is a workaround for it.
-    Widget w = paned_.getFocusChild();
-    if(w is null){
-      return FocusInPage.NONE;
-    }
-    else{
-      auto t = cast(FileManager)w;
-      if(t !is null){// if downcast succeeds, the focused child is filer
-        return FocusInPage.UPPER;
-      }
-      else{
-        return FocusInPage.LOWER;
-      }
-    }
+    if(filer_.hasFocus() || appendPageButton_.hasFocus())
+      return FocusInPage.UPPER;
+    if(terminal_.hasFocus())
+      return FocusInPage.LOWER;
+    return FocusInPage.NONE;
   }
 
-  void FocusLower(){terminal_.grabFocus();}
-  void FocusUpper(){filer_.GrabFocus();}
+  void FocusLower()
+  {
+    terminal_.grabFocus();
+  }
+
+  void FocusUpper()
+  {
+    if(mode_ == ViewMode.TERMINAL)
+      appendPageButton_.grabFocus();
+    else
+      filer_.GrabFocus();
+  }
 
   void FocusShownWidget()
   {

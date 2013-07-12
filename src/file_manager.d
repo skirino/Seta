@@ -106,6 +106,8 @@ public:
 
   ///////////////////// manipulation of focus
 public:
+  override int hasFocus(){return view_.hasFocus();}
+
   void GrabFocus(Entry e = null){view_.GrabFocus();}
   ///////////////////// manipulation of focus
 
