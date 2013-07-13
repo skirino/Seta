@@ -23,6 +23,7 @@ module anything_cd.dialog;
 import core.thread;
 import std.string;
 import std.process;
+import std.algorithm;
 
 import gtk.Dialog;
 import gtk.Widget;
@@ -42,7 +43,6 @@ import gdk.Keysyms;
 import gdk.Event;
 import glib.Source;
 
-import utils.min_max;
 import utils.string_util;
 import utils.tree_util;
 import utils.thread_util;
@@ -288,7 +288,7 @@ private:
   void InitFilteredCandidates()
   {
     // put most recent history (at most 100)
-    string[] dirlist = anything_cd.dir_history.Get()[0 .. Min($, cast(size_t)100)];
+    string[] dirlist = anything_cd.dir_history.Get()[0 .. min($, 100)];
     EndFiltering(dirlist, []);
   }
   //////////////////// filtering in background

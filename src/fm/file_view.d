@@ -23,6 +23,7 @@ module fm.file_view;
 import core.thread;
 import std.c.stdlib;
 import std.string;
+import std.algorithm;
 
 import gtk.TreeView;
 import gtk.Widget;
@@ -49,7 +50,6 @@ import gio.DesktopAppInfo;
 import glib.GException;
 import gtkc.gtk;
 
-import utils.min_max;
 import utils.time_util;
 import utils.string_util;
 import utils.gio_util;
@@ -429,7 +429,7 @@ private:
     size_t maxRows = numRowsNow_ + numAppend;
 
     if(numRowsNow_ < entDSize){// there are directories which should be appended to the view
-      size_t upper = Min(maxRows, entDSize);
+      size_t upper = min(maxRows, entDSize);
       foreach(p; eList_.GetDSorted()[numRowsNow_ .. upper]){
         store_.append(iter);
         store_.set(
@@ -445,7 +445,7 @@ private:
     }
 
     if(numRowsNow_ < entDSize + entFSize){// there are files which should be appended to the view
-      size_t upper = Min(maxRows - entDSize, entFSize);
+      size_t upper = min(maxRows - entDSize, entFSize);
 
       foreach(p; eList_.GetFSorted()[numRowsNow_ - entDSize .. upper]){
         store_.append(iter);

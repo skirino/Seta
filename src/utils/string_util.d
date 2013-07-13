@@ -25,11 +25,10 @@ import std.stdio;
 import std.c.string;
 import std.ascii;
 import std.process;
+import std.algorithm : min;
 
 import gtk.Label;
 import glib.Str;
-
-import utils.min_max;
 
 
 pure bool IsBlank(string s)
@@ -309,7 +308,7 @@ string Extract1stArg(string args)
     size_t posSpace = FindUnescapedChar(replaced, ' ');
     size_t posNewline = locate(replaced, '\n');
     size_t posSemicolon = FindUnescapedChar(replaced, ';');
-    return replaced[0 .. Min(posSpace, posNewline, posSemicolon)];
+    return replaced[0 .. min(min(posSpace, posNewline), posSemicolon)];
   }
 }
 

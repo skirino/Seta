@@ -32,7 +32,6 @@ import gio.File;
 import gio.FileOutputStream;
 import glib.Str;
 
-import utils.min_max;
 import utils.gio_util;
 import utils.string_util;
 import constants;
@@ -109,7 +108,7 @@ mixin(GetUint!("WidthLastModified"));
 
 uint[] GetWidths()
 {
-  int widthName = Max(10,
+  int widthName = max(10,
                       instance_.getInteger("Layout", "SplitH") - 40 -
                       instance_.getInteger("Layout", "WidthType") -
                       instance_.getInteger("Layout", "WidthSize") -

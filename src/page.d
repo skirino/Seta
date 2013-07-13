@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module page;
 
 import std.process;
+import std.algorithm;
 
 import gtk.VBox;
 import gtk.HBox;
@@ -33,7 +34,6 @@ import gtk.Tooltip;
 
 import utils.string_util;
 import utils.gio_util;
-import utils.min_max;
 import utils.image_util;
 import constants;
 import rcfile = config.rcfile;
@@ -273,7 +273,7 @@ private:
   {
     uint pos = paned_.getPosition();
     auto windowHeight = rcfile.GetWindowSizeV();
-    lastSplitPosition_ = Max(Min(pos, 9*windowHeight/10), windowHeight/10);
+    lastSplitPosition_ = max(min(pos, 9*windowHeight/10), windowHeight/10);
   }
 
   void TerminalMode()

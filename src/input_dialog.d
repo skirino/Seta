@@ -20,20 +20,21 @@ MA 02110-1301 USA.
 
 module input_dialog;
 
+import std.algorithm;
+
 import gtk.Label;
 import gtk.Entry;
 import gtk.Dialog;
 import gtk.VBox;
 
 import utils.string_util;
-import utils.min_max;
 
 
 string InputDialog(bool hideInput = false)(string title, string description, string defaultValue = "")
 {
   scope label = new Label(description, false);
   scope entry = new Entry(defaultValue);
-  entry.setWidthChars(Max(cast(int)defaultValue.length, 20));// ensure width of "entry"
+  entry.setWidthChars(cast(int)max(defaultValue.length, 20));// ensure width of "entry"
   static if(hideInput){
     entry.setVisibility(0);
   }

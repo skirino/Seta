@@ -22,10 +22,10 @@ module anything_cd.filter_dirs_job;
 
 import core.thread;
 import std.string;
+import std.algorithm;
 
 import gdk.Threads;
 
-import utils.min_max;
 import utils.string_util;
 import utils.vector;
 static import anything_cd.dir_list;
@@ -105,7 +105,7 @@ public:
         mixin(ReturnIfCanceled);
 
         size_t start = pageIndex * PER_PAGE;
-        size_t end   = Min(start + PER_PAGE, len);
+        size_t end   = min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
           if(dirlist[i].containsWords(words)){
             pathsFromHistory.append(dirlist[i]);
@@ -123,7 +123,7 @@ public:
         mixin(ReturnIfCanceled);
 
         size_t start = pageIndex * PER_PAGE;
-        size_t end   = Min(start + PER_PAGE, len);
+        size_t end   = min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
           if(dirlist[i].containsWords(words)){
             pathsFromList.append(dirlist[i]);
