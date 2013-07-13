@@ -25,7 +25,6 @@ import gtk.Dialog;
 import gtk.Label;
 import gtk.Entry;
 import gtk.RadioButton;
-import gtk.Menu;
 import gtk.MenuItem;
 import gtk.VBox;
 import gtk.Table;
@@ -39,6 +38,7 @@ import gdk.Event;
 
 import utils.string_util;
 import utils.tree_util;
+import utils.menu_util;
 import constants;
 import rcfile = config.rcfile;
 import config.known_hosts;
@@ -212,7 +212,7 @@ class StartSSHDialog : Dialog
     iterCursor = GetIter(hosts.getModel(), path);
 
     // menu for "Connect", "Unregister"
-    auto menu = new Menu;
+    auto menu = new MenuWithMargin;
     menu.append(new MenuItem(&ConnectCallback, "_Connect"));
     menu.append(new MenuItem(&UnregisterCallback, "_Unregister"));
     menu.showAll();

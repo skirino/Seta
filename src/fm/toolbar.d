@@ -25,7 +25,6 @@ import gtk.Label;
 import gtk.Entry;
 import gtk.Button;
 import gtk.ToggleButton;
-import gtk.Menu;
 import gtk.MenuItem;
 import gtk.CheckMenuItem;
 import gtk.Image;
@@ -39,6 +38,7 @@ import glib.ListG;
 import utils.template_util;
 import utils.string_util;
 import utils.image_util;
+import utils.menu_util;
 import constants;
 import rcfile = config.rcfile;
 import config.known_hosts;
@@ -305,7 +305,7 @@ private:
   bool RemoveShortcutPopup(GdkEventButton * eb, Widget w, string path)
   {
     if(eb.button == MouseButton.RIGHT){
-      auto menu = new Menu;
+      auto menu = new MenuWithMargin;
       menu.append(new MenuItem(
                     delegate void(MenuItem item){
                       RemoveShortcut(item, path);
@@ -359,7 +359,7 @@ private:
         }
       }
 
-      auto menu = new Menu;
+      auto menu = new MenuWithMargin;
       auto dlg = delegate void(MenuItem item){
         UnmountMedia(item, path);
       };

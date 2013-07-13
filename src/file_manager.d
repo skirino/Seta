@@ -27,7 +27,6 @@ import gtk.EditableIF;
 import gtk.Button;
 import gtk.ScrolledWindow;
 import gtk.PopupBox;
-import gtk.Menu;
 import gtk.MenuItem;
 import gdk.Threads;
 import gdk.Event;
@@ -36,6 +35,7 @@ import glib.Str;
 import gtkc.gio;
 
 import utils.string_util;
+import utils.menu_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
@@ -296,7 +296,7 @@ public:
       return false;
     }
 
-    auto menu = new Menu;
+    auto menu = new MenuWithMargin;
     foreach(int n, l; list){
       string label = mediator_.FileSystemNativePath(l);
       auto dlg = delegate void(MenuItem item){
@@ -338,7 +338,7 @@ public:
       return false;
     }
 
-    auto menu = new Menu;
+    auto menu = new MenuWithMargin;
     string path = ParentDirectory(pwd);
     while(path != "/"){
       auto fullpath = mediator_.FileSystemMountedVFSPath(path);

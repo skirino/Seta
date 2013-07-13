@@ -44,7 +44,6 @@ import gtk.TreeStore;
 import gtk.CellRendererText;
 import gtk.CellRendererAccel;
 import gtk.AccelGroup;
-import gtk.Menu;
 import gtk.MenuItem;
 import gdk.Keysyms;
 import gdk.Event;
@@ -53,6 +52,7 @@ import gdk.Color;
 import utils.gio_util;
 import utils.string_util;
 import utils.tree_util;
+import utils.menu_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
@@ -260,7 +260,7 @@ private:
     return false;
   }
 
-  class KeybindMenu : Menu
+  class KeybindMenu : MenuWithMargin
   {
     TreeStore keyStore_;
     TreeIter iter_;
@@ -684,7 +684,7 @@ private:
     return false;
   }
 
-  class AppendRemoveMenu : Menu
+  class AppendRemoveMenu : MenuWithMargin
   {
     TreeView view_;
     ListStore store_;

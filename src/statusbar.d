@@ -23,11 +23,11 @@ module statusbar;
 import gtk.Statusbar;
 import gtk.ToggleButton;
 import gtk.Arrow;
-import gtk.Menu;
 import gtk.MenuShell;
 import gtk.MenuItem;
 import gtkc.gtk;// for gtk_get_current_event_time()
 
+import utils.menu_util;
 import rcfile = config.rcfile;
 import thread_list;
 import note;
@@ -145,7 +145,7 @@ private:
       XYPosition temp;
       showThreadListButton_.translateCoordinates(getToplevel(), 0, 0, temp.x_, temp.y_);
 
-      auto menu = new Menu;
+      auto menu = new MenuWithMargin;
       menu.addOnSelectionDone(&ThreadListDone);
 
       // append items

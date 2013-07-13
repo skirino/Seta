@@ -40,6 +40,7 @@ import glib.GException;
 
 import utils.string_util;
 import utils.unistd_util;
+import utils.menu_util;
 import constants;
 import rcfile = config.rcfile;
 import config.dialog;
@@ -69,7 +70,7 @@ extern(C) void RightClickMenuPositioning(
 }
 
 
-class RightClickMenu : Menu
+class RightClickMenu : MenuWithMargin
 {
 private:
   bool selectedOneIsDir_;
@@ -103,6 +104,10 @@ public:
     changeDir_ = changeDir;
     bool parentIncluded = (selected.length > 0) && (selected[0] == PARENT_STRING);
     super();
+    setMarginLeft  (1);
+    setMarginRight (1);
+    setMarginTop   (1);
+    setMarginBottom(1);
 
     if(selectedFileNames_.length > 0){
       if(selectedFileNames_.length == 1){
@@ -131,7 +136,7 @@ public:
             submenuItem_.addOnToggled(&SubmenuItemToggled);
             submenuItem_.addOnButtonPress(&SubmenuItemClicked);
 
-            submenu_ = new Menu;
+            submenu_ = new MenuWithMargin;
             submenuItem_.setSubmenu(submenu_);
 
             for(ListG node = availableApps_; node !is null; node = node.next()){
@@ -188,7 +193,6 @@ public:
     if((!parentIncluded) && selected.length != 0){
       append(new MenuItem(&DeleteFun!(true), "Move to _Trash"));
       append(new SeparatorMenuItem);
-      // append(new MenuItem(&DeleteFun!(false), "_Delete"));
     }
 
     append(new MenuItem(&MkdirFun, "_Make directory"));
@@ -301,7 +305,7 @@ private:
   {
     auto item = new MenuItem(RemoveSlash(dir.GetName()), false);
     m.append(item);
-    auto submenu = new Menu;
+    auto submenu = new MenuWithMargin;
     item.setSubmenu(submenu);
     if(dir.IsEmpty()){
       submenu.append(new MenuItem("<empty>"));
