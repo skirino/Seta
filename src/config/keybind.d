@@ -148,65 +148,54 @@ private struct MapKeyAction
 }
 
 
-private __gshared MapKeyAction[4] keymaps;
-private const uint idxMainWindow  = 0;
-private const uint idxFileManager = 1;
-private const uint idxFileView    = 2;
-private const uint idxTerminal    = 3;
+private __gshared MapKeyAction keymapMainWindow;
+private __gshared MapKeyAction keymapFileManager;
+private __gshared MapKeyAction keymapFileView;
+private __gshared MapKeyAction keymapTerminal;
 
-
-private int ActionKeyToIndex(string key)
+private MapKeyAction* FindKeymapForActionKey(string key)
 {
-  if(key.StartsWith("MainWindowAction.")){
-    return idxMainWindow;
-  }
-  else if(key.StartsWith("FileManagerAction.")){
-    return idxFileManager;
-  }
-  else if(key.StartsWith("FileViewAction.")){
-    return idxFileView;
-  }
-  else if(key.StartsWith("TerminalAction.")){
-    return idxTerminal;
-  }
-  return -1;
+  if(key.StartsWith("MainWindow"))
+    return &keymapMainWindow;
+  if(key.StartsWith("FileManager"))
+    return &keymapFileManager;
+  if(key.StartsWith("FileView"))
+    return &keymapFileView;
+  if(key.StartsWith("Terminal"))
+    return &keymapTerminal;
+  assert(false);
 }
-
 
 void Init()
 {
-  keymaps[0].Clear();
-  keymaps[1].Clear();
-  keymaps[2].Clear();
-  keymaps[3].Clear();
+  keymapMainWindow .Clear();
+  keymapFileManager.Clear();
+  keymapFileView   .Clear();
+  keymapTerminal   .Clear();
 
   KeyCode[][string] dict = rcfile.GetKeybinds();
   foreach(key; dict.keys){
-    int x = ActionKeyToIndex(key);
-    if(x != -1){
-      foreach(code; dict[key]){
-        keymaps[x].Register(code);
-      }
+    auto keymap = FindKeymapForActionKey(key);
+    foreach(code; dict[key]){
+      keymap.Register(code);
     }
   }
 
   // keybinds in terminal which should not be modified by users
   // register Ret, C-j, C-m, C-o
-  keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0,       GdkKeysyms.GDK_Return, TerminalAction.Enter));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_j,      TerminalAction.Enter));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_m,      TerminalAction.Enter));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_o,      TerminalAction.Enter));
+  keymapTerminal.Register(KeyCode(cast(GdkModifierType)0,       GdkKeysyms.GDK_Return, TerminalAction.Enter));
+  keymapTerminal.Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_j,      TerminalAction.Enter));
+  keymapTerminal.Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_m,      TerminalAction.Enter));
+  keymapTerminal.Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_o,      TerminalAction.Enter));
 
   // register Tab, C-i
-  keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0,       GdkKeysyms.GDK_Tab, TerminalAction.Replace));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_i,   TerminalAction.Replace));
+  keymapTerminal.Register(KeyCode(cast(GdkModifierType)0,       GdkKeysyms.GDK_Tab, TerminalAction.Replace));
+  keymapTerminal.Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_i,   TerminalAction.Replace));
 }
-
 
 int QueryAction(string actionType)(GdkEventKey * ekey)
 {
-  int idx = mixin("idx" ~ actionType);
-  return keymaps[idx].QueryAction(ekey);
+  return mixin("keymap" ~ actionType).QueryAction(ekey);
 }
 
 
