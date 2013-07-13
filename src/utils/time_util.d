@@ -379,4 +379,3 @@ private static const char[2][61] ZERO_TO_61=
     "59",
     "60",
     ];
-
