@@ -170,13 +170,13 @@ private:
 
     case TerminalAction.ScrollUp:
       auto adj = getVadjustment();
-      auto value = max(adj.getLower(), adj.getValue() - 1);
+      auto value = max(adj.getLower(), adj.getValue() - rcfile.GetScrollLinesOnKeyAction());
       adj.setValue(value);
       return true;
 
     case TerminalAction.ScrollDown:
       auto adj = getVadjustment();
-      auto value = min(adj.getUpper() - adj.getPageSize(), adj.getValue() + 1);
+      auto value = min(adj.getUpper() - adj.getPageSize(), adj.getValue() + rcfile.GetScrollLinesOnKeyAction());
       adj.setValue(value);
       return true;
 

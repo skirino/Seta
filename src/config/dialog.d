@@ -412,7 +412,7 @@ private:
   Table pageTerminal_;
   FontButton fontButton_;
   ColorButton cbColorForeground_, cbColorBackground_;
-  SpinButton sbTransparency_;
+  SpinButton sbTransparency_, sbScrollLinesOnKeyAction_;
   CheckButton cbEnablePathExpansion_;
   Entry entPROMPT_, entRPROMPT_, entReplaceTargetLeft_, entReplaceTargetRight_,
     entUserDefinedText1_, entUserDefinedText2_, entUserDefinedText3_, entUserDefinedText4_, entUserDefinedText5_,
@@ -446,6 +446,9 @@ private:
                     "In the case of $L<n>DIR, $LDIR will be replaced with pwd in left pane, $L1DIR with pwd in 1st tab in left pane and so on, when Enter or Tab is pressed."));
     mixin(AddEntry!("Terminal", "ReplaceTargetRight", "\"Signature to be replaced with path (right): \"",
                     "In the case of $R<n>DIR, $RDIR will be replaced with pwd in right pane, $R1DIR with pwd in 1st tab in right pane and so on, when Enter or Tab is pressed."));
+
+    AttachSectionLabel(pageTerminal_, row++, "Scrolling");
+    mixin(AddSpinButton!("Terminal", "ScrollLinesOnKeyAction", "0, 100, 1", "_Lines to scroll on pressing keyboard shortcut: "));
 
     AttachSectionLabel(pageTerminal_, row++, "User defined texts that can be input by keyboard shortcuts\n   (\"\\n\" will be replaced with newline)");
     mixin(AddEntry!("Terminal", "UserDefinedText1",
@@ -499,6 +502,8 @@ private:
     else{
       PopupBox.error(targetR ~ " is neglected since the signature for replace should contain \"<n>\".", "");
     }
+
+    changed |= rcfile.ResetInteger("Terminal", "ScrollLinesOnKeyAction", cast(int)sbScrollLinesOnKeyAction_.getValue());
 
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText1", entUserDefinedText1_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText2", entUserDefinedText2_.getText());

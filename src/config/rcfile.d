@@ -154,6 +154,7 @@ mixin(GetString!("Terminal", "RPROMPT"));
 mixin(GetString!("Terminal", "ReplaceTargetLeft"));
 mixin(GetString!("Terminal", "ReplaceTargetRight"));
 double GetTransparency(){return instance_.getDouble("Terminal", "BackgroundTransparency");}
+uint GetScrollLinesOnKeyAction(){return instance_.getInteger("Terminal", "ScrollLinesOnKeyAction");}
 bool GetEnablePathExpansion(){return instance_.getBoolean("Terminal", "EnablePathExpansion") != 0;}
 
 mixin(GetString!("Terminal", "UserDefinedText1"));
@@ -484,6 +485,8 @@ private:
     mixin(SetDefaultValue!("String", "Terminal", "ReplaceTargetLeft" , "\"$L<n>DIR\""));
     mixin(SetDefaultValue!("String", "Terminal", "ReplaceTargetRight", "\"$R<n>DIR\""));
 
+    mixin(SetDefaultValue!("Integer", "Terminal", "ScrollLinesOnKeyAction", "1"));
+
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText1", "\"\""));
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText2", "\"\""));
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText3", "\"\""));
@@ -763,6 +766,8 @@ BackgroundTransparency=0.3
 EnablePathExpansion=true
 ReplaceTargetLeft=$L<n>DIR
 ReplaceTargetRight=$R<n>DIR
+
+ScrollLinesOnKeyAction=1
 
 UserDefinedText1=
 UserDefinedText2=
