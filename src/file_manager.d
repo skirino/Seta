@@ -119,7 +119,7 @@ private:
   {
     auto ekey = e.key();
 
-    int q = QueryFileManagerAction(ekey);
+    int q = QueryAction!"FileManager"(ekey);
     switch(q){
 
     case -1:

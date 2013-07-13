@@ -309,7 +309,7 @@ private:
     }
 
     // called before the focused widget's callback
-    switch(QueryMainWindowAction(ekey)){
+    switch(QueryAction!"MainWindow"(ekey)){
 
     case -1:
       return false;

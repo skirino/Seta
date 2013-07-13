@@ -155,7 +155,7 @@ private const uint idxFileView    = 2;
 private const uint idxTerminal    = 3;
 
 
-int ActionKeyToIndex(string key)
+private int ActionKeyToIndex(string key)
 {
   if(key.StartsWith("MainWindowAction.")){
     return idxMainWindow;
@@ -203,18 +203,11 @@ void Init()
 }
 
 
-private template QueryActionMixin(string name)
+int QueryAction(string actionType)(GdkEventKey * ekey)
 {
-  const string QueryActionMixin =
-    "int Query" ~ name ~ "Action(GdkEventKey * ekey)
-    {
-      return keymaps[idx" ~ name ~ "].QueryAction(ekey);
-    }";
+  int idx = mixin("idx" ~ actionType);
+  return keymaps[idx].QueryAction(ekey);
 }
-mixin(QueryActionMixin!("MainWindow"));
-mixin(QueryActionMixin!("FileManager"));
-mixin(QueryActionMixin!("FileView"));
-mixin(QueryActionMixin!("Terminal"));
 
 
 ///////////////////// utils to interpret GdkEventKey struct

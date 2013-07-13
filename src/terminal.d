@@ -162,7 +162,7 @@ private:
       lastKeyPressTime_ = ekey.time;
     }
 
-    int q = QueryTerminalAction(ekey);
+    int q = QueryAction!"Terminal"(ekey);
     switch(q){
 
     case -1:

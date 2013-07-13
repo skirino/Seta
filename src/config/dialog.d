@@ -152,20 +152,25 @@ private:
     keys.sort;
 
     foreach(key; keys){
-      int x = ActionKeyToIndex(key);
-      if(x != -1){
-        KeyCode[] codes = dictKeyCode_[key];
-        foreach(code; codes){
-          scope iter = keyStore_.append(categories_[x]);
-          // set Action and Key
-          keyStore_.set(iter, [1, 2], [key[key.locate('.')+1 .. $], code.toString()]);
-          // set Key-cell to be editable
-          keyStore_.setValue(iter, 3, 1);
-        }
+      auto categoryIter = FindCategoryIterFromActionKey(key);
+      KeyCode[] codes = dictKeyCode_[key];
+      foreach(code; codes){
+        scope iter = keyStore_.append(categoryIter);
+        keyStore_.set(iter, [1, 2], [key[key.locate('.')+1 .. $], code.toString()]);
+        keyStore_.setValue(iter, 3, 1); // make Key-cell editable
       }
     }
 
     keybinds_.expandAll();
+  }
+
+  TreeIter FindCategoryIterFromActionKey(string key)
+  {
+    foreach(i, id; CATEGORY_IDENTIFIERS){
+      if(key.StartsWith(id))
+        return categories_[i];
+    }
+    assert(false);
   }
 
   void AccelEdited(string pathStr, uint key, GdkModifierType mod, uint hardwareKeycode, CellRendererAccel rend)

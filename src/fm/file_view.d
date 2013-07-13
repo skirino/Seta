@@ -764,7 +764,7 @@ private:
   {
     auto ekey = e.key();
 
-    switch(QueryFileViewAction(ekey)){
+    switch(QueryAction!"FileView"(ekey)){
 
     case -1:
       return false;
