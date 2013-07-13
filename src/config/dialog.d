@@ -98,6 +98,8 @@ private:
   TreeView keybinds_;
   TreeStore keyStore_;
   TreeIter[4] categories_;
+  static immutable string[4] CATEGORY_IDENTIFIERS  = ["MainWindow", "FileManager", "FileView", "Terminal"];
+  static immutable string[4] CATEGORY_EXPLANATIONS = ["general", "file manager", "file view", "terminal"];
   KeyCode[][string] dictKeyCode_;
 
   void InitKeybindPage()
@@ -114,14 +116,14 @@ private:
     auto col0 = new TreeViewColumn("Category", rend0, "text", 0);
     col0.setSizing(GtkTreeViewColumnSizing.FIXED);
     col0.setResizable(1);
-    col0.setMinWidth(120);
+    col0.setMinWidth(150);
     keybinds_.appendColumn(col0);
 
     auto rend1 = new CellRendererText;
     auto col1 = new TreeViewColumn("Action", rend1, "text", 1);
     col1.setSizing(GtkTreeViewColumnSizing.FIXED);
     col1.setResizable(1);
-    col1.setMinWidth(180);
+    col1.setMinWidth(240);
     keybinds_.appendColumn(col1);
 
     auto rend2 = new CellRendererAccel;
@@ -139,17 +141,10 @@ private:
     keyStore_ = new TreeStore([GType.STRING, GType.STRING, GType.STRING, GType.BOOLEAN]);
     keybinds_.setModel(keyStore_);
 
-    categories_[0] = keyStore_.createIter();
-    keyStore_.setValue(categories_[0], 0, "general");
-
-    categories_[1] = keyStore_.createIter();
-    keyStore_.setValue(categories_[1], 0, "file manager");
-
-    categories_[2] = keyStore_.createIter();
-    keyStore_.setValue(categories_[2], 0, "file view");
-
-    categories_[3] = keyStore_.createIter();
-    keyStore_.setValue(categories_[3], 0, "terminal");
+    for(int i=0; i<4; ++i){
+      categories_[i] = keyStore_.createIter();
+      keyStore_.setValue(categories_[i], 0, CATEGORY_EXPLANATIONS[i]);
+    }
 
     // arrange rows
     dictKeyCode_ = rcfile.GetKeybinds();
@@ -196,7 +191,7 @@ private:
     iter.setModel(keyStore_);
     foreach(int i, category; categories_){
       if(keyStore_.iterChildren(iter, category)){
-        string categoryName = IndexToActionKey(i) ~ '.';
+        string categoryName = CATEGORY_IDENTIFIERS[i] ~ "Action.";
         string previousKey;
         string[] codeList;
 

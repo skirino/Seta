@@ -173,24 +173,6 @@ int ActionKeyToIndex(string key)
 }
 
 
-string IndexToActionKey(int x)
-{
-  if(x == idxMainWindow){
-    return "MainWindowAction";
-  }
-  else if(x == idxFileManager){
-    return "FileManagerAction";
-  }
-  else if(x == idxFileView){
-    return "FileViewAction";
-  }
-  else if(x == idxTerminal){
-    return "TerminalAction";
-  }
-  return null;
-}
-
-
 void Init()
 {
   keymaps[0].Clear();
@@ -210,14 +192,14 @@ void Init()
 
   // keybinds in terminal which should not be modified by users
   // register Ret, C-j, C-m, C-o
-  keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0, GdkKeysyms.GDK_Return, TerminalAction.Enter));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_j, TerminalAction.Enter));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_m, TerminalAction.Enter));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_o, TerminalAction.Enter));
+  keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0,       GdkKeysyms.GDK_Return, TerminalAction.Enter));
+  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_j,      TerminalAction.Enter));
+  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_m,      TerminalAction.Enter));
+  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_o,      TerminalAction.Enter));
 
   // register Tab, C-i
-  keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0, GdkKeysyms.GDK_Tab, TerminalAction.Replace));
-  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_i, TerminalAction.Replace));
+  keymaps[idxTerminal].Register(KeyCode(cast(GdkModifierType)0,       GdkKeysyms.GDK_Tab, TerminalAction.Replace));
+  keymaps[idxTerminal].Register(KeyCode(GdkModifierType.CONTROL_MASK, GdkKeysyms.GDK_i,   TerminalAction.Replace));
 }
 
 
@@ -242,4 +224,3 @@ GdkModifierType TurnOffLockFlags(uint state)
   return cast(GdkModifierType) (state & MASK);
 }
 ///////////////////// utils to interpret GdkEventKey struct
-
