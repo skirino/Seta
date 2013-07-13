@@ -433,7 +433,7 @@ private:
 
     mixin(AddSpinButton!("Terminal", "Transparency", "0.0, 1.0, 0.1", "_Transparency of background: "));
 
-    AttachSectionLabel(pageTerminal_, row++, "Hints for Seta to extract command-line argument");
+    AttachSectionLabel(pageTerminal_, row++, "Hints for Seta to extract command-line arguments");
 
     mixin(AddEntry!("Terminal", "PROMPT",  "\"_PROMPT for terminal: \"", "PROMPT in shell"));
     mixin(AddEntry!("Terminal", "RPROMPT", "\"_RPROMPT for terminal (zsh): \"",
