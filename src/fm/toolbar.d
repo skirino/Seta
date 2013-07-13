@@ -32,15 +32,13 @@ import gtk.Image;
 import gtk.Toolbar;
 import gtk.ToolItem;
 import gtk.SeparatorToolItem;
-import gtk.IconSize;
-import gdk.Pixbuf;
 import gdk.Event;
-import glib.GException;
 import glib.Str;
 import glib.ListG;
 
 import utils.template_util;
 import utils.string_util;
+import utils.image_util;
 import constants;
 import rcfile = config.rcfile;
 import config.known_hosts;
@@ -113,9 +111,6 @@ public:
 private:
   void InitToolButtons()
   {
-    int width, height;
-    gtk.IconSize.IconSize.lookup(GtkIconSize.LARGE_TOOLBAR, width, height);
-
     itemBack_ = ConstructToolItemWithButton(LoadImage(StockID.GO_BACK), "Go back",
                                             &parent_.NextDirInHistoryClicked!(false, Button),
                                             &parent_.NextDirInHistoryClicked!(false, MenuItem),
@@ -132,7 +127,7 @@ private:
                                             &parent_.RootClicked!(Button), &parent_.RootClicked!(MenuItem));
     itemHome_ = ConstructToolItemWithButton(LoadImage(StockID.HOME), "Go to home directory",
                                             &parent_.HomeClicked!(Button), &parent_.HomeClicked!(MenuItem));
-    itemOtherSide_ = ConstructToolItemWithButton(LoadImage("/usr/share/pixmaps/seta/gnome-session-switch.svg", width),
+    itemOtherSide_ = ConstructToolItemWithButton(LoadImage("/usr/share/pixmaps/seta/gnome-session-switch.svg"),
                                                  "Go to directory shown in the other pane",
                                                  &parent_.MoveToDirOtherSide!(Button),
                                                  &parent_.MoveToDirOtherSide!(MenuItem));
@@ -142,7 +137,7 @@ private:
     itemSSH_ = ConstructToolItemWithButton(LoadImage(StockID.NETWORK), "Start/quit SSH",
                                            &parent_.SSHClicked!(Button), &parent_.SSHClicked!(MenuItem));
 
-    itemHidden_ = ConstructToolItemWithToggleButton(LoadImage("/usr/share/pixmaps/seta/seta_show-hidden-files.svg", width),
+    itemHidden_ = ConstructToolItemWithToggleButton(LoadImage("/usr/share/pixmaps/seta/seta_show-hidden-files.svg"),
                                                     "Show/hide hidden files",
                                                     &HiddenClicked,
                                                     &HiddenClickedMenuItem,
@@ -160,20 +155,6 @@ private:
     itemFilter_.add(filter_);
 
     itemSeparator2_ = new SeparatorToolItem;
-  }
-
-  Image LoadImage(StockID stockID)
-  {
-    return new Image(stockID, GtkIconSize.LARGE_TOOLBAR);
-  }
-  Image LoadImage(string path, int size){
-    try{
-      auto pixbuf = new Pixbuf(path, size, size, 1);
-      return new Image(pixbuf);
-    }
-    catch(GException ex){
-      return LoadImage(StockID.MISSING_IMAGE);
-    }
   }
 
   ToolItem ConstructToolItemWithButton(
@@ -201,6 +182,7 @@ private:
 
     return item;
   }
+
   ToolItem ConstructToolItemWithToggleButton(
     Image img,
     string tooltip,
