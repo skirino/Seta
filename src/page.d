@@ -116,8 +116,9 @@ public:
   // initialize and set 5 widgets in topBar_
   private void SetupTopBar()
   {
-    // set button size
+    // temporarily change button size
     Button.setIconSize(GtkIconSize.MENU);
+    scope(exit) Button.setIconSize(GtkIconSize.BUTTON);
 
     appendPageButton_ = new Button(StockID.ADD, &AppendPage, true);
     appendPageButton_.setTooltipText("Open new tab");
@@ -127,9 +128,6 @@ public:
     viewModeButton.setTooltipText("Switch view mode");
     viewModeButton.setCanFocus(0);
     topBar_.packStart(viewModeButton, 0, 0, 0);
-
-    // reset button size
-    Button.setIconSize(GtkIconSize.BUTTON);
 
     hostLabel_ = new Label("localhost");
     topBar_.packStart(hostLabel_, 0, 0, 10);
