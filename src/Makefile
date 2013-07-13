@@ -1,4 +1,4 @@
-SRC = anything_cd/*.d config/*.d fm/*.d gtk/*.d term/*.d utils/*.d *.d
+SRC = anything_cd/*.d config/*.d fm/*.d term/*.d utils/*.d *.d
 INPUTS = C/workaround.o ${SRC}
 
 SYSTEM = $(shell uname -s)
