@@ -145,6 +145,7 @@ public:
 
     pwdLabel_ = new Label("");
     SetupPWDLabel();
+    pwdLabel_.setSelectable(1);
     topBar_.packStart(pwdLabel_, 1, 1, 0);
 
     itemsLabel_ = new Label("");
