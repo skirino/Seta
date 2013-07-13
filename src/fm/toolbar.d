@@ -53,7 +53,7 @@ private:
   uint numToolItemsShown_;
   size_t numShortcuts_;
 
-  ToolItem itemBack_, itemForward_, itemUp_, itemRoot_, itemHome_, itemOtherSide_, itemRefresh_,
+  ToolItem itemBack_, itemForward_, itemUp_, itemRoot_, itemHome_, itemRefresh_,
     itemSSH_, itemHidden_, itemSeparator1_, itemFilter_, itemSeparator2_;
   Entry filter_;
   ToggleButton showHiddenButton_;
@@ -87,7 +87,7 @@ public:
   {
     // buttons in toolbar
     numToolItemsShown_ = 0;
-    mixin(FoldTupple!(InsertOrRemove, "Back", "Forward", "Up", "Root", "Home", "OtherSide", "Refresh", "SSH", "Hidden"));
+    mixin(FoldTupple!(InsertOrRemove, "Back", "Forward", "Up", "Root", "Home", "Refresh", "SSH", "Hidden"));
     mixin(InsertOrRemove!("Separator1", "rcfile.GetShowFilter()"));
     mixin(InsertOrRemove!("Filter",     "rcfile.GetShowFilter()"));
     mixin(InsertOrRemove!("Separator2", "numToolItemsShown_ > 0"));
@@ -127,10 +127,6 @@ private:
                                             &parent_.RootClicked!(Button), &parent_.RootClicked!(MenuItem));
     itemHome_ = ConstructToolItemWithButton(LoadImage(StockID.HOME), "Go to home directory",
                                             &parent_.HomeClicked!(Button), &parent_.HomeClicked!(MenuItem));
-    itemOtherSide_ = ConstructToolItemWithButton(LoadImage("/usr/share/pixmaps/seta/gnome-session-switch.svg"),
-                                                 "Go to directory shown in the other pane",
-                                                 &parent_.MoveToDirOtherSide!(Button),
-                                                 &parent_.MoveToDirOtherSide!(MenuItem));
     itemRefresh_ = ConstructToolItemWithButton(LoadImage(StockID.REFRESH), "Refresh",
                                                &parent_.RefreshClicked!(Button),
                                                &parent_.RefreshClicked!(MenuItem));

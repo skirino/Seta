@@ -34,6 +34,7 @@ import gtk.Tooltip;
 import utils.string_util;
 import utils.gio_util;
 import utils.min_max;
+import utils.image_util;
 import constants;
 import rcfile = config.rcfile;
 import tab;
@@ -128,6 +129,16 @@ public:
     viewModeButton.setTooltipText("Switch view mode");
     viewModeButton.setCanFocus(0);
     topBar_.packStart(viewModeButton, 0, 0, 0);
+
+    auto img = LoadImage("/usr/share/pixmaps/seta/gnome-session-switch.svg");
+    auto goToDirOtherPaneButton = new Button;
+    goToDirOtherPaneButton.setTooltipText("Go to directory shown in the other pane");
+    goToDirOtherPaneButton.setCanFocus(0);
+    goToDirOtherPaneButton.setImage(img);
+    goToDirOtherPaneButton.addOnClicked(delegate void(Button _){
+        filer_.ChangeDirectory(GetCWDOtherSide());
+      });
+    topBar_.packStart(goToDirOtherPaneButton, 0, 0, 0);
 
     hostLabel_ = new Label("localhost");
     topBar_.packStart(hostLabel_, 0, 0, 10);

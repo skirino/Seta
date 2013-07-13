@@ -369,13 +369,6 @@ public:
   {
     CheckChangeDir(mediator_.FileSystemHome());
   }
-  void MoveToDirOtherSide(ArgType)(ArgType b)
-  {
-    string host = mediator_.GetHostLabel();
-    if(host == "localhost"){
-      CheckChangeDir(mediator_.GetCWDOtherSide());
-    }
-  }
   void RefreshClicked(ArgType)(ArgType b)
   {
     view_.TryUpdate();
