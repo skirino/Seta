@@ -326,7 +326,7 @@ public:
       ChangeDirectory(parent);
     }
   }
-  bool PopupGoupMenu(Event e, Widget w)
+  bool PopupGoUpMenu(Event e, Widget w)
   {
     auto eb = e.button();
     if(eb.button != MouseButton.RIGHT){

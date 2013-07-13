@@ -122,7 +122,7 @@ private:
     itemUp_ = ConstructToolItemWithButton(LoadImage(StockID.GO_UP), "Go up",
                                           &parent_.UpClicked!(Button),
                                           &parent_.UpClicked!(MenuItem),
-                                          &parent_.PopupGoupMenu);
+                                          &parent_.PopupGoUpMenu);
     itemRoot_ = ConstructToolItemWithButton(LoadImage(StockID.GOTO_TOP), "Go to root directory",
                                             &parent_.RootClicked!(Button), &parent_.RootClicked!(MenuItem));
     itemHome_ = ConstructToolItemWithButton(LoadImage(StockID.HOME), "Go to home directory",
