@@ -443,7 +443,7 @@ private:
 
   void FeedChild(string text)
   {
-    vte_terminal_feed_child(vte_, cast(char*)text.ptr, text.length);
+    vte_terminal_feed_child(vte_, text.ptr, text.length);
   }
 
   string GetText()
@@ -762,7 +762,7 @@ extern(C){
 
   // IO between child process
   void vte_terminal_feed_child(VteTerminal *terminal,
-                               char *text,
+                               const char *text,
                                glong length);
   alias gboolean function(VteTerminal *terminal,
                           glong column,
