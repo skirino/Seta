@@ -24,6 +24,7 @@ import gtk.Notebook;
 import gtk.Widget;
 import gobject.Value;
 
+import utils.ref_util;
 import rcfile = config.rcfile;
 import page_list;
 import page;
@@ -35,13 +36,13 @@ class Note : Notebook
   ////////////////////////// GUI stuff
 private:
   char side_;
-  SetaWindow mainWin_;
+  Nonnull!SetaWindow mainWin_;
 
 public:
   this(char lr, SetaWindow mainWin)
   {
     side_ = lr;
-    mainWin_ = mainWin;
+    mainWin_.init(mainWin);
 
     super();
     setScrollable(1);
@@ -94,23 +95,18 @@ public:
 private:
   string GetInitialDirectoryBySide()
   {
-    if(side_ == 'L'){
+    if(side_ == 'L')
       return rcfile.GetInitialDirectoryLeft();
-    }
-    else{
+    else
       return rcfile.GetInitialDirectoryRight();
-    }
   }
 
   void LabelAllPages(Widget w, uint u, Notebook note)
   {
     uint num = getNPages();
-    if(num > 0){
-      setShowTabs(num-1);// show tabs when note has more than 1 pages
-
-      for(uint i=0; i<num; ++i){
-        GetNthPage(i).GetTab().SetID(side_, i+1);
-      }
+    setShowTabs(num > 1);
+    for(uint i=0; i<num; ++i){
+      GetNthPage(i).GetTab().SetID(side_, i+1);
     }
   }
 
