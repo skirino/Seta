@@ -122,7 +122,7 @@ public:
 
     auto appendPageButton = new Button(StockID.ADD, &AppendPage, true);
     appendPageButton.setTooltipText("Open new tab");
-    appendPageButton.setCanFocus(0);
+    appendPageButton.setCanFocus(1);
     topBar_.packStart(appendPageButton, 0, 0, 0);
 
     auto viewModeButton = new Button(StockID.FULLSCREEN, &ViewModeButtonClicked, true);
