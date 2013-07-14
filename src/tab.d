@@ -100,7 +100,7 @@ private:
 public:
   void CloseThisPage()
   {
-    closePage_(lr_, pageNum_);
+    closePage_(lr_, pageNum_ - 1);// convert to 0-based number
   }
 
   void SetID(char lr, uint n)

@@ -133,8 +133,8 @@ private:
   void ClosePage(char lr, uint num)
   {
     Note note = lr == 'L' ? noteL_ : noteR_;
-    note.GetNthPage(num-1).PrepareDestroy();
-    note.removePage(num-1);
+    note.GetNthPage(num).PrepareDestroy();
+    note.removePage(num);
 
     immutable int npagesL = noteL_.getNPages();
     immutable int npagesR = noteR_.getNPages();
@@ -174,12 +174,9 @@ private:
   void CloseThisPage()
   {
     auto note = GetFocusedNote();
-    if(note is null){
-      return;
-    }
+    if(note is null) return;
     immutable char lr = (note is noteL_) ? 'L' : 'R';
-    immutable n = note.getCurrentPage();
-    ClosePage(lr, n + 1);
+    ClosePage(lr, note.getCurrentPage());
   }
   ///////////////////////// GUI stuff
 
