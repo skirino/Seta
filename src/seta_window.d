@@ -32,6 +32,7 @@ import gtk.PopupBox;
 import gdk.Event;
 import gdk.Keysyms;
 
+import utils.ref_util;
 import constants;
 import rcfile = config.rcfile;
 import config.dialog;
@@ -45,17 +46,17 @@ class SetaWindow : MainWindow
 {
   ///////////////////////// GUI stuff
 private:
-  static __gshared SetaWindow singleton_;
+  static __gshared Nonnull!SetaWindow singleton_;
 
-  HPaned hpaned_;
-  SetaStatusbar statusbar_;
-  Note noteL_;
-  Note noteR_;
+  Nonnull!HPaned hpaned_;
+  Nonnull!SetaStatusbar statusbar_;
+  Nonnull!Note noteL_;
+  Nonnull!Note noteR_;
 
 public:
   static void Init()
   {
-    singleton_ = new SetaWindow();
+    singleton_.init(new SetaWindow());
     SetLayout();// set parameters in rcfile
     singleton_.showAll();// do size allocations and negotiations
     SetLayout();// reset parameters and hide some of child widgets such as statusbar
@@ -69,15 +70,14 @@ public:
     super("Seta");
     addOnKeyPress(&KeyPressed);
     addOnWindowState(&WindowStateChangedCallback);
-    addOnDelete(&WindowDelete);
     //setIcon(new Pixbuf("/home/skirino/temp/seta_main.jpg"));
 
     auto vbox = new VBox(0, 0);
     {
-      hpaned_ = new HPaned;
+      hpaned_.init(new HPaned);
       {
-        noteL_ = new Note('L', this);
-        noteR_ = new Note('R', this);
+        noteL_.init(new Note('L', this));
+        noteR_.init(new Note('R', this));
 
         string[] dirsL = rcfile.GetInitialDirectoriesLeft();
         foreach(dir; dirsL){
@@ -93,7 +93,7 @@ public:
       }
       vbox.packStart(hpaned_, 1, 1, 0);
 
-      statusbar_ = InitStatusbar(noteL_, noteR_);
+      statusbar_.init(InitStatusbar(noteL_, noteR_));
       vbox.packEnd(statusbar_, 0, 0, 0);
     }
     add(vbox);
@@ -107,27 +107,16 @@ public:
   }
 
 private:
-  bool WindowDelete(Event e, Widget w)
-  {
-    // For clean shutdown of Seta application,
-    // it turns out to be better here to return TRUE (stop propagating the delete signal).
-    // If the event is further propagated, the terminal in which Seta is started
-    // cannot temporarily catch any keypress events.
-    return true;
-  }
-
   void AppendPageCopy(char lr)
   {
     // Make a copy of the displayed page.
     // If a remote directory is being displayed,
     // it is problematic to startup zsh within a remote directory,
     // so just create a new page with initial directory.
-    if(lr == 'L'){
+    if(lr == 'L')
       noteL_.AppendPageCopy();
-    }
-    else{
+    else
       noteR_.AppendPageCopy();
-    }
   }
 
   void ClosePage(char lr, uint num)
@@ -144,17 +133,15 @@ private:
     }
     else if(lr == 'L' && npagesL == 0){
       auto pageR = noteR_.GetCurrentPage();
-      if(pageR.WhichIsFocused() == FocusInPage.NONE){
+      if(pageR.WhichIsFocused() == FocusInPage.NONE)
         pageR.FocusLower();
-      }
       ExpandRightPane();
       ExpandRightPane();// expand twice in order to switch from left-pane-only mode to right-pane-only
     }
     else if(lr == 'R' && npagesR == 0){
       auto pageL = noteL_.GetCurrentPage();
-      if(pageL.WhichIsFocused() == FocusInPage.NONE){
+      if(pageL.WhichIsFocused() == FocusInPage.NONE)
         pageL.FocusLower();
-      }
       ExpandLeftPane();
       ExpandLeftPane();
     }
@@ -198,15 +185,11 @@ private:
   FocusInMainWindow WhichIsFocused()
   {
     auto pageL = noteL_.GetCurrentPage();
-    if(pageL !is null && pageL.WhichIsFocused() != FocusInPage.NONE){
+    if(pageL !is null && pageL.WhichIsFocused() != FocusInPage.NONE)
       return FocusInMainWindow.LEFT;
-    }
-
     auto pageR = noteR_.GetCurrentPage();
-    if(pageR !is null && pageR.WhichIsFocused() != FocusInPage.NONE){
+    if(pageR !is null && pageR.WhichIsFocused() != FocusInPage.NONE)
       return FocusInMainWindow.RIGHT;
-    }
-
     return FocusInMainWindow.NONE;
   }
 
@@ -228,54 +211,39 @@ private:
   {
     static if(direction == Direction.UP || direction == Direction.DOWN){
       auto note = GetFocusedNote();
-      if(note is null){
-        return;
-      }
+      if(note is null) return;
       auto page = note.GetCurrentPage();
       FocusInPage f = page.WhichIsFocused();
-
       static if(direction == Direction.UP){
-        if(f == FocusInPage.LOWER){
+        if(f == FocusInPage.LOWER)
           page.FocusUpper();
-        }
       }
       static if(direction == Direction.DOWN){
-        if(f == FocusInPage.UPPER){
+        if(f == FocusInPage.UPPER)
           page.FocusLower();
-        }
       }
     }
     else{// direction == Direction.LEFT || direction == Direction.RIGHT
       auto pageL = noteL_.GetCurrentPage();
-      if(pageL is null){
-        return;
-      }
+      if(pageL is null) return;
       auto pageR = noteR_.GetCurrentPage();
-      if(pageR is null){
-        return;
-      }
+      if(pageR is null) return;
 
       FocusInPage fl = pageL.WhichIsFocused();
       FocusInPage fr = pageR.WhichIsFocused();
-      if(fl == FocusInPage.NONE && fr == FocusInPage.NONE){
-        return;
-      }
+      if(fl == FocusInPage.NONE && fr == FocusInPage.NONE) return;
 
       static if(direction == Direction.LEFT){
-        if(fr == FocusInPage.UPPER){
+        if(fr == FocusInPage.UPPER)
           pageL.FocusUpper();
-        }
-        else if(fr == FocusInPage.LOWER){
+        else if(fr == FocusInPage.LOWER)
           pageL.FocusLower();
-        }
       }
       static if(direction == Direction.RIGHT){
-        if(fl == FocusInPage.UPPER){
+        if(fl == FocusInPage.UPPER)
           pageR.FocusUpper();
-        }
-        else if(fl == FocusInPage.LOWER){
+        else if(fl == FocusInPage.LOWER)
           pageR.FocusLower();
-        }
       }
     }
   }
@@ -327,23 +295,19 @@ private:
 
     case MainWindowAction.MoveToNextPage:
       mixin(FocusedNoteOrReturnFalse);
-      if(note.getCurrentPage() == note.getNPages() - 1){// last page
+      if(note.getCurrentPage() == note.getNPages() - 1)// last page
         note.setCurrentPage(0);// move to the 1st page
-      }
-      else{
+      else
         note.nextPage();
-      }
       note.GetCurrentPage().FocusShownWidget();
       return true;
 
     case MainWindowAction.MoveToPreviousPage:
       mixin(FocusedNoteOrReturnFalse);
-      if(note.getCurrentPage() == 0){// 1st page
+      if(note.getCurrentPage() == 0)// 1st page
         note.setCurrentPage(note.getNPages() - 1);// move to the last page
-      }
-      else{
+      else
         note.prevPage();
-      }
       note.GetCurrentPage().FocusShownWidget();
       return true;
 
@@ -378,18 +342,16 @@ private:
         // now only noteL is displayed.
         // if noteL does not have focus, move it to terminal widget of noteL
         auto pageL = noteL_.GetCurrentPage();
-        if(pageL.WhichIsFocused() == FocusInPage.NONE){
+        if(pageL.WhichIsFocused() == FocusInPage.NONE)
           pageL.FocusShownWidget();
-        }
       }
       return true;
 
     case MainWindowAction.ExpandRightPane:
       if(statusbar.ExpandRightPane()){
         auto pageR = noteR_.GetCurrentPage();
-        if(pageR.WhichIsFocused() == FocusInPage.NONE){
+        if(pageR.WhichIsFocused() == FocusInPage.NONE)
           pageR.FocusShownWidget();
-        }
       }
       return true;
 
@@ -408,9 +370,8 @@ private:
     case MainWindowAction.ShowChangeDirDialog:
       mixin(FocusedNoteOrReturnFalse);
       auto page = note.GetCurrentPage();
-      if(page.FileSystemIsRemote()){
+      if(page.FileSystemIsRemote())
         return false;
-      }
       StartChangeDirDialog(page);
       return true;
 
@@ -419,18 +380,15 @@ private:
       return true;
 
     case MainWindowAction.ToggleFullscreen:
-      if(isFullscreen_){
+      if(isFullscreen_)
         unfullscreen();
-      }
-      else{
+      else
         fullscreen();
-      }
       return true;
 
     case MainWindowAction.QuitApplication:
-      if(PopupBox.yesNo("Quit Seta?", "")){
+      if(PopupBox.yesNo("Quit Seta?", ""))
         Main.quit();
-      }
       return true;
 
     default:
