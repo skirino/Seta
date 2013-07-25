@@ -39,6 +39,7 @@ import utils.image_util;
 import constants;
 import rcfile = config.rcfile;
 import tab;
+import terminal_wrapper;
 import terminal;
 import file_manager;
 import mediator;
@@ -53,11 +54,10 @@ private:
   Nonnull!Mediator mediator_;
   Nonnull!Tab      tab_;
 
-  Nonnull!PageHeader  header_;
-  Nonnull!VPaned      paned_;
-  Nonnull!FileManager filer_;
-  Nonnull!HBox        termWithScrollbar_;
-  Nonnull!Terminal    terminal_;
+  Nonnull!PageHeader      header_;
+  Nonnull!VPaned          paned_;
+  Nonnull!FileManager     filer_;
+  Nonnull!TerminalWrapper termWithScrollbar_;
 
   bool mapped_ = false;
 
@@ -73,17 +73,17 @@ public:
     }
 
     getCWDFromMain_ = GetCWDFromMain;
-    appendPage_ = AppendPageCopy;
+    appendPage_     = AppendPageCopy;
 
     super(0, 0);
     addOnMap(&ResetLayoutOnFirstMap);
     addOnUnrealize(&UnregisterFromPageList);
 
-    tab_     .init(new Tab(side, ClosePage));
-    mediator_.init(new Mediator(this));
-    terminal_.init(new Terminal(mediator_, initialDir, GetCWDFromMain));
-    filer_   .init(new FileManager(mediator_, initialDir));
-    mediator_.Set(filer_, terminal_);
+    tab_              .init(new Tab(side, ClosePage));
+    mediator_         .init(new Mediator(this));
+    filer_            .init(new FileManager(mediator_, initialDir));
+    termWithScrollbar_.init(new TerminalWrapper(mediator_, initialDir, GetCWDFromMain));
+    mediator_.Set(filer_, termWithScrollbar_.Get());
 
     header_.init(new PageHeader(
                    &AppendPage,
@@ -92,18 +92,11 @@ public:
     packStart(header_, 0, 0, 0);
 
     paned_.init(new VPaned);
-    {
-      paned_.pack1(filer_, 1, 0);
+    paned_.pack1(filer_,             true, 0);
+    paned_.pack2(termWithScrollbar_, true, 0);
+    packStart(paned_, true, true, 0);
 
-      termWithScrollbar_.init(new HBox(0, 0));
-      termWithScrollbar_.packStart(terminal_, true, true, 0);
-      auto vscrollbar = new VScrollbar(terminal_.getVadjustment());
-      termWithScrollbar_.packStart(vscrollbar, false, false, 0);
-      paned_.pack2(termWithScrollbar_, 1, 0);
-    }
-    packStart(paned_,  1, 1, 0);
-
-    filer_.ChangeDirectory(initialDir, false, false);// do not notify terminal and do not append history
+    filer_.ChangeDirectory(initialDir, false, false);// do not notify terminal and do not append to history
 
     showAll();
     SetLayout();
@@ -146,7 +139,7 @@ public:
 
   bool        OnLeftSide    (){return tab_.OnLeftSide();}
   FileManager GetFileManager(){return filer_;}
-  Terminal    GetTerminal   (){return terminal_;}
+  Terminal    GetTerminal   (){return termWithScrollbar_.Get();}
   Tab         GetTab        (){return tab_;}
 
   void UpdatePathLabel(string path, long numItems)
@@ -315,7 +308,7 @@ public:
   {
     if(filer_.hasFocus())
       return FocusInPage.UPPER;
-    if(terminal_.hasFocus())
+    if(termWithScrollbar_.Get().hasFocus())
       return FocusInPage.LOWER;
     return FocusInPage.NONE;
   }
@@ -323,7 +316,7 @@ public:
   void FocusLower()
   {
     if(mode_ != ViewMode.FILER){
-      terminal_.grabFocus();
+      termWithScrollbar_.Get().grabFocus();
     }
   }
 
@@ -340,7 +333,7 @@ public:
       filer_.GrabFocus();
     }
     else{// mode_ == ViewMode.TERMINAL || mode_ == ViewMode.BOTH
-      terminal_.grabFocus();
+      termWithScrollbar_.Get().grabFocus();
     }
   }
 
