@@ -88,7 +88,7 @@ public:
     header_.init(new PageHeader(
                    &AppendPage,
                    &ViewModeButtonClicked,
-                   delegate void(Button _){ filer_.ChangeDirectory(GetCWDOtherSide()); }));
+                   &GoToDirOtherSide));
     packStart(header_, 0, 0, 0);
 
     paned_.init(new VPaned);
@@ -188,6 +188,11 @@ private:
   {
     char side = tab_.GetID()[0];
     appendPage_(side);
+  }
+
+  void GoToDirOtherSide(Button b)
+  {
+    filer_.ChangeDirectory(GetCWDOtherSide());
   }
 
 public:
