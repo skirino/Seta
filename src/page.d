@@ -43,6 +43,7 @@ import terminal;
 import file_manager;
 import mediator;
 import page_list;
+import page_header;
 
 
 class Page : VBox
@@ -50,11 +51,7 @@ class Page : VBox
   /////////////////////////// GUI stuff
 private:
   Nonnull!Mediator mediator_;
-
-  HBox topBar_;
-  Label hostLabel_;
-  Label pwdLabel_;
-  Label itemsLabel_;
+  Nonnull!PageHeader header_;
 
   VPaned paned_;
   FileManager filer_;
@@ -91,9 +88,11 @@ public:
     filer_    = new FileManager(mediator_, initialDir);
     mediator_.Set(filer_, terminal_);
 
-    topBar_ = new HBox(0, 0);
-    SetupTopBar();
-    packStart(topBar_, 0, 0, 0);
+    header_.init(new PageHeader(
+                   &AppendPage,
+                   &ViewModeButtonClicked,
+                   delegate void(Button _){ filer_.ChangeDirectory(GetCWDOtherSide()); }));
+    packStart(header_, 0, 0, 0);
 
     paned_ = new VPaned;
     {
@@ -111,61 +110,6 @@ public:
 
     showAll();
     SetLayout();
-  }
-
-  // initialize and set 5 widgets in topBar_
-  private void SetupTopBar()
-  {
-    // temporarily change button size
-    Button.setIconSize(GtkIconSize.MENU);
-    scope(exit) Button.setIconSize(GtkIconSize.BUTTON);
-
-    auto appendPageButton = new Button(StockID.ADD, &AppendPage, true);
-    appendPageButton.setTooltipText("Open new tab");
-    appendPageButton.setCanFocus(1);
-    topBar_.packStart(appendPageButton, 0, 0, 0);
-
-    auto viewModeButton = new Button(StockID.FULLSCREEN, &ViewModeButtonClicked, true);
-    viewModeButton.setTooltipText("Switch view mode");
-    viewModeButton.setCanFocus(0);
-    topBar_.packStart(viewModeButton, 0, 0, 0);
-
-    auto img = LoadImage("/usr/share/pixmaps/seta/gnome-session-switch.svg");
-    auto goToDirOtherPaneButton = new Button;
-    goToDirOtherPaneButton.setTooltipText("Go to directory shown in the other pane");
-    goToDirOtherPaneButton.setCanFocus(0);
-    goToDirOtherPaneButton.setImage(img);
-    goToDirOtherPaneButton.addOnClicked(delegate void(Button _){
-        filer_.ChangeDirectory(GetCWDOtherSide());
-      });
-    topBar_.packStart(goToDirOtherPaneButton, 0, 0, 0);
-
-    hostLabel_ = new Label("localhost");
-    topBar_.packStart(hostLabel_, 0, 0, 10);
-
-    pwdLabel_ = new Label("");
-    SetupPWDLabel();
-    pwdLabel_.setSelectable(1);
-    topBar_.packStart(pwdLabel_, 1, 1, 0);
-
-    itemsLabel_ = new Label("");
-    topBar_.packStart(itemsLabel_, 0, 0, 10);
-  }
-
-  private void SetupPWDLabel()
-  {
-    pwdLabel_.setEllipsize(PangoEllipsizeMode.START);
-    // tooltip for long path
-    pwdLabel_.setHasTooltip(1);
-    pwdLabel_.addOnQueryTooltip(
-      delegate bool(int x, int y, int keyboardTip, Tooltip tip, Widget w){
-        auto l = cast(Label)w;
-        if(l.getLayout().isEllipsized()){
-          tip.setText(l.getText());
-          return true;
-        }
-        return false;
-      });
   }
 
   void SetLayout()
@@ -211,19 +155,19 @@ public:
   void UpdatePathLabel(string path, long numItems)
   {
     string nativePath = mediator_.FileSystemNativePath(path);
-    pwdLabel_.setText(nativePath);
     tab_.SetPath(path);
-    itemsLabel_.setText(PluralForm!(long, "item")(numItems));
+    header_.SetPwd(nativePath);
+    header_.SetNumItems(numItems);
   }
-
   void SetHostLabel(string h)
   {
-    hostLabel_.setText(h);
+    header_.SetHost(h);
   }
   string GetHostLabel()
   {
-    return hostLabel_.getText();
+    return header_.GetHost();
   }
+
   void CloseThisPage()
   {
     tab_.CloseThisPage();
