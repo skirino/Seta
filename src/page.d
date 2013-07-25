@@ -32,6 +32,7 @@ import gtk.Label;
 import gtk.Button;
 import gtk.Tooltip;
 
+import utils.ref_util;
 import utils.string_util;
 import utils.gio_util;
 import utils.image_util;
@@ -48,7 +49,7 @@ class Page : VBox
 {
   /////////////////////////// GUI stuff
 private:
-  Mediator mediator_;
+  Nonnull!Mediator mediator_;
 
   HBox topBar_;
   Label hostLabel_;
@@ -60,8 +61,7 @@ private:
   HBox termWithScrollbar_;
   Terminal terminal_;
 
-  // just to have reference to the tab widget
-  Tab tab_;
+  Tab tab_;// reference to the tab widget for this page in Note
 
   bool mapped_ = false;
 
@@ -85,10 +85,10 @@ public:
     addOnUnrealize(&UnregisterFromPageList);
 
     // initialize children
-    tab_ = new Tab(side, ClosePage);
-    mediator_ = new Mediator(this);
+    tab_      = new Tab(side, ClosePage);
+    mediator_.init(new Mediator(this));
     terminal_ = new Terminal(mediator_, initialDir, GetCWDFromMain);
-    filer_ = new FileManager(mediator_, initialDir);
+    filer_    = new FileManager(mediator_, initialDir);
     mediator_.Set(filer_, terminal_);
 
     topBar_ = new HBox(0, 0);
