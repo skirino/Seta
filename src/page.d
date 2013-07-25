@@ -51,14 +51,13 @@ class Page : VBox
   /////////////////////////// GUI stuff
 private:
   Nonnull!Mediator mediator_;
-  Nonnull!PageHeader header_;
+  Nonnull!Tab      tab_;
 
-  VPaned paned_;
-  FileManager filer_;
-  HBox termWithScrollbar_;
-  Terminal terminal_;
-
-  Tab tab_;// reference to the tab widget for this page in Note
+  Nonnull!PageHeader  header_;
+  Nonnull!VPaned      paned_;
+  Nonnull!FileManager filer_;
+  Nonnull!HBox        termWithScrollbar_;
+  Nonnull!Terminal    terminal_;
 
   bool mapped_ = false;
 
@@ -69,7 +68,6 @@ public:
        void delegate(char) AppendPageCopy,
        void delegate(char, uint) ClosePage)
   {
-    // check whether "initialDir" is a valid path or not
     if(!DirectoryExists(initialDir)){
       initialDir = getenv("HOME") ~ '/';
     }
@@ -81,11 +79,10 @@ public:
     addOnMap(&ResetLayoutOnFirstMap);
     addOnUnrealize(&UnregisterFromPageList);
 
-    // initialize children
-    tab_      = new Tab(side, ClosePage);
+    tab_     .init(new Tab(side, ClosePage));
     mediator_.init(new Mediator(this));
-    terminal_ = new Terminal(mediator_, initialDir, GetCWDFromMain);
-    filer_    = new FileManager(mediator_, initialDir);
+    terminal_.init(new Terminal(mediator_, initialDir, GetCWDFromMain));
+    filer_   .init(new FileManager(mediator_, initialDir));
     mediator_.Set(filer_, terminal_);
 
     header_.init(new PageHeader(
@@ -94,11 +91,11 @@ public:
                    delegate void(Button _){ filer_.ChangeDirectory(GetCWDOtherSide()); }));
     packStart(header_, 0, 0, 0);
 
-    paned_ = new VPaned;
+    paned_.init(new VPaned);
     {
       paned_.pack1(filer_, 1, 0);
 
-      termWithScrollbar_ = new HBox(0, 0);
+      termWithScrollbar_.init(new HBox(0, 0));
       termWithScrollbar_.packStart(terminal_, true, true, 0);
       auto vscrollbar = new VScrollbar(terminal_.getVadjustment());
       termWithScrollbar_.packStart(vscrollbar, false, false, 0);
