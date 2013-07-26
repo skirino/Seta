@@ -44,6 +44,7 @@ import glib.Str;
 import glib.Regex;
 import glib.Source;
 
+import utils.ref_util;
 import utils.string_util;
 import utils.unistd_util;
 import utils.thread_util;
@@ -74,7 +75,7 @@ private:
 public:
   this(Mediator mediator, string initialDir, string delegate(char, uint) getCWDLR)
   {
-    mediator_ = mediator;
+    mediator_.init(mediator);
     cwd_      = initialDir;
     getCWDLR_ = getCWDLR;
 
@@ -281,7 +282,7 @@ public:
 private:
   string cwd_;
   string delegate(char, uint) getCWDLR_;
-  Mediator mediator_;
+  Nonnull!Mediator mediator_;
 
 public:
   void ChangeDirectoryFromFiler(string dirpath)
@@ -348,9 +349,8 @@ public:
   void ChangeDirTo1stArg(string args)
   {
     string temp = Extract1stArg(args);
-    if(temp.IsBlank()){
+    if(temp.IsBlank())
       return;
-    }
 
     // note that this cannot replace all environment variables
     // since the child process can have original variables
@@ -404,16 +404,13 @@ private:
 
   void SyncFilerDirectoryByCwd()
   {
-    // adjust directory of file manager
-    if(mediator_.FileSystemIsRemote()){
+    if(mediator_.FileSystemIsRemote())
       return; // cwd of the child process can be obtained only within localhost
-    }
 
     auto dirFromProc = GetCWDFromProcFS();
     auto realPath = RealPath(cwd_, readlinkBuffer_);
-    if(dirFromProc.IsBlank() || realPath.IsBlank()){// cannot happen
+    if(dirFromProc.IsBlank() || realPath.IsBlank())// cannot happen
       return;
-    }
 
     if(realPath != dirFromProc){
       cwd_ = dirFromProc;
@@ -456,7 +453,7 @@ private:
 
   void ClearInputtedCommand()
   {
-    static const string backspaces = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+    static immutable string backspaces = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
     FeedChild(backspaces);
   }
 
@@ -465,9 +462,8 @@ private:
     string text = trimr(GetText());
     size_t indexCompName = locatePatternPrior(text, prompt_);
 
-    if(indexCompName == text.length){
+    if(indexCompName == text.length)
       return null;
-    }
 
     string diff = text[indexCompName .. $];
     size_t indexPrompt = locatePattern(diff, "$ ");
@@ -599,16 +595,15 @@ private:
   class InputPassThread : Thread, StoppableOperationIF
   {
     mixin ListedOperationT;
-    Terminal term_;
+    Nonnull!Terminal term_;
     string host_, pass_;
     bool cancelled_;
 
     this(Terminal term, string host, string pass)
     {
-      term_ = term;
+      term_.init(term);
       host_ = host;
       pass_ = pass;
-      cancelled_ = false;
       Register();
       super(&Run);
     }
@@ -617,9 +612,8 @@ private:
     {
       // try to input password for 10 seconds
       for(int i=0; i<20; ++i){
-        if(cancelled_){
+        if(cancelled_)
           break;
-        }
 
         if(AskingPassword(term_.pty_)){
           string lastLine = splitLines(trim(term_.GetText()))[$-1];
