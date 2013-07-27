@@ -232,7 +232,7 @@ string FileSizeInStr(long n)
 
 string PermissionInStr(uint mode, bool isSymlink)
 {
-  static __gshared char[10] ret;
+  char[10] ret;
 
   if(isSymlink){
     ret[0] = 'l';
