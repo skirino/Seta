@@ -38,6 +38,7 @@ import pango.PgAttribute;
 import pango.PgAttributeList;
 
 import constants;
+import utils.ref_util;
 import utils.string_util;
 import config.keybind;
 import terminal;
@@ -60,48 +61,47 @@ private:
     SEARCH_BACKWARD = 2,
   }
 
-  Terminal terminal_;
+  Nonnull!Terminal     terminal_;
+  Nonnull!ComboBoxText cb_;
+  Nonnull!Label        reErrorLabel_;
+  Nonnull!Widget       searchForwardButton_;
+  Nonnull!Widget       searchBackwardButton_;
+  Nonnull!CheckButton  ignoreCases_;
   Regex re_;
-  Entry e_;
-  ComboBoxText cb_;
-  Label reErrorLabel_;
-  Widget searchForwardButton_;
-  Widget searchBackwardButton_;
-  CheckButton ignoreCases_;
 
 public:
   this(Terminal terminal)
   {
-    terminal_ = terminal;
+    terminal_.init(terminal);
     super();
     addOnResponse(&Respond);
     addOnKeyPress(&KeyPressed);
-    VBox contentArea = getContentArea();
+    auto contentArea = getContentArea();
 
     auto hbox = new HBox(0, 0);
     auto l = new Label("_Search for: ");
     hbox.packStart(l, 0, 0, 5);
 
-    cb_ = new ComboBoxText;
+    cb_.init(new ComboBoxText);
     cb_.addOnChanged(&SearchTextChanged!(ComboBoxText));
     hbox.packStart(cb_, 0, 0, 0);
     l.setMnemonicWidget(cb_);
     contentArea.packStart(hbox, 0, 0, 5);
 
-    reErrorLabel_ = new Label("");
+    reErrorLabel_.init(new Label(""));
     reErrorLabel_.setEllipsize(PangoEllipsizeMode.END);
     auto attrs = new PgAttributeList;
     attrs.insert(PgAttribute.foregroundNew(65535, 0, 0));
     reErrorLabel_.setAttributes(attrs);
     contentArea.packStart(reErrorLabel_, 0, 0, 0);
 
-    ignoreCases_ = new CheckButton("_Ignore cases");
+    ignoreCases_.init(new CheckButton("_Ignore cases"));
     ignoreCases_.addOnToggled(&SearchTextChanged!(ToggleButton));
     contentArea.packStart(ignoreCases_, 0, 0, 0);
 
     addButton(StockID.CLOSE, GtkResponseType.DELETE_EVENT);
-    searchBackwardButton_ = addButton(StockID.MEDIA_PREVIOUS, ResponseID.SEARCH_BACKWARD);
-    searchForwardButton_  = addButton(StockID.MEDIA_NEXT,     ResponseID.SEARCH_FORWARD);
+    searchBackwardButton_.init(addButton(StockID.MEDIA_PREVIOUS, ResponseID.SEARCH_BACKWARD));
+    searchForwardButton_ .init(addButton(StockID.MEDIA_NEXT,     ResponseID.SEARCH_FORWARD));
 
     ApplySettings();
   }
@@ -133,16 +133,13 @@ private:
 
   void Search(Order o = Order.FORWARD)()
   {
-    if(re_ is null){
+    if(re_ is null)
       return;
-    }
 
-    static if(o == Order.FORWARD){
+    static if(o == Order.FORWARD)
       terminal_.SearchNext();
-    }
-    else {
+    else
       terminal_.SearchPrevious();
-    }
 
     // prepend or reorder the search text
     cb_.prependOrReplaceText(cb_.getActiveText());
@@ -163,9 +160,8 @@ private:
 
   void BuildRegexp()
   {
-    if(re_ !is null){
+    if(re_ !is null)
       re_.unref();
-    }
 
     auto text = cb_.getActiveText();
     if(IsBlank(text)){
@@ -195,7 +191,7 @@ private:
 
   //////////////// remember settings used at last time
   static __gshared string[] searchTextHistory = [];
-  static __gshared int ignoreCases       = 1;
+  static __gshared int ignoreCases = 1;
 
   void ApplySettings()
   {
@@ -216,9 +212,8 @@ private:
     while(true){
       cb_.setActive(index);
       string text = cb_.getActiveText();
-      if(text == previous){
+      if(text == previous)
         break;
-      }
       searchTextHistory ~= text;
       previous = text;
       ++index;
