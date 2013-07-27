@@ -29,7 +29,7 @@ scope class ScopeTimer
 {
 private:
   timeval start_;
-  const string message_;
+  immutable string message_;
 
 public:
   this(string message)
@@ -62,7 +62,7 @@ public:
 
 ulong GetCurrentTime()
 {
-  return time(null);
+  return core.stdc.time.time(null);
 }
 
 
@@ -85,7 +85,7 @@ string EpochTimeToString(ulong l)
   ret[13] = ':';
   ret[14..16] = ZERO_TO_61[st.tm_min][];
 
-  return ret[].idup;// return slice of local buffer
+  return ret[].idup;
 }
 
 string EpochTimeToStringSeconds(ulong l)
@@ -106,11 +106,11 @@ string EpochTimeToStringSeconds(ulong l)
   ret[11] = ':';
   ret[12..14] = ZERO_TO_61[st.tm_sec][];
 
-  return ret[].idup;// return slice of local buffer
+  return ret[].idup;
 }
 
 
-private static const char[4][201] YEAR_1900_TO_2100 =
+private static immutable char[4][201] YEAR_1900_TO_2100 =
   [
     "1900",
     "1901",
@@ -315,7 +315,7 @@ private static const char[4][201] YEAR_1900_TO_2100 =
     "2100",
     ];
 
-private static const char[2][61] ZERO_TO_61=
+private static immutable char[2][61] ZERO_TO_61=
   [
     "00",
     "01",
