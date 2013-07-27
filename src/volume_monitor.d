@@ -132,12 +132,10 @@ void QueryMountedVolumes(out string[] names, out string[] paths)
 
 string GetPathToNthVolume(size_t n)
 {
-  if(n < monitorInstance.paths_.length){
+  if(n < monitorInstance.paths_.length)
     return monitorInstance.paths_[n];
-  }
-  else{
+  else
     return null;
-  }
 }
 
 

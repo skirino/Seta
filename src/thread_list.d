@@ -134,9 +134,8 @@ void Finish()
 {
   // stop all running threads
   foreach(th; list.array()){
-    if(th !is null){
+    if(th !is null)
       th.ForceStopThread();
-    }
   }
 }
 
@@ -146,14 +145,10 @@ ThreadInfo[] GetWorkingThreadList()
   // pick up RUNNING threads
   ThreadInfo[] ret;
   foreach(info; list.array()){
-    if(info.state_ == ThreadInfoState.RUNNING){
+    if(info.state_ == ThreadInfoState.RUNNING)
       ret ~= info;
-    }
   }
-
-  // sort by timeStart_, since order of threads in the list is completely random
-  ret.sort;
-
+  ret.sort; // sort by timeStart_, since order of threads in the list is completely random
   return ret;
 }
 
@@ -167,9 +162,8 @@ uint ThreadStart(ListedOperationIF th)
   // register the thread to list (use INVALID element in the vector)
   uint idx = 0;
   foreach(info; list.array()){
-    if(info.state_ == ThreadInfoState.INVALID){
+    if(info.state_ == ThreadInfoState.INVALID)
       break;
-    }
     ++idx;
   }
 
@@ -180,7 +174,6 @@ uint ThreadStart(ListedOperationIF th)
   list[idx].state_ = ThreadInfoState.RUNNING;
   list[idx].timeStart_ = GetCurrentTime();
   list[idx].th_ = th;
-
   return idx;
 }
 
@@ -197,9 +190,8 @@ void ThreadEnd(uint idx)
 
 private void ChangeMouseCursor(GdkCursorType type)(gdk.Window.Window w)
 {
-  if(w !is null){
+  if(w !is null)
     w.setCursor(new gdk.Cursor.Cursor(type));
-  }
 }
 private alias ChangeMouseCursor!(GdkCursorType.LEFT_PTR) ChangeMouseCursorDefault;
 private alias ChangeMouseCursor!(GdkCursorType.WATCH)    ChangeMouseCursorWaiting;
