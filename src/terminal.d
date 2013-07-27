@@ -25,6 +25,7 @@ import std.process;
 import std.conv;
 import std.exception;
 import std.algorithm;
+import std.array;
 import std.c.stdlib;
 import core.thread;
 import core.sys.posix.unistd;
@@ -351,7 +352,7 @@ public:
   void ChangeDirTo1stArg(string args)
   {
     string temp = Extract1stArg(args);
-    if(temp.IsBlank())
+    if(temp.empty)
       return;
 
     // note that this cannot replace all environment variables
@@ -411,7 +412,7 @@ private:
 
     auto dirFromProc = GetCWDFromProcFS();
     auto realPath = RealPath(cwd_, readlinkBuffer_);
-    if(dirFromProc.IsBlank() || realPath.IsBlank())// cannot happen
+    if(dirFromProc.empty || realPath.empty)// cannot happen
       return;
 
     if(realPath != dirFromProc){

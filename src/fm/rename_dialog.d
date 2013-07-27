@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module fm.rename_dialog;
 
+import std.array;
+
 import gtk.Dialog;
 import gtk.Button;
 import gtk.Entry;
@@ -329,12 +331,10 @@ private class RenameDialog : Dialog
     lerr_.setText(message);//"<span foreground=\"red\"> " ~ message ~ " </span>");
     lerr_.setTooltipText(message);
 
-    if(message.IsBlank()){
+    if(message.empty)
       ok_.setSensitive(1);
-    }
-    else{// there is something wrong, forbid to rename
+    else// there is something wrong, forbid to rename
       ok_.setSensitive(0);
-    }
   }
 
   void EntriesChanged(ArgType)(ArgType arg)

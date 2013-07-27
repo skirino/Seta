@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module term.search_dialog;
 
+import std.array;
+
 import gtk.Dialog;
 import gtk.Widget;
 import gtk.Label;
@@ -164,7 +166,7 @@ private:
       re_.unref();
 
     auto text = cb_.getActiveText();
-    if(IsBlank(text)){
+    if(text.empty){
       re_ = null;
       reErrorLabel_.setText("");
       reErrorLabel_.setTooltipText("");

@@ -23,6 +23,7 @@ module anything_cd.filter_dirs_job;
 import core.thread;
 import std.string;
 import std.algorithm;
+import std.array;
 
 import gdk.Threads;
 
@@ -82,9 +83,8 @@ public:
 
   void Start()
   {
-    if(IsBlank(targetText_)){
+    if(targetText_.empty)
       return;
-    }
 
     mixin(ReturnIfCanceled);
 

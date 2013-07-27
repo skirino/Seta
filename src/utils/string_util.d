@@ -32,12 +32,6 @@ import gtk.Label;
 import glib.Str;
 
 
-pure bool IsBlank(string s)
-{
-  return (s is null) || (s.length == 0);
-}
-
-
 // fast strcmp for D strings
 pure int StrCmp(string s1, string s2)
 {
@@ -45,6 +39,14 @@ pure int StrCmp(string s1, string s2)
   if (result == 0)
     result = cast(int)s1.length - cast(int)s2.length;
   return result;
+}
+
+unittest{
+  assert(StrCmp("abc", "abc") == 0);
+  assert(StrCmp("ab" , "abc") < 0);
+  assert(StrCmp("abb", "abc") < 0);
+  assert(StrCmp("abc", "ab" ) > 0);
+  assert(StrCmp("abc", "abb") > 0);
 }
 
 

@@ -24,6 +24,7 @@ import core.thread;
 import std.string;
 import std.process;
 import std.algorithm;
+import std.array;
 
 import gtk.Dialog;
 import gtk.Widget;
@@ -59,7 +60,7 @@ void StartChangeDirDialog(Page page)
   d.run();
 
   string path = d.dir_chosen_;
-  if(!IsBlank(path)){
+  if(!path.empty){
     if(path.StartsWith("~")){
       path = getenv("HOME") ~ path[1..$];
     }
