@@ -322,13 +322,15 @@ private:
 
   void EnumerateFilterSortSet(bool remote, string dir, File dirFile, bool appendToHistory, bool notifyTerminal)
   {
+    auto cb = appendToHistory ? (notifyTerminal ? &SetRowsCallback!(true, true,  true ) :
+                                                  &SetRowsCallback!(true, true,  false)) :
+                                (notifyTerminal ? &SetRowsCallback!(true, false, true ) :
+                                                  &SetRowsCallback!(true, false, false));
     prepareUpdateThread_.StopAndWait();
 
-    prepareUpdateThread_ =
-      new PrepareEntriesJob(
-        true, dir, this,
-        mixin(RuntimeDispatch3!("&SetRowsCallback", "true", "appendToHistory", "notifyTerminal")),
-        eList_.GetDTemp(), eList_.GetFTemp(), eList_.GetDFiltered(), eList_.GetFFiltered());
+    prepareUpdateThread_ = new PrepareEntriesJob(
+      true, dir, this, cb,
+      eList_.GetDTemp(), eList_.GetFTemp(), eList_.GetDFiltered(), eList_.GetFFiltered());
     prepareUpdateThread_.SetForEnumerate(remote, fileInfoAttributes_, dirFile);
     prepareUpdateThread_.SetForFilter(showHidden_, filterText_);
     prepareUpdateThread_.SetForSort(sortColumn_, sortOrder_);
