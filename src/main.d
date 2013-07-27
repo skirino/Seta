@@ -61,19 +61,15 @@ void main(string[] args)
     writeln("All tests passed!");
   }
   else{
-    // initialize libraries
     threadsInit();
     Main.init(args);
     threadsEnter();
+    scope(exit){ threadsLeave(); }
 
-    // initialize Seta utilities
     Initialize();
+    scope(exit){ Finalize(); }
 
     SetaWindow.Init();
     Main.run();
-
-    Finalize();
-
-    threadsLeave();
   }
 }
