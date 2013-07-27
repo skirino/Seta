@@ -24,9 +24,8 @@ module utils.array_util;
 ptrdiff_t IndexOf(T)(const(T)[] array, const(T) elem)
 {
   foreach(i, t; array){
-    if(t == elem){
+    if(t == elem)
       return i;
-    }
   }
   return -1;
 }
