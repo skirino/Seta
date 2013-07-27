@@ -47,9 +47,8 @@ TreePath GetPathAtPos(TreeView view, double x, double y)
   TreePath path;
   TreeViewColumn col;
   int cellx, celly;
-  if(view.getPathAtPos(cast(int)x, cast(int)y, path, col, cellx, celly)){
+  if(view.getPathAtPos(cast(int)x, cast(int)y, path, col, cellx, celly))
     return path;
-  }
   return null;
 }
 
@@ -66,18 +65,14 @@ TreeViewColumn GetColAtPos(TreeView view, double x, double y)
 
 TreeIter GetIter(TreeModelIF model, TreePath path)
 {
-  if(path is null){
+  if(path is null)
     return null;
-  }
-  else{
-    TreeIter iter = new TreeIter;
-    if(model.getIter(iter, path)){
-      return iter;
-    }
-    else{
-      return null;
-    }
-  }
+
+  TreeIter iter = new TreeIter;
+  if(model.getIter(iter, path))
+    return iter;
+  else
+    return null;
 }
 
 
@@ -85,12 +80,10 @@ TreeIter GetIterFirst(TreeModelIF model)
 {
   TreeIter iter = new TreeIter;
   iter.setModel(model);
-  if(model.getIterFirst(iter)){
+  if(model.getIterFirst(iter))
     return iter;
-  }
-  else{
+  else
     return null;
-  }
 }
 
 
@@ -98,12 +91,10 @@ TreeIter GetIterFromString(TreeModelIF model, string pathStr)
 {
   TreeIter iter = new TreeIter;
   iter.setModel(model);
-  if(model.getIterFromString(iter, pathStr)){
+  if(model.getIterFromString(iter, pathStr))
     return iter;
-  }
-  else{
+  else
     return null;
-  }
 }
 
 
@@ -128,7 +119,7 @@ TreeIter[] GetSelectedIters(TreeSelection selec, TreeModelIF model)
 {
   TreeIter[] iters;
   GList* gList = gtk_tree_selection_get_selected_rows(selec.getTreeSelectionStruct(), null);
-  if (gList !is null){
+  if(gList !is null){
     scope list = new ListG(gList);
     for(ListG node = list; node !is null; node = node.next()){
       auto path = new TreePath(cast(GtkTreePath*)node.data());
