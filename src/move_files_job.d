@@ -46,9 +46,8 @@ import statusbar;
 
 string[] GetFilesFromStrv(char ** curis)
 {
-  if(curis == null){
+  if(curis == null)
     return null;
-  }
 
   string[] files;
   char ** ptr = curis;
@@ -176,9 +175,8 @@ GdkDragAction GetFilesInClipboard(out string[] files)
 /////////////////////// move or copy files
 void TransferFiles(GdkDragAction action, string[] files, FileView sourceView, string destDir, FileView destView = null)
 {
-  if(files.length == 0){
+  if(files.length == 0)
     return;
-  }
 
   // obtain source directory by removing "basename" in files[0]
   string sourceDir = ParentDirectory(AppendSlash(files[0]));
@@ -243,8 +241,8 @@ private:
   {
     return GetRatioNow() ~ (numTransferred_ == 1 ? " item" : " items");
   }
-  string GetFromSourceDir(){return "from \"" ~ sourceDir_ ~ '\"';}
-  string GetToDestDir()    {return "to \""   ~ destDir_   ~ '\"';}
+  string GetFromSourceDir(){ return "from \"" ~ sourceDir_ ~ '\"'; }
+  string GetToDestDir()    { return "to \""   ~ destDir_   ~ '\"'; }
 
 
 
@@ -343,9 +341,8 @@ private:
 
     foreach(file; files_){
       // stop copying/moving when forced by the main thread
-      if(mode_ == PasteModeFlags.CANCEL_ALL){
+      if(mode_ == PasteModeFlags.CANCEL_ALL)
         break;
-      }
 
       // determine "newname"
       string name = GetBasename(file);
@@ -374,9 +371,8 @@ private:
       // now start transfer this file/dir
       if(!move || !newname.StartsWith(file)){// avoid moving to its child directory
         try{
-          if(Transfer1(file, newname)){
+          if(Transfer1(file, newname))
             ++numTransferred_;
-          }
         }
         catch(GException ex){}// in most cases permission denied
       }
