@@ -69,8 +69,8 @@ class Terminal : Widget, ScrollableIF
   //////////////////// GUI stuff
 private:
   VteTerminal * vte_;
-  int pty_;
-  pid_t pid_;
+  immutable int pty_;
+  immutable pid_t pid_;
 
 public:
   this(Mediator mediator, string initialDir, string delegate(char, uint) getCWDLR)
@@ -89,11 +89,13 @@ public:
 
     // Fork the child process.
     const(char)*[2] argv = [environment["SHELL"].toStringz, null];
+    pid_t pid;
     GError *e;
     auto success = vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0,
                                                   Str.toStringz(initialDir), argv.ptr, null,
-                                                  cast(GSpawnFlags)0, null, null, &pid_, &e);
+                                                  cast(GSpawnFlags)0, null, null, &pid, &e);
     enforce(success, text("!!! [Seta] Failed to fork shell process : ", Str.toString(e.message)));
+    pid_ = pid;
 
     VtePty * ptyObj = vte_terminal_get_pty_object(vte_);
     pty_ = vte_pty_get_fd(ptyObj);
@@ -386,7 +388,7 @@ public:
 
   ////////////////// automatic sync of filer
 private:
-  static const int PATH_MAX = 4096;// PATH_MAX in /usr/include/linux/limits.h
+  static immutable int PATH_MAX = 4096;// PATH_MAX in /usr/include/linux/limits.h
   char[] readlinkBuffer_;
   uint syncCallbackID_;
 

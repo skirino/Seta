@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 
 module mediator;
 
+import utils.ref_util;
 import constants;
 import input_dialog;
 import page;
@@ -34,26 +35,23 @@ import statusbar;
 class Mediator
 {
 private:
-  Page page_;
-  FileSystem fsys_;
-  FileManager filer_;
-  Terminal term_;
+  Nonnull!Page        page_;
+  Nonnull!FileSystem  fsys_;
+  Nonnull!FileManager filer_;
+  Nonnull!Terminal    term_;
 
 public:
   this(Page p)
   {
-    page_ = p;
-    filer_ = null;
-    term_ = null;
-    fsys_ = new FileSystem;
+    page_.init(p);
+    fsys_.init(new FileSystem);
   }
 
   void Set(FileManager f, Terminal t)
   {
-    filer_ = f;
-    term_ = t;
+    filer_.init(f);
+    term_ .init(t);
   }
-
 
 
   /////////////////// SSH
@@ -66,9 +64,8 @@ public:
       string password = con.getPassword();
       if(password.length == 0){
         password = InputDialog!(true)("SSH", "The remote filesystem is already mounted by gvfs.\nInput password for SSH :");
-        if(password.length == 0){// no valid password
+        if(password.length == 0)// no valid password
           return;
-        }
         con.setPassword(password);
       }
 
@@ -85,21 +82,21 @@ public:
 
 
   /////////////////// interface to Page
-  bool FilerIsVisible(){return page_.GetViewMode() != ViewMode.TERMINAL;}
-  string GetPageID(){return page_.GetTab().GetID();}
-  void UpdatePathLabel(string path, long numItems){page_.UpdatePathLabel(path, numItems);}
-  void SetHostLabel(string p){page_.SetHostLabel(p);}
-  string GetHostLabel(){return page_.GetHostLabel();}
-  string GetCWDOtherSide(){return page_.GetCWDOtherSide();}
-  void CloseThisPage(){page_.CloseThisPage();}
-  bool OnLeftSide(){return page_.OnLeftSide();}
+  void CloseThisPage(){ page_.CloseThisPage(); }
+  void UpdatePathLabel(string path, long numItems){ page_.UpdatePathLabel(path, numItems); }
+  void SetHostLabel   (string path)               { page_.SetHostLabel(path); }
+  bool FilerIsVisible (){ return page_.GetViewMode() != ViewMode.TERMINAL; }
+  bool OnLeftSide     (){ return page_.OnLeftSide(); }
+  string GetPageID      (){ return page_.GetTab().GetID(); }
+  string GetHostLabel   (){ return page_.GetHostLabel(); }
+  string GetCWDOtherSide(){ return page_.GetCWDOtherSide(); }
   /////////////////// interface to Page
 
 
 
   /////////////////// interface to FileManager
-  string FilerGetPWD(bool onlyAfterGVFS = true){return filer_.GetPWD(onlyAfterGVFS);}
-  void FilerAppendToHistory(string dir){filer_.AppendToHistory(dir);}
+  string FilerGetPWD(bool onlyAfterGVFS = true){ return filer_.GetPWD(onlyAfterGVFS); }
+  void FilerAppendToHistory(string dir){ filer_.AppendToHistory(dir); }
   string FilerCDToPrevious()// for "cd -"
   {
     string previous = filer_.GetPreviousDir();
@@ -114,17 +111,14 @@ public:
   }
   bool FilerChangeDirFromTerminal(string path)
   {
-    if(filer_.ChangeDirectory(path, true, false)){
-      PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to file manager(" ~ GetPageID() ~ ")");
-      return true;
-    }
-    else{
+    if(!filer_.ChangeDirectory(path, true, false))
       return false;
-    }
+    PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to file manager(" ~ GetPageID() ~ ")");
+    return true;
   }
-  void FilerDisconnect (){filer_.Disconnect();}
-  void FilerFocusFilter(){filer_.FocusFilter();}
-  void FilerClearFilter(){filer_.ClearFilter();}
+  void FilerDisconnect (){ filer_.Disconnect(); }
+  void FilerFocusFilter(){ filer_.FocusFilter(); }
+  void FilerClearFilter(){ filer_.ClearFilter(); }
   /////////////////// interface to FileManager
 
 
@@ -137,20 +131,20 @@ public:
     term_.ChangeDirectoryFromFiler(path);
     PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to terminal(" ~ GetPageID() ~ ")");
   }
-  void TerminalQuitSSH(string pwd){term_.QuitSSH(pwd);}
+  void TerminalQuitSSH(string pwd){ term_.QuitSSH(pwd); }
   /////////////////// interface to Terminal
 
 
 
   /////////////////// interface to FileSystem
-  bool FileSystemIsRemote(){return fsys_.remote_;}
-  string FileSystemRoot(){return fsys_.rootDir_;}
-  string FileSystemHome(){return fsys_.homeDir_;}
-  string FileSystemNewPath(){return fsys_.homeDir_ is null ? fsys_.rootDir_ : fsys_.homeDir_;}
-  string FileSystemParentDirectory(string p){return fsys_.ParentDirectory(p);}
-  string FileSystemNativePath(string p){return fsys_.NativePath(p);}
-  string FileSystemMountedVFSPath(string path){return fsys_.MountedVFSPath(path);}
-  string FileSystemSetLocal(){return fsys_.SetLocal();}
-  bool FileSystemLookingAtRemoteFS(string p){return fsys_.LookingAtRemoteFS(p);}
+  bool FileSystemLookingAtRemoteFS(string p){ return fsys_.LookingAtRemoteFS(p); }
+  bool FileSystemIsRemote(){ return fsys_.remote_; }
+  string FileSystemRoot   (){ return fsys_.rootDir_; }
+  string FileSystemHome   (){ return fsys_.homeDir_; }
+  string FileSystemNewPath(){ return fsys_.homeDir_ is null ? fsys_.rootDir_ : fsys_.homeDir_; }
+  string FileSystemParentDirectory(string path){ return fsys_.ParentDirectory(path); }
+  string FileSystemNativePath     (string path){ return fsys_.NativePath(path); }
+  string FileSystemMountedVFSPath (string path){ return fsys_.MountedVFSPath(path); }
+  string FileSystemSetLocal(){ return fsys_.SetLocal(); }
   /////////////////// interface to FileSystem
 }

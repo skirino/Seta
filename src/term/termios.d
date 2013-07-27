@@ -27,7 +27,7 @@ import std.stdio;
 /+
  Constants defined in
  [1] /usr/include/bits/termios.h   (C, linux)
- [2] /usr/include/sys/termios.h        (C, OSX)
+ [2] /usr/include/sys/termios.h    (C, OSX)
  [3] phobos core.sys.posix.termios (D, version=linux)
  [4] phobos core.sys.posix.termios (D, version=OSX)
 
