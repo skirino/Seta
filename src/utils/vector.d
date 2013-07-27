@@ -36,11 +36,11 @@ public:
     array_.length = reserved;
   }
 
-  size_t size()  {return size_;}
-  size_t length(){return size_;}
-  size_t capacity(){return array_.length;}
+  size_t size()    { return size_; }
+  size_t length()  { return size_; }
+  size_t capacity(){ return array_.length; }
 
-  void clear(){size_ = 0;}
+  void clear(){ size_ = 0; }
 
   void append(T t)
   {
@@ -133,9 +133,8 @@ public:
   {
     v.clear();
     foreach(elem; array()){
-      if(filter(elem)){
+      if(filter(elem))
         v.append(elem);
-      }
     }
   }
 
