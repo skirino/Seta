@@ -54,8 +54,8 @@ void PushIntoStatusbar(string text)
 class SetaStatusbar : Statusbar
 {
 private:
-  static const uint num_ = 10;
-  string[num_] previousMessages_;
+  static immutable size_t MAX_MESSAGES = 10;
+  string[MAX_MESSAGES] previousMessages_;
   string messageNow_;
 
 
@@ -87,17 +87,16 @@ public:
 private:
   void SetTooltip(string text)
   {
-    for(size_t i=0; i<num_-1; ++i){
+    for(size_t i=0; i<MAX_MESSAGES-1; ++i){
       previousMessages_[i] = previousMessages_[i+1];
     }
-    previousMessages_[num_-1] = messageNow_;
+    previousMessages_[MAX_MESSAGES-1] = messageNow_;
     messageNow_ = text;
 
     string tooltip = "previous messages:";
     foreach(message; previousMessages_){
-      if(message.length > 0){
+      if(message.length > 0)
         tooltip ~= "\n\n" ~ message;
-      }
     }
     setTooltipText(tooltip);
   }
@@ -136,7 +135,7 @@ private:
     showThreadListButton_.setActive(0);
   }
 
-  struct XYPosition {int x_, y_;}
+  struct XYPosition{ int x_, y_; }
   ThreadInfo[] array_;
 
   void ShowThreadList(ToggleButton b)
@@ -188,7 +187,6 @@ private:
 }
 
 
-
 ///////////////////////// show/hide left/right pane
 bool ExpandLeftPane()
 {
@@ -202,61 +200,58 @@ bool ExpandRightPane()
 ///////////////////////// show/hide left/right pane
 
 
+template ConstructToggleButton(char l)
+{
+  immutable string ConstructToggleButton =
+    "
+    show" ~ l ~ "Button = new ToggleButton(\"" ~ l ~ "\");
+    show" ~ l ~ "Button.setActive(1);
+    show" ~ l ~ "Button.setTooltipText(\"show/hide " ~ l ~ " pane\");
+    show" ~ l ~ "Button.addOnToggled(&Toggle" ~ l ~ ");
+    packEnd(show" ~ l ~ "Button, 0, 0, 0);
+    ";
+}
 
-
-  template ConstructToggleButton(char l)
-  {
-    const string ConstructToggleButton =
-      "
-      show" ~ l ~ "Button = new ToggleButton(\"" ~ l ~ "\");
-      show" ~ l ~ "Button.setActive(1);
-      show" ~ l ~ "Button.setTooltipText(\"show/hide " ~ l ~ " pane\");
-      show" ~ l ~ "Button.addOnToggled(&Toggle" ~ l ~ ");
-      packEnd(show" ~ l ~ "Button, 0, 0, 0);
-      ";
-  }
-
-  template ToggleCallbackMixin(char l, char r)
-  {
-    const string ToggleCallbackMixin =
-      "void Toggle" ~ l ~ "(ToggleButton b)
-      {
-        if(show" ~ l ~ "Button.getActive() == 0){
-          note" ~ l ~ "_.hide();
-          if(show" ~ r ~ "Button.getActive() == 0){
-            show" ~ r ~ "Button.setActive(1);
+template ToggleCallbackMixin(char l, char r)
+{
+  immutable string ToggleCallbackMixin =
+    "void Toggle" ~ l ~ "(ToggleButton b)
+    {
+      if(show" ~ l ~ "Button.getActive() == 0){
+        note" ~ l ~ "_.hide();
+        if(show" ~ r ~ "Button.getActive() == 0){
+          show" ~ r ~ "Button.setActive(1);
+        }
+      }
+      else{
+        if(note" ~ l ~ "_.getNPages() == 0){
+          if('" ~ l ~ "' == 'L'){
+            note" ~ l ~ "_.AppendNewPage();
+          }
+          else{
+            note" ~ l ~ "_.AppendNewPage();
           }
         }
-        else{
-          if(note" ~ l ~ "_.getNPages() == 0){
-            if('" ~ l ~ "' == 'L'){
-              note" ~ l ~ "_.AppendNewPage();
-            }
-            else{
-              note" ~ l ~ "_.AppendNewPage();
-            }
-          }
-          note" ~ l ~ "_.show();
-        }
-      }";
-  }
+        note" ~ l ~ "_.show();
+      }
+    }";
+}
 
-  template MoveLRMixin(char l, char r)
-  {
-    const string MoveLRMixin =
-      "bool Move" ~ l ~ "()
-      {
-        if(show" ~ l ~ "Button.getActive() != 0){
-          if(show" ~ r ~ "Button.getActive() != 0){// both pane
-            show" ~ r ~ "Button.setActive(0);
-            return true;
-          }
-          // else : only l pane
+template MoveLRMixin(char l, char r)
+{
+  immutable string MoveLRMixin =
+    "bool Move" ~ l ~ "()
+    {
+      if(show" ~ l ~ "Button.getActive() != 0){
+        if(show" ~ r ~ "Button.getActive() != 0){// both pane
+          show" ~ r ~ "Button.setActive(0);
+          return true;
         }
-        else{// only r pane
-          show" ~ l ~ "Button.setActive(1);
-        }
-        return false;
-      }";
-  }
-
+        // else : only l pane
+      }
+      else{// only r pane
+        show" ~ l ~ "Button.setActive(1);
+      }
+      return false;
+    }";
+}
