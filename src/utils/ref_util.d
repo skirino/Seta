@@ -30,9 +30,9 @@ private:
 
 public:
   @disable void opAssign(Maybe!(T) rhs);
-  this(T t){_Maybe_t = t;}
-  @property T get(){return _Maybe_t;}
-  void set(T t){_Maybe_t = t;}
+  this(T t){ _Maybe_t = t; }
+  @property T get(){ return _Maybe_t; }
+  void set(T t){ _Maybe_t = t; }
   auto opDispatch(string fn, Args...)(Args args)
   {
     alias typeof(mixin("_Maybe_t." ~ fn ~ "(args)")) R;
@@ -59,8 +59,8 @@ public:
     enforce(t         !is null, "!!! Nonnull 2");
     _Nonnull_t = t;
   }
-  this(T t){init(t);}
-  T _Nonnull_get(){return _Nonnull_t;}
+  this(T t){ init(t); }
+  T _Nonnull_get(){ return _Nonnull_t; }
   alias _Nonnull_get this;
 }
 
@@ -68,8 +68,8 @@ public:
 unittest{
   void AssertThrowBase(bool b, R)(R delegate() f){
     bool thrown;
-    try{f();}
-    catch(Exception){thrown = true;}
+    try{ f(); }
+    catch(Exception){ thrown = true; }
     assert(thrown == b);
   }
   void ShouldThrow(R)(R delegate() f){
@@ -81,10 +81,10 @@ unittest{
 
   class X{
     int x;
-    void f1(){x = 1;}
-    int f2(int a, int b){return x + a + b;}
+    void f1(){ x = 1; }
+    int f2(int a, int b){ return x + a + b; }
   }
-  int func(X x){return x.x;}
+  int func(X x){ return x.x; }
 
   auto m0 = Maybe!X();
   assert(m0._Maybe_t is null);
@@ -102,7 +102,7 @@ unittest{
   ShouldNotThrow(() => Nonnull!X());
   ShouldNotThrow(() => Nonnull!X().init(new X));
   ShouldThrow(() => Nonnull!X().init(null));
-  ShouldThrow(delegate void(){auto n = Nonnull!X(); n.init(new X); n.init(new X);});
+  ShouldThrow(delegate void(){ auto n = Nonnull!X(); n.init(new X); n.init(new X); });
 
   auto n = Nonnull!X(new X);
   assert(n._Nonnull_t.x == 0);
