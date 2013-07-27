@@ -98,11 +98,11 @@ unittest{
   assert(func(m1.get) == 1);
   assert(m1.f2(2, 3) == 6);
 
-  ShouldThrow(() => Nonnull!X(null));
+  ShouldThrow   (() => Nonnull!X(null));
   ShouldNotThrow(() => Nonnull!X());
   ShouldNotThrow(() => Nonnull!X().init(new X));
-  ShouldThrow(() => Nonnull!X().init(null));
-  ShouldThrow(delegate void(){ auto n = Nonnull!X(); n.init(new X); n.init(new X); });
+  ShouldThrow   (() => Nonnull!X().init(null));
+  ShouldThrow   (delegate void(){ auto n = Nonnull!X(); n.init(new X); n.init(new X); });
 
   auto n = Nonnull!X(new X);
   assert(n._Nonnull_t.x == 0);
