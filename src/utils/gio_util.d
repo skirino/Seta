@@ -28,19 +28,16 @@ import glib.GException;
 
 File GetFileForDirectory(string dirname)
 {
-  if(dirname.length == 0){
+  if(dirname.length == 0)
     return null;
-  }
 
   try{
     auto f = gio.File.File.parseName(dirname);
     scope FileInfo info = f.queryInfo("standard::type", GFileQueryInfoFlags.NONE, null);
-    if(info.getFileType() == GFileType.TYPE_DIRECTORY){
+    if(info.getFileType() == GFileType.TYPE_DIRECTORY)
       return f;
-    }
-    else{// not a directory
+    else// not a directory
       return null;
-    }
   }
   catch(GException ex){// no such file or directory
     return null;
@@ -49,9 +46,8 @@ File GetFileForDirectory(string dirname)
 
 bool Exists(string path)
 {
-  if(path.length == 0){
+  if(path.length == 0)
     return false;
-  }
 
   scope f = File.parseName(path);
   return f.queryExists(null) != 0;
@@ -82,8 +78,7 @@ bool CanEnumerateChildren(File dir)
 bool CanEnumerateChildren(string dir)
 {
   auto f = GetFileForDirectory(dir);
-  if(f is null){
+  if(f is null)
     return false;
-  }
   return CanEnumerateChildren(f);
 }
