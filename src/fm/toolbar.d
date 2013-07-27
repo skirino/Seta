@@ -404,10 +404,9 @@ private:
 }
 
 
-
 template InsertOrRemove(string s, string booleanExpression)
 {
-  const string InsertOrRemove =
+  immutable string InsertOrRemove =
     "
       if(" ~ booleanExpression ~ "){
         if(item" ~ s ~ "_.getParent is null){
@@ -426,5 +425,5 @@ template InsertOrRemove(string s, string booleanExpression)
 
 template InsertOrRemove(string s)
 {
-  const string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
+  immutable string InsertOrRemove = InsertOrRemove!(s, "rcfile.GetShow" ~ s ~ "Button()");
 }

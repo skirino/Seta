@@ -23,7 +23,7 @@ module utils.template_util;
 
 template RuntimeDispatch1(string tmplt, string b, string args = "")
 {
-  const string RuntimeDispatch1 =
+  immutable string RuntimeDispatch1 =
     "
     ( " ~ b ~ " ? " ~ tmplt ~ "!(true)"  ~ args ~
     "           : " ~ tmplt ~ "!(false)" ~ args ~
@@ -32,7 +32,7 @@ template RuntimeDispatch1(string tmplt, string b, string args = "")
 
 template RuntimeDispatch2(string tmplt, string b1, string b2, string args = "")
 {
-  const string RuntimeDispatch2 =
+  immutable string RuntimeDispatch2 =
     "
     ( " ~ b1 ~ " ? (" ~ b2 ~ " ? " ~ tmplt ~ "!(true,  true)"  ~ args ~
     "                          : " ~ tmplt ~ "!(true,  false)" ~ args ~ ")" ~
@@ -43,7 +43,7 @@ template RuntimeDispatch2(string tmplt, string b1, string b2, string args = "")
 
 template RuntimeDispatch3(string tmplt, string b1, string b2, string b3, string args = "")
 {
-  const string RuntimeDispatch3 =
+  immutable string RuntimeDispatch3 =
     "
     ( " ~ b1 ~ " ? (" ~ b2 ~ " ? (" ~ b3 ~ " ? " ~ tmplt ~ "!(true,  true,  true)"  ~ args ~
     "                                        : " ~ tmplt ~ "!(true,  true,  false)" ~ args ~ ")" ~
@@ -59,10 +59,8 @@ template RuntimeDispatch3(string tmplt, string b1, string b2, string b3, string 
 
 template FoldTupple(alias templateFun, s ...)
 {
-  static if(s.length == 0){
+  static if(s.length == 0)
     immutable string FoldTupple = "";
-  }
-  else{
+  else
     immutable string FoldTupple = templateFun!(s[0]) ~ FoldTupple!(templateFun, s[1 .. $]);
-  }
 }

@@ -43,7 +43,7 @@ import ssh_connection;
 import page_list;
 
 
-static const string SetaVersion = "0.6.3";
+static immutable string SetaVersion = "0.7.0";
 
 void Init()
 {
@@ -65,7 +65,7 @@ void Free()
 
 private template GetString(string group, string key)
 {
-  const string GetString =
+  immutable string GetString =
     "string Get" ~ key ~ "(){return instance_.getString(\"" ~ group ~ "\", \"" ~ key ~ "\");}";
 }
 
@@ -73,12 +73,12 @@ private template GetString(string group, string key)
 ///////////////// [Layout]
 private template GetUint(string key)
 {
-  const string GetUint =
+  immutable string GetUint =
     "uint Get" ~ key ~ "(){return ForceUint(instance_.getInteger(\"Layout\", \"" ~ key ~ "\"));}";
 }
 private template GetBoolean(string key)
 {
-  const string GetBoolean =
+  immutable string GetBoolean =
     "bool Get" ~ key ~ "(){return instance_.getBoolean(\"Layout\", \"" ~ key ~ "\") != 0;}";
 }
 mixin(GetUint!("WindowSizeH"));
@@ -374,7 +374,7 @@ void ReconstructKeybinds()
 
 private template GetKeybindInString(string widget, string action)
 {
-  const string GetKeybindInString =
+  immutable string GetKeybindInString =
     "string Get" ~ action ~ "(){return instance_.getString(\"Keybind\", \"" ~ widget ~ "Action." ~ action ~ "\");}";
 }
 
@@ -636,7 +636,7 @@ private:
 
 private template SetDefaultValue(string Type, string group, string key, string value)
 {
-  const string SetDefaultValue =
+  immutable string SetDefaultValue =
     "
     if(!hasKey(\"" ~ group ~ "\", \"" ~ key ~ "\")){
       changed_ = true;
@@ -646,7 +646,7 @@ private template SetDefaultValue(string Type, string group, string key, string v
 
 private template InstallKeybind(string action, string keystr)
 {
-  const string InstallKeybind =
+  immutable string InstallKeybind =
     SetDefaultValue!("String", "Keybind", action, "\"" ~ keystr ~ "\"") ~
     "{
       string val = getString(\"Keybind\", \"" ~ action ~ "\");
@@ -661,7 +661,7 @@ private template InstallKeybind(string action, string keystr)
 /////////////////// for ConfigDialog
 private template ResetValue(string type, string Type)
 {
-  const string ResetValue =
+  immutable string ResetValue =
     "
     bool Reset" ~ Type ~ "(string group, string key, " ~ type ~ " val)
     {

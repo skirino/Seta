@@ -46,12 +46,11 @@ private:
 
   void Construct(bool isDir)(FileInfo info)
   {
-    static if(isDir){
+    static if(isDir)
       name_ = info.getName() ~ '/';
-    }
-    else{
+    else
       name_ = info.getName();
-    }
+
     lastModified_ = info.getAttributeUint64("time::modified");
     mode_ = info.getAttributeUint32("unix::mode");
     isSymlink_ = info.getIsSymlink() != 0;
@@ -72,7 +71,6 @@ public:
     size_ = CountNumEntries(pwd ~ name_);
     owner_ = info.getAttributeString("owner::user");
   }
-
 
 
   ///////////////////////// SSH
@@ -97,14 +95,14 @@ public:
 
 
   ///////////////////////// accessor
-  string GetName      (){return name_;}
-  string GetType      (){return type_;}
-  string GetDirSize   (){return PluralForm!(int, "item")(cast(int)size_);}
-  string GetFileSize  (){return FileSizeInStr(size_);}
-  string GetOwner     (){return owner_;}
-  string GetPermission(){return PermissionInStr(mode_, isSymlink_);}
-  string GetModified  (){return EpochTimeToString(lastModified_);}
-  bool IsSymlink(){return isSymlink_;}
+  string GetName      (){ return name_; }
+  string GetType      (){ return type_; }
+  string GetDirSize   (){ return PluralForm!(int, "item")(cast(int)size_); }
+  string GetFileSize  (){ return FileSizeInStr(size_); }
+  string GetOwner     (){ return owner_; }
+  string GetPermission(){ return PermissionInStr(mode_, isSymlink_); }
+  string GetModified  (){ return EpochTimeToString(lastModified_); }
+  bool IsSymlink(){ return isSymlink_; }
 
   FileColorType GetDirColorType()
   {
@@ -137,7 +135,7 @@ int CompareNameDescending(DirEntry e1, DirEntry e2)
 
 private template CompareStringFuncMixin(string nameFun, string member)
 {
-  const string CompareStringFuncMixin =
+  immutable string CompareStringFuncMixin =
     "int Compare" ~ nameFun ~ "ThenName(bool ascending)(DirEntry e1, DirEntry e2)
     {
       int i = StrCmp(e1." ~ member ~ ", e2." ~ member ~ ");
@@ -160,7 +158,7 @@ mixin(CompareStringFuncMixin!("Owner", "owner_"));
 
 private template CompareIntegerFuncMixin(string nameFun, string member)
 {
-  const string CompareIntegerFuncMixin =
+  immutable string CompareIntegerFuncMixin =
     "int Compare" ~ nameFun ~ "ThenName(bool ascending)(DirEntry e1, DirEntry e2)
     {
       if(e1." ~ member ~ " == e2." ~ member ~ "){
@@ -186,22 +184,20 @@ mixin(CompareIntegerFuncMixin!("LastModified", "lastModified_"));
 long CountNumEntries(string dirname)
 {
   scope f = GetFileForDirectory(dirname);
-  if(f !is null){
-    try{
-      long num = 0;
-      scope enumerate = f.enumerateChildren("", GFileQueryInfoFlags.NONE, null);
-      FileInfo info;
-      while((info = enumerate.nextFile(null)) !is null){
-        ++num;
-      }
-      enumerate.close(null);
-      return num;
+  if(f is null)
+    return -1;
+
+  try{
+    long num = 0;
+    scope enumerate = f.enumerateChildren("", GFileQueryInfoFlags.NONE, null);
+    FileInfo info;
+    while((info = enumerate.nextFile(null)) !is null){
+      ++num;
     }
-    catch(Exception ex){// cannot see contents of the directory, maybe permission denied
-      return -1;
-    }
+    enumerate.close(null);
+    return num;
   }
-  else{
+  catch(Exception ex){// cannot see contents of the directory, maybe permission denied
     return -1;
   }
 }
@@ -209,29 +205,27 @@ long CountNumEntries(string dirname)
 
 string FileSizeInStr(long n)
 {
-  const int kilo = 0x400;
-  const int mega = 0x100000;
-  const int giga = 0x40000000;
+  static immutable int kilo = 0x400;
+  static immutable int mega = 0x100000;
+  static immutable int giga = 0x40000000;
 
-  if(n < kilo){
+  if(n < kilo)
     return Str.toString(cast(ulong)n) ~ " B";
+
+  char[] buffer;
+  buffer.length = 4;
+
+  if(n < mega){
+    string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/kilo);
+    return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " KB";
+  }
+  else if(n < giga){
+    string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/mega);
+    return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " MB";
   }
   else{
-    char[] buffer;
-    buffer.length = 4;
-
-    if(n < mega){
-      string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/kilo);
-      return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " KB";
-    }
-    else if(n < giga){
-      string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/mega);
-      return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " MB";
-    }
-    else{
-      string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/giga);
-      return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " GB";
-    }
+    string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/giga);
+    return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " GB";
   }
 }
 
@@ -268,7 +262,7 @@ string PermissionInStr(uint mode, bool isSymlink)
   return ret.idup;
 }
 
-private static const char[3][8] RWX =
+private static immutable char[3][8] RWX =
   ["---",
    "--x",
    "-w-",
@@ -277,5 +271,3 @@ private static const char[3][8] RWX =
    "r-x",
    "rw-",
    "rwx"];
-
-
