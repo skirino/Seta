@@ -21,6 +21,8 @@ MA 02110-1301 USA.
 module config.hosts_view;
 
 import std.string;
+import std.algorithm;
+import std.array;
 
 import gtk.TreeView;
 import gtk.TreeViewColumn;
@@ -78,7 +80,7 @@ public:
       TreeIter iter = new TreeIter;
       hostsStore_.append(iter);
 
-      string[] items = TrimAll(split(host, ":"));
+      auto items = split(host, ":").map!(trim).array();
       foreach(int i, item; items){
         hostsStore_.setValue(iter, i, item);
       }

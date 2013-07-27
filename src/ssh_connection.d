@@ -21,6 +21,8 @@ MA 02110-1301 USA.
 module ssh_connection;
 
 import std.string;
+import std.algorithm : map;
+import std.array;
 
 import gtk.Window;
 import gtk.MountOperation;
@@ -126,7 +128,7 @@ public:
 
   this(string line)
   {
-    string[] userDomainHome = TrimAll(line.split(":"));
+    string[] userDomainHome = line.split(":").map!(trim).array();
     this(userDomainHome);
   }
 

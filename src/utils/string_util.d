@@ -25,7 +25,8 @@ import std.stdio;
 import std.c.string;
 import std.ascii;
 import std.process;
-import std.algorithm : min;
+import std.algorithm : min, map;
+import std.array;
 
 import gtk.Label;
 import glib.Str;
@@ -37,26 +38,10 @@ pure bool IsBlank(string s)
 }
 
 
-pure string[] TrimAll(string[] l)
-{
-  string[] ret;
-  ret.length = l.length;
-  foreach(i, e; l){
-    ret[i] = trim(e);
-  }
-  return ret;
-}
-
-
 // fast strcmp for D strings
 pure int StrCmp(string s1, string s2)
 {
-  auto len = s1.length;
-  if (s2.length < len){
-    len = s2.length;
-  }
-
-  int result = memcmp(s1.ptr, s2.ptr, len);
+  int result = memcmp(s1.ptr, s2.ptr, min(s1.length, s2.length));
   if (result == 0)
     result = cast(int)s1.length - cast(int)s2.length;
   return result;
@@ -67,9 +52,9 @@ pure int StrCmp(string s1, string s2)
 int GetTextWidth(string text)
 {
   static __gshared Label l;
-  if(l is null){
+  if(l is null)
     l = new Label("");
-  }
+
   int width, height;
   l.setText(text);
   l.getLayout().getPixelSize(width, height);
