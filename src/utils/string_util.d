@@ -73,34 +73,29 @@ pure string NonnullString(string s)
 string PluralForm(INT, string singularForm, string pluralForm = singularForm ~ "s")(INT n)
 {
   static if(is(INT == int)){
-    if(n == -1){
+    if(n == -1)
       return "? " ~ pluralForm;
-    }
   }
 
-  if(n == 1){
+  if(n == 1)
     return "1 " ~ singularForm;
-  }
-  else{
+  else
     return Str.toString(n) ~ ' ' ~ pluralForm;
-  }
 }
 
 
 pure bool StartsWith(string s1, string s2)
 {
-  if(s1.length >= s2.length){
+  if(s1.length >= s2.length)
     return s1[0 .. s2.length] == s2;
-  }
   return false;
 }
 
 
 pure bool EndsWith(string s1, string s2)
 {
-  if(s1.length >= s2.length){
+  if(s1.length >= s2.length)
     return s1[$-s2.length .. $] == s2;
-  }
   return false;
 }
 
@@ -111,9 +106,8 @@ void EachLineInFile(string filename, bool delegate(string) f)
     scope file = File(filename);
     foreach(line; file.byLine()){
       bool continueLoop = f(line.idup);
-      if(!continueLoop){
+      if(!continueLoop)
         break;
-      }
     }
   }
   catch(Exception ex){}// no such file or permission denied
@@ -136,23 +130,19 @@ string LineInFileWhichStartsWith(string phrase, string filename)
 
 pure string AppendSlash(string s)
 {
-  if(s is null){
+  if(s is null)
     return "/";
-  }
-  else{
+  else
     return (s[$-1] == '/') ? s : s ~ '/';
-  }
 }
 
 
 pure string RemoveSlash(string s)
 {
-  if(s[$-1] == '/'){
+  if(s[$-1] == '/')
     return s[0..$-1];
-  }
-  else{
+  else
     return s;
-  }
 }
 
 
@@ -258,17 +248,15 @@ pure string UnescapeSpecialChars(string input)
 // not to go beyond root directory of filesystem
 pure string ParentDirectory(string dir, string root = "/")
 {
-  if(dir == "/" || dir == root){
+  if(dir == "/" || dir == root)
     return root;
+
+  assert(dir.length > 1);
+  size_t index = dir.length-2;// dir[$-1] == '/'
+  while(dir[index] != '/'){
+    --index;
   }
-  else{
-    assert(dir.length > 1);
-    size_t index = dir.length-2;// dir[$-1] == '/'
-    while(dir[index] != '/'){
-      --index;
-    }
-    return dir[0..index+1];// dir[0..index+1] end with '/'
-  }
+  return dir[0..index+1];// dir[0..index+1] end with '/'
 }
 
 
@@ -276,15 +264,13 @@ string Extract1stArg(string args)
 {
   // "args" is already trimmed, so there is no whitespace at both start and end of the input
   string replaced = ReplaceQuotedArg(args);
-  if(replaced.length == 0){
+  if(replaced.length == 0)
     return null;
-  }
-  else{
-    size_t posSpace = FindUnescapedChar(replaced, ' ');
-    size_t posNewline = locate(replaced, '\n');
-    size_t posSemicolon = FindUnescapedChar(replaced, ';');
-    return replaced[0 .. min(min(posSpace, posNewline), posSemicolon)];
-  }
+
+  size_t posSpace = FindUnescapedChar(replaced, ' ');
+  size_t posNewline = locate(replaced, '\n');
+  size_t posSemicolon = FindUnescapedChar(replaced, ';');
+  return replaced[0 .. min(min(posSpace, posNewline), posSemicolon)];
 }
 
 
@@ -314,17 +300,14 @@ private string ReplaceQuotedArg(string args)
     }
 
     size_t end = FindUnescapedChar(args, quotation, start+1);
-    if(end == args.length){// unmatched
+    if(end == args.length)// unmatched
       return null;
-    }
-    else{
-      ret ~= args[index .. start];
-      ret ~= EscapeSpecialChars(args[start + 1 .. end]);
-      index = end+1;
-      if(index == args.length){
-        break;
-      }
-    }
+
+    ret ~= args[index .. start];
+    ret ~= EscapeSpecialChars(args[start + 1 .. end]);
+    index = end+1;
+    if(index == args.length)
+      break;
   }
 
   return ret;
@@ -333,9 +316,8 @@ private string ReplaceQuotedArg(string args)
 
 pure private size_t ReverseCountBackslash(string s)
 {
-  if(s.length == 0){
+  if(s.length == 0)
     return 0;
-  }
 
   size_t num = 0;
   size_t pos = s.length-1;
@@ -351,11 +333,8 @@ pure private size_t FindUnescapedChar(string s, char target, size_t start = 0)
 {
   for(size_t i=start; i<s.length; ++i){
     if(s[i] == target){
-      if(i == 0 ||
-         ReverseCountBackslash(s[0 .. i-1]) % 2 == 0
-        ){
+      if(i == 0 || ReverseCountBackslash(s[0 .. i-1]) % 2 == 0)
         return i;
-      }
     }
   }
   return s.length;
@@ -371,9 +350,8 @@ string ExpandEnvVars(string arg)
     // find dollar which is not escaped by backslash
     size_t dollar = FindUnescapedChar(arg, '$', indexStart);
     ret ~= arg[indexStart .. dollar];
-    if(dollar == arg.length){
+    if(dollar == arg.length)
       break;
-    }
 
     // extract variable token
     size_t end = dollar+1;
@@ -410,14 +388,12 @@ pure string RemovePercentBrace(string s)
         }
       }
 
-      if(open == 0){
+      if(open == 0)
         ret ~= '%';
-      }
     }
     else{
-      if(open == 0){
+      if(open == 0)
         ret ~= s[i];
-      }
     }
   }
 
@@ -431,9 +407,8 @@ pure string RemovePercentBrace(string s)
 C[] triml(C)(C[] s)
 {
   foreach(i, c; s){
-    if(!isWhite(c)){
+    if(!isWhite(c))
       return s[i .. $];
-    }
   }
   return "";
 }
@@ -441,9 +416,8 @@ C[] triml(C)(C[] s)
 C[] trimr(C)(C[] s)
 {
   for(ptrdiff_t i=s.length-1; i>=0; --i){
-    if(!isWhite(s[i])){
+    if(!isWhite(s[i]))
       return s[0 .. i+1];
-    }
   }
   return "";
 }
@@ -480,9 +454,8 @@ unittest
 
 C[] substitute(C)(const(C)[] s, const(C)[] from, const(C)[] to)
 {
-  if(from.length == 0){
+  if(from.length == 0)
     return s.dup;
-  }
 
   C[] p;
   size_t istart = 0;
