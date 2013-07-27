@@ -37,18 +37,6 @@ pure bool IsBlank(string s)
 }
 
 
-string[] ToStringArray(T)(T[] array)
-{
-  string[] ret;
-  ret.length = array.length;
-  foreach(i, e; array)
-  {
-    ret[i] = e.toString();
-  }
-  return ret;
-}
-
-
 pure string[] TrimAll(string[] l)
 {
   string[] ret;

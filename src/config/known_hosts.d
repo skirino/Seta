@@ -31,13 +31,8 @@ import ssh_dialog;
 private __gshared SSHConnection[] registeredHosts_;
 private __gshared SSHConnection[] temporalHosts_;
 
-SSHConnection[] GetKnownHosts(){return registeredHosts_;}
+SSHConnection[] GetKnownHosts(){ return registeredHosts_; }
 
-
-string[] GetHostsStringList()
-{
-  return ToStringArray(registeredHosts_);
-}
 
 void Register(string[] list)
 {

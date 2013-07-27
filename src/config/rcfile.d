@@ -287,7 +287,7 @@ void ResetShortcuts(Shortcut[] list)
   }
 
   if(!same){
-    string s = ToStringArray(list).join(SeparatorShortcutList);
+    string s = list.map!"a.toString()"().join(SeparatorShortcutList);
     instance_.setString("Directories", "Shortcuts", NonnullString(s));
     instance_.changed_ = true;
     page_list.NotifyReconstructShortcuts();
