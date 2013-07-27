@@ -32,24 +32,20 @@ import utils.string_util;
 string ReadLink(const string path, char[] buffer)
 {
   ssize_t len = readlink(toStringz(path), buffer.ptr, buffer.length);
-  if(len != -1){
+  if(len != -1)
     return AppendSlash(buffer[0 .. len].idup);
-  }
-  else{
+  else
     return null;
-  }
 }
 
 
 string RealPath(const string path, char[] buffer)
 {
   char * ptr = realpath(toStringz(path), buffer.ptr);
-  if(ptr){
+  if(ptr)
     return AppendSlash(Str.toString(ptr));
-  }
-  else{
+  else
     return null;
-  }
 }
 
 
