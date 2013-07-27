@@ -40,27 +40,26 @@ private:
   shellrc.ShellSetting shellSetting_;
 
 public:
-  void IncrementUseCount(){++count_;}
-  void DecrementUseCount(){--count_;}
-  bool IsUsed(){return count_ > 0;}
+  void IncrementUseCount(){ ++count_; }
+  void DecrementUseCount(){ --count_; }
+  bool IsUsed(){ return count_ > 0; }
 
-  string getHomeDir(){return homeDir_;}
-  void setHomeDir(string home){homeDir_ = AppendSlash(home);}
-  string getPrompt(){return prompt_;}
-  void setPrompt(string p){prompt_ = p;}
-  string getRPrompt(){return rprompt_;}
-  void setRPrompt(string p){rprompt_ = p;}
+  string getHomeDir(){ return homeDir_; }
+  string getPrompt (){ return prompt_; }
+  string getRPrompt(){ return rprompt_; }
+  void   setHomeDir(string home){ homeDir_ = AppendSlash(home); }
+  void   setPrompt (string p){ prompt_ = p; }
+  void   setRPrompt(string p){ rprompt_ = p; }
 
-  shellrc.ShellSetting GetShellSetting(){return shellSetting_;}
+  shellrc.ShellSetting GetShellSetting(){ return shellSetting_; }
 
   void ReadShellSetting(string gvfsRoot)
   {
     // called after successful mounting
 
     // if already constructed, return immediately
-    if(shellSetting_ !is null){
+    if(shellSetting_ !is null)
       return;
-    }
 
     // read /etc/passwd
     string line = LineInFileWhichStartsWith(getUsername() ~ ':', gvfsRoot ~ "etc/passwd");
@@ -75,7 +74,6 @@ public:
         if(homeDir_ != home2){
           homeDir_ = home2;
         }
-
         shellSetting_ = new shellrc.ShellSetting(homeDir_, shell);
       }
     }
@@ -108,23 +106,20 @@ public:
       // substitute supplied value
       if(userDomainHome.length >= 3){
         string temp = userDomainHome[2];
-        if(temp.length > 0){
+        if(temp.length > 0)
           homeDir_ = AppendSlash(temp);
-        }
       }
 
       if(userDomainHome.length >= 4){
         string temp = userDomainHome[3];
-        if(temp.length > 0){
+        if(temp.length > 0)
           prompt_ = temp;
-        }
       }
 
       if(userDomainHome.length >= 5){
         string temp = userDomainHome[4];
-        if(temp.length > 0){
+        if(temp.length > 0)
           rprompt_ = temp;
-        }
       }
     }
   }
@@ -164,17 +159,15 @@ public:
     const char separator = ':';
     string ret = getUsername() ~ separator ~ getDomain();
     if(homeDir_.length > 0){
-      static if(withSlash){
+      static if(withSlash)
         ret ~= separator ~ AppendSlash(homeDir_);
-      }
-      else{
+      else
         ret ~= separator ~ RemoveSlash(homeDir_);
-      }
+
       if(prompt_.length > 0){
         ret ~= separator ~ prompt_;
-        if(rprompt_.length > 0){
+        if(rprompt_.length > 0)
           ret ~= separator ~ rprompt_;
-        }
       }
     }
     return ret;
