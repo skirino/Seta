@@ -35,7 +35,10 @@ public:// make it easier to access through Mediator class
   string pwdLocal_;
 
 public:
-  this(){SetLocal();}
+  this()
+  {
+    SetLocal();
+  }
 
   string SetLocal()
   {
@@ -100,21 +103,18 @@ public:
   // for filer which uses locally-mounted vfs path
   string MountedVFSPath(string path)
   {
-    if(remote_){
+    if(remote_)
       return rootDir_[0..$-1] ~ path;
-    }
-    else{
+    else
       return path;
-    }
   }
 
 private:
   string GetHomeDirFrom_etc_passwd(string username)
   {
     string line = LineInFileWhichStartsWith(username ~ ':', rootDir_ ~ "etc/passwd");
-    if(line is null){
+    if(line is null)
       return null;
-    }
 
     size_t end   = locatePrior(line, ':');
     size_t start = locatePrior(line, ':', end);
