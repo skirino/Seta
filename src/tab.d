@@ -30,16 +30,18 @@ import gtk.EventBox;
 import gdk.Event;
 import glib.Str;
 
+import utils.ref_util;
+
 
 // tab with close button
 // In order to catch button press event on tab, make a subclass of EventBox
 class Tab : EventBox
 {
 private:
-  HBox hbox_;
-  Label labelIndex_;
-  Label labelPath_;// shared with FileManager
-  Button closeButton_;
+  Nonnull!HBox   hbox_;
+  Nonnull!Label  labelIndex_;
+  Nonnull!Label  labelPath_;// shared with FileManager
+  Nonnull!Button closeButton_;
   void delegate(char, uint) closePage_;
   char lr_;// 'L' or 'R'
   uint pageNum_;
@@ -48,8 +50,10 @@ public:
   this(char side, void delegate(char, uint) closePage)
   {
     lr_ = side;
-    labelIndex_ = new Label("idx");
-    labelPath_ = new Label("");
+    closePage_ = closePage;
+
+    labelIndex_.init(new Label("idx"));
+    labelPath_ .init(new Label(""));
     labelPath_.setEllipsize(PangoEllipsizeMode.START);
 
     // to reduce blank space around the button, wrap "img" by HBox and VBox
@@ -60,20 +64,19 @@ public:
     vboxImg.packStart(hboxImg, 1, 0, 0);
 
     // close button with x-mark
-    closeButton_ = new Button;
+    closeButton_.init(new Button);
     closeButton_.add(vboxImg);
     closeButton_.setRelief(GtkReliefStyle.NONE);
     closeButton_.setSizeRequest(20, 20);
     closeButton_.addOnClicked(&ClosePage);
 
-    hbox_ = new HBox(0, 0);
+    hbox_.init(new HBox(0, 0));
     hbox_.packStart(labelIndex_, 0, 0, 2);
-    hbox_.packStart(labelPath_, 1, 1, 2);
-    hbox_.packEnd(closeButton_, 0, 0, 2);
+    hbox_.packStart(labelPath_,  1, 1, 2);
+    hbox_.packEnd(closeButton_,  0, 0, 2);
 
     super();
     add(hbox_);
-    closePage_ = closePage;
     addOnButtonPress(&ButtonPressed);
     setVisibleWindow(0);// For clean redrawing of tabs, it is better not to have visible window.
     showAll();
@@ -83,13 +86,10 @@ private:
   bool ButtonPressed(Event e, Widget w)
   {
     auto eb = e.button();
-    if(eb.button == 2){// middle button, close the page associated this tab
-      CloseThisPage();
-      return true;
-    }
-    else{
+    if(eb.button != 2) // only middle button
       return false;
-    }
+    CloseThisPage();
+    return true;
   }
 
   void ClosePage(Button b)
