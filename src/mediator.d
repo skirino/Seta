@@ -22,8 +22,8 @@ MA 02110-1301 USA.
 module mediator;
 
 import utils.ref_util;
+import utils.dialog_util;
 import constants;
-import input_dialog;
 import page;
 import file_manager;
 import terminal;

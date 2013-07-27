@@ -41,6 +41,7 @@ import glib.GException;
 import utils.string_util;
 import utils.unistd_util;
 import utils.menu_util;
+import utils.dialog_util;
 import constants;
 import rcfile = config.rcfile;
 import config.dialog;
@@ -48,7 +49,6 @@ import scripts = config.nautilus_scripts;
 import fm.file_view;
 import fm.rename_dialog;
 import move_files_job;
-import input_dialog;
 
 
 void LaunchApp(AppInfoIF appInfo, File f)

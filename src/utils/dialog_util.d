@@ -18,7 +18,7 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module input_dialog;
+module utils.dialog_util;
 
 import std.algorithm;
 
@@ -43,7 +43,8 @@ string InputDialog(bool hideInput = false)(string title, string description, str
   d.setTitle(title);
 
   string ret;
-  entry.addOnActivate(delegate void(Entry e){
+  entry.addOnActivate(
+    delegate void(Entry e){
       d.response(GtkResponseType.OK);
     });
 
@@ -51,12 +52,11 @@ string InputDialog(bool hideInput = false)(string title, string description, str
   box.add(label);
   box.add(entry);
   d.getContentArea.add(box);
-  d.addButtons(["OK"                           , "_cancel"],
+  d.addButtons(["OK"              , "_Cancel"],
                [GtkResponseType.OK, GtkResponseType.CANCEL]);
 
   d.addOnResponse(
-    delegate void(int responseID, Dialog dialog)
-    {
+    delegate void(int responseID, Dialog dialog){
       if(responseID == GtkResponseType.OK){
         ret = entry.getText();
         d.destroy();

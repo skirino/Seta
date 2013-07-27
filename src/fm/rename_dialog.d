@@ -53,7 +53,7 @@ import pango.PgAttributeList;
 
 import utils.string_util;
 import utils.tree_util;
-import input_dialog;
+import utils.dialog_util;
 import statusbar;
 
 

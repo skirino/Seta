@@ -34,13 +34,13 @@ import glib.URI;
 import gtkc.gtk;
 import gtkc.glib;
 
-import utils.gio_util;
 import utils.string_util;
+import utils.gio_util;
+import utils.dialog_util;
 import constants;
 import desktop_notification;
 import fm.file_view;
 import thread_list;
-import input_dialog;
 import statusbar;
 
 
