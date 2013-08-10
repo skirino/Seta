@@ -68,9 +68,8 @@ public:
        void delegate(char) AppendPageCopy,
        void delegate(char, uint) ClosePage)
   {
-    if(!DirectoryExists(initialDir)){
+    if(!DirectoryExists(initialDir))
       initialDir = getenv("HOME") ~ '/';
-    }
 
     getCWDFromMain_ = GetCWDFromMain;
     appendPage_     = AppendPageCopy;
@@ -218,9 +217,8 @@ private:
   void TerminalMode()
   {
     if(mode_ != ViewMode.TERMINAL){
-      if(mode_ == ViewMode.BOTH){
+      if(mode_ == ViewMode.BOTH)
         SetLastSplitPosition();
-      }
       mode_ = ViewMode.TERMINAL;
       termWithScrollbar_.showAll();
       MoveFocusPosition();
@@ -231,17 +229,15 @@ private:
   void FilerMode()
   {
     if(mode_ != ViewMode.FILER){
-      if(mode_ == ViewMode.BOTH){
+      if(mode_ == ViewMode.BOTH)
         SetLastSplitPosition();
-      }
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.FILER;
       filer_.showAll();
       MoveFocusPosition();
       termWithScrollbar_.hide();
-      if(needUpdate){// Update AFTER changing the mode
+      if(needUpdate)// Update AFTER changing the mode
         filer_.Update();
-      }
     }
   }
 
@@ -254,9 +250,8 @@ private:
       termWithScrollbar_.showAll();
       MoveFocusPosition();
       paned_.setPosition(lastSplitPosition_);
-      if(needUpdate){// Update AFTER changing the mode
+      if(needUpdate)// Update AFTER changing the mode
         filer_.Update();
-      }
     }
   }
   //////////////////////// view mode
@@ -315,33 +310,28 @@ public:
 
   void FocusLower()
   {
-    if(mode_ != ViewMode.FILER){
+    if(mode_ != ViewMode.FILER)
       termWithScrollbar_.Get().grabFocus();
-    }
   }
 
   void FocusUpper()
   {
-    if(mode_ != ViewMode.TERMINAL){
+    if(mode_ != ViewMode.TERMINAL)
       filer_.GrabFocus();
-    }
   }
 
   void FocusShownWidget()
   {
-    if(mode_ == ViewMode.FILER){
+    if(mode_ == ViewMode.FILER)
       filer_.GrabFocus();
-    }
-    else{// mode_ == ViewMode.TERMINAL || mode_ == ViewMode.BOTH
+    else // mode_ == ViewMode.TERMINAL || mode_ == ViewMode.BOTH
       termWithScrollbar_.Get().grabFocus();
-    }
   }
 
   void MoveFocusPosition()
   {
-    if(getFocusChild() !is null){
+    if(getFocusChild() !is null)
       FocusShownWidget();
-    }
   }
   ///////////////////////// manipulation of focus
 
