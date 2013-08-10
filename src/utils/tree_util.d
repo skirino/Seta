@@ -49,7 +49,8 @@ TreePath GetPathAtPos(TreeView view, double x, double y)
   int cellx, celly;
   if(view.getPathAtPos(cast(int)x, cast(int)y, path, col, cellx, celly))
     return path;
-  return null;
+  else
+    return null;
 }
 
 
