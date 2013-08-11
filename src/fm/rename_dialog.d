@@ -118,22 +118,17 @@ void RenameFiles(string dir, string[] infiles)
           string message = newname ~ " exists. Overwrite?";
           int x;
 
-          if(files.length - i == 1){// only one file to rename
+          if(files.length - i == 1)// only one file to rename
             x = ChooseDialog!(2)(message, ["_OK", "_Cancel"]);
-          }
-          else{// there are still more than one files to rename
+          else// there are still more than one files to rename
             x = ChooseDialog!(4)(message, ["_OK", "_Skip this file", "Overwrite _all", "_Cancel all"]);
-          }
 
-          if(x == 3){// "cancel all"
+          if(x == 3)// "cancel all"
             break;
-          }
-          else if(x == 2){// "overwrite all"
+          else if(x == 2)// "overwrite all"
             askOverwrite = false;
-          }
-          else if(x == -1 || x == 1){// invalid, "cancel"
+          else if(x == -1 || x == 1)// invalid, "cancel"
             continue;
-          }
         }
 
         // does not exist || (exists && ("OK" || "overwrite all"))
@@ -144,21 +139,18 @@ void RenameFiles(string dir, string[] infiles)
         }
         catch(GException ex){
           int x = ChooseDialog!(2)(ex.msg, ["_Skip this file", "_Cancel all"]);
-          if(x == -1 || x == 1){
+          if(x == -1 || x == 1)
             break;
-          }
         }
       }
     }
   }
 
   // notify statusbar
-  if(num == 0){
+  if(num == 0)
     PushIntoStatusbar("Rename was canceled");
-  }
-  else{
+  else
     PushIntoStatusbar(PluralForm!(uint, "item was", "items were")(num) ~ " renamed");
-  }
 }
 
 
@@ -424,12 +416,10 @@ private class RenameDialog : Dialog
 
     string Do(int ReplaceType)(string oldname)
     {
-      if(oldname[$-1] == '/'){// directory
+      if(oldname[$-1] == '/')// directory
         return textPre_ ~ SearchReplace!(ReplaceType)(oldname[0 .. $-1]) ~ textApp_ ~ '/';
-      }
-      else{// file
+      else// file
         return textPre_ ~ SearchReplace!(ReplaceType)(oldname) ~ textApp_;
-      }
     }
 
     string SearchReplace(int ReplaceType)(string name)
@@ -451,19 +441,15 @@ private class RenameDialog : Dialog
       }
       else if(ReplaceType == ReplaceStringFirst ||
               ReplaceType == ReplaceStringLast){
-        static if(ReplaceType == ReplaceStringFirst){
+        static if(ReplaceType == ReplaceStringFirst)
           size_t idx = locatePattern(name, textSearch_);
-        }
-        else{// ReplaceStringLast
+        else// ReplaceStringLast
           size_t idx = locatePatternPrior(name, textSearch_);
-        }
 
-        if(idx == name.length){// no match
+        if(idx == name.length)// no match
           return name;
-        }
-        else{
+        else
           return name[0 .. idx] ~ textReplace_ ~ name[idx+textSearch_.length .. $];
-        }
       }
       else{// do not replace
         return name;
@@ -518,15 +504,13 @@ private class RenameDialog : Dialog
       string name = iter.getValueString(0);
       if(name[$-1] == '/'){
         newName = AppendSlash(newName);
-        if(!newName[0 .. $-1].contains('/')){
+        if(!newName[0 .. $-1].contains('/'))
           store_.setValue(iter, 1, newName);
-        }
       }
       else{
         newName = RemoveSlash(newName);
-        if(!newName.contains('/')){
+        if(!newName.contains('/'))
           store_.setValue(iter, 1, newName);
-        }
       }
     }
   }
@@ -561,4 +545,3 @@ private class RenameDialog : Dialog
   }
   ///////////////////// editable cell
 }
-
