@@ -38,28 +38,30 @@ private:
   Vector!(DirEntry) dFiltered_;
   Vector!(DirEntry) fFiltered_;
 
+  static immutable INITIAL_BUFFER_SIZE = 200;
+
 
 public:
   this()
   {
-    dAll_ = new Vector!(DirEntry)(200);
-    fAll_ = new Vector!(DirEntry)(200);
-    dSorted_ = new Vector!(DirEntry)(200);
-    fSorted_ = new Vector!(DirEntry)(200);
-    dTemp_ = new Vector!(DirEntry)(200);
-    fTemp_ = new Vector!(DirEntry)(200);
-    dFiltered_ = new Vector!(DirEntry)(200);
-    fFiltered_ = new Vector!(DirEntry)(200);
+    dAll_      = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
+    fAll_      = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
+    dSorted_   = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
+    fSorted_   = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
+    dTemp_     = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
+    fTemp_     = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
+    dFiltered_ = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
+    fFiltered_ = new Vector!(DirEntry)(INITIAL_BUFFER_SIZE);
   }
 
-  Vector!(DirEntry) GetDAll(){return dAll_;}
-  Vector!(DirEntry) GetFAll(){return fAll_;}
-  Vector!(DirEntry) GetDSorted(){return dSorted_;}
-  Vector!(DirEntry) GetFSorted(){return fSorted_;}
-  Vector!(DirEntry) GetDTemp(){return dTemp_;}
-  Vector!(DirEntry) GetFTemp(){return fTemp_;}
-  Vector!(DirEntry) GetDFiltered(){return dFiltered_;}
-  Vector!(DirEntry) GetFFiltered(){return fFiltered_;}
+  Vector!(DirEntry) GetDAll     (){ return dAll_; }
+  Vector!(DirEntry) GetFAll     (){ return fAll_; }
+  Vector!(DirEntry) GetDSorted  (){ return dSorted_; }
+  Vector!(DirEntry) GetFSorted  (){ return fSorted_; }
+  Vector!(DirEntry) GetDTemp    (){ return dTemp_; }
+  Vector!(DirEntry) GetFTemp    (){ return fTemp_; }
+  Vector!(DirEntry) GetDFiltered(){ return dFiltered_; }
+  Vector!(DirEntry) GetFFiltered(){ return fFiltered_; }
 
   long NumEntriesAll()
   {

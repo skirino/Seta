@@ -24,6 +24,7 @@ import core.thread;
 import std.c.stdlib;
 import std.string;
 import std.algorithm;
+import std.exception;
 
 import gtk.TreeView;
 import gtk.Widget;
@@ -50,6 +51,7 @@ import gio.DesktopAppInfo;
 import glib.GException;
 import gtkc.gtk;
 
+import utils.ref_util;
 import utils.time_util;
 import utils.string_util;
 import utils.gio_util;
@@ -73,20 +75,20 @@ class FileView : TreeView
 {
   //////////////////// GUI stuff
 private:
-  static const int[] cols =
+  static immutable int[] cols =
     [ColumnType.NAME, ColumnType.TYPE, ColumnType.SIZE,
      ColumnType.OWNER, ColumnType.PERMISSIONS, ColumnType.LAST_MODIFIED,
      ColumnType.COLOR];
-  ListStore store_;
+  Nonnull!ListStore store_;
 
-  EntryList eList_;
+  Nonnull!EntryList eList_;
 
 public:
   this(Mediator mediator)
   {
     mediator_ = mediator;
     showHidden_ = false;
-    eList_ = new EntryList;
+    eList_.init(new EntryList);
 
     super();
     setRulesHint(1);// alternating row colors
@@ -99,8 +101,8 @@ public:
     addOnUnrealize(&StopOngoingOperations);
     getSelection.setMode(GtkSelectionMode.MULTIPLE);
 
-    //                      name          type          size          owner         permissions   lastmodified  (color)
-    store_ = new ListStore([GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING]);
+    //                         name          type          size          owner         permissions   lastmodified  (color)
+    store_.init(new ListStore([GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING, GType.STRING]));
     setModel(store_);
 
     // columns
@@ -153,7 +155,7 @@ public:
 
   //////////////////// column
 private:
-  TreeViewColumn[ColumnType.COLOR] cols_;
+  TreeViewColumn[ColumnType.max] cols_;
 
   TreeViewColumn SetupNewColumn(ColumnType id)
   {
@@ -171,9 +173,8 @@ private:
   string GetValueString(TreeIter iter, TreeViewColumn col)
   {
     foreach(int i, c; cols_){
-      if(c is col){
+      if(c is col)
         return iter.getValueString(i);
-      }
     }
     return null;
   }
@@ -218,28 +219,25 @@ public:
 private:
   void Update(string dirname, File file = null, bool appendToHistory = false, bool notifyTerminal = false)
   {
-    assert(dirname[$-1] == '/');
+    enforce(dirname[$-1] == '/');
 
     File dirFile = file is null ? File.parseName(dirname) : file;
     bool remote = mediator_.FileSystemLookingAtRemoteFS(dirname);
 
-    if(!mediator_.FilerIsVisible()){
+    if(mediator_.FilerIsVisible()){
+      // start worker thread
+      EnumerateFilterSortSet(remote, dirname, dirFile, appendToHistory, notifyTerminal);
+    }
+    else{
       pwd_ = dirname;
       contentsChanged_ = false;
       mediator_.UpdatePathLabel(dirname, CountNumEntries(dirname));// just count number of entries
       ResetMonitoring(remote, dirFile);
 
-      if(notifyTerminal){
+      if(notifyTerminal)
         mediator_.TerminalChangeDirectoryFromFiler(pwd_);
-      }
-
-      if(appendToHistory){
+      if(appendToHistory)
         mediator_.FilerAppendToHistory(pwd_);
-      }
-    }
-    else{
-      // start worker thread
-      EnumerateFilterSortSet(remote, dirname, dirFile, appendToHistory, notifyTerminal);
     }
   }
   ///////////////////// list up entries in directory
@@ -255,14 +253,12 @@ private:
   {
     FileView view = cast(FileView)ptr;
     if(view !is null && view.contentsChanged_){
-      if(view.isRubberBandingActive()){// Updating contents of TreeView during rubber banding is problematic
+      if(view.isRubberBandingActive())// Updating contents of TreeView during rubber banding is problematic
         return 1;// will be repeatedly called until FALSE is returned
-      }
 
       // contents-change should not cancel user's request for "change directory"
-      if(view.prepareUpdateThread_ !is null && view.prepareUpdateThread_.isRunning()){// not updating
+      if(view.prepareUpdateThread_ !is null && view.prepareUpdateThread_.isRunning())// not updating
         return 1;// will be repeatedly called until FALSE is returned
-      }
 
       view.TryUpdate();
     }
@@ -279,16 +275,15 @@ private:
 
   void UpdateIfNecessary()
   {
-    if(contentsChanged_){
+    if(contentsChanged_)
       TryUpdate();
-    }
   }
 
   void ResetMonitoring(bool remote, File pwdNewFile)
   {
-    if(monitor_ !is null){
+    if(monitor_ !is null)
       monitor_.cancel();
-    }
+
     if(!remote){// remote dirs cannot be monitored
       try{
         monitor_ = pwdNewFile.monitorDirectory(GFileMonitorFlags.NONE, null);
@@ -302,11 +297,9 @@ public:
   void StopOngoingOperations(Widget w = null)
   {
     // disable monitoring of directory
-    if(monitor_ !is null){
+    if(monitor_ !is null)
       monitor_.cancel();
-    }
     contentsChanged_ = false;
-
     prepareUpdateThread_.StopAndWait();
   }
   ///////////////////// update driven by changes in directory
@@ -361,9 +354,8 @@ private:
 
     // update monitoring
     static if(withEnumerateDirEntries){
-      if(pwd_ != pwdNew){
+      if(pwd_ != pwdNew)
         ResetMonitoring(remote, pwdNewFile);
-      }
     }
 
     pwd_ = pwdNew;
@@ -371,13 +363,10 @@ private:
 
     ResetRows();
 
-    static if(appendToHistory){
+    static if(appendToHistory)
       mediator_.FilerAppendToHistory(pwd_);
-    }
-
-    static if(notifyTerminal){
+    static if(notifyTerminal)
       mediator_.TerminalChangeDirectoryFromFiler(pwd_);
-    }
   }
 
   void ResetRows()
@@ -408,23 +397,19 @@ private:
 
     // set entries to ListStore
     AppendRows(1000, colors, iter);// append up to 1000 rows
-    if(numRowsNow_ < eList_.NumEntriesSorted()){// if there are remaining rows to be added
+    if(numRowsNow_ < eList_.NumEntriesSorted())// if there are remaining rows to be added
       threadsAddIdle(&AppendRowsAtIdle, cast(void*)this);
-    }
   }
 
   void AppendRows(size_t numAppend, string[] colors = null, TreeIter iter = null)
   {
-    if(numRowsNow_ >= eList_.NumEntriesSorted()){
+    if(numRowsNow_ >= eList_.NumEntriesSorted())
       return;
-    }
 
-    if(colors is null){
+    if(colors is null)
       colors = rcfile.GetRowColors();
-    }
-    if(iter is null){
+    if(iter is null)
       iter = new TreeIter;
-    }
 
     size_t entDSize = eList_.GetDSorted().size();
     size_t entFSize = eList_.GetFSorted().size();
@@ -441,9 +426,8 @@ private:
       }
       numRowsNow_ = upper;
 
-      if(maxRows <= entDSize){// finished appending "numAppend" directories at this time
+      if(maxRows <= entDSize)// finished appending "numAppend" directories at this time
         return;
-      }
     }
 
     if(numRowsNow_ < entDSize + entFSize){// there are files which should be appended to the view
@@ -470,12 +454,10 @@ private:
     // This callback is called when displaying directories with more than 1000 entries.
     auto view = cast(FileView)ptr;// should not be 'scope'
     view.AppendRows(5000);// Append 5000 items at a time.
-    if(view.numRowsNow_ < view.eList_.NumEntriesSorted()){
+    if(view.numRowsNow_ < view.eList_.NumEntriesSorted())
       return 1;// continue to call this callback function
-    }
-    else{
+    else
       return 0;
-    }
   }
   ///////////////////// listup in another thread
 
@@ -500,9 +482,8 @@ private:
 
     foreach(id, width; rcfile.GetWidths()){
       if(id > 0){// omit "ColumnType.NAME"
-        if(width > 0){
+        if(width > 0)
           fileInfoAttributes_ ~= ',' ~ optionalAttributes_[id];
-        }
       }
     }
   }
@@ -591,9 +572,8 @@ public:
   void GoDownIfOnlyOneDir()
   {
     auto ents = eList_.GetDSorted();
-    if(ents.size() == 1){
+    if(ents.size() == 1)
       mediator_.FilerChangeDirectory(pwd_ ~ ents[0].GetName());
-    }
   }
   ////////////////////// change directory
 
@@ -637,9 +617,8 @@ private:
     scope iter = new TreeIter;
     iter.setModel(store_);
     auto validContext = GetTooltipContext(this, &x, &y, keyboardTip, path, iter);
-    if(!validContext || path is null){
+    if(!validContext || path is null)
       return false;
-    }
 
     TreeViewColumn col = GetColAtPos(this, x, y);
     string tooltipContent;
@@ -652,9 +631,8 @@ private:
       col.cellGetPosition(renderer, startPos, actualWidth);
       string text = GetValueString(iter, col);
       int textWidth = GetTextWidth(text);
-      if(actualWidth < textWidth){// text in the cell is too long and thus ellipsized
+      if(actualWidth < textWidth)// text in the cell is too long and thus ellipsized
         tooltipContent ~= text;
-      }
     }
     //////////////////////
 
@@ -698,18 +676,16 @@ private:
     string[] ret;
     foreach(iter; iters){
       string name = GetNameFromIter(iter);
-      if(name !is null){
+      if(name !is null)
         ret ~= name;
-      }
     }
     return ret;
   }
 
   string GetNameFromIter(TreeIter iter)
   {
-    if(iter is null){
+    if(iter is null)
       return null;
-    }
     return iter.getValueString(ColumnType.NAME);
   }
 
@@ -733,10 +709,8 @@ private:
     }
     else if(rowSelected <= eList_.GetDSorted().size()){// directory is double-clicked
       size_t index = rowSelected - 1;
-      if(! mediator_.FilerChangeDirectory(pwd_ ~ eList_.GetDSorted()[index].GetName())){
-        // no such directory, just update
-        TryUpdate();
-      }
+      if(! mediator_.FilerChangeDirectory(pwd_ ~ eList_.GetDSorted()[index].GetName()))
+        TryUpdate();// no such directory, just update
     }
     else{// file is double-clicked
       size_t index = rowSelected - 1 - eList_.GetDSorted().size();
@@ -789,17 +763,14 @@ private:
 
     case FileViewAction.SelectRow:
       TreePath path = GetPathAtCursor(this);
-      if(path is null){
+      if(path is null)
         return false;
-      }
       else{
         TreeSelection selection = getSelection();
-        if(selection.pathIsSelected(path)){
+        if(selection.pathIsSelected(path))
           selection.unselectPath(path);
-        }
-        else{
+        else
           selection.selectPath(path);
-        }
         return true;
       }
 
@@ -818,9 +789,8 @@ private:
     case FileViewAction.PopupMenu:
       // popup right-click menu
       TreePath path = GetPathAtCursor(this);
-      if(path !is null){// select the path
+      if(path !is null)// select the path
         getSelection().selectPath(path);
-      }
       PopupFilerMenu!(true)(path, ekey.time);
       return true;
 
@@ -918,16 +888,14 @@ private:
   {
     auto eb = e.button();
 
-    if(eb.window != getBinWindow().getWindowStruct()){// header is clicked
+    if(eb.window != getBinWindow().getWindowStruct())// header is clicked
       return false;
-    }
 
     grabFocus();// to enable select path at 1st click
     TreePath path = GetPathAtPos(this, eb.x, eb.y);
     TreeSelection selection = getSelection();
-    if(path is null){// empty space is clicked
+    if(path is null)// empty space is clicked
       selection.unselectAll();
-    }
 
     if(eb.button == MouseButton.RIGHT){// right button, popup menu
       if(path !is null){
@@ -1006,9 +974,8 @@ private:
             TreePath path = GetPathAtPos(this, eb.x, eb.y);
             TreeSelection selection = getSelection();
             if(path !is null){
-              if(selection.pathIsSelected(path)){
+              if(selection.pathIsSelected(path))
                 selection.unselectPath(path);
-              }
             }
           }
         }
@@ -1061,9 +1028,8 @@ private:
   {
     // prepare items that will be moved/copied
     string[] filenames = GetSelectedFileNames();
-    if(filenames.length > 0){
+    if(filenames.length > 0)
       selection.dataSetUris(MakeURIList(pwd_, filenames));
-    }
     draggingState_ = DraggingState.NEUTRAL;
   }
 
@@ -1089,12 +1055,10 @@ private:
         if(path !is null){
           string name = GetNameFromPath(path);
           if(sourceWidget !is this || name[$-1] != '/' || !getSelection().pathIsSelected(path)){
-            if(name == PARENT_STRING){// drop on "../"
+            if(name == PARENT_STRING)// drop on "../"
               destDir = mediator_.FileSystemParentDirectory(pwd_);
-            }
-            else if(name[$-1] == '/'){// drop on directory
+            else if(name[$-1] == '/')// drop on directory
               destDir = pwd_ ~ name;
-            }
           }
         }
       }
@@ -1111,9 +1075,8 @@ public:
   void TransferFinished(string destDir)
   {
     if(destDir == pwd_){// still showing contents of the same directory, and
-      if(mediator_.FileSystemLookingAtRemoteFS(pwd_)){// it is remote one
+      if(mediator_.FileSystemLookingAtRemoteFS(pwd_))// it is remote one
         TryUpdate();
-      }
     }
   }
   ////////////////////// drag and drop
