@@ -467,23 +467,23 @@ private:
 private:
   string fileInfoAttributes_;
 
-  static const string necessaryAttributes_ = "standard::name,standard::type,standard::is-symlink";
-  static const string[ColumnType.COLOR] optionalAttributes_ =
+  static immutable string ATTR_REQUIRED = "standard::name,standard::type,standard::is-symlink";
+  static immutable string[ColumnType.COLOR] ATTRS_OPTIONAL =
     ["", "standard::content-type", "standard::size", "owner::user", "unix::mode", "time::modified"];
 
   void InitFileInfoAttributes()
   {
-    fileInfoAttributes_ = necessaryAttributes_ ~ ',' ~ std.string.join(optionalAttributes_.dup, ",");
+    fileInfoAttributes_ = ATTR_REQUIRED ~ ',' ~ std.string.join(ATTRS_OPTIONAL.dup, ",");
   }
 
   void ResetFileInfoAttributes()
   {
-    fileInfoAttributes_ = necessaryAttributes_;
+    fileInfoAttributes_ = ATTR_REQUIRED;
 
     foreach(id, width; rcfile.GetWidths()){
       if(id > 0){// omit "ColumnType.NAME"
         if(width > 0)
-          fileInfoAttributes_ ~= ',' ~ optionalAttributes_[id];
+          fileInfoAttributes_ ~= ',' ~ ATTRS_OPTIONAL[id];
       }
     }
   }

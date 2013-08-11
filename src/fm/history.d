@@ -27,7 +27,7 @@ import anything_cd.dir_history;
 class DirHistory
 {
 private:
-  static const int MaxHistory = 50;
+  static immutable int MaxHistory = 50;
   string[MaxHistory] dirs_;// ring buffer
   int idxPWD_, bufferStart_, bufferEnd_;
 

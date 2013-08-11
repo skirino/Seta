@@ -90,7 +90,7 @@ private __gshared ScanHomeDirectoryJob thread_;
 class DirListBase
 {
 protected:
-  static const size_t MAX = 1000;
+  static immutable size_t MAX = 1000;
   Vector!(string) list_;
   string filename_;
 
@@ -225,8 +225,8 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
 
   string[] ScanChildren(string path)
   {
-    static const string attributes = "standard::name,standard::type,standard::is-symlink";
-    static const string[] ignoreDirs = ["lost+found", ".svn", ".git"];
+    static immutable string attributes = "standard::name,standard::type,standard::is-symlink";
+    static immutable string[] ignoreDirs = ["lost+found", ".svn", ".git"];
 
     string[] dirs = [];
 

@@ -143,7 +143,7 @@ public:
 
 
 private:
-  static const string ReturnIfCanceled =
+  static immutable string ReturnIfCanceled =
     "if(canceled_){
       threadsEnter();
       Unregister();

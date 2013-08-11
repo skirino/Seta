@@ -205,7 +205,7 @@ private:
 
   //////////////////// filtering in background
 private:
-  static const uint IdleTimeToStartScanInMillis = 500;
+  static immutable uint IdleTimeToStartScanInMillis = 500;
 
   bool textChanged_;
   uint sourceID_;

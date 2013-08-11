@@ -252,7 +252,7 @@ private:
 
 
   ///////////////////////// callback for keyboard shortcuts
-  static const string FocusedNoteOrReturnFalse =
+  static immutable string FocusedNoteOrReturnFalse =
     "auto note = GetFocusedNote();
     if(note is null){
       return false;

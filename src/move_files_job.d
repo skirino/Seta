@@ -225,12 +225,12 @@ private class MoveFilesJob(bool move) : Thread, StoppableOperationIF
 private:
   // utils for message strings
   static if(move){
-    static const string moving = "moving";
-    static const string Moving = "Moving";
+    static immutable string moving = "moving";
+    static immutable string Moving = "Moving";
   }
   else{
-    static const string moving = "copying";
-    static const string Moving = "Copying";
+    static immutable string moving = "copying";
+    static immutable string Moving = "Copying";
   }
 
   string GetRatioNow()

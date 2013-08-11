@@ -103,19 +103,19 @@ public:
   /////////////// inside worker thread
 private:
 
-  static const string ReturnProcess =
+  static immutable string ReturnProcess =
     "
     threadsEnter();
     Unregister();
     threadsLeave();
     return;
     ";
-  static const string ReturnIfCanceled =
+  static immutable string ReturnIfCanceled =
     "if(canceled_){" ~
       ReturnProcess ~
     "}";
 
-  static const string CloseAndReturnIfCanceled =
+  static immutable string CloseAndReturnIfCanceled =
     "if(canceled_){
       enumerate.close(null);" ~
       ReturnProcess ~
