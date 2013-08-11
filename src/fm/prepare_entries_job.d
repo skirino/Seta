@@ -74,16 +74,14 @@ public:
   void SetForEnumerate(bool remote, string attr, File pwdFile)
   {
     remote_ = remote;
-    if(remote){
+    if(remote)
       // "owner::user" cannot be obtained from the GVFS, then switch to faster content-type
       attributes_ = attr
         .substitute(",owner::user", "")
         .substitute("standard::content-type", "standard::fast-content-type")
         .idup;
-    }
-    else{
+    else
       attributes_ = attr;
-    }
     pwdFile_ = pwdFile;
   }
 
@@ -139,24 +137,20 @@ private:
       while((info = enumerate.nextFile(null)) !is null){
         mixin(CloseAndReturnIfCanceled);
 
-        if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
+        if(info.getFileType() == GFileType.TYPE_DIRECTORY)// directory
           entriesDAll_.append(new DirEntry(info, 0));
-        }
-        else{// file
+        else// file
           entriesFAll_.append(new DirEntry(info, 0, 0));
-        }
       }
     }
     else{// local
       while((info = enumerate.nextFile(null)) !is null){
         mixin(CloseAndReturnIfCanceled);
 
-        if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
+        if(info.getFileType() == GFileType.TYPE_DIRECTORY)// directory
           entriesDAll_.append(new DirEntry(info, dir_));
-        }
-        else{// file
+        else// file
           entriesFAll_.append(new DirEntry(info));
-        }
       }
     }
 
@@ -328,12 +322,11 @@ public:
     Vector!(DirEntry) entriesDFiltered,
     Vector!(DirEntry) entriesFFiltered)
   {
-    if(readDisk){
+    if(readDisk)
       super(&EnumerateFilterSort);
-    }
-    else{
+    else
       super(&FilterSort);
-    }
+
     canceled_ = false;
     dir_ = dir;
     fv_ = fv;
@@ -383,20 +376,17 @@ private:
                              Pred cmp)
   {
     // cancel check
-    if(canceled_){
+    if(canceled_)
       return true;
-    }
 
     size_t n1 = n / 2;
     size_t n2 = n - n1;
 
-    if(mpsort_with_tmp (base + n1, n2, tmp, cmp)){
+    if(mpsort_with_tmp (base + n1, n2, tmp, cmp))
       return true;
-    }
 
-    if(mpsort_with_tmp (base,      n1, tmp, cmp)){
+    if(mpsort_with_tmp (base,      n1, tmp, cmp))
       return true;
-    }
 
     size_t a = 0;
     size_t alim = n1;
@@ -451,25 +441,21 @@ private:
       return false;
     }
     else{
-      // cancel check
-      if(canceled_){
+      if(canceled_)// cancel check
         return true;
-      }
 
       size_t n1 = n / 2;
       size_t n2 = n - n1;
 
-      if(mpsort_with_tmp (base + n1, n2, tmp, cmp)){
+      if(mpsort_with_tmp (base + n1, n2, tmp, cmp))
         return true;
-      }
 
       if (n1 < 2){
         tmp[0] = base[0];
       }
       else{
-        if(mpsort_into_tmp (base, n1, tmp, cmp)){
+        if(mpsort_into_tmp (base, n1, tmp, cmp))
           return true;
-        }
       }
 
       size_t t = 0;
