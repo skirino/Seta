@@ -37,10 +37,10 @@ import thread_list;
 class FilterDirsJob : Thread, StoppableOperationIF
 {
 private:
-  static const size_t MaxNumberOfPathsFromHistory = 100;
-  static const size_t MaxNumberOfPathsFromList = 1000;
-  static const size_t MaxNumberOfPaths = 1000;
-  static const size_t PER_PAGE = 100;
+  static immutable size_t MaxNumberOfPathsFromHistory = 100;
+  static immutable size_t MaxNumberOfPathsFromList    = 1000;
+  static immutable size_t MaxNumberOfPaths            = 1000;
+  static immutable size_t PER_PAGE                    = 100;
 
   mixin ListedOperationT;
   bool canceled_;
@@ -90,9 +90,8 @@ public:
 
     string[] words = [];
     foreach(word; toLower(targetText_).split()){
-      if(word.length > 0){
+      if(word.length > 0)
         words ~= word;
-      }
     }
 
     // process paths PER_PAGE and check cancel flag at start of page
@@ -107,9 +106,8 @@ public:
         size_t start = pageIndex * PER_PAGE;
         size_t end   = min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
-          if(dirlist[i].containsWords(words)){
+          if(dirlist[i].containsWords(words))
             pathsFromHistory.append(dirlist[i]);
-          }
         }
       }
     }
@@ -125,14 +123,12 @@ public:
         size_t start = pageIndex * PER_PAGE;
         size_t end   = min(start + PER_PAGE, len);
         for(size_t i=start; i<end; ++i){
-          if(dirlist[i].containsWords(words)){
+          if(dirlist[i].containsWords(words))
             pathsFromList.append(dirlist[i]);
-          }
         }
 
-        if(pathsFromList.size >= MaxNumberOfPaths){// sufficient number of paths found
+        if(pathsFromList.size >= MaxNumberOfPaths)// sufficient number of paths found
           break;
-        }
       }
     }
 
@@ -163,9 +159,8 @@ private bool containsWords(string targetStr, string[] words)
 {
   string str = targetStr.toLower();
   foreach(word; words){
-    if(!str.containsPattern(word)){
+    if(!str.containsPattern(word))
       return false;
-    }
   }
   return true;
 }
