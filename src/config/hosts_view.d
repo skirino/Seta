@@ -96,15 +96,15 @@ public:
     void delegate(string, string, CellRendererText) cb3,
     void delegate(string, string, CellRendererText) cb4)
   {
-    rendUser_.setProperty("editable", 1);
-    rendHost_.setProperty("editable", 1);
-    rendHome_.setProperty("editable", 1);
-    rendPrompt_.setProperty("editable", 1);
+    rendUser_   .setProperty("editable", 1);
+    rendHost_   .setProperty("editable", 1);
+    rendHome_   .setProperty("editable", 1);
+    rendPrompt_ .setProperty("editable", 1);
     rendRPrompt_.setProperty("editable", 1);
-    rendUser_.addOnEdited(cb0);
-    rendHost_.addOnEdited(cb1);
-    rendHome_.addOnEdited(cb2);
-    rendPrompt_.addOnEdited(cb3);
+    rendUser_   .addOnEdited(cb0);
+    rendHost_   .addOnEdited(cb1);
+    rendHome_   .addOnEdited(cb2);
+    rendPrompt_ .addOnEdited(cb3);
     rendRPrompt_.addOnEdited(cb4);
   }
 }
