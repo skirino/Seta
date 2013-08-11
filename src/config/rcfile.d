@@ -152,9 +152,9 @@ mixin(GetString!("Terminal", "PROMPT"));
 mixin(GetString!("Terminal", "RPROMPT"));
 mixin(GetString!("Terminal", "ReplaceTargetLeft"));
 mixin(GetString!("Terminal", "ReplaceTargetRight"));
-double GetTransparency(){return instance_.getDouble("Terminal", "BackgroundTransparency");}
-uint GetScrollLinesOnKeyAction(){return instance_.getInteger("Terminal", "ScrollLinesOnKeyAction");}
-bool GetEnablePathExpansion(){return instance_.getBoolean("Terminal", "EnablePathExpansion") != 0;}
+double GetTransparency(){ return instance_.getDouble("Terminal", "BackgroundTransparency"); }
+uint GetScrollLinesOnKeyAction(){ return instance_.getInteger("Terminal", "ScrollLinesOnKeyAction"); }
+bool GetEnablePathExpansion(){ return instance_.getBoolean("Terminal", "EnablePathExpansion") != 0; }
 
 mixin(GetString!("Terminal", "UserDefinedText1"));
 mixin(GetString!("Terminal", "UserDefinedText2"));
@@ -178,10 +178,10 @@ string GetUserDefinedText(int index)
 private const string SeparatorShortcutList = "_///_";
 private const string SeparatorShortcut = "_//_";
 
-string[] GetInitialDirectoriesLeft (){return instance_.getStringList("Directories", "InitialDirectoriesLeft");}
-string[] GetInitialDirectoriesRight(){return instance_.getStringList("Directories", "InitialDirectoriesRight");}
-string GetInitialDirectoryLeft (){return GetInitialDirectoriesLeft ()[0];}
-string GetInitialDirectoryRight(){return GetInitialDirectoriesRight()[0];}
+string[] GetInitialDirectoriesLeft (){ return instance_.getStringList("Directories", "InitialDirectoriesLeft"); }
+string[] GetInitialDirectoriesRight(){ return instance_.getStringList("Directories", "InitialDirectoriesRight"); }
+string GetInitialDirectoryLeft (){ return GetInitialDirectoriesLeft ()[0]; }
+string GetInitialDirectoryRight(){ return GetInitialDirectoriesRight()[0]; }
 
 struct Shortcut
 {
@@ -224,11 +224,9 @@ Shortcut[] GetShortcuts()
     Shortcut[] ret;
     foreach(s; list){
       Shortcut temp;
-      if(temp.Parse(s)){
+      if(temp.Parse(s))
         ret ~= temp;
-      }
     }
-
     return ret;
   }
   else{
@@ -239,12 +237,10 @@ Shortcut[] GetShortcuts()
 string GetNthShortcut(uint n)
 {
   Shortcut[] shortcuts = GetShortcuts();
-  if(n < shortcuts.length){
+  if(n < shortcuts.length)
     return shortcuts[n].path_;
-  }
-  else{
+  else
     return null;
-  }
 }
 
 void AddDirectoryShortcut(string path)
@@ -264,9 +260,8 @@ void RemoveDirectoryShortcut(string path)
     Shortcut[] old = GetShortcuts();
     Shortcut[] list;
     foreach(shortcut; old){
-      if(shortcut.path_ != path){
+      if(shortcut.path_ != path)
         list ~= shortcut;
-      }
     }
     ResetShortcuts(list);
   }
@@ -298,7 +293,7 @@ void ResetShortcuts(Shortcut[] list)
 
 
 ///////////////// [SSH]
-string GetSSHOption(){return instance_.getString("SSH", "SSHOption");}
+string GetSSHOption(){ return instance_.getString("SSH", "SSHOption"); }
 
 string[] GetSSHHosts()
 {
@@ -335,9 +330,8 @@ void RemoveSSHHost(SSHConnection con)
     foreach(host; hosts){
       host = trim(host);
       scope con2 = new SSHConnection(host);
-      if(!con2.Equals(con)){
+      if(!con2.Equals(con))
         newhosts ~= host;
-      }
     }
     string newer = join(newhosts, ",");
     instance_.setString("SSH", "Hosts", newer);
@@ -621,10 +615,10 @@ private:
 
   string[] getStringList(string group, string key)
   {
-    if(hasKey(group, key)){
+    if(hasKey(group, key))
       return super.getStringList(group, key);
-    }
-    return null;
+    else
+      return null;
   }
 
   string[] GetSSHHosts()
