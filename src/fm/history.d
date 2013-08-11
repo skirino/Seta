@@ -33,19 +33,16 @@ private:
 
   int Idx(int i)
   {
-    if(i < 0){
+    if(i < 0)
       return MaxHistory + i;
-    }
-    else if(i >= MaxHistory){
+    else if(i >= MaxHistory)
       return i - MaxHistory;
-    }
-    else{
+    else
       return i;
-    }
   }
 
 public:
-  this(string dir){Reset(dir);}
+  this(string dir){ Reset(dir); }
 
   void Reset(string dir)
   {
@@ -55,16 +52,15 @@ public:
     dirs_[0] = dir;
   }
 
-  string GetPWD(){return dirs_[idxPWD_];}
+  string GetPWD(){ return dirs_[idxPWD_]; }
 
   void Append(string dir)
   {
     int next = Idx(idxPWD_ + 1);
 
     if(idxPWD_ == bufferEnd_){// if "idxPWD_" is at the end of the ring buffer
-      if(bufferStart_ == next){// "start" and "end" lie next to each other
+      if(bufferStart_ == next)// "start" and "end" lie next to each other
         bufferStart_ = Idx(bufferStart_ + 1);
-      }
     }
 
     bufferEnd_ = idxPWD_ = next;
@@ -74,34 +70,28 @@ public:
   void GoNext(bool ForwardDirection)()
   {
     static if(ForwardDirection){
-      if(idxPWD_ != bufferEnd_){
+      if(idxPWD_ != bufferEnd_)
         idxPWD_ = Idx(idxPWD_ + 1);
-      }
     }
     else{// back
-      if(idxPWD_ != bufferStart_){
+      if(idxPWD_ != bufferStart_)
         idxPWD_ = Idx(idxPWD_ - 1);
-      }
     }
   }
 
   string GetDirNext(bool ForwardDirection)()
   {
     static if(ForwardDirection){
-      if(idxPWD_ == bufferEnd_){
+      if(idxPWD_ == bufferEnd_)
         return null;
-      }
-      else{
+      else
         return dirs_[Idx(idxPWD_ + 1)];
-      }
     }
     else{// back
-      if(idxPWD_ == bufferStart_){
+      if(idxPWD_ == bufferStart_)
         return null;
-      }
-      else{
+      else
         return dirs_[Idx(idxPWD_ - 1)];
-      }
     }
   }
 
