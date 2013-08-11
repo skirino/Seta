@@ -136,17 +136,14 @@ private:
 
     if(responseID == GtkResponseType.OK){
       TreeIter iter = GetSelectedIter(view_.getSelection(), store_);
-      if(iter !is null){
+      if(iter !is null)
         dir_chosen_ = iter.getValueString(0);
-      }
     }
     else if(responseID == SCAN_FILESYSTEM){
-      if(PopupBox.yesNo("Start to scan your home directory?", "")){
+      if(PopupBox.yesNo("Start to scan your home directory?", ""))
         anything_cd.dir_list.Scan();
-      }
-      else{// do not destroy this dialog
+      else// do not destroy this dialog
         return;
-      }
     }
 
     destroy();
@@ -217,28 +214,24 @@ private:
   void CancelTimeoutCallback()
   {
     // cancel previous threadsAddTimeout to wait for an idle time (0.5 second)
-    if(sourceID_ > 0){
+    if(sourceID_ > 0)
       Source.remove(sourceID_);
-    }
   }
 
   void TextChanged(EditableIF e)
   {
-    if(textChanged_){
+    if(textChanged_)
       CancelTimeoutCallback();
-    }
-    else{
+    else
       textChanged_ = true;
-    }
     sourceID_ = threadsAddTimeout(IdleTimeToStartScanInMillis, &SearchDirsCallback, cast(void*)this);
   }
 
   extern(C) static int SearchDirsCallback(void * ptr)
   {
     ChangeDirDialog self = cast(ChangeDirDialog)ptr;
-    if(self !is null && !self.destroyed_ && self.textChanged_){
+    if(self !is null && !self.destroyed_ && self.textChanged_)
       self.StartFiltering();
-    }
     return 0;
   }
 
@@ -274,9 +267,8 @@ private:
 
     // select 1st row if it exists
     scope iter1st = GetIterFirst(store_);
-    if(iter1st !is null){
+    if(iter1st !is null)
       view_.getSelection().selectIter(iter1st);
-    }
 
     ResetTextChanged();
   }
