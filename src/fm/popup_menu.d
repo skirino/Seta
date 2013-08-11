@@ -364,12 +364,10 @@ void MakeDirectory(string pwd)
       PopupBox.error(dirname ~ " exists.", "error");
     }
     else{
-      try{
+      try
         newdir.makeDirectory(null);
-      }
-      catch(GException ex){
+      catch(GException ex)
         PopupBox.error(ex.msg, "error");
-      }
     }
   }
 }
@@ -381,12 +379,10 @@ void DeleteFiles(bool toTrash)(string pwd, string[] names)
     try{
       foreach(name; names){
         File f = File.parseName(pwd ~ name);
-        static if(toTrash){
+        static if(toTrash)
           f.trash(null);
-        }
-        else{
+        else
           f.delet(null);
-        }
       }
     }
     catch(GException ex){
