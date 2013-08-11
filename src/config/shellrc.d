@@ -27,7 +27,7 @@ import utils.string_util;
 
 
 private __gshared ShellSetting localhostShell_;
-ShellSetting GetLocalShellSetting(){return localhostShell_;}
+ShellSetting GetLocalShellSetting(){ return localhostShell_; }
 void Init()
 {
   localhostShell_ = new ShellSetting(getenv("HOME"), getenv("SHELL"));
@@ -47,21 +47,19 @@ private:
   ChangeDirAlias[] cdAliases_;
 
 public:
-  bool GetAutoCd(){return autoCd_;}
-  ChangeDirAlias[] GetChangeDirAliases(){return cdAliases_;}
+  bool GetAutoCd(){ return autoCd_; }
+  ChangeDirAlias[] GetChangeDirAliases(){ return cdAliases_; }
 
   this(string home, string shell)
   {
-    if(home.length == 0 || shell.length == 0){
+    if(home.length == 0 || shell.length == 0)
       return;// there's nothing I can do
-    }
 
     // obtain fullpaths to the shell's rc file
     size_t possh    = shell.locatePattern("sh");
     size_t posslash = shell.locatePrior('/', possh);
-    if(possh == shell.length || posslash == shell.length){
+    if(possh == shell.length || posslash == shell.length)
       return;
-    }
     string shelltype = shell[posslash+1 .. possh+2];
 
     string[] filenames =
@@ -113,32 +111,26 @@ private:
         // search for "setopt auto_cd"
         if(l.StartsWith("setopt ")){
           string l2 = triml(l[7 .. $]);
-          if(l2 == "auto_cd"){// line after "setopt "
+          if(l2 == "auto_cd")// line after "setopt "
             autoCd_ = true;
-          }
         }
 
         // "source" command
         string args;
-        if(l.StartsWith("source ")){
+        if(l.StartsWith("source "))
           args = triml(l[7 .. $]);
-        }
-        else if(l.StartsWith(". ")){
+        else if(l.StartsWith(". "))
           args = triml(l[2 .. $]);
-        }
 
         if(args !is null){
           // currently only 1 file (specified by the 1st argument) is processed
           string arg = args.Extract1stArg().ExpandEnvVars();
-          if(arg.StartsWith("/")){
+          if(arg.StartsWith("/"))
             fileList ~= arg;
-          }
-          else if(arg.StartsWith("~")){
+          else if(arg.StartsWith("~"))
             fileList ~= home ~ arg[1 .. $];
-          }
-          else{
+          else
             fileList ~= home ~ '/' ~ ExpandEnvVars(arg);
-          }
         }
 
         return true;// continue reading this file
@@ -146,4 +138,3 @@ private:
     return fileList;
   }
 }
-
