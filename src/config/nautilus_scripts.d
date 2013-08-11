@@ -31,10 +31,10 @@ import utils.string_util;
 class NautilusScript
 {
   string path_;
-  this(string path){path_ = path;}
+  this(string path){ path_ = path; }
 
-  string GetPath(){return path_;}
-  string GetName(){return GetBasename(path_);}
+  string GetPath(){ return path_; }
+  string GetName(){ return GetBasename(path_); }
   override int opCmp(Object rhs)
   {
     return StrCmp(path_, (cast(NautilusScript)rhs).path_);
@@ -63,9 +63,8 @@ class ScriptsDir
           dirs_ ~= new ScriptsDir(name);
         }
         else{// file
-          if(info.getAttributeBoolean("access::can-execute")){
+          if(info.getAttributeBoolean("access::can-execute"))
             scripts_ ~= new NautilusScript(name);
-          }
         }
       }
 
@@ -76,7 +75,7 @@ class ScriptsDir
     catch(Exception ex){}// no such file or directory
   }
 
-  string GetName(){return GetBasename(path_);}
+  string GetName(){ return GetBasename(path_); }
   override int opCmp(Object rhs)
   {
     return StrCmp(path_, (cast(ScriptsDir)rhs).path_);
@@ -90,13 +89,12 @@ class ScriptsDir
 
 
 private __gshared ScriptsDir top;
-ScriptsDir GetScriptsDirTop(){return top;}
+ScriptsDir GetScriptsDirTop(){ return top; }
 
 
 void Init()
 {
   top = new ScriptsDir(getenv("HOME") ~ "/.gnome2/nautilus-scripts/");
-  if(top.IsEmpty()){
+  if(top.IsEmpty())
     top = null;
-  }
 }
