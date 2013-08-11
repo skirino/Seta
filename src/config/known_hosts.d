@@ -39,9 +39,8 @@ void Register(string[] list)
   registeredHosts_.length = 0;
   foreach(host; list){
     auto con = new SSHConnection(host);
-    if(con.IsValid()){
+    if(con.IsValid())
       registeredHosts_ ~= con;
-    }
   }
 }
 
@@ -49,9 +48,8 @@ void Unregister(SSHConnection con)
 {
   SSHConnection[] temp;
   foreach(host; registeredHosts_){
-    if(!host.Equals(con.getUsername(), con.getDomain())){
+    if(!host.Equals(con.getUsername(), con.getDomain()))
       temp ~= host;
-    }
   }
   registeredHosts_ = temp;
 }
@@ -92,15 +90,12 @@ SSHConnection Find(string username, string domain)
 {
   // if the host has been registered, return it
   foreach(host; registeredHosts_){
-    if(host.Equals(username, domain)){
+    if(host.Equals(username, domain))
       return host;
-    }
   }
   foreach(host; temporalHosts_){
-    if(host.Equals(username, domain)){
+    if(host.Equals(username, domain))
       return host;
-    }
   }
   return null;
 }
-
