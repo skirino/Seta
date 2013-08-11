@@ -204,33 +204,28 @@ private:
           string key  = iter.getValueString(1);
           string code = iter.getValueString(2);
           if(key == previousKey){
-            if(code.length > 0){// skip empty (cleared) row
+            if(code.length > 0)// skip empty (cleared) row
               codeList ~= code;
-            }
           }
           else{
-            if(previousKey.length > 0){// exclude first time for each category
+            if(previousKey.length > 0)// exclude first time for each category
               changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
-            }
 
             previousKey = key;
             codeList.length = 0;
-            if(code.length > 0){// skip empty (cleared) row
+            if(code.length > 0)// skip empty (cleared) row
               codeList ~= code;
-            }
           }
         }
         while(keyStore_.iterNext(iter));
 
-        if(previousKey.length > 0){
+        if(previousKey.length > 0)
           changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
-        }
       }
     }
 
-    if(changed){
+    if(changed)
       rcfile.ReconstructKeybinds();
-    }
   }
 
   // for right click menu
@@ -238,19 +233,16 @@ private:
   {
     auto eb = e.button();
 
-    if(eb.window != keybinds_.getBinWindow().getWindowStruct()){// header is clicked
+    if(eb.window != keybinds_.getBinWindow().getWindowStruct())// header is clicked
       return false;
-    }
-    if(eb.button != MouseButton.RIGHT){// not right button
+    if(eb.button != MouseButton.RIGHT)// not right button
       return false;
-    }
 
     grabFocus();
 
     TreePath path = GetPathAtPos(keybinds_, eb.x, eb.y);
-    if(path is null){// empty space is clicked
+    if(path is null)// empty space is clicked
       return false;
-    }
     TreeIter iter = GetIter(keyStore_, path);
 
     // show menu for "Clear" and "Add"
@@ -400,9 +392,8 @@ private:
     mixin(CheckCheckButton!("Layout", "UseDesktopNotification"));
     mixin(CheckSpinButton!("NotifyExpiresInMSec"));
 
-    if(changed){
+    if(changed)
       page_list.NotifySetLayout();
-    }
   }
   ///////////////////// [Layout]
 
@@ -489,19 +480,16 @@ private:
 
     // check whether replace targets have "<n>"
     string targetL = entReplaceTargetLeft_.getText();
-    if(targetL.containsPattern("<n>")){
+    if(targetL.containsPattern("<n>"))
       changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetLeft" , targetL);
-    }
-    else{
+    else
       PopupBox.error(targetL ~ " is neglected since the signature for replace should contain \"<n>\".", "");
-    }
+
     string targetR = entReplaceTargetRight_.getText();
-    if(targetR.containsPattern("<n>")){
+    if(targetR.containsPattern("<n>"))
       changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetRight", targetR);
-    }
-    else{
+    else
       PopupBox.error(targetR ~ " is neglected since the signature for replace should contain \"<n>\".", "");
-    }
 
     changed |= rcfile.ResetInteger("Terminal", "ScrollLinesOnKeyAction", cast(int)sbScrollLinesOnKeyAction_.getValue());
 
@@ -515,9 +503,8 @@ private:
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText8", entUserDefinedText8_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText9", entUserDefinedText9_.getText());
 
-    if(changed){
+    if(changed)
       page_list.NotifyApplyTerminalPreferences();
-    }
   }
   ///////////////////// [Terminal]
 
@@ -629,9 +616,8 @@ private:
     if(store.getIterFirst(iter)){// ListStore is not empty
       do{
         auto dir = AppendSlash(trim(iter.getValueString(0)));
-        if(CanEnumerateChildren(dir)){
+        if(CanEnumerateChildren(dir))
           dirs ~= dir;
-        }
       }
       while(store.iterNext(iter));
     }
@@ -647,12 +633,10 @@ private:
       do{
         string label = trim(iter.getValueString(0));
         string path  = trim(iter.getValueString(1));
-        if(label.length == 0){
+        if(label.length == 0)
           label = GetBasename(path);
-        }
-        if(CanEnumerateChildren(path)){
+        if(CanEnumerateChildren(path))
           list ~= rcfile.Shortcut(label, path);
-        }
       }
       while(shortcutsStore_.iterNext(iter));
     }
@@ -664,24 +648,20 @@ private:
   {
     ListStore model = mixin(modelIdentifier);
     TreeIter iter = GetIterFromString(model, pathStr);
-    static if(transformFun.length == 0){
+    static if(transformFun.length == 0)
       model.setValue(iter, idx, newName);
-    }
-    else{
+    else
       model.setValue(iter, idx, mixin(transformFun) (newName));
-    }
   }
 
   // for right click menu
   bool ShowAppendRemoveMenu(Event e, Widget w, TreeView view, ListStore store)
   {
     auto eb = e.button();
-    if(eb.window != view.getBinWindow().getWindowStruct()){// header is clicked
+    if(eb.window != view.getBinWindow().getWindowStruct())// header is clicked
       return false;
-    }
-    if(eb.button != MouseButton.RIGHT){// not right button
+    if(eb.button != MouseButton.RIGHT)// not right button
       return false;
-    }
 
     auto iter = store.GetIter(GetPathAtPos(view, eb.x, eb.y));
     auto menu = new AppendRemoveMenu(view, store, iter);
@@ -702,9 +682,8 @@ private:
       iter_ = iter;
 
       append(new MenuItem(&Append, "_Append"));
-      if(iter !is null){
+      if(iter !is null)
         append(new MenuItem(&Remove, "_Remove"));
-      }
 
       showAll();
     }
@@ -713,12 +692,10 @@ private:
     {
       TreeIter next = new TreeIter;
       next.setModel(store_);
-      if(iter_ is null){// empty space is clicked
+      if(iter_ is null)// empty space is clicked
         store_.append(next);
-      }
-      else{// one row is clicked
+      else// one row is clicked
         store_.insertAfter(next, iter_);
-      }
 
       // select the new row
       TreePath path = next.getTreePath();
@@ -793,9 +770,8 @@ private:
       rcfile.Write();
     }
 
-    if(responseID != GtkResponseType.APPLY){
+    if(responseID != GtkResponseType.APPLY)
       destroy();
-    }
   }
 }
 
@@ -906,9 +882,9 @@ private void AttachPairWidget(Table t, uint row, string labelText, Widget w, str
 
 private void AttachSectionLabel(Table t, uint row, string text)
 {
-  if(row > 0){// append additional space between sections
+  if(row > 0)// append additional space between sections
     t.setRowSpacing(row-1, 15);
-  }
+
   auto l = new Label("<b>" ~ text ~ "</b>");// bold text
   l.setUseMarkup(1);
   l.setAlignment(0.0, 1.0);
@@ -917,5 +893,5 @@ private void AttachSectionLabel(Table t, uint row, string text)
 
 
 // constants to align widgets in Table
-private const int XPadding = 20;
-private const int YPadding = 3;
+private immutable int XPadding = 20;
+private immutable int YPadding = 3;
