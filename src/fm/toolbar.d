@@ -71,8 +71,8 @@ public:
 
 
   ///////////////////// accessor
-  uint GetNumShortcuts(){return cast(uint)numShortcuts_;}
-  Entry GetFilterEntry(){return filter_;}
+  uint GetNumShortcuts(){ return cast(uint)numShortcuts_; }
+  Entry GetFilterEntry(){ return filter_; }
 
   void ToggleShowHidden()
   {
@@ -354,9 +354,8 @@ private:
         assert(posAtmark != name.length);
         string user   = name[6 .. posAtmark];
         string domain = name[posAtmark+1 .. $-1];
-        if(HostIsLoggedIn(user, domain)){
+        if(HostIsLoggedIn(user, domain))
           return false;
-        }
       }
 
       auto menu = new MenuWithMargin;
@@ -373,9 +372,8 @@ private:
   void UnmountMedia(MenuItem item, string path)
   {
     // change directory of all pages showing dirs under "path"
-    if(path.containsPattern("/.gvfs/sftp ")){
+    if(path.containsPattern("/.gvfs/sftp "))
       page_list.NotifyFilerDisconnect(path, path);
-    }
     page_list.NotifyEscapeFromPath(path);
 
     UnmountByPath(path);
