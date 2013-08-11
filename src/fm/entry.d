@@ -143,12 +143,10 @@ private template CompareStringFuncMixin(string nameFun, string member)
         return StrCmp(e1.name_, e2.name_);
       }
       else{
-        static if(ascending){
+        static if(ascending)
           return i;
-        }
-        else{
+        else
           return -i;
-        }
       }
     }";
 }
@@ -165,12 +163,10 @@ private template CompareIntegerFuncMixin(string nameFun, string member)
         return StrCmp(e1.name_, e2.name_);
       }
       else{
-        static if(ascending){
+        static if(ascending)
           return cast(int)(e1." ~ member ~ " - e2." ~ member ~ ");
-        }
-        else{
+        else
           return cast(int)(e2." ~ member ~ " - e1." ~ member ~ ");
-        }
       }
     }";
 }
@@ -191,9 +187,8 @@ long CountNumEntries(string dirname)
     long num = 0;
     scope enumerate = f.enumerateChildren("", GFileQueryInfoFlags.NONE, null);
     FileInfo info;
-    while((info = enumerate.nextFile(null)) !is null){
+    while((info = enumerate.nextFile(null)) !is null)
       ++num;
-    }
     enumerate.close(null);
     return num;
   }
@@ -234,30 +229,24 @@ string PermissionInStr(uint mode, bool isSymlink)
 {
   char[10] ret;
 
-  if(isSymlink){
+  if(isSymlink)
     ret[0] = 'l';
-  }
-  else if((mode & S_IFMT) == S_IFDIR){
+  else if((mode & S_IFMT) == S_IFDIR)
     ret[0] = 'd';
-  }
-  else{
+  else
     ret[0] = '-';
-  }
 
   ret[1..4]  = RWX[(mode & S_IRWXU)/64][];
-  if(mode & S_ISUID){
+  if(mode & S_ISUID)
     ret[3] = ret[3] == 'x' ? 's' : 'S';
-  }
 
   ret[4..7]  = RWX[(mode & S_IRWXG)/8][];
-  if(mode & S_ISGID){
+  if(mode & S_ISGID)
     ret[6] = ret[6] == 'x' ? 's' : 'S';
-  }
 
   ret[7..10] = RWX[(mode & S_IRWXO)][];
-  if(mode & S_ISVTX){
+  if(mode & S_ISVTX)
     ret[9] = ret[9] == 'x' ? 't' : 'T';
-  }
 
   return ret.idup;
 }
