@@ -83,9 +83,8 @@ private KeyCode ParseKeyCode(string s, uint action)
   if(s.length > 0){// not empty
     AccelGroup.acceleratorParse(s, ret.keyval_, ret.state_);
     // if keyval_ is alphabet and SHIFT is pressed, keycode should be modified to uppercase
-    if(isAlpha(ret.keyval_) && (ret.state_ & GdkModifierType.SHIFT_MASK)){
+    if(isAlpha(ret.keyval_) && (ret.state_ & GdkModifierType.SHIFT_MASK))
       ret.keyval_ = toUpper(ret.keyval_);
-    }
   }
   else{// empty string
     ret.state_ = cast(GdkModifierType)0;
@@ -101,9 +100,8 @@ KeyCode[] ParseKeyCodeList(string s, uint action)
 
   foreach(x; list){
     KeyCode code = ParseKeyCode(trim(x), action);
-    if(code.IsValid()){
+    if(code.IsValid())
       ret ~= code;
-    }
   }
   return ret;
 }
@@ -129,9 +127,8 @@ private struct MapKeyAction
 
     // simple linear search
     foreach(action; actions_){
-      if(code.IsEqual(action)){
+      if(code.IsEqual(action))
         return action.actIdx_;
-      }
     }
     return -1;
   }
