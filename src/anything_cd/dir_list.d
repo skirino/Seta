@@ -54,9 +54,8 @@ void Scan()
 string ReplaceHomeDir(string dir)
 {
   auto home = getenv("HOME");
-  if(dir.StartsWith(home)){
+  if(dir.StartsWith(home))
     dir = "~" ~ dir[home.length .. $];
-  }
   return dir;
 }
 void Add(string dir)
@@ -108,9 +107,8 @@ public:
         if(line.length > 0){
           list_.append(line);
           static if(withinMAX){
-            if(list_.size() == MAX){
+            if(list_.size() == MAX)
               return false;
-            }
           }
         }
         return true;
@@ -120,9 +118,8 @@ public:
   void Save()
   {
     scope file = File(filename_, "w");
-    foreach(path; list_.array()){
+    foreach(path; list_.array())
       file.writeln(path);
-    }
   }
 
   void Add(string dir)
@@ -130,9 +127,8 @@ public:
     // check uniqueness of paths
     auto idx = list_.array().IndexOf(dir);
     if(idx == -1){// not found
-      if(list_.size() == MAX){
+      if(list_.size() == MAX)
         list_.pop();
-      }
       list_.prepend(dir);
     }
     else{// found
@@ -190,7 +186,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
   }
 
-  gdk.Window.Window GetAssociatedWindow(){return null;}
+  gdk.Window.Window GetAssociatedWindow(){ return null; }
 
 
 
@@ -209,9 +205,8 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
 
   void AppendOneDirectory(string path)
   {
-    if(path.StartsWith(home_)){
+    if(path.StartsWith(home_))
       path = "~" ~ path[home_.length .. $];
-    }
     v_.append(AppendSlash(path));
   }
 
@@ -223,10 +218,8 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     string[] dirs = ScanChildren(path);
     foreach(dir; dirs){
       ScanOneDirectory(path ~ '/' ~ dir);
-
-      if(canceled_){
+      if(canceled_)
         break;
-      }
     }
   }
 
@@ -244,9 +237,8 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
       while((info = enumerate.nextFile(null)) !is null){
         if((info.getFileType() == GFileType.TYPE_DIRECTORY) && (info.getIsSymlink() == 0)){
           string name = info.getName();
-          if(ignoreDirs.Contains(name)){
+          if(ignoreDirs.Contains(name))
             dirs ~= name;
-          }
         }
       }
       enumerate.close(null);
