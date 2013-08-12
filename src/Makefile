@@ -11,10 +11,10 @@ else # assuming Linux
 endif
 
 all: C/workaround.o
-	dmd ${DFLAGS} -O -ofseta ${LINKOPTS} ${INPUTS}
-
-debug: C/workaround.o
 	dmd ${DFLAGS} -g -version=DEBUG -ofseta ${LINKOPTS} ${INPUTS}
+
+release: C/workaround.o
+	dmd ${DFLAGS} -O -ofseta ${LINKOPTS} ${INPUTS}
 
 test: C/workaround.o
 	dmd ${DFLAGS} -unittest -ofsetatest ${LINKOPTS} ${INPUTS}
