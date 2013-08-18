@@ -163,7 +163,7 @@ private:
   void BuildRegexp()
   {
     if(re_ !is null)
-      re_.unref();
+      re_ = null;
 
     auto text = cb_.getActiveText();
     if(text.empty){
