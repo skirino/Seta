@@ -181,6 +181,8 @@ class StartSSHDialog : Dialog
 
   void SetRowContents(TreePath path, TreeView view)
   {
+    if(path is null)
+      return;
     SetRowContents(GetIter(view.getModel(), path));
   }
 
