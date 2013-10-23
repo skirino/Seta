@@ -32,6 +32,31 @@ import gtk.Label;
 import glib.Str;
 
 
+pure char** ToStringzArray(string[] array)
+{
+  // This function exists since glib.Str.toStringzArray seems to have an off-by-one error.
+  if(array.length == 0)
+    return null;
+  char** ret = (new char*[array.length + 1]).ptr;
+  foreach(size_t i, str; array){
+    ret[i] = cast(char*)(str.dup ~ '\0');
+  }
+  ret[array.length] = null;
+  return ret;
+}
+
+unittest{
+  assert(ToStringzArray([]) == null);
+  auto p1 = ToStringzArray(["a"]);
+  assert(Str.toString(p1[0]) == "a");
+  assert(p1[1] == null);
+  auto p2 = ToStringzArray(["ho", "ge"]);
+  assert(Str.toString(p2[0]) == "ho");
+  assert(Str.toString(p2[1]) == "ge");
+  assert(p2[2] == null);
+}
+
+
 // fast strcmp for D strings
 pure int StrCmp(string s1, string s2)
 {

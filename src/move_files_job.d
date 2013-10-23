@@ -24,7 +24,6 @@ import core.thread;
 import std.c.stdlib;
 
 import gtk.Clipboard;
-import gtk.SelectionData;
 import gdk.Threads;
 import gio.File;
 import gio.Cancellable;
@@ -63,7 +62,7 @@ string[] GetFilesFromStrv(char ** curis)
 
 string[] GetFilesFromSelection(GtkSelectionData * selection)
 {
-  // to work around limitation of Str.toStringArray
+  // to work around a limitation of Str.toStringArray
   // (whose return is limited to max 10 length)
   // I use the bare GTK API.
   char ** curis = gtk_selection_data_get_uris(selection);
@@ -121,7 +120,10 @@ private extern(C) void ClipboardGetFun(
   if(storedFiles.length > 0){
     string[] uris = storedMove ? [URI_MOVE] : [];
     uris ~= MakeURIList(storedDir, storedFiles);
-    (new SelectionData(selection)).dataSetUris(uris);
+    // Since destructor of SelectionData frees the memory which is also handled by gtk lib,
+    // creating a new instance of SelectionData causes double free error.
+    // To workaround the issue I directly use gtk API here.
+    gtk_selection_data_set_uris(selection, ToStringzArray(uris));
   }
 }
 
