@@ -84,7 +84,7 @@ private KeyCode ParseKeyCode(string s, uint action)
     AccelGroup.acceleratorParse(s, ret.keyval_, ret.state_);
     // if keyval_ is alphabet and SHIFT is pressed, keycode should be modified to uppercase
     if(isAlpha(ret.keyval_) && (ret.state_ & GdkModifierType.SHIFT_MASK))
-      ret.keyval_ = toUpper(ret.keyval_);
+      ret.keyval_ = std.ascii.toUpper(ret.keyval_);
   }
   else{// empty string
     ret.state_ = cast(GdkModifierType)0;
