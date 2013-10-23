@@ -21,12 +21,12 @@ MA 02110-1301 USA.
 module fm.entry;
 
 import std.conv;
+import std.string;
 import std.c.stdlib;
 import core.sys.posix.sys.stat;
 
 import gio.FileInfo;
 import gio.ContentType;
-import glib.Str;
 
 import utils.time_util;
 import utils.string_util;
@@ -201,28 +201,37 @@ long CountNumEntries(string dirname)
 
 string FileSizeInStr(long n)
 {
-  static immutable int kilo = 0x400;
-  static immutable int mega = 0x100000;
-  static immutable int giga = 0x40000000;
+  static immutable long kilo = 1000L;
+  static immutable long mega = 1000_000L;
+  static immutable long giga = 1000_000_000L;
+  static immutable long tera = 1000_000_000_000L;
+
+  string FileSizeFormat(long unit, string unitStr)
+  {
+    string sizeStr = "%4.1f".format(1.0 * n / unit);
+    return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr).trim ~ ' ' ~ unitStr;
+  }
 
   if(n < kilo)
     return n.to!string ~ " B";
+  if(n < mega)
+    return FileSizeFormat(kilo, "KB");
+  if(n < giga)
+    return FileSizeFormat(mega, "MB");
+  if(n < tera)
+    return FileSizeFormat(giga, "GB");
+  return FileSizeFormat(tera, "TB");
+}
 
-  char[] buffer;
-  buffer.length = 4;
-
-  if(n < mega){
-    string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/kilo);
-    return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " KB";
-  }
-  else if(n < giga){
-    string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/mega);
-    return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " MB";
-  }
-  else{
-    string sizeStr = Str.asciiFormatd(buffer, "%3.1f", 1.0*n/giga);
-    return (sizeStr[$-1] == '.' ? sizeStr[0..$-1] : sizeStr) ~ " GB";
-  }
+unittest{
+  assert(FileSizeInStr(0)             == "0 B");
+  assert(FileSizeInStr(999)           == "999 B");
+  assert(FileSizeInStr(1000)          == "1.0 KB");
+  assert(FileSizeInStr(1500)          == "1.5 KB");
+  assert(FileSizeInStr(15000)         == "15.0 KB");
+  assert(FileSizeInStr(1000000)       == "1.0 MB");
+  assert(FileSizeInStr(1000000000)    == "1.0 GB");
+  assert(FileSizeInStr(1000000000000) == "1.0 TB");
 }
 
 

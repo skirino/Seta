@@ -43,7 +43,7 @@ import ssh_connection;
 import page_list;
 
 
-static immutable string SetaVersion = "0.7.0";
+static immutable string SetaVersion = "0.7.1";
 
 void Init()
 {
