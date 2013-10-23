@@ -20,6 +20,7 @@ MA 02110-1301 USA.
 
 module fm.entry;
 
+import std.conv;
 import std.c.stdlib;
 import core.sys.posix.sys.stat;
 
@@ -205,7 +206,7 @@ string FileSizeInStr(long n)
   static immutable int giga = 0x40000000;
 
   if(n < kilo)
-    return Str.toString(cast(ulong)n) ~ " B";
+    return n.to!string ~ " B";
 
   char[] buffer;
   buffer.length = 4;

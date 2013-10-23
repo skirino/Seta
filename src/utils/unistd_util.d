@@ -20,11 +20,10 @@ MA 02110-1301 USA.
 
 module utils.unistd_util;
 
+import std.conv;
 import std.string;
 import core.sys.posix.unistd;
 import core.sys.posix.stdlib;
-
-import glib.Str;
 
 import utils.string_util;
 
@@ -43,7 +42,7 @@ string RealPath(const string path, char[] buffer)
 {
   char * ptr = realpath(toStringz(path), buffer.ptr);
   if(ptr)
-    return AppendSlash(Str.toString(ptr));
+    return AppendSlash(ptr.to!string);
   else
     return null;
 }

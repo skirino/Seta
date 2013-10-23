@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module fm.toolbar;
 
+import std.conv;
+
 import gtk.Widget;
 import gtk.Label;
 import gtk.Entry;
@@ -32,7 +34,6 @@ import gtk.Toolbar;
 import gtk.ToolItem;
 import gtk.SeparatorToolItem;
 import gdk.Event;
-import glib.Str;
 import glib.ListG;
 
 import utils.template_util;
@@ -218,7 +219,7 @@ public:
     foreach(i, shortcut; shortcuts){
       size_t index = i + 1;
       string dir   = shortcut.path_;
-      string label = "(" ~ Str.toString(index) ~ ") " ~ shortcut.label_;
+      string label = "(" ~ index.to!string ~ ") " ~ shortcut.label_;
       AppendShortcutToDirectoryButton(dir, label);
     }
 
@@ -230,7 +231,7 @@ public:
       string dir      = paths[i];
       string baseName = GetBasename(dir);
       size_t index    = i + 1 + numShortcuts_;
-      string label    = (index <= 9) ? "(" ~ Str.toString(index) ~ ") " ~ baseName : baseName;
+      string label    = (index <= 9) ? "(" ~ index.to!string ~ ") " ~ baseName : baseName;
       AppendShortcutToMountedVolumeButton(dir, label, name);
     }
 

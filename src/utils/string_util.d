@@ -27,9 +27,9 @@ import std.ascii;
 import std.process;
 import std.algorithm : min, map;
 import std.array;
+import std.conv;
 
 import gtk.Label;
-import glib.Str;
 
 
 pure char** ToStringzArray(string[] array)
@@ -48,11 +48,11 @@ pure char** ToStringzArray(string[] array)
 unittest{
   assert(ToStringzArray([]) == null);
   auto p1 = ToStringzArray(["a"]);
-  assert(Str.toString(p1[0]) == "a");
+  assert(p1[0].to!string == "a");
   assert(p1[1] == null);
   auto p2 = ToStringzArray(["ho", "ge"]);
-  assert(Str.toString(p2[0]) == "ho");
-  assert(Str.toString(p2[1]) == "ge");
+  assert(p2[0].to!string == "ho");
+  assert(p2[1].to!string == "ge");
   assert(p2[2] == null);
 }
 
@@ -105,7 +105,7 @@ string PluralForm(INT, string singularForm, string pluralForm = singularForm ~ "
   if(n == 1)
     return "1 " ~ singularForm;
   else
-    return Str.toString(n) ~ ' ' ~ pluralForm;
+    return n.to!string ~ ' ' ~ pluralForm;
 }
 
 

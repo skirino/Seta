@@ -41,7 +41,6 @@ import gdk.Threads;
 import gdk.Color;
 import gdk.Event;
 import gdk.DragContext;
-import glib.Str;
 import glib.Regex;
 import glib.Source;
 
@@ -93,9 +92,9 @@ public:
     pid_t pid;
     GError *e;
     auto success = vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0,
-                                                  Str.toStringz(initialDir), argv.ptr, null,
+                                                  initialDir.toStringz, argv.ptr, null,
                                                   cast(GSpawnFlags)0, null, null, &pid, &e);
-    enforce(success, text("!!! [Seta] Failed to fork shell process : ", Str.toString(e.message)));
+    enforce(success, text("!!! [Seta] Failed to fork shell process : ", to!string(e.message)));
     pid_ = pid;
 
     VtePty * ptyObj = vte_terminal_get_pty_object(vte_);
@@ -122,7 +121,7 @@ public:
     Color.parse(rcfile.GetColorBackground(), colorBack);
     vte_terminal_set_colors(vte_, colorFore.getColorStruct(), colorBack.getColorStruct(), null, 0);
 
-    vte_terminal_set_font_from_string(vte_, Str.toStringz(rcfile.GetFont()));
+    vte_terminal_set_font_from_string(vte_, rcfile.GetFont().toStringz);
     vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());
     vte_terminal_search_set_wrap_around(vte_, 1);
 
@@ -401,7 +400,7 @@ private:
 
   string GetCWDFromProcFS()
   {
-    string filename = "/proc/" ~ Str.toString(pid_) ~ "/cwd";
+    string filename = "/proc/" ~ pid_.to!string ~ "/cwd";
     return ReadLink(filename, readlinkBuffer_);
   }
 
@@ -449,7 +448,7 @@ private:
   string GetText()
   {
     char * text = vte_terminal_get_text(vte_, cast(VteSelectionFunc)null, null, null);
-    string ret = Str.toString(text);
+    string ret = text.to!string;
     free(text);
     return ret;
   }
@@ -519,12 +518,12 @@ private:
   {
     targetsL_[0] = substitute(targetLDIR, "<n>", "").idup;
     for(uint i=1; i<10; ++i){
-      targetsL_[i] = substitute(targetLDIR, "<n>", Str.toString(i)).idup;
+      targetsL_[i] = substitute(targetLDIR, "<n>", i.to!string).idup;
     }
 
     targetsR_[0] = substitute(targetRDIR, "<n>", "").idup;
     for(uint i=1; i<10; ++i){
-      targetsR_[i] = substitute(targetRDIR, "<n>", Str.toString(i)).idup;
+      targetsR_[i] = substitute(targetRDIR, "<n>", i.to!string).idup;
     }
   }
 
@@ -699,7 +698,7 @@ public:
   void InitDragAndDropFunctionality()
   {
     // accept "text/uri-list" (info==1) and "text/plain" (info==2)
-    GtkTargetEntry[] dragTargets = constants.GetDragTargets() ~ GtkTargetEntry(Str.toStringz("text/plain"), 0, 2);
+    GtkTargetEntry[] dragTargets = constants.GetDragTargets() ~ GtkTargetEntry(cast(char*)"text/plain".toStringz, 0, 2);
     DragAndDrop.destSet(
       this,
       GtkDestDefaults.ALL,
@@ -724,8 +723,7 @@ public:
     }
     else if(info == 2){// plain text, feed the original text
       char * cstr = selection.dataGetText();
-      string str = Str.toString(cstr);
-      FeedChild(str);
+      FeedChild(cstr.to!string);
     }
 
     auto dnd = new DragAndDrop(context.getDragContextStruct());
@@ -751,7 +749,7 @@ extern(C){
                                GdkColor *palette,
                                glong palette_size);
   void vte_terminal_set_font_from_string(VteTerminal *terminal,
-                                         char *name);
+                                         const char *name);
   void vte_terminal_set_scrollback_lines(VteTerminal *terminal,
                                          glong lines);
   void vte_terminal_set_audible_bell(VteTerminal *terminal,

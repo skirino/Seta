@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module file_manager;
 
+import std.conv;
+
 import gtk.Widget;
 import gtk.VBox;
 import gtk.Entry;
@@ -31,7 +33,6 @@ import gtk.MenuItem;
 import gdk.Threads;
 import gdk.Event;
 import gio.File;
-import glib.Str;
 import gtkc.gio;
 
 import utils.string_util;
@@ -505,7 +506,7 @@ private:
     else{
       // FAILED_HANDLED is returned when password dialog has been canceled
       if(error.code != GIOErrorEnum.FAILED_HANDLED){// other cases, e.g. password is incorrect
-        PopupBox.error(Str.toString(error.message), "error");
+        PopupBox.error(error.message.to!string, "error");
         PushIntoStatusbar("Failed to establish SSH/SFTP connection");
       }
     }

@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module fm.rename_dialog;
 
 import std.array;
+import std.conv;
 
 import gtk.Dialog;
 import gtk.Button;
@@ -47,7 +48,6 @@ import gtk.ComboBoxText;
 import gdk.Event;
 import gio.File;
 import glib.GException;
-import glib.Str;
 import glib.Regex;
 import gobject.Signals;
 import pango.PgAttribute;
@@ -538,7 +538,7 @@ private class RenameDialog : Dialog
                                        gpointer         user_data)
   {
     RenameDialog d = cast(RenameDialog)user_data;
-    d.pathStringLast_ = Str.toString(path);
+    d.pathStringLast_ = path.to!string;
     Entry ent = new Entry(cast(GtkEntry*)editable);
     ent.addOnFocusOut(&(d.FocusOut));// update "store_"
     ent.addOnActivate(&(d.EditingCellActivate));// move focus to "Rename" button

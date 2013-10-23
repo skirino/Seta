@@ -20,6 +20,7 @@ MA 02110-1301 USA.
 
 module config.rcfile;
 
+import std.conv;
 import std.string;
 import std.array;
 import std.algorithm;
@@ -30,7 +31,6 @@ import gtk.PopupBox;
 import gdk.Color;
 import gio.File;
 import gio.FileOutputStream;
-import glib.Str;
 
 import utils.gio_util;
 import utils.string_util;
@@ -167,7 +167,7 @@ mixin(GetString!("Terminal", "UserDefinedText8"));
 mixin(GetString!("Terminal", "UserDefinedText9"));
 string GetUserDefinedText(int index)
 {
-  string key = "UserDefinedText" ~ Str.toString(index);
+  string key = "UserDefinedText" ~ index.to!string;
   return instance_.getString("Terminal", key);
 }
 ///////////////// [Terminal]

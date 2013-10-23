@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module tab;
 
+import std.conv;
+
 import gtk.Widget;
 import gtk.Label;
 import gtk.Button;
@@ -28,7 +30,6 @@ import gtk.HBox;
 import gtk.VBox;
 import gtk.EventBox;
 import gdk.Event;
-import glib.Str;
 
 import utils.ref_util;
 
@@ -107,11 +108,11 @@ public:
   {
     lr_ = lr;
     pageNum_ = n;
-    labelIndex_.setText(Str.toString(n) ~ ": ");
+    labelIndex_.setText(n.to!string ~ ": ");
   }
   string GetID()
   {
-    return "" ~ lr_ ~ Str.toString(pageNum_);
+    return "" ~ lr_ ~ pageNum_.to!string;
   }
   bool OnLeftSide()
   {

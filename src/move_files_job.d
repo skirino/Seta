@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module move_files_job;
 
 import core.thread;
+import std.conv;
 import std.c.stdlib;
 
 import gtk.Clipboard;
@@ -28,7 +29,6 @@ import gdk.Threads;
 import gio.File;
 import gio.Cancellable;
 import glib.GException;
-import glib.Str;
 import glib.URI;
 import gtkc.gtk;
 import gtkc.glib;
@@ -51,7 +51,7 @@ string[] GetFilesFromStrv(char ** curis)
   string[] files;
   char ** ptr = curis;
   while((*ptr) != null){
-    string temp = URI.unescapeString(Str.toString(*ptr), null);
+    string temp = URI.unescapeString(to!string(*ptr), null);
     if(temp.length > 7){
       files ~= temp[7 .. $];// remove "file://"
     }
@@ -158,7 +158,7 @@ GdkDragAction GetFilesInClipboard(out string[] files)
     char ** ptr = curis;
 
     // check whether "action" is explicitly specified as "move" by the source side
-    if(Str.toString(curis[0]) == URI_MOVE){
+    if(curis[0].to!string == URI_MOVE){
       action = GdkDragAction.ACTION_MOVE;
       ptr++;
       gtk_clipboard_clear(cl);
@@ -237,7 +237,7 @@ private:
 
   string GetRatioNow()
   {
-    return Str.toString(numTransferred_) ~ '/' ~ Str.toString(files_.length);
+    return numTransferred_.to!string ~ '/' ~ files_.length.to!string;
   }
   string GetRatioItems()
   {
