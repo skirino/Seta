@@ -310,13 +310,17 @@ public:
 
   void FocusLower()
   {
-    if(mode_ != ViewMode.FILER)
+    if(mode_ == ViewMode.FILER)
+      filer_.GrabFocus();
+    else
       termWithScrollbar_.Get().grabFocus();
   }
 
   void FocusUpper()
   {
-    if(mode_ != ViewMode.TERMINAL)
+    if(mode_ == ViewMode.TERMINAL)
+      termWithScrollbar_.Get().grabFocus();
+    else
       filer_.GrabFocus();
   }
 
