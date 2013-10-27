@@ -87,7 +87,6 @@ bool ReadyToFeed(int pty, bool remote)
   // At present only c_iflag and c_oflag are checked.
   return remote ? ReadyToFeedRemote(pty) : ReadyToFeedLocal(pty);
 }
-
 private bool ReadyToFeedRemote(int pty)
 {
   termios tios;
@@ -103,7 +102,7 @@ private bool ReadyToFeedLocal(int pty)
   return
     (tios.c_iflag & (IUTF8 | IXON                ) || // bash
      tios.c_iflag & (IUTF8 | IXON | ICRNL | INLCR) )  // zsh
-     &&
+    &&
     (tios.c_oflag == (ONLCR | OPOST));
 }
 

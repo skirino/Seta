@@ -96,9 +96,7 @@ public:
                                                   cast(GSpawnFlags)0, null, null, &pid, &e);
     enforce(success, text("!!! [Seta] Failed to fork shell process : ", to!string(e.message)));
     pid_ = pid;
-
-    VtePty * ptyObj = vte_terminal_get_pty_object(vte_);
-    pty_ = vte_pty_get_fd(ptyObj);
+    pty_ = vte_pty_get_fd(vte_terminal_get_pty_object(vte_));
 
     Signals.connectData(vte_, "child-exited",
                         cast(GCallback)(&CloseThisPageCallback),
@@ -246,7 +244,6 @@ private:
         if(enableReplace_){
           text = ReplaceLRDIR(text);
         }
-
         string replaced = text.substitute("\\n", "\n").idup;
         FeedChild(replaced);
       }
@@ -406,14 +403,13 @@ private:
 
   void SyncFilerDirectoryByCwd()
   {
-    if(mediator_.FileSystemIsRemote())
+    if(mediator_.FileSystemIsRemote)
       return; // cwd of the child process can be obtained only within localhost
 
     auto dirFromProc = GetCWDFromProcFS();
     auto realPath = RealPath(cwd_, readlinkBuffer_);
     if(dirFromProc.empty || realPath.empty)// cannot happen
       return;
-
     if(realPath != dirFromProc){
       cwd_ = dirFromProc;
       mediator_.FilerChangeDirFromTerminal(cwd_);
@@ -801,7 +797,6 @@ extern(C){
                                           gpointer child_setup_data,
                                           GPid *child_pid,
                                           GError **error);
-
   struct VtePty;
   VtePty * vte_terminal_get_pty_object(VteTerminal *terminal);
   int vte_pty_get_fd(VtePty * pty);
