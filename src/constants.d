@@ -63,6 +63,12 @@ enum Direction
   RIGHT,
 }
 
+enum Side
+{
+  LEFT  = 'L',
+  RIGHT = 'R',
+}
+
 enum Order
 {
   FORWARD,

@@ -32,6 +32,7 @@ import gtk.EventBox;
 import gdk.Event;
 
 import utils.ref_util;
+import constants;
 
 
 // tab with close button
@@ -43,14 +44,14 @@ private:
   Nonnull!Label  labelIndex_;
   Nonnull!Label  labelPath_;// shared with FileManager
   Nonnull!Button closeButton_;
-  void delegate(char, uint) closePage_;
-  char lr_;// 'L' or 'R'
+  void delegate(Side, uint) closePage_;
+  Side side_;
   uint pageNum_;
 
 public:
-  this(char side, void delegate(char, uint) closePage)
+  this(Side side, void delegate(Side, uint) closePage)
   {
-    lr_ = side;
+    side_ = side;
     closePage_ = closePage;
 
     labelIndex_.init(new Label("idx"));
@@ -101,23 +102,19 @@ private:
 public:
   void CloseThisPage()
   {
-    closePage_(lr_, pageNum_ - 1);// convert to 0-based number
+    closePage_(side_, pageNum_ - 1);// convert to 0-based number
   }
 
-  void SetID(char lr, uint n)
+  void SetID(Side side, uint n)
   {
-    lr_ = lr;
+    side_ = side;
     pageNum_ = n;
     labelIndex_.setText(n.to!string ~ ": ");
   }
-  string GetID()
-  {
-    return "" ~ lr_ ~ pageNum_.to!string;
-  }
-  bool OnLeftSide()
-  {
-    return lr_ == 'L';
-  }
+  string GetID(){return side_ ~ pageNum_.to!string;}
+  Side GetSide(){return side_;}
+
+  bool OnLeftSide(){return side_ == Side.LEFT;}
 
   void SetPath(string p)
   {

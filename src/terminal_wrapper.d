@@ -24,6 +24,7 @@ import gtk.HBox;
 import gtk.VScrollbar;
 
 import utils.ref_util;
+import constants;
 import terminal;
 import mediator;
 
@@ -36,7 +37,7 @@ private:
 public:
   this(Mediator m,
        string initialDir,
-       string delegate(char, uint) GetCWDFromMain)
+       string delegate(Side, uint) GetCWDFromMain)
   {
     super(0, 0);
     terminal_.init(new Terminal(m, initialDir, GetCWDFromMain));

@@ -25,6 +25,7 @@ import gtk.Widget;
 import gobject.Value;
 
 import utils.ref_util;
+import constants;
 import rcfile = config.rcfile;
 import page_list;
 import page;
@@ -35,13 +36,13 @@ class Note : Notebook
 {
   ////////////////////////// GUI stuff
 private:
-  char side_;
+  immutable Side side_;
   Nonnull!SetaWindow mainWin_;
 
 public:
-  this(char lr, SetaWindow mainWin)
+  this(Side side, SetaWindow mainWin)
   {
-    side_ = lr;
+    side_ = side;
     mainWin_.init(mainWin);
 
     super();
@@ -95,7 +96,7 @@ public:
 private:
   string GetInitialDirectoryBySide()
   {
-    if(side_ == 'L')
+    if(side_ == Side.LEFT)
       return rcfile.GetInitialDirectoryLeft();
     else
       return rcfile.GetInitialDirectoryRight();

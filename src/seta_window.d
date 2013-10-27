@@ -76,8 +76,8 @@ public:
     {
       hpaned_.init(new HPaned);
       {
-        noteL_.init(new Note('L', this));
-        noteR_.init(new Note('R', this));
+        noteL_.init(new Note(Side.LEFT,  this));
+        noteR_.init(new Note(Side.RIGHT, this));
 
         string[] dirsL = rcfile.GetInitialDirectoriesLeft();
         foreach(dir; dirsL){
@@ -107,21 +107,21 @@ public:
   }
 
 private:
-  void AppendPageCopy(char lr)
+  void AppendPageCopy(Side side)
   {
     // Make a copy of the displayed page.
     // If a remote directory is being displayed,
     // it is problematic to startup zsh within a remote directory,
     // so just create a new page with initial directory.
-    if(lr == 'L')
+    if(side == Side.LEFT)
       noteL_.AppendPageCopy();
     else
       noteR_.AppendPageCopy();
   }
 
-  void ClosePage(char lr, uint num)
+  void ClosePage(Side side, uint num)
   {
-    Note note = lr == 'L' ? noteL_ : noteR_;
+    Note note = (side == Side.LEFT) ? noteL_ : noteR_;
     note.GetNthPage(num).PrepareDestroy();
     note.removePage(num);
 
@@ -131,14 +131,14 @@ private:
     if(npagesL == 0 && npagesR == 0){
       Main.quit();
     }
-    else if(lr == 'L' && npagesL == 0){
+    else if(side == Side.LEFT && npagesL == 0){
       auto pageR = noteR_.GetCurrentPage();
       if(pageR.WhichIsFocused() == FocusInPage.NONE)
         pageR.FocusLower();
       ExpandRightPane();
       ExpandRightPane();// expand twice in order to switch from left-pane-only mode to right-pane-only
     }
-    else if(lr == 'R' && npagesR == 0){
+    else if(side == Side.RIGHT && npagesR == 0){
       auto pageL = noteL_.GetCurrentPage();
       if(pageL.WhichIsFocused() == FocusInPage.NONE)
         pageL.FocusLower();
@@ -162,18 +162,17 @@ private:
   {
     auto note = GetFocusedNote();
     if(note is null) return;
-    immutable char lr = (note is noteL_) ? 'L' : 'R';
-    ClosePage(lr, note.getCurrentPage());
+    auto side = (note is noteL_) ? Side.LEFT : Side.RIGHT;
+    ClosePage(side, note.getCurrentPage());
   }
   ///////////////////////// GUI stuff
 
 
 
   ///////////////////////// file/dir path
-  string GetCWDOfChildWidget(char lr, uint n)
+  string GetCWDOfChildWidget(Side side, uint n)
   {
-    assert(lr == 'L' || lr == 'R');
-    Note note = (lr == 'L') ? noteL_ : noteR_;
+    auto note = (side == Side.LEFT) ? noteL_ : noteR_;
     auto page = (n == 0) ? note.GetCurrentPage() : note.GetNthPage(n-1);
     return (page is null) ? null : page.GetCWD();
   }

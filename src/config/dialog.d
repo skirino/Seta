@@ -523,10 +523,10 @@ private:
     uint row = 0;
 
     AttachSectionLabel(pageDirectories_, row++, "Directories shown on start-up on the left pane");
-    InitInitialDirTreeView!('L')(row++, initialDirsL_, initialDirsLStore_);
+    InitInitialDirTreeView!(Side.LEFT)(row++, initialDirsL_, initialDirsLStore_);
 
     AttachSectionLabel(pageDirectories_, row++, "Directories shown on start-up on the right pane");
-    InitInitialDirTreeView!('R')(row++, initialDirsR_, initialDirsRStore_);
+    InitInitialDirTreeView!(Side.RIGHT)(row++, initialDirsR_, initialDirsRStore_);
 
     AttachSectionLabel(pageDirectories_, row++, "Directory shortcuts");
     InitShortcutsTreeView(row++);
@@ -537,7 +537,7 @@ private:
     AttachPairWidget(pageDirectories_, row++, "Command-line option for SSH: ", sshOptionEntry_);
   }
 
-  void InitInitialDirTreeView(char lr)(uint row, ref TreeView view, ref ListStore store)
+  void InitInitialDirTreeView(Side side)(uint row, ref TreeView view, ref ListStore store)
   {
     view = new TreeView;
     view.setVexpand(1);
@@ -549,7 +549,7 @@ private:
 
     auto rend = new CellRendererText;
     rend.setProperty("editable", 1);
-    rend.addOnEdited(&(CellEdited!(0, "initialDirs" ~ lr ~ "Store_", "AppendSlash")));
+    rend.addOnEdited(&(CellEdited!(0, "initialDirs" ~ side ~ "Store_", "AppendSlash")));
     auto col = new TreeViewColumn("path", rend, "text", 0);
     col.setResizable(1);
     view.appendColumn(col);
@@ -557,7 +557,7 @@ private:
     store = new ListStore([GType.STRING]);
     view.setModel(store);
 
-    auto source = lr == 'L' ? rcfile.GetInitialDirectoriesLeft() : rcfile.GetInitialDirectoriesRight();
+    auto source = (side == Side.LEFT) ? rcfile.GetInitialDirectoriesLeft() : rcfile.GetInitialDirectoriesRight();
     foreach(dir; source){
       TreeIter iter = new TreeIter;
       store.append(iter);

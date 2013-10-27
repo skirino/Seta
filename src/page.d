@@ -62,11 +62,11 @@ private:
   bool mapped_ = false;
 
 public:
-  this(char side,
+  this(Side side,
        string initialDir,
-       string delegate(char, uint) GetCWDFromMain,
-       void delegate(char) AppendPageCopy,
-       void delegate(char, uint) ClosePage)
+       string delegate(Side, uint) GetCWDFromMain,
+       void delegate(Side) AppendPageCopy,
+       void delegate(Side, uint) ClosePage)
   {
     if(!DirectoryExists(initialDir))
       initialDir = getenv("HOME") ~ '/';
@@ -174,12 +174,11 @@ public:
 private:
   ViewMode mode_ = ViewMode.BOTH;// initialize BOTH to read disk at startup
   int lastSplitPosition_;
-  void delegate(char) appendPage_;
+  void delegate(Side) appendPage_;
 
   void AppendPage(Button b)
   {
-    char side = tab_.GetID()[0];
-    appendPage_(side);
+    appendPage_(tab_.GetSide());
   }
 
   void GoToDirOtherSide(Button b)
@@ -260,7 +259,7 @@ private:
 
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
 private:
-  string delegate(char, uint) getCWDFromMain_;
+  string delegate(Side, uint) getCWDFromMain_;
 
 public:
   string FileSystemRoot()
@@ -281,7 +280,7 @@ public:
 
   string GetCWDOtherSide()
   {
-    char side = (tab_.GetID()[0] == 'L') ? 'R' : 'L';
+    auto side = tab_.OnLeftSide() ? Side.RIGHT : Side.LEFT;
     return getCWDFromMain_(side, 0);
   }
 

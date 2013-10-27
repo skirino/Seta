@@ -73,7 +73,7 @@ private:
   immutable pid_t pid_;
 
 public:
-  this(Mediator mediator, string initialDir, string delegate(char, uint) getCWDLR)
+  this(Mediator mediator, string initialDir, string delegate(Side, uint) getCWDLR)
   {
     mediator_.init(mediator);
     cwd_      = initialDir;
@@ -194,12 +194,12 @@ private:
       return ReplaceLRDIRInCommandLine!(bool)();
 
     case TerminalAction.InputPWDLeft:
-      string inputPath = getCWDLR_('L', 0);// cwd for currently displayed page in left pane
+      string inputPath = getCWDLR_(Side.LEFT, 0);// cwd for currently displayed page in left pane
       FeedChild(EscapeSpecialChars(inputPath));
       return true;
 
     case TerminalAction.InputPWDRight:
-      string inputPath = getCWDLR_('R', 0);// cwd for currently displayed page in right pane
+      string inputPath = getCWDLR_(Side.RIGHT, 0);// cwd for currently displayed page in right pane
       FeedChild(EscapeSpecialChars(inputPath));
       return true;
 
@@ -283,7 +283,7 @@ public:
   ////////////////// traveling directory tree
 private:
   string cwd_;
-  string delegate(char, uint) getCWDLR_;
+  string delegate(Side, uint) getCWDLR_;
   Nonnull!Mediator mediator_;
 
 public:
@@ -527,9 +527,9 @@ private:
     }
   }
 
-  string ReplaceDIR(char LR)(string line)
+  string ReplaceDIR(Side side)(string line)
   {
-    static if(LR == 'L'){
+    static if(side == Side.LEFT){
       alias targetsL_ targets;
     }
     else{
@@ -541,7 +541,7 @@ private:
     // this code may have performance problem
     foreach(int i, target; targets){
       if(containsPattern(line, target)){
-        string replace = getCWDLR_(LR, i);
+        string replace = getCWDLR_(side, i);
         if(replace !is null){
           ret = substitute(ret, target, EscapeSpecialChars(replace)).idup;
         }
@@ -553,7 +553,7 @@ private:
 
   string ReplaceLRDIR(string line)
   {
-    return ReplaceDIR!('R')(ReplaceDIR!('L')(line));
+    return ReplaceDIR!(Side.RIGHT)(ReplaceDIR!(Side.LEFT)(line));
   }
 
   R ReplaceLRDIRInCommandLine(R)()// R is "bool" or "string"

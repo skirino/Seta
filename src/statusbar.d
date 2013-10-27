@@ -28,6 +28,7 @@ import gtk.MenuItem;
 import gtkc.gtk;// for gtk_get_current_event_time()
 
 import utils.menu_util;
+import constants;
 import rcfile = config.rcfile;
 import thread_list;
 import note;
@@ -65,8 +66,8 @@ private:
 
     noteL_ = noteL;
     noteR_ = noteR;
-    mixin(ConstructToggleButton!('R'));
-    mixin(ConstructToggleButton!('L'));
+    mixin(ConstructToggleButton!(Side.RIGHT));
+    mixin(ConstructToggleButton!(Side.LEFT));
 
     InitShowThreadListButton();
   }
@@ -108,11 +109,11 @@ private:
   ToggleButton showLButton, showRButton;
   Note noteL_, noteR_;
 
-  mixin(ToggleCallbackMixin!('L', 'R'));
-  mixin(ToggleCallbackMixin!('R', 'L'));
+  mixin(ToggleCallbackMixin!(Side.LEFT, Side.RIGHT));
+  mixin(ToggleCallbackMixin!(Side.RIGHT, Side.LEFT));
 
-  mixin(MoveLRMixin!('L', 'R'));
-  mixin(MoveLRMixin!('R', 'L'));
+  mixin(MoveLRMixin!(Side.LEFT, Side.RIGHT));
+  mixin(MoveLRMixin!(Side.RIGHT, Side.LEFT));
   ///////////////////////// show/hide left/right pane
 
 
@@ -200,7 +201,7 @@ bool ExpandRightPane()
 ///////////////////////// show/hide left/right pane
 
 
-template ConstructToggleButton(char l)
+template ConstructToggleButton(Side l)
 {
   immutable string ConstructToggleButton =
     "
@@ -212,7 +213,7 @@ template ConstructToggleButton(char l)
     ";
 }
 
-template ToggleCallbackMixin(char l, char r)
+template ToggleCallbackMixin(Side l, Side r)
 {
   immutable string ToggleCallbackMixin =
     "void Toggle" ~ l ~ "(ToggleButton b)
@@ -225,7 +226,7 @@ template ToggleCallbackMixin(char l, char r)
       }
       else{
         if(note" ~ l ~ "_.getNPages() == 0){
-          if('" ~ l ~ "' == 'L'){
+          if('" ~ l ~ "' == Side.LEFT){
             note" ~ l ~ "_.AppendNewPage();
           }
           else{
@@ -237,7 +238,7 @@ template ToggleCallbackMixin(char l, char r)
     }";
 }
 
-template MoveLRMixin(char l, char r)
+template MoveLRMixin(Side l, Side r)
 {
   immutable string MoveLRMixin =
     "bool Move" ~ l ~ "()
