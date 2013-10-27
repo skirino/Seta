@@ -140,7 +140,7 @@ class StartSSHDialog : Dialog
     hostsView_.addOnButtonPress(&ButtonPress);
     auto sw = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
     sw.add(hostsView_);
-    contentArea.add(sw);
+    contentArea.packStart(sw, 1, 1, 5);
 
     addButton("_Cancel", GtkResponseType.CANCEL);
     addButton("_OK",     GtkResponseType.OK);
