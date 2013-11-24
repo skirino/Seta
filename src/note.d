@@ -27,6 +27,7 @@ import gobject.Value;
 import utils.ref_util;
 import constants;
 import rcfile = config.rcfile;
+import config.page_init_option;
 import page_list;
 import page;
 import seta_window;
@@ -62,11 +63,11 @@ public:
     return GetNthPage(getCurrentPage());
   }
 
-  void AppendNewPage(string initialDir)
+  void AppendNewPage(PageInitOption opt)
   {
     auto page = new Page(
       side_,
-      initialDir,
+      opt.initialDir_,
       &mainWin_.GetCWDOfChildWidget,
       &mainWin_.AppendPageCopy,// not "&AppendPageCopy", since pages can be dragged onto the other Notebook
       &mainWin_.ClosePage);
@@ -80,6 +81,10 @@ public:
     childSetProperty(page, "tab-fill",   v);
 
     page.show();
+  }
+  void AppendNewPage(string dir)
+  {
+    AppendNewPage(PageInitOption(dir, null));
   }
   void AppendNewPage()
   {

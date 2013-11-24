@@ -80,13 +80,11 @@ public:
         noteL_.init(new Note(Side.LEFT,  this));
         noteR_.init(new Note(Side.RIGHT, this));
 
-        auto dirsL = rcfile.GetPageInitOptionsLeft().map!"a.initialDir_";
-        foreach(dir; dirsL){
-          noteL_.AppendNewPage(dir);
+        foreach(opt; rcfile.GetPageInitOptionsLeft()) {
+          noteL_.AppendNewPage(opt);
         }
-        auto dirsR = rcfile.GetPageInitOptionsRight().map!"a.initialDir_";
-        foreach(dir; dirsR){
-          noteR_.AppendNewPage(dir);
+        foreach(opt; rcfile.GetPageInitOptionsRight()) {
+          noteR_.AppendNewPage(opt);
         }
 
         hpaned_.pack1(noteL_, 1, 0);
