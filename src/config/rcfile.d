@@ -38,6 +38,7 @@ import constants;
 import config.shellrc;
 import config.nautilus_scripts;
 import config.keybind;
+import config.shortcut;
 import known_hosts = config.known_hosts;
 import ssh_connection;
 import page_list;
@@ -175,59 +176,17 @@ string GetUserDefinedText(int index)
 
 
 ///////////////// [Directories]
-private immutable string SeparatorShortcutList = "_///_";
-private immutable string SeparatorShortcut = "_//_";
-
 string[] GetInitialDirectoriesLeft (){ return instance_.getStringList("Directories", "InitialDirectoriesLeft"); }
 string[] GetInitialDirectoriesRight(){ return instance_.getStringList("Directories", "InitialDirectoriesRight"); }
 string GetInitialDirectoryLeft (){ return GetInitialDirectoriesLeft ()[0]; }
 string GetInitialDirectoryRight(){ return GetInitialDirectoriesRight()[0]; }
 
-struct Shortcut
-{
-  string label_, path_;
-  string toString()
-  {
-    return label_ ~ SeparatorShortcut ~ path_;
-  }
-  bool opEquals(Shortcut * rhs)
-  {
-    return label_ == rhs.label_ && path_ == rhs.path_;
-  }
-  bool Parse(string s)
-  {
-    string[] l = s.split(SeparatorShortcut);
-    if(l.length == 1){// path only
-      if(DirectoryExists(l[0])){
-        label_ = GetBasename(l[0]);
-        path_ = l[0];
-        return true;
-      }
-    }
-    else if(l.length == 2){// label and path
-      if(DirectoryExists(l[1])){
-        label_ = l[0];
-        path_ = l[1];
-        return true;
-      }
-    }
-    return false;
-  }
-}
 
 Shortcut[] GetShortcuts()
 {
   if(instance_.hasKey("Directories", "Shortcuts")){
     string contents = instance_.getString("Directories", "Shortcuts");
-    string[] list = contents.split(SeparatorShortcutList);
-
-    Shortcut[] ret;
-    foreach(s; list){
-      Shortcut temp;
-      if(temp.Parse(s))
-        ret ~= temp;
-    }
-    return ret;
+    return Shortcut.ParseList(contents);
   }
   else{
     return null;
@@ -270,19 +229,8 @@ void RemoveDirectoryShortcut(string path)
 void ResetShortcuts(Shortcut[] list)
 {
   Shortcut[] old = GetShortcuts();
-
-  bool same = list.length == old.length;
-  if(same){
-    foreach(i, l; list){
-      if(!l.opEquals(&old[i])){
-        same = false;
-        break;
-      }
-    }
-  }
-
-  if(!same){
-    string s = list.map!"a.toString()"().join(SeparatorShortcutList);
+  if(old != list) {
+    string s = Shortcut.ToShortcutListString(list);
     instance_.setString("Directories", "Shortcuts", NonnullString(s));
     instance_.changed_ = true;
     page_list.NotifyReconstructShortcuts();

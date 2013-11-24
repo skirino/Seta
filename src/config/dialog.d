@@ -57,6 +57,7 @@ import constants;
 import rcfile = config.rcfile;
 import config.keybind;
 import config.hosts_view;
+import config.shortcut;
 import page_list;
 
 
@@ -636,7 +637,7 @@ private:
         if(label.length == 0)
           label = GetBasename(path);
         if(CanEnumerateChildren(path))
-          list ~= rcfile.Shortcut(label, path);
+          list ~= Shortcut(label, path);
       }
       while(shortcutsStore_.iterNext(iter));
     }
