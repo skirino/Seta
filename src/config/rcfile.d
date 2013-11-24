@@ -39,6 +39,7 @@ import config.shellrc;
 import config.nautilus_scripts;
 import config.keybind;
 import config.shortcut;
+import config.page_init_option;
 import known_hosts = config.known_hosts;
 import ssh_connection;
 import page_list;
@@ -145,6 +146,21 @@ mixin(GetUint!("NotifyExpiresInMSec"));
 
 
 
+///////////////// [Pages]
+PageInitOption[] GetPageInitOptionsLeft (){ return instance_.GetPageInitOptionsBase("InitialPagesLeft" ); }
+PageInitOption[] GetPageInitOptionsRight(){ return instance_.GetPageInitOptionsBase("InitialPagesRight"); }
+
+private string GetDefaultInitialDirectoryBase(string key)
+{
+  auto list = instance_.GetPageInitOptionsBase(key);
+  return (list.length > 0) ? list[0].initialDir_ : getenv("HOME") ~ '/';
+}
+string GetDefaultInitialDirectoryLeft (){ return GetDefaultInitialDirectoryBase("InitialPagesLeft" ); }
+string GetDefaultInitialDirectoryRight(){ return GetDefaultInitialDirectoryBase("InitialPagesRight"); }
+///////////////// [Pages]
+
+
+
 ///////////////// [Terminal]
 mixin(GetString!("Terminal", "ColorForeground"));
 mixin(GetString!("Terminal", "ColorBackground"));
@@ -153,9 +169,9 @@ mixin(GetString!("Terminal", "PROMPT"));
 mixin(GetString!("Terminal", "RPROMPT"));
 mixin(GetString!("Terminal", "ReplaceTargetLeft"));
 mixin(GetString!("Terminal", "ReplaceTargetRight"));
-double GetTransparency(){ return instance_.getDouble("Terminal", "BackgroundTransparency"); }
-uint GetScrollLinesOnKeyAction(){ return instance_.getInteger("Terminal", "ScrollLinesOnKeyAction"); }
-bool GetEnablePathExpansion(){ return instance_.getBoolean("Terminal", "EnablePathExpansion") != 0; }
+double GetTransparency          (){ return instance_.getDouble ("Terminal", "BackgroundTransparency"); }
+uint   GetScrollLinesOnKeyAction(){ return instance_.getInteger("Terminal", "ScrollLinesOnKeyAction"); }
+bool   GetEnablePathExpansion   (){ return instance_.getBoolean("Terminal", "EnablePathExpansion") != 0; }
 
 mixin(GetString!("Terminal", "UserDefinedText1"));
 mixin(GetString!("Terminal", "UserDefinedText2"));
@@ -348,7 +364,7 @@ private:
     bool exist = Exists(filename_);
     if(exist){
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
-      if(getGroups() == ["Version", "Layout", "Terminal", "Directories", "SSH", "Keybind"]){
+      if(getGroups() == ["Version", "Layout", "Pages", "Terminal", "Directories", "SSH", "Keybind"]){
         if(getString("Version", "Version") != SetaVersion){// .setarc is old
           changed_ = true;
           setString("Version", "Version", SetaVersion);
@@ -402,6 +418,10 @@ private:
 
     mixin(SetDefaultValue!("Boolean", "Layout", "UseDesktopNotification", "false"));
     mixin(SetDefaultValue!("Integer", "Layout", "NotifyExpiresInMSec", "3000"));
+
+    // [Pages]
+    InitInitialPages("InitialPagesLeft");
+    InitInitialPages("InitialPagesRight");
 
     // [Terminal]
     auto colorTest = new Color;
@@ -537,6 +557,27 @@ private:
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText7", "<Alt>7"));
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText8", "<Alt>8"));
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText9", "<Alt>9"));
+  }
+
+  PageInitOption[] GetPageInitOptionsBase(string key)
+  {
+    if(hasKey("Pages", key))
+      return PageInitOption.ParseList(getString("Pages", key));
+    else
+      return null;
+  }
+
+  void InitInitialPages(string key)
+  {
+    auto pageOpts = GetPageInitOptionsBase(key);
+    auto pageOptsWithExistingDirs = pageOpts.filter!((p) => CanEnumerateChildren(p.initialDir_)).array;
+    if(pageOptsWithExistingDirs.length == 0) {
+      pageOptsWithExistingDirs = [PageInitOption(getenv("HOME") ~ '/', null)];
+    }
+    if(pageOptsWithExistingDirs != pageOpts) {
+      changed_ = true;
+      setString("Pages", key, PageInitOption.ToListString(pageOptsWithExistingDirs));
+    }
   }
 
   void InitInitialDirectories(string key)
@@ -680,6 +721,11 @@ ColorExecutable=#228B22
 
 UseDesktopNotification=false
 NotifyExpiresInMSec=3000
+
+
+
+[Pages]
+### Pages to be shown on startup
 
 
 [Terminal]
