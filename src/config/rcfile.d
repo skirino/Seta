@@ -175,8 +175,8 @@ string GetUserDefinedText(int index)
 
 
 ///////////////// [Directories]
-private const string SeparatorShortcutList = "_///_";
-private const string SeparatorShortcut = "_//_";
+private immutable string SeparatorShortcutList = "_///_";
+private immutable string SeparatorShortcut = "_//_";
 
 string[] GetInitialDirectoriesLeft (){ return instance_.getStringList("Directories", "InitialDirectoriesLeft"); }
 string[] GetInitialDirectoriesRight(){ return instance_.getStringList("Directories", "InitialDirectoriesRight"); }
