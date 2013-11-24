@@ -193,7 +193,7 @@ Shortcut[] GetShortcuts()
   }
 }
 
-string GetNthShortcut(uint n)
+string GetNthShortcutDir(uint n)
 {
   Shortcut[] shortcuts = GetShortcuts();
   if(n < shortcuts.length)

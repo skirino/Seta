@@ -177,7 +177,7 @@ private:
       FileManagerAction.GoToDir9:
       int index = q - FileManagerAction.GoToDir1;// 0 <= index <= 8
       if(index < toolbar_.GetNumShortcuts()){// shortcut exists
-        string dir = rcfile.GetNthShortcut(index);
+        string dir = rcfile.GetNthShortcutDir(index);
         CheckChangeDir(dir);
       }
       else{// mounted volumes
