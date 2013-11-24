@@ -202,12 +202,6 @@ string GetUserDefinedText(int index)
 
 
 ///////////////// [Directories]
-string[] GetInitialDirectoriesLeft (){ return instance_.getStringList("Directories", "InitialDirectoriesLeft" ); }
-string[] GetInitialDirectoriesRight(){ return instance_.getStringList("Directories", "InitialDirectoriesRight"); }
-string GetInitialDirectoryLeft (){ return GetInitialDirectoriesLeft ()[0]; }
-string GetInitialDirectoryRight(){ return GetInitialDirectoriesRight()[0]; }
-
-
 Shortcut[] GetShortcuts()
 {
   if(instance_.hasKey("Directories", "Shortcuts"))

@@ -595,20 +595,14 @@ private:
   ///////////////////// [Directories]
   Table pageDirectories_;
   Entry sshOptionEntry_;
-  TreeView shortcuts_, initialDirsL_, initialDirsR_;
-  ListStore shortcutsStore_, initialDirsLStore_, initialDirsRStore_;
+  TreeView shortcuts_;
+  ListStore shortcutsStore_;
 
   void InitDirectoriesPage()
   {
     pageDirectories_ = AppendWrappedTable(note_, "Directories and SSH");
 
     uint row = 0;
-
-    AttachSectionLabel(pageDirectories_, row++, "Directories shown on start-up on the left pane");
-    InitInitialDirTreeView!(Side.LEFT)(row++, initialDirsL_, initialDirsLStore_);
-
-    AttachSectionLabel(pageDirectories_, row++, "Directories shown on start-up on the right pane");
-    InitInitialDirTreeView!(Side.RIGHT)(row++, initialDirsR_, initialDirsRStore_);
 
     AttachSectionLabel(pageDirectories_, row++, "Directory shortcuts");
     InitShortcutsTreeView(row++);
@@ -617,34 +611,6 @@ private:
     InitSSHPage(row++);
     sshOptionEntry_ = new Entry(NonnullString(rcfile.GetSSHOption()));
     AttachPairWidget(pageDirectories_, row++, "Command-line option for SSH: ", sshOptionEntry_);
-  }
-
-  void InitInitialDirTreeView(Side side)(uint row, ref TreeView view, ref ListStore store)
-  {
-    view = new TreeView;
-    view.setVexpand(1);
-    view.setReorderable(1);
-    view.addOnButtonPress(delegate bool(Event e, Widget w){
-        return ShowAppendRemoveMenu(e, w, view, store);
-      });
-    AppendWithScrolledWindow(pageDirectories_, row, view);
-
-    auto rend = new CellRendererText;
-    rend.setProperty("editable", 1);
-    rend.addOnEdited(&(CellEdited!(0, "initialDirs" ~ side ~ "Store_", "AppendSlash")));
-    auto col = new TreeViewColumn("path", rend, "text", 0);
-    col.setResizable(1);
-    view.appendColumn(col);
-
-    store = new ListStore([GType.STRING]);
-    view.setModel(store);
-
-    auto source = (side == Side.LEFT) ? rcfile.GetInitialDirectoriesLeft() : rcfile.GetInitialDirectoriesRight();
-    foreach(dir; source){
-      TreeIter iter = new TreeIter;
-      store.append(iter);
-      store.setValue(iter, 0, dir);
-    }
   }
 
   void InitShortcutsTreeView(uint row)
@@ -684,29 +650,6 @@ private:
   }
 
   void ApplyChangesInDirectories()
-  {
-    ApplyChangesInInitialDirectories(initialDirsLStore_, "InitialDirectoriesLeft");
-    ApplyChangesInInitialDirectories(initialDirsRStore_, "InitialDirectoriesRight");
-    ApplyChangesInShortcuts();
-  }
-
-  void ApplyChangesInInitialDirectories(ListStore store, string key)
-  {
-    string[] dirs;
-    TreeIter iter = new TreeIter;
-    iter.setModel(store);
-    if(store.getIterFirst(iter)){// ListStore is not empty
-      do{
-        auto dir = AppendSlash(trim(iter.getValueString(0)));
-        if(CanEnumerateChildren(dir))
-          dirs ~= dir;
-      }
-      while(store.iterNext(iter));
-    }
-    rcfile.ResetStringList("Directories", key, dirs);
-  }
-
-  void ApplyChangesInShortcuts()
   {
     Shortcut[] list;
     TreeIter iter = new TreeIter;

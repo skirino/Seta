@@ -256,7 +256,7 @@ public:
   {
     string pwd = hist_.GetPWD();
     if(pwd.StartsWith(path)){// inside the mounted volume
-      string defaultDir = mediator_.OnLeftSide() ? rcfile.GetInitialDirectoryLeft() : rcfile.GetInitialDirectoryRight();
+      string defaultDir = mediator_.OnLeftSide() ? rcfile.GetDefaultInitialDirectoryLeft() : rcfile.GetDefaultInitialDirectoryRight();
       ChangeDirectory(defaultDir);
     }
   }

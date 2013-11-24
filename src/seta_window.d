@@ -22,6 +22,7 @@ module seta_window;
 
 import core.memory;
 import std.stdio;
+import std.algorithm;
 
 import gtk.MainWindow;
 import gtk.Main;
@@ -79,11 +80,11 @@ public:
         noteL_.init(new Note(Side.LEFT,  this));
         noteR_.init(new Note(Side.RIGHT, this));
 
-        string[] dirsL = rcfile.GetInitialDirectoriesLeft();
+        auto dirsL = rcfile.GetPageInitOptionsLeft().map!"a.initialDir_";
         foreach(dir; dirsL){
           noteL_.AppendNewPage(dir);
         }
-        string[] dirsR = rcfile.GetInitialDirectoriesRight();
+        auto dirsR = rcfile.GetPageInitOptionsRight().map!"a.initialDir_";
         foreach(dir; dirsR){
           noteR_.AppendNewPage(dir);
         }

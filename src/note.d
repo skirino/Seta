@@ -97,9 +97,9 @@ private:
   string GetInitialDirectoryBySide()
   {
     if(side_ == Side.LEFT)
-      return rcfile.GetInitialDirectoryLeft();
+      return rcfile.GetDefaultInitialDirectoryLeft();
     else
-      return rcfile.GetInitialDirectoryRight();
+      return rcfile.GetDefaultInitialDirectoryRight();
   }
 
   void LabelAllPages(Widget w, uint u, Notebook note)
