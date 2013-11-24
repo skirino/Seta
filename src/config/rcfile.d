@@ -226,7 +226,7 @@ void ResetShortcuts(Shortcut[] list)
 {
   Shortcut[] old = GetShortcuts();
   if(old != list) {
-    string s = Shortcut.ToShortcutListString(list);
+    string s = Shortcut.ToListString(list);
     instance_.setString("Directories", "Shortcuts", NonnullString(s));
     instance_.changed_ = true;
     page_list.NotifyReconstructShortcuts();

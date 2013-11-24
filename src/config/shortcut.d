@@ -71,7 +71,7 @@ struct Shortcut
     return ret;
   }
 
-  static string ToShortcutListString(Shortcut[] list) {
+  static string ToListString(Shortcut[] list) {
     return list.map!"a.toString"().join(SeparatorShortcutList);
   }
 }
