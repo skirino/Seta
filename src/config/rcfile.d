@@ -176,7 +176,7 @@ string GetUserDefinedText(int index)
 
 
 ///////////////// [Directories]
-string[] GetInitialDirectoriesLeft (){ return instance_.getStringList("Directories", "InitialDirectoriesLeft"); }
+string[] GetInitialDirectoriesLeft (){ return instance_.getStringList("Directories", "InitialDirectoriesLeft" ); }
 string[] GetInitialDirectoriesRight(){ return instance_.getStringList("Directories", "InitialDirectoriesRight"); }
 string GetInitialDirectoryLeft (){ return GetInitialDirectoriesLeft ()[0]; }
 string GetInitialDirectoryRight(){ return GetInitialDirectoriesRight()[0]; }
@@ -184,13 +184,10 @@ string GetInitialDirectoryRight(){ return GetInitialDirectoriesRight()[0]; }
 
 Shortcut[] GetShortcuts()
 {
-  if(instance_.hasKey("Directories", "Shortcuts")){
-    string contents = instance_.getString("Directories", "Shortcuts");
-    return Shortcut.ParseList(contents);
-  }
-  else{
+  if(instance_.hasKey("Directories", "Shortcuts"))
+    return Shortcut.ParseList(instance_.getString("Directories", "Shortcuts"));
+  else
     return null;
-  }
 }
 
 string GetNthShortcutDir(uint n)
@@ -206,8 +203,7 @@ void AddDirectoryShortcut(string path)
 {
   instance_.changed_ = true;
 
-  Shortcut[] list = GetShortcuts();
-  list ~= Shortcut(GetBasename(path), path);
+  Shortcut[] list = GetShortcuts() ~ Shortcut(GetBasename(path), path);
   ResetShortcuts(list);
 }
 
