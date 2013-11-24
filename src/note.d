@@ -67,7 +67,7 @@ public:
   {
     auto page = new Page(
       side_,
-      opt.initialDir_,
+      opt,
       &mainWin_.GetCWDOfChildWidget,
       &mainWin_.AppendPageCopy,// not "&AppendPageCopy", since pages can be dragged onto the other Notebook
       &mainWin_.ClosePage);

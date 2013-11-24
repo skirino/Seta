@@ -37,10 +37,11 @@ private:
 public:
   this(Mediator m,
        string initialDir,
+       string terminalRunCommand,
        string delegate(Side, uint) GetCWDFromMain)
   {
     super(0, 0);
-    terminal_.init(new Terminal(m, initialDir, GetCWDFromMain));
+    terminal_.init(new Terminal(m, initialDir, terminalRunCommand, GetCWDFromMain));
     packStart(terminal_, true, true, 0);
     auto vscrollbar = new VScrollbar(terminal_.getVadjustment());
     packStart(vscrollbar, false, false, 0);

@@ -73,7 +73,10 @@ private:
   immutable pid_t pid_;
 
 public:
-  this(Mediator mediator, string initialDir, string delegate(Side, uint) getCWDLR)
+  this(Mediator mediator,
+       string initialDir,
+       string terminalRunCommand,
+       string delegate(Side, uint) getCWDLR)
   {
     mediator_.init(mediator);
     cwd_      = initialDir;
@@ -108,6 +111,9 @@ public:
 
     shellSetting_ = shellrc.GetLocalShellSetting();
     ApplyPreferences();
+
+    if(terminalRunCommand.length > 0)
+      FeedChild(terminalRunCommand ~ '\n');
   }
 
   void ApplyPreferences()

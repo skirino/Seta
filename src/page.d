@@ -38,6 +38,7 @@ import utils.gio_util;
 import utils.image_util;
 import constants;
 import rcfile = config.rcfile;
+import config.page_init_option;
 import tab;
 import terminal_wrapper;
 import terminal;
@@ -63,11 +64,12 @@ private:
 
 public:
   this(Side side,
-       string initialDir,
+       PageInitOption opt,
        string delegate(Side, uint) GetCWDFromMain,
        void delegate(Side) AppendPageCopy,
        void delegate(Side, uint) ClosePage)
   {
+    auto initialDir = opt.initialDir_;
     if(!DirectoryExists(initialDir))
       initialDir = getenv("HOME") ~ '/';
 
@@ -81,7 +83,7 @@ public:
     tab_              .init(new Tab(side, ClosePage));
     mediator_         .init(new Mediator(this));
     filer_            .init(new FileManager(mediator_, initialDir));
-    termWithScrollbar_.init(new TerminalWrapper(mediator_, initialDir, GetCWDFromMain));
+    termWithScrollbar_.init(new TerminalWrapper(mediator_, initialDir, opt.terminalRunCommand_, GetCWDFromMain));
     mediator_.Set(filer_, termWithScrollbar_.Get());
 
     header_.init(new PageHeader(
