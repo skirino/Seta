@@ -58,6 +58,7 @@ import rcfile = config.rcfile;
 import config.keybind;
 import config.hosts_view;
 import config.shortcut;
+import config.page_init_option;
 import page_list;
 
 
@@ -89,12 +90,206 @@ private class ConfigDialog : Dialog
     getContentArea().add(note_);
 
     InitLayoutPage();
+    InitPagesPage();
     InitKeybindPage();
     InitTerminalPage();
     InitDirectoriesPage();
   }
 
 private:
+  ///////////////////// [Layout]
+  Table pageLayout_;
+  SpinButton sbWidthType_, sbWidthSize_, sbWidthOwner_, sbWidthPermissions_, sbWidthLastModified_;
+  SpinButton sbHeightStatusbar_;
+
+  // toolbar
+  CheckButton cbShowBackButton_, cbShowForwardButton_, cbShowUpButton_, cbShowRootButton_, cbShowHomeButton_,
+    cbShowOtherSideButton_, cbShowRefreshButton_, cbShowSSHButton_, cbShowHiddenButton_,
+    cbShowFilter_, cbUseDesktopNotification_;
+  SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
+
+  // main widgets
+  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_,
+    sbNotifyExpiresInMSec_;
+
+  // row colors
+  ColorButton cbColorDirectory_, cbColorFile_, cbColorSymlink_, cbColorExecutable_;
+
+  void InitLayoutPage()
+  {
+    pageLayout_ = AppendWrappedTable(note_, "Appearance");
+
+    uint row = 0;
+
+    AttachSectionLabel(pageLayout_, row++, "Columns in file view (0 to hide)");
+    mixin(AddSpinButton!("Layout", "WidthType",         "0, 500, 1", "Width of 'type' column: "));
+    mixin(AddSpinButton!("Layout", "WidthSize",         "0, 500, 1", "Width of 'size' column: "));
+    mixin(AddSpinButton!("Layout", "WidthOwner",        "0, 500, 1", "Width of 'owner' column: "));
+    mixin(AddSpinButton!("Layout", "WidthPermissions",  "0, 500, 1", "Width of 'permissions' column: "));
+    mixin(AddSpinButton!("Layout", "WidthLastModified", "0, 500, 1", "Width of 'last modified' column: "));
+
+    AttachSectionLabel(pageLayout_, row++, "Colors for rows in file list");
+    mixin(AddColorButton!("Layout", "ColorSymlink",    "Color for symbolic links: "));
+    mixin(AddColorButton!("Layout", "ColorDirectory",  "Color for directories: "));
+    mixin(AddColorButton!("Layout", "ColorExecutable", "Color for executable files: "));
+    mixin(AddColorButton!("Layout", "ColorFile",       "Color for the others: "));
+
+    AttachSectionLabel(pageLayout_, row++, "Toolbar");
+    mixin(AddCheckButton!("Layout", "ShowBackButton",      "Show 'go back' button"));
+    mixin(AddCheckButton!("Layout", "ShowForwardButton",   "Show 'go forward' button"));
+    mixin(AddCheckButton!("Layout", "ShowUpButton",        "Show 'go up' button"));
+    mixin(AddCheckButton!("Layout", "ShowRootButton",      "Show 'go to root directory' button"));
+    mixin(AddCheckButton!("Layout", "ShowHomeButton",      "Show 'go to home directory' button"));
+    mixin(AddCheckButton!("Layout", "ShowOtherSideButton", "Show 'go to directory shown in the other pane' button"));
+    mixin(AddCheckButton!("Layout", "ShowRefreshButton",   "Show 'refresh' button"));
+    mixin(AddCheckButton!("Layout", "ShowSSHButton",       "Show 'SSH' button"));
+    mixin(AddCheckButton!("Layout", "ShowHiddenButton",    "Show 'show/hide hidden files' button"));
+    mixin(AddCheckButton!("Layout", "ShowFilter",          "Show filter box"));
+
+    mixin(AddSpinButton!("Layout", "WidthFilterEntry",    "0, 200, 1", "Width of filter box in toolbar: "));
+    mixin(AddSpinButton!("Layout", "WidthShortcutButton", "0, 200, 1", "Width of shortcut buttons in toolbar: "));
+
+    AttachSectionLabel(pageLayout_, row++, "Other widgets");
+    mixin(AddSpinButton!("Layout", "HeightStatusbar", "0, 100, 1", "Height of the statusbar (0 to hide): "));
+
+    AttachSectionLabel(pageLayout_, row++, "Sizes of main widgets");
+    mixin(AddSpinButton!("Layout", "SplitH",      "0, 5000, 10",  "Width of the left half: "));
+    mixin(AddSpinButton!("Layout", "SplitVLeft" , "0, 5000, 10",  "Height of the upper half on the left side: "));
+    mixin(AddSpinButton!("Layout", "SplitVRight", "0, 5000, 10",  "Height of the upper half on the right side: "));
+    mixin(AddSpinButton!("Layout", "WindowSizeH", "10, 5000, 10", "Horizontal size of the main window: "));
+    mixin(AddSpinButton!("Layout", "WindowSizeV", "10, 5000, 10", "Vertical size of the main window: "));
+
+    AttachSectionLabel(pageLayout_, row++, "Desktop notification");
+    mixin(AddCheckButton!("Layout", "UseDesktopNotification", "Notify finish of async file transfer using desktop-notification"));
+    mixin(AddSpinButton!("Layout", "NotifyExpiresInMSec", "0, 30000, 100", "Expiration time on a notification (in milliseconds): "));
+  }
+
+  void ApplyChangesInLayout()
+  {
+    bool changed = false;
+
+    mixin(CheckSpinButton!("WidthType"));
+    mixin(CheckSpinButton!("WidthSize"));
+    mixin(CheckSpinButton!("WidthOwner"));
+    mixin(CheckSpinButton!("WidthPermissions"));
+    mixin(CheckSpinButton!("WidthLastModified"));
+
+    mixin(CheckColorButton!("Layout", "ColorSymlink"));
+    mixin(CheckColorButton!("Layout", "ColorDirectory"));
+    mixin(CheckColorButton!("Layout", "ColorExecutable"));
+    mixin(CheckColorButton!("Layout", "ColorFile"));
+
+    mixin(CheckCheckButton!("Layout", "ShowBackButton"));
+    mixin(CheckCheckButton!("Layout", "ShowForwardButton"));
+    mixin(CheckCheckButton!("Layout", "ShowUpButton"));
+    mixin(CheckCheckButton!("Layout", "ShowRootButton"));
+    mixin(CheckCheckButton!("Layout", "ShowHomeButton"));
+    mixin(CheckCheckButton!("Layout", "ShowOtherSideButton"));
+    mixin(CheckCheckButton!("Layout", "ShowRefreshButton"));
+    mixin(CheckCheckButton!("Layout", "ShowSSHButton"));
+    mixin(CheckCheckButton!("Layout", "ShowHiddenButton"));
+    mixin(CheckCheckButton!("Layout", "ShowFilter"));
+
+    mixin(CheckSpinButton!("WidthFilterEntry"));
+    mixin(CheckSpinButton!("WidthShortcutButton"));
+
+    mixin(CheckSpinButton!("HeightStatusbar"));
+
+    mixin(CheckSpinButton!("SplitH"));
+    mixin(CheckSpinButton!("SplitVLeft"));
+    mixin(CheckSpinButton!("SplitVRight"));
+    mixin(CheckSpinButton!("WindowSizeH"));
+    mixin(CheckSpinButton!("WindowSizeV"));
+
+    mixin(CheckCheckButton!("Layout", "UseDesktopNotification"));
+    mixin(CheckSpinButton!("NotifyExpiresInMSec"));
+
+    if(changed)
+      page_list.NotifySetLayout();
+  }
+  ///////////////////// [Layout]
+
+
+
+  ///////////////////// [Pages]
+  Table pagePages_;
+  TreeView pagesLeft_, pagesRight_;
+  ListStore pagesLeftStore_, pagesRightStore_;
+
+
+  void InitPagesPage()
+  {
+    pagePages_ = AppendWrappedTable(note_, "Pages");
+
+    uint row = 0;
+
+    AttachSectionLabel(pagePages_, row++, "Initially shown pages on left side");
+    InitPagesTree!(Side.LEFT)(row++, pagesLeft_, pagesLeftStore_);
+
+    AttachSectionLabel(pagePages_, row++, "Initially shown pages on right side");
+    InitPagesTree!(Side.RIGHT)(row++, pagesRight_, pagesRightStore_);
+  }
+
+  void InitPagesTree(Side side)(uint row, ref TreeView view, ref ListStore store)
+  {
+    view = new TreeView;
+    view.setVexpand(1);
+    view.addOnButtonPress(delegate bool(Event e, Widget w){
+        return ShowAppendRemoveMenu(e, w, view, store);
+      });
+    AppendWithScrolledWindow(pagePages_, row, view);
+
+    auto rendPath = new CellRendererText;
+    rendPath.setProperty("editable", 1);
+    rendPath.addOnEdited(&(CellEdited!(0, "pages" ~ (side == Side.LEFT ? "Left" : "Right") ~ "Store_", "AppendSlash")));
+    auto colPath = new TreeViewColumn("path", rendPath, "text", 0);
+    colPath.setResizable(1);
+    view.appendColumn(colPath);
+
+    auto rendCommand = new CellRendererText;
+    rendCommand.setProperty("editable", 1);
+    rendCommand.addOnEdited(&(CellEdited!(1, "pages" ~ (side == Side.LEFT ? "Left" : "Right") ~ "Store_")));
+    auto colCommand = new TreeViewColumn("command", rendCommand, "text", 1);
+    colCommand.setResizable(1);
+    view.appendColumn(colCommand);
+
+    store = new ListStore([GType.STRING, GType.STRING]);
+    view.setModel(store);
+
+    auto source = (side == Side.LEFT) ? rcfile.GetPageInitOptionsLeft() : rcfile.GetPageInitOptionsRight();
+    foreach(opt; source) {
+      auto iter = new TreeIter;
+      store.append(iter);
+      store.setValue(iter, 0, opt.initialDir_);
+      store.setValue(iter, 1, opt.terminalRunCommand_);
+    }
+  }
+
+  void ApplyChangesInPages()
+  {
+    ApplyChangesInPageInitOptions(pagesLeftStore_,  "InitialPagesLeft");
+    ApplyChangesInPageInitOptions(pagesRightStore_, "InitialPagesRight");
+  }
+
+  void ApplyChangesInPageInitOptions(ListStore store, string key)
+  {
+    PageInitOption[] opts;
+    auto iter = new TreeIter;
+    iter.setModel(store);
+    if(store.getIterFirst(iter)){
+      do{
+        auto path    = iter.getValueString(0).trim.AppendSlash;
+        auto command = iter.getValueString(1);
+        if(CanEnumerateChildren(path))
+          opts ~= PageInitOption(path, command);
+      } while(store.iterNext(iter));
+    }
+    rcfile.ResetPageInitOptions(key, opts);
+  }
+  ///////////////////// [Pages]
+
+
+
   ///////////////////// [Keybind]
   TreeView keybinds_;
   TreeStore keyStore_;
@@ -283,120 +478,6 @@ private:
     }
   }
   ///////////////////// [Keybind]
-
-
-
-  ///////////////////// [Layout]
-  Table pageLayout_;
-  SpinButton sbWidthType_, sbWidthSize_, sbWidthOwner_, sbWidthPermissions_, sbWidthLastModified_;
-  SpinButton sbHeightStatusbar_;
-
-  // toolbar
-  CheckButton cbShowBackButton_, cbShowForwardButton_, cbShowUpButton_, cbShowRootButton_, cbShowHomeButton_,
-    cbShowOtherSideButton_, cbShowRefreshButton_, cbShowSSHButton_, cbShowHiddenButton_,
-    cbShowFilter_, cbUseDesktopNotification_;
-  SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
-
-  // main widgets
-  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_,
-    sbNotifyExpiresInMSec_;
-
-  // row colors
-  ColorButton cbColorDirectory_, cbColorFile_, cbColorSymlink_, cbColorExecutable_;
-
-  void InitLayoutPage()
-  {
-    pageLayout_ = AppendWrappedTable(note_, "Appearance");
-
-    uint row = 0;
-
-    AttachSectionLabel(pageLayout_, row++, "Columns in file view (0 to hide)");
-    mixin(AddSpinButton!("Layout", "WidthType",         "0, 500, 1", "Width of 'type' column: "));
-    mixin(AddSpinButton!("Layout", "WidthSize",         "0, 500, 1", "Width of 'size' column: "));
-    mixin(AddSpinButton!("Layout", "WidthOwner",        "0, 500, 1", "Width of 'owner' column: "));
-    mixin(AddSpinButton!("Layout", "WidthPermissions",  "0, 500, 1", "Width of 'permissions' column: "));
-    mixin(AddSpinButton!("Layout", "WidthLastModified", "0, 500, 1", "Width of 'last modified' column: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Colors for rows in file list");
-    mixin(AddColorButton!("Layout", "ColorSymlink",    "Color for symbolic links: "));
-    mixin(AddColorButton!("Layout", "ColorDirectory",  "Color for directories: "));
-    mixin(AddColorButton!("Layout", "ColorExecutable", "Color for executable files: "));
-    mixin(AddColorButton!("Layout", "ColorFile",       "Color for the others: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Toolbar");
-    mixin(AddCheckButton!("Layout", "ShowBackButton",      "Show 'go back' button"));
-    mixin(AddCheckButton!("Layout", "ShowForwardButton",   "Show 'go forward' button"));
-    mixin(AddCheckButton!("Layout", "ShowUpButton",        "Show 'go up' button"));
-    mixin(AddCheckButton!("Layout", "ShowRootButton",      "Show 'go to root directory' button"));
-    mixin(AddCheckButton!("Layout", "ShowHomeButton",      "Show 'go to home directory' button"));
-    mixin(AddCheckButton!("Layout", "ShowOtherSideButton", "Show 'go to directory shown in the other pane' button"));
-    mixin(AddCheckButton!("Layout", "ShowRefreshButton",   "Show 'refresh' button"));
-    mixin(AddCheckButton!("Layout", "ShowSSHButton",       "Show 'SSH' button"));
-    mixin(AddCheckButton!("Layout", "ShowHiddenButton",    "Show 'show/hide hidden files' button"));
-    mixin(AddCheckButton!("Layout", "ShowFilter",          "Show filter box"));
-
-    mixin(AddSpinButton!("Layout", "WidthFilterEntry",    "0, 200, 1", "Width of filter box in toolbar: "));
-    mixin(AddSpinButton!("Layout", "WidthShortcutButton", "0, 200, 1", "Width of shortcut buttons in toolbar: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Other widgets");
-    mixin(AddSpinButton!("Layout", "HeightStatusbar", "0, 100, 1", "Height of the statusbar (0 to hide): "));
-
-    AttachSectionLabel(pageLayout_, row++, "Sizes of main widgets");
-    mixin(AddSpinButton!("Layout", "SplitH",      "0, 5000, 10",  "Width of the left half: "));
-    mixin(AddSpinButton!("Layout", "SplitVLeft" , "0, 5000, 10",  "Height of the upper half on the left side: "));
-    mixin(AddSpinButton!("Layout", "SplitVRight", "0, 5000, 10",  "Height of the upper half on the right side: "));
-    mixin(AddSpinButton!("Layout", "WindowSizeH", "10, 5000, 10", "Horizontal size of the main window: "));
-    mixin(AddSpinButton!("Layout", "WindowSizeV", "10, 5000, 10", "Vertical size of the main window: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Desktop notification");
-    mixin(AddCheckButton!("Layout", "UseDesktopNotification", "Notify finish of async file transfer using desktop-notification"));
-    mixin(AddSpinButton!("Layout", "NotifyExpiresInMSec", "0, 30000, 100", "Expiration time on a notification (in milliseconds): "));
-  }
-
-  void ApplyChangesInLayout()
-  {
-    bool changed = false;
-
-    mixin(CheckSpinButton!("WidthType"));
-    mixin(CheckSpinButton!("WidthSize"));
-    mixin(CheckSpinButton!("WidthOwner"));
-    mixin(CheckSpinButton!("WidthPermissions"));
-    mixin(CheckSpinButton!("WidthLastModified"));
-
-    mixin(CheckColorButton!("Layout", "ColorSymlink"));
-    mixin(CheckColorButton!("Layout", "ColorDirectory"));
-    mixin(CheckColorButton!("Layout", "ColorExecutable"));
-    mixin(CheckColorButton!("Layout", "ColorFile"));
-
-    mixin(CheckCheckButton!("Layout", "ShowBackButton"));
-    mixin(CheckCheckButton!("Layout", "ShowForwardButton"));
-    mixin(CheckCheckButton!("Layout", "ShowUpButton"));
-    mixin(CheckCheckButton!("Layout", "ShowRootButton"));
-    mixin(CheckCheckButton!("Layout", "ShowHomeButton"));
-    mixin(CheckCheckButton!("Layout", "ShowOtherSideButton"));
-    mixin(CheckCheckButton!("Layout", "ShowRefreshButton"));
-    mixin(CheckCheckButton!("Layout", "ShowSSHButton"));
-    mixin(CheckCheckButton!("Layout", "ShowHiddenButton"));
-    mixin(CheckCheckButton!("Layout", "ShowFilter"));
-
-    mixin(CheckSpinButton!("WidthFilterEntry"));
-    mixin(CheckSpinButton!("WidthShortcutButton"));
-
-    mixin(CheckSpinButton!("HeightStatusbar"));
-
-    mixin(CheckSpinButton!("SplitH"));
-    mixin(CheckSpinButton!("SplitVLeft"));
-    mixin(CheckSpinButton!("SplitVRight"));
-    mixin(CheckSpinButton!("WindowSizeH"));
-    mixin(CheckSpinButton!("WindowSizeV"));
-
-    mixin(CheckCheckButton!("Layout", "UseDesktopNotification"));
-    mixin(CheckSpinButton!("NotifyExpiresInMSec"));
-
-    if(changed)
-      page_list.NotifySetLayout();
-  }
-  ///////////////////// [Layout]
 
 
 
@@ -627,7 +708,7 @@ private:
 
   void ApplyChangesInShortcuts()
   {
-    rcfile.Shortcut[] list;
+    Shortcut[] list;
     TreeIter iter = new TreeIter;
     iter.setModel(shortcutsStore_);
     if(shortcutsStore_.getIterFirst(iter)){// ListStore is not empty
@@ -642,71 +723,6 @@ private:
       while(shortcutsStore_.iterNext(iter));
     }
     rcfile.ResetShortcuts(list);
-  }
-
-  void CellEdited(int idx, string modelIdentifier, string transformFun = "")(
-    string pathStr, string newName, CellRendererText rend)
-  {
-    ListStore model = mixin(modelIdentifier);
-    TreeIter iter = GetIterFromString(model, pathStr);
-    static if(transformFun.length == 0)
-      model.setValue(iter, idx, newName);
-    else
-      model.setValue(iter, idx, mixin(transformFun) (newName));
-  }
-
-  // for right click menu
-  bool ShowAppendRemoveMenu(Event e, Widget w, TreeView view, ListStore store)
-  {
-    auto eb = e.button();
-    if(eb.window != view.getBinWindow().getWindowStruct())// header is clicked
-      return false;
-    if(eb.button != MouseButton.RIGHT)// not right button
-      return false;
-
-    auto iter = store.GetIter(GetPathAtPos(view, eb.x, eb.y));
-    auto menu = new AppendRemoveMenu(view, store, iter);
-    menu.popup(0, eb.time);
-    return false;
-  }
-
-  class AppendRemoveMenu : MenuWithMargin
-  {
-    TreeView view_;
-    ListStore store_;
-    TreeIter iter_;
-
-    this(TreeView view, ListStore store, TreeIter iter)
-    {
-      view_ = view;
-      store_ = store;
-      iter_ = iter;
-
-      append(new MenuItem(&Append, "_Append"));
-      if(iter !is null)
-        append(new MenuItem(&Remove, "_Remove"));
-
-      showAll();
-    }
-
-    void Append(MenuItem item)
-    {
-      TreeIter next = new TreeIter;
-      next.setModel(store_);
-      if(iter_ is null)// empty space is clicked
-        store_.append(next);
-      else// one row is clicked
-        store_.insertAfter(next, iter_);
-
-      // select the new row
-      TreePath path = next.getTreePath();
-      view_.setCursor(path, null, 1);
-    }
-
-    void Remove(MenuItem item)
-    {
-      store_.remove(iter_);
-    }
   }
   ///////////////////// [Directories]
 
@@ -760,11 +776,79 @@ private:
 
 
 
+  ///////////////////// common parts
+  bool ShowAppendRemoveMenu(Event e, Widget w, TreeView view, ListStore store)
+  {
+    auto eb = e.button();
+    if(eb.window != view.getBinWindow().getWindowStruct())// header is clicked
+      return false;
+    if(eb.button != MouseButton.RIGHT)// not right button
+      return false;
+
+    auto iter = store.GetIter(GetPathAtPos(view, eb.x, eb.y));
+    auto menu = new AppendRemoveMenu(view, store, iter);
+    menu.popup(0, eb.time);
+    return false;
+  }
+
+  class AppendRemoveMenu : MenuWithMargin
+  {
+    TreeView view_;
+    ListStore store_;
+    TreeIter iter_;
+
+    this(TreeView view, ListStore store, TreeIter iter)
+    {
+      view_ = view;
+      store_ = store;
+      iter_ = iter;
+
+      append(new MenuItem(&Append, "_Append"));
+      if(iter !is null)
+        append(new MenuItem(&Remove, "_Remove"));
+
+      showAll();
+    }
+
+    void Append(MenuItem item)
+    {
+      TreeIter next = new TreeIter;
+      next.setModel(store_);
+      if(iter_ is null)// empty space is clicked
+        store_.append(next);
+      else// one row is clicked
+        store_.insertAfter(next, iter_);
+
+      // select the new row
+      TreePath path = next.getTreePath();
+      view_.setCursor(path, null, 1);
+    }
+
+    void Remove(MenuItem item)
+    {
+      store_.remove(iter_);
+    }
+  }
+
+  void CellEdited(int idx, string modelIdentifier, string transformFun = "")(
+    string pathStr, string newName, CellRendererText rend)
+  {
+    ListStore model = mixin(modelIdentifier);
+    TreeIter iter = GetIterFromString(model, pathStr);
+    static if(transformFun.length == 0)
+      model.setValue(iter, idx, newName);
+    else
+      model.setValue(iter, idx, mixin(transformFun) (newName));
+  }
+  ///////////////////// common parts
+
+
   void Respond(int responseID, Dialog dialog)
   {
     if(responseID == GtkResponseType.OK || responseID == GtkResponseType.APPLY){
       ApplyChangesInKeybind();
       ApplyChangesInLayout();
+      ApplyChangesInPages();
       ApplyChangesInTerminal();
       ApplyChangesInDirectories();
       ApplyChangesInSSH();

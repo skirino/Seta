@@ -157,6 +157,16 @@ private string GetDefaultInitialDirectoryBase(string key)
 }
 string GetDefaultInitialDirectoryLeft (){ return GetDefaultInitialDirectoryBase("InitialPagesLeft" ); }
 string GetDefaultInitialDirectoryRight(){ return GetDefaultInitialDirectoryBase("InitialPagesRight"); }
+
+void ResetPageInitOptions(string key, PageInitOption[] list)
+{
+  PageInitOption[] old = instance_.GetPageInitOptionsBase(key);
+  if(old != list) {
+    string s = PageInitOption.ToListString(list);
+    instance_.setString("Pages", key, NonnullString(s));
+    instance_.changed_ = true;
+  }
+}
 ///////////////// [Pages]
 
 
