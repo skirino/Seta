@@ -163,10 +163,11 @@ public:
   {
     tab_.CloseThisPage();
   }
-  // to stop directory monitoring
+
   void PrepareDestroy()
   {
-    filer_.PrepareDestroy();
+    filer_.PrepareDestroy();// to stop directory monitoring
+    GetTerminal().KillChildProcessIfStillAlive();
   }
   /////////////////////////// GUI stuff
 

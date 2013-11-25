@@ -29,6 +29,7 @@ import std.array;
 import std.c.stdlib;
 import core.thread;
 import core.sys.posix.unistd;
+import core.sys.posix.signal;
 
 import gtk.Widget;
 import gtk.DragAndDrop;
@@ -70,7 +71,7 @@ class Terminal : Widget, ScrollableIF
 private:
   VteTerminal * vte_;
   immutable int pty_;
-  immutable pid_t pid_;
+  pid_t pid_;
 
 public:
   this(Mediator mediator,
@@ -92,13 +93,11 @@ public:
 
     // Fork the child process.
     const(char)*[2] argv = [environment["SHELL"].toStringz, null];
-    pid_t pid;
     GError *e;
     auto success = vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0,
                                                   initialDir.toStringz, argv.ptr, null,
-                                                  cast(GSpawnFlags)0, null, null, &pid, &e);
+                                                  cast(GSpawnFlags)0, null, null, &pid_, &e);
     enforce(success, text("!!! [Seta] Failed to fork shell process : ", to!string(e.message)));
-    pid_ = pid;
     pty_ = vte_pty_get_fd(vte_terminal_get_pty_object(vte_));
 
     Signals.connectData(vte_, "child-exited",
@@ -136,6 +135,14 @@ public:
     ResetReplaceTargets(rcfile.GetReplaceTargetLeft(), rcfile.GetReplaceTargetRight());
   }
 
+  void KillChildProcessIfStillAlive()
+  {
+    if(pid_ >= 0) {
+      kill(pid_, SIGKILL);
+      pid_ = -1;
+    }
+  }
+
 private:
   extern(C) static void CloseThisPageCallback(VteTerminal * vte, void * ptr)
   {
@@ -143,7 +150,10 @@ private:
     threadsEnter();
     auto t = cast(Terminal)ptr;
     t.CancelSyncFilerDirCallback();
-    t.mediator_.CloseThisPage();
+    if(t.pid_ >= 0) {
+      t.mediator_.CloseThisPage();
+      t.pid_ = -1;
+    }
     threadsLeave();
   }
   //////////////////// GUI stuff
