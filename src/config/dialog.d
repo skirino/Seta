@@ -223,10 +223,10 @@ private:
 
     uint row = 0;
 
-    AttachSectionLabel(pagePages_, row++, "Initially shown pages on left side");
+    AttachSectionLabel(pagePages_, row++, "Pages shown on left side on start-up");
     InitPagesTree!(Side.LEFT)(row++, pagesLeft_, pagesLeftStore_);
 
-    AttachSectionLabel(pagePages_, row++, "Initially shown pages on right side");
+    AttachSectionLabel(pagePages_, row++, "Pages shown on right side on start-up");
     InitPagesTree!(Side.RIGHT)(row++, pagesRight_, pagesRightStore_);
   }
 
