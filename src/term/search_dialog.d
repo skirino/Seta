@@ -112,8 +112,13 @@ private:
   bool KeyPressed(Event e, Widget w)
   {
     auto ekey = e.key();
-    if(TurnOffLockFlags(ekey.state) == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
+    auto state = TurnOffLockFlags(ekey.state);
+    if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
       Search();
+      return true;
+    }
+    if(state == GdkModifierType.SHIFT_MASK && ekey.keyval == GdkKeysyms.GDK_Return){
+      Search!(Order.BACKWARD)();
       return true;
     }
     return false;
