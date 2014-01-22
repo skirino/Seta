@@ -78,6 +78,7 @@ public:
     super();
     addOnResponse(&Respond);
     addOnKeyPress(&KeyPressed);
+    addOnFocusOut(&FocusOut);
     auto contentArea = getContentArea();
 
     auto hbox = new HBox(0, 0);
@@ -136,6 +137,13 @@ private:
     else if(responseID == ResponseID.SEARCH_BACKWARD){
       Search!(Order.BACKWARD)();
     }
+  }
+
+  bool FocusOut(Event e, Widget w)
+  {
+    RestoreSettings();
+    destroy();
+    return false;
   }
 
   void Search(Order o = Order.FORWARD)()
