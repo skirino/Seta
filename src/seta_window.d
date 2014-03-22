@@ -76,20 +76,16 @@ public:
     auto vbox = new VBox(0, 0);
     {
       hpaned_.init(new HPaned);
-      {
-        noteL_.init(new Note(Side.LEFT,  this));
-        noteR_.init(new Note(Side.RIGHT, this));
+      noteL_.init(new Note(Side.LEFT,  this));
+      noteR_.init(new Note(Side.RIGHT, this));
 
-        foreach(opt; rcfile.GetPageInitOptionsLeft()) {
-          noteL_.AppendNewPage(opt);
-        }
-        foreach(opt; rcfile.GetPageInitOptionsRight()) {
-          noteR_.AppendNewPage(opt);
-        }
+      foreach(opt; rcfile.GetPageInitOptionsLeft())
+        noteL_.AppendNewPage(opt);
+      foreach(opt; rcfile.GetPageInitOptionsRight())
+        noteR_.AppendNewPage(opt);
 
-        hpaned_.pack1(noteL_, 1, 0);
-        hpaned_.pack2(noteR_, 1, 0);
-      }
+      hpaned_.pack1(noteL_, 1, 0);
+      hpaned_.pack2(noteR_, 1, 0);
       vbox.packStart(hpaned_, 1, 1, 0);
 
       statusbar_.init(InitStatusbar(noteL_, noteR_));
@@ -232,18 +228,30 @@ private:
       if(fl == FocusInPage.NONE && fr == FocusInPage.NONE) return;
 
       static if(direction == Direction.LEFT){
-        if(fr == FocusInPage.UPPER)
-          pageL.FocusUpper();
-        else if(fr == FocusInPage.LOWER)
-          pageL.FocusLower();
+        if(noteL_.getVisible) {
+          if(fr == FocusInPage.UPPER)
+            pageL.FocusUpper();
+          else if(fr == FocusInPage.LOWER)
+            pageL.FocusLower();
+        }
       }
       static if(direction == Direction.RIGHT){
-        if(fl == FocusInPage.UPPER)
-          pageR.FocusUpper();
-        else if(fl == FocusInPage.LOWER)
-          pageR.FocusLower();
+        if(noteR_.getVisible) {
+          if(fl == FocusInPage.UPPER)
+            pageR.FocusUpper();
+          else if(fl == FocusInPage.LOWER)
+            pageR.FocusLower();
+        }
       }
     }
+  }
+
+private:
+  void AddFocusToNoteIfNone(Note note)
+  {
+    auto page = note.GetCurrentPage();
+    if(page.WhichIsFocused() == FocusInPage.NONE)
+      page.FocusShownWidget();
   }
   ///////////////////////// manipulation of focus
 
@@ -311,8 +319,7 @@ private:
 
     case MainWindowAction.SwitchViewMode:
       mixin(FocusedNoteOrReturnFalse);
-      auto page = note.GetCurrentPage();
-      page.ViewModeButtonClicked(null);
+      note.GetCurrentPage().ViewModeButtonClicked(null);
       return true;
 
     case MainWindowAction.CloseThisPage:
@@ -336,21 +343,13 @@ private:
       return true;
 
     case MainWindowAction.ExpandLeftPane:
-      if(statusbar.ExpandLeftPane()){
-        // now only noteL is displayed.
-        // if noteL does not have focus, move it to terminal widget of noteL
-        auto pageL = noteL_.GetCurrentPage();
-        if(pageL.WhichIsFocused() == FocusInPage.NONE)
-          pageL.FocusShownWidget();
-      }
+      if(statusbar.ExpandLeftPane())
+        AddFocusToNoteIfNone(noteL_);
       return true;
 
     case MainWindowAction.ExpandRightPane:
-      if(statusbar.ExpandRightPane()){
-        auto pageR = noteR_.GetCurrentPage();
-        if(pageR.WhichIsFocused() == FocusInPage.NONE)
-          pageR.FocusShownWidget();
-      }
+      if(statusbar.ExpandRightPane())
+        AddFocusToNoteIfNone(noteR_);
       return true;
 
     case MainWindowAction.GoToDirOtherSide:
