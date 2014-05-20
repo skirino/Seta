@@ -76,6 +76,7 @@ public:
   {
     terminal_.init(terminal);
     super();
+    setResizable(false);
     addOnResponse(&Respond);
     addOnKeyPress(&KeyPressed);
     addOnFocusOut(&FocusOut);

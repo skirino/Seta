@@ -175,7 +175,8 @@ private class RenameDialog : Dialog
   {
     super();
     setTitle("Rename " ~ PluralForm!(size_t, "file")(files.length));
-    setDefaultSize(430, 450);
+    setResizable(false);
+    setSizeRequest(430, 450);
     addOnResponse(&Respond);
     auto contentArea = getContentArea();
 

@@ -69,7 +69,8 @@ class StartSSHDialog : Dialog
   this()
   {
     super();
-    setDefaultSize(640, 400);
+    setResizable(false);
+    setSizeRequest(640, 400);
     addOnResponse(&Respond);
 
     VBox contentArea = getContentArea();

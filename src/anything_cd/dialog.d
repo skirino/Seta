@@ -83,7 +83,8 @@ public:
   {
     textChanged_ = false;
     super();
-    setDefaultSize(768, 600);
+    setResizable(false);
+    setSizeRequest(768, 600);
     addOnResponse(&Respond);
     addOnKeyPress(&KeyPressed);
     destroyed_ = false;

@@ -77,7 +77,8 @@ private class ConfigDialog : Dialog
   this()
   {
     super();
-    setDefaultSize(800, 720);
+    setResizable(false);
+    setSizeRequest(800, 720);
     addOnResponse(&Respond);
 
     addButton(StockID.CANCEL, GtkResponseType.CANCEL);
