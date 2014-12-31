@@ -799,8 +799,8 @@ extern(C){
                                            gboolean wrap_around);
 
   // process management
-  enum VtePtyFlags;
-  enum GSpawnFlags;
+  enum VtePtyFlags : int;
+  enum GSpawnFlags : int;
   alias int GPid;// the same type as pid_t
   alias extern(C) void function(gpointer user_data) GSpawnChildSetupFunc;
   gboolean vte_terminal_fork_command_full(VteTerminal *terminal,
