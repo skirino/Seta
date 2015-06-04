@@ -385,7 +385,7 @@ string ExpandEnvVars(string arg)
     }
     string var = arg[dollar..end];
 
-    ret ~= getenv(var[1..$]) || var;
+    ret ~= environment.get(var[1..$]) || var;
     indexStart = end;
   }
 

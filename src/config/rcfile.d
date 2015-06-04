@@ -153,7 +153,7 @@ PageInitOption[] GetPageInitOptionsRight(){ return instance_.GetPageInitOptionsB
 private string GetDefaultInitialDirectoryBase(string key)
 {
   auto list = instance_.GetPageInitOptionsBase(key);
-  return (list.length > 0) ? list[0].initialDir_ : getenv("HOME") ~ '/';
+  return (list.length > 0) ? list[0].initialDir_ : environment.get("HOME") ~ '/';
 }
 string GetDefaultInitialDirectoryLeft (){ return GetDefaultInitialDirectoryBase("InitialPagesLeft" ); }
 string GetDefaultInitialDirectoryRight(){ return GetDefaultInitialDirectoryBase("InitialPagesRight"); }
@@ -364,7 +364,7 @@ private:
     setListSeparator(',');
 
     changed_ = false;
-    filename_ = getenv("HOME") ~ "/.setarc";
+    filename_ = environment.get("HOME") ~ "/.setarc";
     bool exist = Exists(filename_);
     if(exist){
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
@@ -439,7 +439,7 @@ private:
     }
     mixin(SetDefaultValue!("String", "Terminal", "Font", "\"Monospace 11\""));
     mixin(SetDefaultValue!("Double", "Terminal", "BackgroundTransparency", "0.0"));
-    mixin(SetDefaultValue!("String", "Terminal", "PROMPT", "getenv(\"USER\") ~ \"@\""));
+    mixin(SetDefaultValue!("String", "Terminal", "PROMPT", "environment.get(\"USER\") ~ \"@\""));
     mixin(SetDefaultValue!("String", "Terminal", "RPROMPT", "\"\""));
 
     mixin(SetDefaultValue!("Boolean","Terminal", "EnablePathExpansion", "true"));
@@ -576,7 +576,7 @@ private:
     auto pageOpts = GetPageInitOptionsBase(key);
     auto pageOptsWithExistingDirs = pageOpts.filter!((p) => CanEnumerateChildren(p.initialDir_)).array;
     if(pageOptsWithExistingDirs.length == 0) {
-      pageOptsWithExistingDirs = [PageInitOption(getenv("HOME") ~ '/', null)];
+      pageOptsWithExistingDirs = [PageInitOption(environment.get("HOME") ~ '/', null)];
     }
     if(pageOptsWithExistingDirs != pageOpts) {
       changed_ = true;
@@ -598,7 +598,7 @@ private:
     }
     if(initialDirs.length == 0){
       changed_ = true;
-      setStringList("Directories", key, [AppendSlash(getenv("HOME"))]);
+      setStringList("Directories", key, [AppendSlash(environment.get("HOME"))]);
     }
   }
 

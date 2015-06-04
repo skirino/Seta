@@ -20,6 +20,8 @@ MA 02110-1301 USA.
 
 module thread_list;
 
+import std.algorithm : sort;
+
 import gdk.Window;
 import gdk.Cursor;
 import gtk.Main;
@@ -148,7 +150,7 @@ ThreadInfo[] GetWorkingThreadList()
     if(info.state_ == ThreadInfoState.RUNNING)
       ret ~= info;
   }
-  ret.sort; // sort by timeStart_, since order of threads in the list is completely random
+  sort(ret); // sort by timeStart_, since order of threads in the list is completely random
   return ret;
 }
 

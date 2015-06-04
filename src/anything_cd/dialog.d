@@ -62,7 +62,7 @@ void StartChangeDirDialog(Page page)
   string path = d.dir_chosen_;
   if(!path.empty){
     if(path.StartsWith("~")){
-      path = getenv("HOME") ~ path[1..$];
+      path = environment.get("HOME") ~ path[1..$];
     }
     page.GetFileManager().ChangeDirectory(path);
   }

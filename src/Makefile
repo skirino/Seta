@@ -6,7 +6,7 @@ ifeq ("$(SYSTEM)", "Darwin")
 	DFLAGS = -m32 -w
 	LINKOPTS = -L-lgtkd -L-lvte -L-L/opt/local/lib -L-lgtk-x11-2.0 -L-ldl
 else # assuming Linux
-	DFLAGS = -Iextern/libnotify/ -w
+	DFLAGS = -Iextern/libnotify/ -wi
 	LINKOPTS = -L-lgtkd-2 -L-lvte2_90 -L-ldl -L-lnotify -L-lgtk-3
 endif
 

@@ -44,7 +44,7 @@ public:
   {
     remote_ = false;
     rootDir_ = "/";
-    homeDir_ = getenv("HOME") ~ '/';
+    homeDir_ = environment.get("HOME") ~ '/';
     return pwdLocal_;
   }
 

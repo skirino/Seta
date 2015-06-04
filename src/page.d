@@ -71,7 +71,7 @@ public:
   {
     auto initialDir = opt.initialDir_;
     if(!DirectoryExists(initialDir))
-      initialDir = getenv("HOME") ~ '/';
+      initialDir = environment.get("HOME") ~ '/';
 
     getCWDFromMain_ = GetCWDFromMain;
     appendPage_     = AppendPageCopy;

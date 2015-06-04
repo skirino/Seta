@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module anything_cd.dir_list;
 
 import core.thread;
+import std.algorithm : sort;
 import std.process;
 import std.stdio;
 
@@ -53,7 +54,7 @@ void Scan()
 
 string ReplaceHomeDir(string dir)
 {
-  auto home = getenv("HOME");
+  auto home = environment.get("HOME");
   if(dir.StartsWith(home))
     dir = "~" ~ dir[home.length .. $];
   return dir;
@@ -148,7 +149,7 @@ private class DirList : DirListBase
 public:
   this()
   {
-    super(getenv("HOME") ~ "/.seta_dirlist");
+    super(environment.get("HOME") ~ "/.seta_dirlist");
     Load();
   }
 }
@@ -165,7 +166,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
   this()
   {
     super(&Scan);
-    home_ = getenv("HOME");
+    home_ = environment.get("HOME");
     v_ = new Vector!(string)(DirList.MAX);
 
     Register();
@@ -245,7 +246,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
     }
     catch(Exception ex){}// permission denied or directory has been removed
 
-    dirs.sort;
+    sort(dirs);
     return dirs;
   }
 }

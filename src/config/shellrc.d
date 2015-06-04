@@ -30,7 +30,7 @@ private __gshared ShellSetting localhostShell_;
 ShellSetting GetLocalShellSetting(){ return localhostShell_; }
 void Init()
 {
-  localhostShell_ = new ShellSetting(getenv("HOME"), getenv("SHELL"));
+  localhostShell_ = new ShellSetting(environment.get("HOME"), environment.get("SHELL"));
 }
 
 

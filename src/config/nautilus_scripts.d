@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module config.nautilus_scripts;
 
 import std.process;
+import std.algorithm : sort;
 
 import gio.File;
 import gio.FileInfo;
@@ -69,8 +70,8 @@ class ScriptsDir
       }
 
       enumerate.close(null);
-      dirs_.sort;
-      scripts_.sort;
+      sort(dirs_);
+      sort(scripts_);
     }
     catch(Exception ex){}// no such file or directory
   }
@@ -94,7 +95,7 @@ ScriptsDir GetScriptsDirTop(){ return top; }
 
 void Init()
 {
-  top = new ScriptsDir(getenv("HOME") ~ "/.gnome2/nautilus-scripts/");
+  top = new ScriptsDir(environment.get("HOME") ~ "/.gnome2/nautilus-scripts/");
   if(top.IsEmpty())
     top = null;
 }

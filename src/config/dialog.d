@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module config.dialog;
 
 import std.string;
+import std.algorithm : sort;
 
 import gtk.Dialog;
 import gtk.Widget;
@@ -346,7 +347,7 @@ private:
     // arrange rows
     dictKeyCode_ = rcfile.GetKeybinds();
     string[] keys = dictKeyCode_.keys;
-    keys.sort;
+    sort(keys);
 
     foreach(key; keys){
       auto categoryIter = FindCategoryIterFromActionKey(key);

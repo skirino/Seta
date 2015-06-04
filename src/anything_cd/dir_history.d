@@ -62,7 +62,7 @@ private class DirHistory : DirListBase
 public:
   this()
   {
-    super(getenv("HOME") ~ "/.seta_history");
+    super(environment.get("HOME") ~ "/.seta_history");
     Load!(true)();
   }
 }
