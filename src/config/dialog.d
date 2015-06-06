@@ -510,8 +510,8 @@ private:
 
     AttachSectionLabel(pageTerminal_, row++, "Hints for Seta to extract command-line arguments");
 
-    mixin(AddEntry!("Terminal", "PROMPT",  "\"_PROMPT for terminal: \"", "PROMPT in shell"));
-    mixin(AddEntry!("Terminal", "RPROMPT", "\"_RPROMPT for terminal (zsh): \"",
+    mixin(AddEntry!("Terminal", "PROMPT",  "\"_PROMPT regex pattern: \"", "PROMPT in shell"));
+    mixin(AddEntry!("Terminal", "RPROMPT", "\"_RPROMPT regex patter: \"",
                     "RPROMPT in zsh, which is usually used to show additional information (e.g. working directory) on right side of terminal window"));
 
     AttachSectionLabel(pageTerminal_, row++, "Assist in inputting directory paths by substitution in command-line");

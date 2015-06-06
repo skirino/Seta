@@ -21,6 +21,7 @@ MA 02110-1301 USA.
 module terminal;
 
 import std.string;
+import std.regex : regex, replaceFirst, split;
 import std.process;
 import std.conv;
 import std.exception;
@@ -473,49 +474,12 @@ private:
 
   string GetLastCommand()
   {
-    string text = trimr(GetText());
-    size_t indexCompName = locatePatternPrior(text, prompt_);
-
-    if(indexCompName == text.length)
+    string t0 = trimr(GetText());
+    string t1 = t0.split(regex(prompt_))[$ - 1];
+    if(t1.length == t0.length)
       return null;
-
-    string diff = text[indexCompName .. $];
-    size_t indexPrompt = locatePattern(diff, "$ ");
-    if(indexPrompt == diff.length){
-      indexPrompt = locatePattern(diff, "# ");
-    }
-    if(indexPrompt == diff.length){
-      indexPrompt = locatePattern(diff, "% ");
-    }
-
-    if(indexPrompt != diff.length){// if "$ ", "# " or "% " is found
-      size_t posNewline = locate(diff, '\n');
-      if(indexPrompt+2 < posNewline){
-        string line = diff[indexPrompt+2 .. posNewline];
-        if(rprompt_.length > 0){
-          // if the last char is "]"
-          if(line[$-1] == rprompt_[$-1]){
-            // search for " [~"
-            size_t rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '~', line.length-1);
-            // search for " [/"
-            if(rpromptStart == line.length){
-              rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ '/', line.length-1);
-            }
-            // search for " [..."
-            if(rpromptStart == line.length){
-              rpromptStart = locatePatternPrior(line, " " ~ rprompt_[0] ~ "...", line.length-1);
-            }
-
-            if(rpromptStart != line.length){
-              line = trimr(line[0 .. rpromptStart]);
-            }
-          }
-        }
-        return line;
-      }
-    }
-
-    return null;
+    string t2 = t1.split(regex(rprompt_))[0];
+    return trimr(t2);
   }
   /////////////////// manipulate text in vte terminal
 
