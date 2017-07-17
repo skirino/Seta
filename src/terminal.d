@@ -96,7 +96,6 @@ public:
 
     // Fork the child process.
     const(char)*[2] argv = [environment["SHELL"].toStringz, null];
-    GError *e;
     vte_terminal_spawn_async(vte_, cast(VtePtyFlags)0,
                              initialDir.toStringz, argv.ptr, null,
                              cast(GSpawnFlags)0, null, null, null, -1, null,
@@ -491,6 +490,8 @@ private:
   string GetLastCommand()
   {
     string t0 = trimr(GetText());
+    if(t0.empty)
+      return null;
     string t1 = t0.split(regex(prompt_))[$ - 1];
     if(t1.length == t0.length)
       return null;
