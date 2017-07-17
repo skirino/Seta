@@ -75,7 +75,7 @@ class Terminal : Widget, ScrollableIF
 private:
   VteTerminal * vte_;
   immutable int pty_;
-  pid_t pid_;
+  pid_t pid_ = -1;
 
 public:
   this(Mediator mediator,
@@ -99,7 +99,8 @@ public:
     GError *e;
     vte_terminal_spawn_async(vte_, cast(VtePtyFlags)0,
                              initialDir.toStringz, argv.ptr, null,
-                             cast(GSpawnFlags)0, null, null, null, -1, null, null, null);
+                             cast(GSpawnFlags)0, null, null, null, -1, null,
+                             &SpawnFinishCallback, cast(void*)this);
     pty_ = vte_pty_get_fd(vte_terminal_get_pty(vte_));
 
     Signals.connectData(vte_, "child-exited",
@@ -162,6 +163,15 @@ private:
       t.pid_ = -1;
     }
     threadsLeave();
+  }
+
+  extern(C) static void SpawnFinishCallback(VteTerminal *terminal,
+                                            GPid pid,
+                                            GError *error,
+                                            void *user_data)
+  {
+    auto t = cast(Terminal)user_data;
+    t.pid_ = pid;
   }
   //////////////////// GUI stuff
 
