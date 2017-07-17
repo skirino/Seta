@@ -101,7 +101,7 @@ public:
     singleton_.statusbar_.SetLayout();
   }
 
-private:
+public:
   void AppendPageCopy(Side side)
   {
     // Make a copy of the displayed page.
@@ -153,6 +153,7 @@ private:
     }
   }
 
+private:
   void CloseThisPage()
   {
     auto note = GetFocusedNote();
@@ -165,6 +166,7 @@ private:
 
 
   ///////////////////////// file/dir path
+public:
   string GetCWDOfChildWidget(Side side, uint n)
   {
     auto note = (side == Side.LEFT) ? noteL_ : noteR_;
@@ -176,6 +178,7 @@ private:
 
 
   ///////////////////////// manipulation of focus
+private:
   FocusInMainWindow WhichIsFocused()
   {
     auto pageL = noteL_.GetCurrentPage();

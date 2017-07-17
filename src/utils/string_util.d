@@ -22,12 +22,12 @@ module utils.string_util;
 
 import std.string;
 import std.stdio;
-import std.c.string;
 import std.ascii;
 import std.process;
 import std.algorithm : min, map;
 import std.array;
 import std.conv;
+import core.stdc.string : memcmp;
 
 import gtk.Label;
 

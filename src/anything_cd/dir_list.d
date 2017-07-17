@@ -92,10 +92,11 @@ class DirListBase
 {
 protected:
   static immutable size_t MAX = 1000;
-  Vector!(string) list_;
   string filename_;
 
 public:
+  Vector!(string) list_;
+
   this(string filename)
   {
     filename_ = filename;

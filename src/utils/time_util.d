@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module utils.time_util;
 
-import core.stdc.time;
+import core.sys.posix.time : localtime_r;
 import core.sys.posix.sys.time;
 import std.stdio;
 
@@ -72,7 +72,7 @@ string EpochTimeToString(ulong l)
 
   tm st;
   auto t = cast(time_t) l;
-  core.sys.posix.time.localtime_r(&t, &st);
+  localtime_r(&t, &st);
 
   // 1900 + st.tm_year represents the year
   ret[0..4] = YEAR_1900_TO_2100[st.tm_year][];
@@ -94,7 +94,7 @@ string EpochTimeToStringSeconds(ulong l)
 
   tm st;
   auto t = cast(time_t) l;
-  core.sys.posix.time.localtime_r(&t, &st);
+  localtime_r(&t, &st);
 
   ret[0..2] = ZERO_TO_61[st.tm_mon+1][];
   ret[2] = '/';

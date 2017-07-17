@@ -45,6 +45,7 @@ import rcfile = config.rcfile;
 import config.known_hosts;
 import file_manager;
 import volume_monitor;
+import page_list : NotifyFilerDisconnect, NotifyEscapeFromPath;
 
 
 class SetaToolbar : Toolbar
@@ -374,8 +375,8 @@ private:
   {
     // change directory of all pages showing dirs under "path"
     if(path.containsPattern("/.gvfs/sftp "))
-      page_list.NotifyFilerDisconnect(path, path);
-    page_list.NotifyEscapeFromPath(path);
+      NotifyFilerDisconnect(path, path);
+    NotifyEscapeFromPath(path);
 
     UnmountByPath(path);
 

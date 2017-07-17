@@ -45,6 +45,7 @@ import known_hosts = config.known_hosts;
 import fm.file_view;
 import fm.history;
 import fm.toolbar;
+import anything_cd.dir_list : Add, Remove;
 import thread_list;
 import mediator;
 import statusbar;
@@ -203,11 +204,11 @@ public:
     bool notifyTerminal = true)
   {
     if(view_.ChangeDirectory(dir, appendToHistory, notifyTerminal)){
-      anything_cd.dir_list.Add(dir);
+      Add(dir);
       return true;
     }
     else{
-      anything_cd.dir_list.Remove(dir);
+      Remove(dir);
       return false;
     }
   }
@@ -403,7 +404,7 @@ public:
 
 
   ///////////////////////// SSH
-private:
+public:
   void SSHClicked(ArgType)(ArgType b)
   {
     if(!mediator_.FileSystemIsRemote()){

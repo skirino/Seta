@@ -20,9 +20,9 @@ MA 02110-1301 USA.
 
 module fm.popup_menu;
 
-import std.c.stdlib;
 import std.process;
 import std.string;
+import core.stdc.stdlib : system;
 
 import gtk.Menu;
 import gtk.MenuItem;

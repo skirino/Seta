@@ -22,7 +22,6 @@ module fm.entry;
 
 import std.conv;
 import std.string;
-import std.c.stdlib;
 import core.sys.posix.sys.stat;
 
 import gio.FileInfo;

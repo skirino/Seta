@@ -20,11 +20,11 @@ MA 02110-1301 USA.
 
 module fm.file_view;
 
-import core.thread;
-import std.c.stdlib;
 import std.string;
 import std.algorithm;
 import std.exception;
+import core.thread;
+import core.stdc.stdlib : system;
 
 import gtk.TreeView;
 import gtk.Widget;

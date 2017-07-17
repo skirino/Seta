@@ -49,6 +49,8 @@ import utils.tree_util;
 import utils.thread_util;
 import config.keybind;
 import anything_cd.filter_dirs_job;
+import anything_cd.dir_list : Scan;
+import anything_cd.dir_history : Get;
 import page;
 
 
@@ -142,7 +144,7 @@ private:
     }
     else if(responseID == SCAN_FILESYSTEM){
       if(PopupBox.yesNo("Start to scan your home directory?", ""))
-        anything_cd.dir_list.Scan();
+        Scan();
       else// do not destroy this dialog
         return;
     }
@@ -282,7 +284,7 @@ private:
   void InitFilteredCandidates()
   {
     // put most recent history (at most 100)
-    string[] dirlist = anything_cd.dir_history.Get()[0 .. min($, 100)];
+    string[] dirlist = Get()[0 .. min($, 100)];
     EndFiltering(dirlist, []);
   }
   //////////////////// filtering in background

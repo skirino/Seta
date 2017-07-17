@@ -20,9 +20,9 @@ MA 02110-1301 USA.
 
 module move_files_job;
 
-import core.thread;
 import std.conv;
-import std.c.stdlib;
+import core.thread;
+import core.stdc.stdlib : system;
 
 import gtk.Clipboard;
 import gdk.Threads;

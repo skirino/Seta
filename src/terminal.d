@@ -27,7 +27,7 @@ import std.conv;
 import std.exception;
 import std.algorithm;
 import std.array;
-import std.c.stdlib;
+import core.stdc.stdlib : free;
 import core.thread;
 import core.sys.posix.unistd;
 import core.sys.posix.signal;
@@ -151,7 +151,7 @@ public:
   }
 
 private:
-  extern(C) static void CloseThisPageCallback(VteTerminal * vte, Object ptr)
+  extern(C) static void CloseThisPageCallback(VteTerminal * vte, int status, void *ptr)
   {
     // glib's callback does not grab GDK lock automatically
     threadsEnter();
@@ -409,8 +409,8 @@ public:
   ////////////////// automatic sync of filer
 private:
   static immutable int PATH_MAX = 4096;// PATH_MAX in /usr/include/linux/limits.h
-  char[] readlinkBuffer_;
   uint syncCallbackID_;
+  char[] readlinkBuffer_;
 
   void InitSyncFilerDirFunctionality()
   {
@@ -448,8 +448,6 @@ private:
 
   void CancelSyncFilerDirCallback()
   {
-    import std.stdio;
-    writeln("callback ID = %d", syncCallbackID_);
     Source.remove(syncCallbackID_);
   }
   ////////////////// automatic sync of filer
