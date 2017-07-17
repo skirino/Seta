@@ -33,6 +33,7 @@ import gtk.MenuItem;
 import gdk.Threads;
 import gdk.Event;
 import gio.File;
+import gio.FileIF;
 import gtkc.gio;
 
 import utils.string_util;
@@ -107,7 +108,7 @@ public:
 
   ///////////////////// manipulation of focus
 public:
-  override int hasFocus(){return view_.hasFocus();}
+  override bool hasFocus(){return view_.hasFocus();}
 
   void GrabFocus(Entry e = null){view_.GrabFocus();}
   ///////////////////// manipulation of focus
@@ -413,7 +414,7 @@ private:
         PushIntoStatusbar("Trying to establish SSH connection to " ~ connection.GetUserDomain() ~ " ...");
 
         // check whether the remote host is already mounted
-        File remoteRoot = File.parseName("sftp://" ~ connection.GetUserDomain() ~ '/');
+        FileIF remoteRoot = File.parseName("sftp://" ~ connection.GetUserDomain() ~ '/');
         if(remoteRoot.queryExists(null)){// already mounted
           string remotePath = remoteRoot.getPath() ~ '/';
           mediator_.SSHConnectionSucceeded(remotePath, connection);
@@ -516,11 +517,11 @@ private:
   class SFTPMountStarter : ListedOperationIF
   {
     mixin ListedOperationT;
-    File remoteRoot_;
+    FileIF remoteRoot_;
     void delegate(string, SSHConnection) dlgSuccess_;
     SSHConnection con_;
 
-    void Start(File remoteRoot, void delegate(string, SSHConnection) dlg, SSHConnection con)
+    void Start(FileIF remoteRoot, void delegate(string, SSHConnection) dlg, SSHConnection con)
     {
       remoteRoot_ = remoteRoot;
       dlgSuccess_ = dlg;

@@ -24,6 +24,7 @@ import core.thread;
 import core.stdc.string;
 
 import gio.File;
+import gio.FileIF;
 import gio.FileInfo;
 import gio.FileEnumerator;
 import gdk.Threads;
@@ -51,7 +52,7 @@ private:
   Vector!(DirEntry) entriesDFiltered_;
   Vector!(DirEntry) entriesFFiltered_;
 
-  void delegate(bool, string, File) setRowsCallback_;
+  void delegate(bool, string, FileIF) setRowsCallback_;
 
 
 
@@ -60,7 +61,7 @@ private:
   // enumerate
   bool remote_;
   string attributes_;
-  File pwdFile_;
+  FileIF pwdFile_;
 
   // filter
   bool showHidden_;
@@ -71,7 +72,7 @@ private:
   GtkSortType sortOrder_;
 
 public:
-  void SetForEnumerate(bool remote, string attr, File pwdFile)
+  void SetForEnumerate(bool remote, string attr, FileIF pwdFile)
   {
     remote_ = remote;
     if(remote)
@@ -137,7 +138,7 @@ private:
       while((info = enumerate.nextFile(null)) !is null){
         mixin(CloseAndReturnIfCanceled);
 
-        if(info.getFileType() == GFileType.TYPE_DIRECTORY)// directory
+        if(info.getFileType() == GFileType.DIRECTORY)// directory
           entriesDAll_.append(new DirEntry(info, 0));
         else// file
           entriesFAll_.append(new DirEntry(info, 0, 0));
@@ -147,7 +148,7 @@ private:
       while((info = enumerate.nextFile(null)) !is null){
         mixin(CloseAndReturnIfCanceled);
 
-        if(info.getFileType() == GFileType.TYPE_DIRECTORY)// directory
+        if(info.getFileType() == GFileType.DIRECTORY)// directory
           entriesDAll_.append(new DirEntry(info, dir_));
         else// file
           entriesFAll_.append(new DirEntry(info));
@@ -316,7 +317,7 @@ public:
     bool readDisk,
     string dir,
     Widget fv,
-    void delegate(bool, string, File) callback,
+    void delegate(bool, string, FileIF) callback,
     Vector!(DirEntry) entriesD,
     Vector!(DirEntry) entriesF,
     Vector!(DirEntry) entriesDFiltered,

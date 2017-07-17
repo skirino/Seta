@@ -172,8 +172,8 @@ private:
   }
 
   extern(C) static void ThreadListPositioning(
-    GtkMenu * menu, gint * x, gint * y,
-    gboolean * pushIn, void * data)
+    GtkMenu * menu, int * x, int * y,
+    int * pushIn, void * data)
   {
     auto ptr = cast(XYPosition*)data;
     GtkRequisition req;

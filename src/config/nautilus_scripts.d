@@ -60,7 +60,7 @@ class ScriptsDir
       while((info = enumerate.nextFile(null)) !is null){
         string name = path_ ~ info.getName();
 
-        if(info.getFileType() == GFileType.TYPE_DIRECTORY){// directory
+        if(info.getFileType() == GFileType.DIRECTORY){// directory
           dirs_ ~= new ScriptsDir(name);
         }
         else{// file

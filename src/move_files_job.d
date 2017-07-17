@@ -51,7 +51,7 @@ string[] GetFilesFromStrv(char ** curis)
   string[] files;
   char ** ptr = curis;
   while((*ptr) != null){
-    string temp = URI.unescapeString(to!string(*ptr), null);
+    string temp = URI.uriUnescapeString(to!string(*ptr), null);
     if(temp.length > 7){
       files ~= temp[7 .. $];// remove "file://"
     }
@@ -77,7 +77,7 @@ string[] MakeURIList(string dir, string[] files)
   string head = "file://" ~ dir;
   foreach(file; files){
     string temp = head ~ file;
-    ret ~= URI.escapeString(temp, ":/", 0);
+    ret ~= URI.uriEscapeString(temp, ":/", 0);
   }
   return ret;
 }
@@ -153,13 +153,13 @@ GdkDragAction GetFilesInClipboard(out string[] files)
   // use GTK API and avoid using GtkD functions (which internally use Str.toStringArray)
   GtkClipboard * cl = GetDefaultClipboard();
   char ** curis = gtk_clipboard_wait_for_uris(cl);
-  auto action = GdkDragAction.ACTION_COPY;
+  auto action = GdkDragAction.COPY;
   if((curis != null) && (*curis != null)){
     char ** ptr = curis;
 
     // check whether "action" is explicitly specified as "move" by the source side
     if(curis[0].to!string == URI_MOVE){
-      action = GdkDragAction.ACTION_MOVE;
+      action = GdkDragAction.MOVE;
       ptr++;
       gtk_clipboard_clear(cl);
     }
@@ -183,12 +183,12 @@ void TransferFiles(GdkDragAction action, string[] files, FileView sourceView, st
   // obtain source directory by removing "basename" in files[0]
   string sourceDir = ParentDirectory(AppendSlash(files[0]));
 
-  if(action == GdkDragAction.ACTION_MOVE){
+  if(action == GdkDragAction.MOVE){
     if(sourceDir != destDir){// skip "move to the same directory"
       (new MoveFilesJob!(true)(files, sourceDir, sourceView, destDir, destView)).start();
     }
   }
-  else if(action == GdkDragAction.ACTION_COPY){
+  else if(action == GdkDragAction.COPY){
     (new MoveFilesJob!(false)(files, sourceDir, sourceView, destDir, destView)).start();
   }
 }

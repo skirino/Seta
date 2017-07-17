@@ -1,13 +1,14 @@
 SRC = anything_cd/*.d config/*.d fm/*.d term/*.d utils/*.d *.d
 INPUTS = C/workaround.o ${SRC}
+GTKD_DIR = ../../SetupDDevelopmentEnvironment/GtkD/
 
 SYSTEM = $(shell uname -s)
 ifeq ("$(SYSTEM)", "Darwin")
 	DFLAGS = -m32 -w
 	LINKOPTS = -L-lgtkd -L-lvte -L-L/opt/local/lib -L-lgtk-x11-2.0 -L-ldl
 else # assuming Linux
-	DFLAGS = -Iextern/libnotify/ -wi
-	LINKOPTS = -L-lgtkd-2 -L-lvte2_90 -L-ldl -L-lnotify -L-lgtk-3
+	DFLAGS = -I${GTKD_DIR}generated/gtkd/ -Iextern/libnotify/ -wi
+	LINKOPTS = -L-L${GTKD_DIR} -L-lgtkd-3 -L-lvte-2.91 -L-ldl -L-lnotify -L-lgtk-3
 endif
 
 all: C/workaround.o

@@ -236,7 +236,7 @@ private class ScanHomeDirectoryJob : Thread, StoppableOperationIF
 
       FileInfo info;
       while((info = enumerate.nextFile(null)) !is null){
-        if((info.getFileType() == GFileType.TYPE_DIRECTORY) && (info.getIsSymlink() == 0)){
+        if((info.getFileType() == GFileType.DIRECTORY) && (info.getIsSymlink() == 0)){
           string name = info.getName();
           if(ignoreDirs.Contains(name))
             dirs ~= name;

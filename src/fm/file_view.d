@@ -38,6 +38,7 @@ import gtk.CellRendererText;
 import gtk.PopupBox;
 import gtk.Tooltip;
 import gtk.DragAndDrop;
+import gtk.TargetEntry;
 import gtk.TargetList;
 import gtk.SelectionData;
 import gdk.Event;
@@ -45,6 +46,7 @@ import gdk.Threads;
 import gdk.Rectangle;
 import gdk.DragContext;
 import gio.File;
+import gio.FileIF;
 import gio.FileInfo;
 import gio.FileMonitor;
 import gio.DesktopAppInfo;
@@ -217,11 +219,11 @@ public:
   }
 
 private:
-  void Update(string dirname, File file = null, bool appendToHistory = false, bool notifyTerminal = false)
+  void Update(string dirname, FileIF file = null, bool appendToHistory = false, bool notifyTerminal = false)
   {
     enforce(dirname[$-1] == '/');
 
-    File dirFile = file is null ? File.parseName(dirname) : file;
+    FileIF dirFile = file is null ? File.parseName(dirname) : file;
     bool remote = mediator_.FileSystemLookingAtRemoteFS(dirname);
 
     if(mediator_.FilerIsVisible()){
@@ -265,7 +267,7 @@ private:
     return 0;
   }
 
-  void DirChanged(File f1, File f2, GFileMonitorEvent e, FileMonitor m)
+  void DirChanged(FileIF f1, FileIF f2, GFileMonitorEvent e, FileMonitor m)
   {
     if(!contentsChanged_){
       contentsChanged_ = true;
@@ -279,7 +281,7 @@ private:
       TryUpdate();
   }
 
-  void ResetMonitoring(bool remote, File pwdNewFile)
+  void ResetMonitoring(bool remote, FileIF pwdNewFile)
   {
     if(monitor_ !is null)
       monitor_.cancel();
@@ -313,7 +315,7 @@ private:
 
   PrepareEntriesJob prepareUpdateThread_;
 
-  void EnumerateFilterSortSet(bool remote, string dir, File dirFile, bool appendToHistory, bool notifyTerminal)
+  void EnumerateFilterSortSet(bool remote, string dir, FileIF dirFile, bool appendToHistory, bool notifyTerminal)
   {
     auto cb = appendToHistory ? (notifyTerminal ? &SetRowsCallback!(true, true,  true ) :
                                                   &SetRowsCallback!(true, true,  false)) :
@@ -347,7 +349,7 @@ private:
   }
 
   void SetRowsCallback(bool withEnumerateDirEntries, bool appendToHistory, bool notifyTerminal)(
-    bool remote, string pwdNew, File pwdNewFile)
+    bool remote, string pwdNew, FileIF pwdNewFile)
   {
     // set DirEntry vectors (swap internal arrays to avoid deep copy)
     eList_.SwapEntries!(withEnumerateDirEntries)();
@@ -382,7 +384,7 @@ private:
     {// parent dir
       store_.append(iter);
       string parentPath = mediator_.FileSystemParentDirectory(pwd_);
-      File f = File.parseName(parentPath);
+      FileIF f = File.parseName(parentPath);
       FileInfo info = f.queryInfo("standard::is-symlink,unix::mode,owner::user,time::modified", GFileQueryInfoFlags.NONE, null);
       store_.set(
         iter, cast(int[])cols,
@@ -449,7 +451,7 @@ private:
     AppendRows(eList_.NumEntriesSorted());
   }
 
-  extern(C) static gboolean AppendRowsAtIdle(void * ptr)
+  extern(C) static int AppendRowsAtIdle(void * ptr)
   {
     // This callback is called when displaying directories with more than 1000 entries.
     auto view = cast(FileView)ptr;// should not be 'scope'
@@ -558,7 +560,7 @@ public:
 
     if(dirname != pwd_){
       // check whether the directory can be opened
-      File f = GetFileForDirectory(dirname);
+      FileIF f = GetFileForDirectory(dirname);
       if(f !is null){// path exists
         if(CanEnumerateChildren(f)){// not permission denied
           Update(dirname, f, appendToHistory, notifyTerminal);
@@ -610,7 +612,7 @@ private:
 
 
   // callback to show tooltip for ellipsized texts or target paths of symlinks
-  bool TooltipCallback(int x, int y, int keyboardTip, Tooltip tip, Widget w)
+  bool TooltipCallback(int x, int y, bool keyboardTip, Tooltip tip, Widget w)
   {
     // show tooltip for ellipsized texts in NAME and TYPE column
     TreePath path;
@@ -648,7 +650,7 @@ private:
                                                 eList_.GetFSorted()[row - 1 - eList_.GetDSorted().size];
 
         if(ent.IsSymlink()){
-          File f = File.parseName(pwd_ ~ ent.GetName());
+          FileIF f = File.parseName(pwd_ ~ ent.GetName());
           FileInfo info = f.queryInfo("standard::symlink-target", GFileQueryInfoFlags.NONE, null);
           string linkTarget = "link to: " ~ info.getSymlinkTarget();
           tooltipContent ~= tooltipContent.length > 0 ? '\n' ~ linkTarget : linkTarget;
@@ -716,7 +718,7 @@ private:
       size_t index = rowSelected - 1 - eList_.GetDSorted().size();
       string fullname = pwd_ ~ eList_.GetFSorted()[index].GetName();
       try{// to open file using appropriate application
-        File f = File.parseName(fullname);
+        FileIF f = File.parseName(fullname);
         FileInfo info = f.queryInfo("standard::content-type,access::can-execute", GFileQueryInfoFlags.NONE, null);
         auto appInfo = DesktopAppInfo.getDefaultForType(info.getContentType(), 0);
         if(appInfo !is null){
@@ -866,15 +868,15 @@ private:
 
   void InitDragAndDropFunctionality()
   {
-    GtkTargetEntry[] dragTargets = constants.GetDragTargets();
+    TargetEntry[] dragTargets = constants.GetDragTargets();
     enableModelDragDest(
       dragTargets,
-      GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
+      GdkDragAction.MOVE | GdkDragAction.COPY);
 
     enableModelDragSource(
       GdkModifierType.BUTTON1_MASK | GdkModifierType.BUTTON2_MASK,
       dragTargets,
-      GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
+      GdkDragAction.MOVE | GdkDragAction.COPY);
 
     addOnButtonPress(&ButtonPressed);
     addOnButtonRelease(&ButtonReleased);
@@ -997,16 +999,15 @@ private:
     auto em = e.motion();
 
     if(draggingState_ == DraggingState.PRESSED){
-      if(DragAndDrop.checkThreshold(this, dragStartX_, dragStartY_,
+      if(dragCheckThreshold(dragStartX_, dragStartY_,
                                     cast(int)em.x, cast(int)em.y)){
         // start dragging
         draggingState_ = DraggingState.DRAGGING;
 
         // specify possible action for this drag here (judging from the dragging button)
-        GdkDragAction action = dragStartButton_ == MouseButton.LEFT ? GdkDragAction.ACTION_MOVE : GdkDragAction.ACTION_COPY;
+        GdkDragAction action = dragStartButton_ == MouseButton.LEFT ? GdkDragAction.MOVE : GdkDragAction.COPY;
 
-        auto dnd = DragAndDrop.begin(
-          this,
+        auto dnd = dragBegin(
           new TargetList(constants.GetDragTargets()),
           action,
           dragStartButton_,
@@ -1029,7 +1030,7 @@ private:
     // prepare items that will be moved/copied
     string[] filenames = GetSelectedFileNames();
     if(filenames.length > 0)
-      selection.dataSetUris(MakeURIList(pwd_, filenames));
+      selection.setUris(MakeURIList(pwd_, filenames));
     draggingState_ = DraggingState.NEUTRAL;
   }
 
@@ -1038,7 +1039,6 @@ private:
     DragContext context, int x, int y,
     SelectionData selection, uint info, uint time, Widget w)
   {
-    DragAndDrop dnd = new DragAndDrop(context.getDragContextStruct());
     string[] files = GetFilesFromSelection(selection.getSelectionDataStruct());
 
     if(files.length > 0){
@@ -1047,7 +1047,7 @@ private:
       TreePath path;
       GtkTreeViewDropPosition pos;
       getDestRowAtPos(x, y, path, pos);
-      Widget sourceWidget = dnd.getSourceWidget();
+      Widget sourceWidget = DragAndDrop.dragGetSourceWidget(context);
 
       // if dropped on a row for a directory, set "destDir" to the path to that directory
       if(pos == GtkTreeViewDropPosition.INTO_OR_BEFORE ||
@@ -1067,7 +1067,7 @@ private:
       TransferFiles(action, files, cast(FileView)sourceWidget, destDir, this);// cast may fail and null may be passed
     }
 
-    dnd.finish(1, 0, 0);
+    DragAndDrop.dragFinish(context, 1, 0, 0);
   }
 
 public:

@@ -101,7 +101,7 @@ private:
     // tooltip for long path
     pwdLabel_.setHasTooltip(1);
     pwdLabel_.addOnQueryTooltip(
-      delegate bool(int x, int y, int keyboardTip, Tooltip tip, Widget w){
+      delegate bool(int x, int y, bool keyboardTip, Tooltip tip, Widget w){
         auto l = cast(Label)w;
         if(l.getLayout().isEllipsized()){
           tip.setText(l.getText());

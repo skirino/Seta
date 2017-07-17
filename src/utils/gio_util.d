@@ -21,12 +21,13 @@ MA 02110-1301 USA.
 module utils.gio_util;
 
 import gio.File;
+import gio.FileIF;
 import gio.FileInfo;
 import gio.FileEnumerator;
 import glib.GException;
 
 
-File GetFileForDirectory(string dirname)
+FileIF GetFileForDirectory(string dirname)
 {
   if(dirname.length == 0)
     return null;
@@ -34,7 +35,7 @@ File GetFileForDirectory(string dirname)
   try{
     auto f = gio.File.File.parseName(dirname);
     scope FileInfo info = f.queryInfo("standard::type", GFileQueryInfoFlags.NONE, null);
-    if(info.getFileType() == GFileType.TYPE_DIRECTORY)
+    if(info.getFileType() == GFileType.DIRECTORY)
       return f;
     else// not a directory
       return null;
@@ -63,7 +64,7 @@ bool DirectoryExists(string path)
 // In order to work with both local and remote(sftp) directories
 // the simplest way is to try to "enumerateChildren", since
 // username for SFTP connection may be different from the user of the main process.
-bool CanEnumerateChildren(File dir)
+bool CanEnumerateChildren(FileIF dir)
 {
   try{
     scope enumerate = dir.enumerateChildren("", GFileQueryInfoFlags.NONE, null);

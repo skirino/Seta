@@ -32,6 +32,7 @@ import gtk.PopupBox;
 import gtk.Widget;
 import gdk.Event;
 import gio.File;
+import gio.FileIF;
 import gio.FileInfo;
 import gio.AppInfoIF;
 import gio.DesktopAppInfo;
@@ -51,7 +52,7 @@ import fm.rename_dialog;
 import move_files_job;
 
 
-void LaunchApp(AppInfoIF appInfo, File f)
+void LaunchApp(AppInfoIF appInfo, FileIF f)
 {
   ListG arg = ListG.alloc();
   arg.getListGStruct().data = f.getFileStruct();
@@ -60,8 +61,8 @@ void LaunchApp(AppInfoIF appInfo, File f)
 
 
 extern(C) void RightClickMenuPositioning(
-  GtkMenu * menu, gint * x, gint * y,
-  gboolean * pushIn, void * data)
+  GtkMenu * menu, int * x, int * y,
+  int * pushIn, void * data)
 {
   GdkRectangle * rect = cast(GdkRectangle*)data;
   *pushIn = 1;
@@ -74,7 +75,7 @@ class RightClickMenu : MenuWithMargin
 {
 private:
   bool selectedOneIsDir_;
-  File[] selectedFiles_;
+  FileIF[] selectedFiles_;
   AppInfoIF[] defaultApps_;
   CheckMenuItem submenuItem_;
   bool setDefaultApp_ = false;
@@ -359,7 +360,7 @@ void MakeDirectory(string pwd)
   string dirname = InputDialog("mkdir", "New directory: ");
   if(dirname.length > 0){// valid input
     string absname = pwd ~ dirname;
-    File newdir = File.parseName(absname);
+    FileIF newdir = File.parseName(absname);
     if(newdir.queryExists(null)){
       PopupBox.error(dirname ~ " exists.", "error");
     }
@@ -378,7 +379,7 @@ void DeleteFiles(bool toTrash)(string pwd, string[] names)
   if(names.length > 0){
     try{
       foreach(name; names){
-        File f = File.parseName(pwd ~ name);
+        FileIF f = File.parseName(pwd ~ name);
         static if(toTrash)
           f.trash(null);
         else

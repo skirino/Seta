@@ -207,7 +207,7 @@ private:
 
   //////////////// remember settings used at last time
   static __gshared string[] searchTextHistory = [];
-  static __gshared int ignoreCases = 1;
+  static __gshared bool ignoreCases = true;
 
   void ApplySettings()
   {

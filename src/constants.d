@@ -23,6 +23,7 @@ module constants;
 import std.string;
 
 import gtk.DragAndDrop;
+import gtk.TargetEntry;
 import gio.ContentType;
 
 
@@ -121,9 +122,14 @@ void Init()
 {
   directoryTypeDescription = ContentType.getDescription("inode/directory");
 
-  dragTargets[0].target = cast(char*)toStringz("text/uri-list");
-  dragTargets[0].flags  = 0;
-  dragTargets[0].info   = 1;
+  gtkDragTarget.target = cast(char*) "text/uri-list".toStringz();
+  gtkDragTarget.flags  = 0;
+  gtkDragTarget.info   = 1;
+  dragTargets[0] = new TargetEntry(&gtkDragTarget);
+
+  gtkTextPlainDragTarget.target = cast(char*) "text/plain".toStringz();
+  gtkTextPlainDragTarget.flags  = 0;
+  gtkTextPlainDragTarget.info   = 2;
 }
 
 
@@ -133,13 +139,18 @@ string GetDirectoryTypeDescription()
   return directoryTypeDescription;
 }
 
-
-private __gshared GtkTargetEntry[1] dragTargets;
-GtkTargetEntry[] GetDragTargets()
+private __gshared GtkTargetEntry gtkDragTarget;
+private __gshared TargetEntry[1] dragTargets;
+TargetEntry[] GetDragTargets()
 {
   return dragTargets;
 }
 
+private __gshared GtkTargetEntry gtkTextPlainDragTarget;
+TargetEntry GetTextPlainDragTarget()
+{
+  return new TargetEntry(&gtkTextPlainDragTarget);
+}
 
 
 enum MainWindowAction

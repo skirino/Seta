@@ -325,7 +325,7 @@ private:
     keybinds_.appendColumn(col1);
 
     auto rend2 = new CellRendererAccel;
-    rend2.setProperty("accel-mode", cast(int)GtkCellRendererAccelMode.MODE_OTHER);// to react to accels with Tab
+    rend2.setProperty("accel-mode", cast(int)GtkCellRendererAccelMode.OTHER);// to react to accels with Tab
     rend2.addOnAccelEdited(&AccelEdited);
     rend2.addOnAccelCleared(&AccelCleared);
     auto col2 = new TreeViewColumn("Key", rend2, "text", 2);

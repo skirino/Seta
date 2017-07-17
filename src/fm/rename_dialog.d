@@ -47,6 +47,7 @@ import gtk.HSeparator;
 import gtk.ComboBoxText;
 import gdk.Event;
 import gio.File;
+import gio.FileIF;
 import glib.GException;
 import glib.Regex;
 import gobject.Signals;
@@ -70,7 +71,7 @@ void RenameFiles(string dir, string[] infiles)
   else{
     // fileter by "access::can-rename"
     foreach(file; infiles){
-      File f = File.parseName(dir ~ file);
+      FileIF f = File.parseName(dir ~ file);
       scope info = f.queryInfo("access::can-rename", GFileQueryInfoFlags.NONE, null);
       if(info.getAttributeBoolean("access::can-rename")){
         files ~= file;
@@ -111,7 +112,7 @@ void RenameFiles(string dir, string[] infiles)
         }
 
         // now "newname" is free from slash-issue
-        File dest = File.parseName(dir ~ newname);
+        FileIF dest = File.parseName(dir ~ newname);
 
         // check for overwriting existing file
         if(askOverwrite && dest.queryExists(null) != 0){// exists
@@ -133,7 +134,7 @@ void RenameFiles(string dir, string[] infiles)
 
         // does not exist || (exists && ("OK" || "overwrite all"))
         try{
-          File src  = File.parseName(dir ~ file);
+          FileIF src  = File.parseName(dir ~ file);
           src.move(dest, GFileCopyFlags.OVERWRITE, null, null, null);
           ++num;
         }
@@ -201,7 +202,7 @@ private class RenameDialog : Dialog
     renderer_.setProperty("editable", 1);
     renderer_.addOnEdited(&EditedNewName);
     // connect callback to update contents of the editable cell when focus-out
-    Signals.connectData(renderer_.getCellRendererTextStruct(), "editing-started",
+    Signals.connectData(renderer_, "editing-started",
                         cast(GCallback)(&EditingStarted), cast(void*)this, null, GConnectFlags.AFTER);
 
     colNew_ = new TreeViewColumn("New Name", renderer_, "text", 1);
@@ -370,7 +371,7 @@ private class RenameDialog : Dialog
       }
       else{
         try{// check replace string
-          int x;
+          bool x;
           Regex.checkReplacement(map_.textReplace_, x);
         }
         catch(GException ex){
@@ -462,7 +463,7 @@ private class RenameDialog : Dialog
 
 
   //////////////////// tooltip for long contents
-  bool QueryTooltip(int x, int y, int keyboardTip, Tooltip tip, Widget w)
+  bool QueryTooltip(int x, int y, bool keyboardTip, Tooltip tip, Widget w)
   {
     // obtain the cell where the mouse cursor is
     TreePath path;
@@ -535,8 +536,8 @@ private class RenameDialog : Dialog
   // the easiest way is to use C API
   extern(C) static void EditingStarted(GtkCellRenderer *renderer,
                                        GtkCellEditable *editable,
-                                       gchar           *path,
-                                       gpointer         user_data)
+                                       char            *path,
+                                       void            *user_data)
   {
     RenameDialog d = cast(RenameDialog)user_data;
     d.pathStringLast_ = path.to!string;

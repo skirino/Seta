@@ -38,13 +38,16 @@ import gtk.ScrolledWindow;
 import gtk.ScrollableIF;
 import gtk.ScrollableT;
 import gtk.SelectionData;
+import gtk.TargetEntry;
 import gobject.Signals;
 import gdk.Threads;
 import gdk.Color;
+import gdk.RGBA;
 import gdk.Event;
 import gdk.DragContext;
 import glib.Regex;
 import glib.Source;
+import pango.PgFontDescription;
 
 import utils.ref_util;
 import utils.string_util;
@@ -90,20 +93,18 @@ public:
 
     vte_terminal_set_scrollback_lines(vte_, -1);// infinite scrollback
     vte_terminal_set_audible_bell(vte_, 0);
-    vte_terminal_set_background_transparent(vte_, 1);
 
     // Fork the child process.
     const(char)*[2] argv = [environment["SHELL"].toStringz, null];
     GError *e;
-    auto success = vte_terminal_fork_command_full(vte_, cast(VtePtyFlags)0,
-                                                  initialDir.toStringz, argv.ptr, null,
-                                                  cast(GSpawnFlags)0, null, null, &pid_, &e);
-    enforce(success, text("!!! [Seta] Failed to fork shell process : ", to!string(e.message)));
-    pty_ = vte_pty_get_fd(vte_terminal_get_pty_object(vte_));
+    vte_terminal_spawn_async(vte_, cast(VtePtyFlags)0,
+                             initialDir.toStringz, argv.ptr, null,
+                             cast(GSpawnFlags)0, null, null, null, -1, null, null, null);
+    pty_ = vte_pty_get_fd(vte_terminal_get_pty(vte_));
 
     Signals.connectData(vte_, "child-exited",
                         cast(GCallback)(&CloseThisPageCallback),
-                        cast(void*)this, null, GConnectFlags.AFTER);
+                        this, null, GConnectFlags.AFTER);
 
     InitTermios(pty_);
     InitDragAndDropFunctionality();
@@ -125,8 +126,13 @@ public:
     Color.parse(rcfile.GetColorBackground(), colorBack);
     vte_terminal_set_colors(vte_, colorFore.getColorStruct(), colorBack.getColorStruct(), null, 0);
 
-    vte_terminal_set_font_from_string(vte_, rcfile.GetFont().toStringz);
-    vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());
+    import std.stdio;
+    std.stdio.writefln("font setting = " ~ rcfile.GetFont());
+    auto fontDesc = new PgFontDescription(rcfile.GetFont(), 13);
+    vte_terminal_set_font(vte_, fontDesc.getPgFontDescriptionStruct());
+    //    vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());
+    auto backgroundRGBA = new RGBA(0.0, 0.0, 0.0, rcfile.GetTransparency());
+    vte_terminal_set_color_background(vte_, backgroundRGBA.getRGBAStruct());
     vte_terminal_search_set_wrap_around(vte_, 1);
 
     // to extract last command and replace $L(R)DIR
@@ -145,7 +151,7 @@ public:
   }
 
 private:
-  extern(C) static void CloseThisPageCallback(VteTerminal * vte, void * ptr)
+  extern(C) static void CloseThisPageCallback(VteTerminal * vte, Object ptr)
   {
     // glib's callback does not grab GDK lock automatically
     threadsEnter();
@@ -442,6 +448,8 @@ private:
 
   void CancelSyncFilerDirCallback()
   {
+    import std.stdio;
+    writeln("callback ID = %d", syncCallbackID_);
     Source.remove(syncCallbackID_);
   }
   ////////////////// automatic sync of filer
@@ -674,12 +682,8 @@ public:
   void InitDragAndDropFunctionality()
   {
     // accept "text/uri-list" (info==1) and "text/plain" (info==2)
-    GtkTargetEntry[] dragTargets = constants.GetDragTargets() ~ GtkTargetEntry(cast(char*)"text/plain".toStringz, 0, 2);
-    DragAndDrop.destSet(
-      this,
-      GtkDestDefaults.ALL,
-      dragTargets,
-      GdkDragAction.ACTION_MOVE | GdkDragAction.ACTION_COPY);
+    TargetEntry[] dragTargets = constants.GetDragTargets() ~ constants.GetTextPlainDragTarget();
+    dragDestSet(GtkDestDefaults.ALL, dragTargets, GdkDragAction.MOVE | GdkDragAction.COPY);
     addOnDragDataReceived(&DragDataReceived);
   }
 
@@ -698,12 +702,10 @@ public:
       }
     }
     else if(info == 2){// plain text, feed the original text
-      char * cstr = selection.dataGetText();
-      FeedChild(cstr.to!string);
+      FeedChild(selection.getText());
     }
 
-    auto dnd = new DragAndDrop(context.getDragContextStruct());
-    dnd.finish(1, 0, 0);
+    DragAndDrop.dragFinish(context, 1, 0, 0);
 
     grabFocus();
   }
@@ -724,31 +726,28 @@ extern(C){
                                GdkColor *background,
                                GdkColor *palette,
                                glong palette_size);
-  void vte_terminal_set_font_from_string(VteTerminal *terminal,
-                                         const char *name);
+  void vte_terminal_set_font(VteTerminal *terminal,
+                             const PangoFontDescription *font_desc);
   void vte_terminal_set_scrollback_lines(VteTerminal *terminal,
                                          glong lines);
   void vte_terminal_set_audible_bell(VteTerminal *terminal,
-                                     gboolean is_audible);
+                                     bool is_audible);
 
   // IO between child process
   void vte_terminal_feed_child(VteTerminal *terminal,
                                const char *text,
-                               glong length);
-  alias gboolean function(VteTerminal *terminal,
-                          glong column,
-                          glong row,
-                          gpointer data) VteSelectionFunc;
+                               long length);
+  alias bool function(VteTerminal *terminal,
+                          long column,
+                          long row,
+                          void * data) VteSelectionFunc;
   char * vte_terminal_get_text(VteTerminal *terminal,
                                VteSelectionFunc is_selected,
-                               gpointer data,
+                               void * data,
                                GArray *attributes);
 
-  // transparent background
-  void vte_terminal_set_background_transparent(VteTerminal *terminal,
-                                               gboolean transparent);
-  void vte_terminal_set_background_saturation(VteTerminal *terminal,
-                                              double saturation);
+  // background color
+  void vte_terminal_set_color_background(VteTerminal *terminal, const GdkRGBA *background);
 
   // copy and paste
   void vte_terminal_copy_clipboard(VteTerminal *terminal);
@@ -757,27 +756,33 @@ extern(C){
   // search
   void vte_terminal_search_set_gregex(VteTerminal *terminal,
                                       GRegex *regex);
-  gboolean vte_terminal_search_find_next(VteTerminal *terminal);
-  gboolean vte_terminal_search_find_previous(VteTerminal *terminal);
+  bool vte_terminal_search_find_next(VteTerminal *terminal);
+  bool vte_terminal_search_find_previous(VteTerminal *terminal);
   void vte_terminal_search_set_wrap_around(VteTerminal *terminal,
-                                           gboolean wrap_around);
+                                           bool wrap_around);
 
   // process management
   enum VtePtyFlags : int;
   enum GSpawnFlags : int;
   alias int GPid;// the same type as pid_t
-  alias extern(C) void function(gpointer user_data) GSpawnChildSetupFunc;
-  gboolean vte_terminal_fork_command_full(VteTerminal *terminal,
-                                          VtePtyFlags pty_flags,
-                                          const(char) *working_directory,
-                                          const(char)**argv,
-                                          const(char)**envv,
-                                          GSpawnFlags spawn_flags,
-                                          GSpawnChildSetupFunc child_setup,
-                                          gpointer child_setup_data,
-                                          GPid *child_pid,
-                                          GError **error);
+  alias extern(C) void function(VteTerminal *terminal,
+                                GPid pid,
+                                GError *error,
+                                void *user_data) VteTerminalSpawnAsyncCallback;
+  void vte_terminal_spawn_async(VteTerminal *terminal,
+                                VtePtyFlags pty_flags,
+                                const(char) *working_directory,
+                                const(char) **argv,
+                                const(char) **envv,
+                                GSpawnFlags spawn_flags_,
+                                GSpawnChildSetupFunc child_setup,
+                                void *child_setup_data,
+                                GDestroyNotify child_setup_data_destroy,
+                                int timeout,
+                                GCancellable *cancellable,
+                                VteTerminalSpawnAsyncCallback callback,
+                                void *user_data);
   struct VtePty;
-  VtePty * vte_terminal_get_pty_object(VteTerminal *terminal);
+  VtePty * vte_terminal_get_pty(VteTerminal *terminal);
   int vte_pty_get_fd(VtePty * pty);
 }
