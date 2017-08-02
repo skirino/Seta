@@ -289,7 +289,7 @@ private:
     if(!remote){// remote dirs cannot be monitored
       try{
         monitor_ = pwdNewFile.monitorDirectory(GFileMonitorFlags.NONE, null);
-        monitor_.addOnChanged(&DirChanged);
+        //monitor_.addOnChanged(&DirChanged);
       }
       catch(GException ex){}// cannot monitor e.g. directories in music CDs
     }

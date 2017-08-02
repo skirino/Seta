@@ -58,7 +58,7 @@ interface ListedOperationIF
   string GetThreadListLabel(string startTime);
 
   // override this to change mouse cursor during the execution of this thread
-  gdk.Window.Window GetAssociatedWindow();
+  Window GetAssociatedWindow();
 }
 
 interface StoppableOperationIF : ListedOperationIF
@@ -190,7 +190,7 @@ void ThreadEnd(uint idx)
 }
 
 
-private void ChangeMouseCursor(GdkCursorType type)(gdk.Window.Window w)
+private void ChangeMouseCursor(GdkCursorType type)(Window w)
 {
   if(w !is null)
     w.setCursor(new gdk.Cursor.Cursor(type));

@@ -120,19 +120,18 @@ public:
   void ApplyPreferences()
   {
     // appearance
-    auto colorFore = new Color;
-    auto colorBack = new Color;
-    Color.parse(rcfile.GetColorForeground(), colorFore);
-    Color.parse(rcfile.GetColorBackground(), colorBack);
-    vte_terminal_set_colors(vte_, colorFore.getColorStruct(), colorBack.getColorStruct(), null, 0);
+    auto colorFore = new RGBA();
+    auto colorBack = new RGBA();
+    enforce(colorFore.parse(rcfile.GetColorForeground()));
+    enforce(colorBack.parse(rcfile.GetColorBackground()));
+    vte_terminal_set_colors(vte_, colorFore.getRGBAStruct(), colorBack.getRGBAStruct(), null, 0);
 
-    import std.stdio;
-    std.stdio.writefln("font setting = " ~ rcfile.GetFont());
-    auto fontDesc = new PgFontDescription(rcfile.GetFont(), 13);
+    auto fontString = rcfile.GetFont();
+    auto splitPosition = fontString.lastIndexOf(' ');
+    auto fontType = fontString[0 .. splitPosition];
+    auto fontSize = fontString[splitPosition + 1 .. $].to!int;
+    auto fontDesc = new PgFontDescription(fontType, fontSize);
     vte_terminal_set_font(vte_, fontDesc.getPgFontDescriptionStruct());
-    //    vte_terminal_set_background_saturation(vte_, rcfile.GetTransparency());
-    auto backgroundRGBA = new RGBA(0.0, 0.0, 0.0, rcfile.GetTransparency());
-    vte_terminal_set_color_background(vte_, backgroundRGBA.getRGBAStruct());
     vte_terminal_search_set_wrap_around(vte_, 1);
 
     // to extract last command and replace $L(R)DIR
@@ -731,10 +730,10 @@ extern(C){
 
   // miscellaneous settings
   void vte_terminal_set_colors(VteTerminal *terminal,
-                               GdkColor *foreground,
-                               GdkColor *background,
-                               GdkColor *palette,
-                               glong palette_size);
+                               const GdkRGBA *foreground,
+                               const GdkRGBA *background,
+                               const GdkRGBA *palette,
+                               ulong palette_size);
   void vte_terminal_set_font(VteTerminal *terminal,
                              const PangoFontDescription *font_desc);
   void vte_terminal_set_scrollback_lines(VteTerminal *terminal,
@@ -754,9 +753,6 @@ extern(C){
                                VteSelectionFunc is_selected,
                                void * data,
                                GArray *attributes);
-
-  // background color
-  void vte_terminal_set_color_background(VteTerminal *terminal, const GdkRGBA *background);
 
   // copy and paste
   void vte_terminal_copy_clipboard(VteTerminal *terminal);
@@ -794,4 +790,15 @@ extern(C){
   struct VtePty;
   VtePty * vte_terminal_get_pty(VteTerminal *terminal);
   int vte_pty_get_fd(VtePty * pty);
+  bool vte_terminal_spawn_sync(VteTerminal *terminal,
+                               VtePtyFlags pty_flags,
+                               const(char) *working_directory,
+                               const(char) **argv,
+                               const(char) **envv,
+                               GSpawnFlags spawn_flags,
+                               GSpawnChildSetupFunc child_setup,
+                               void *child_setup_data,
+                               GPid *child_pid,
+                               GCancellable *cancellable,
+                               GError **error);
 }

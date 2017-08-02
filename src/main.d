@@ -23,7 +23,6 @@ module main;
 import std.stdio;
 
 import gtk.Main;
-import gthread.Thread;
 import gdk.Threads;
 
 import constants;
@@ -61,14 +60,11 @@ void main(string[] args)
     writeln("All tests passed!");
   }
   else{
-    threadsInit();
-    Main.init(args);
+    Main.initMultiThread(args);
     threadsEnter();
     scope(exit){ threadsLeave(); }
-
     Initialize();
     scope(exit){ Finalize(); }
-
     SetaWindow.Init();
     Main.run();
   }
