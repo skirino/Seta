@@ -26,7 +26,6 @@ import std.algorithm;
 import gtk.VBox;
 import gtk.HBox;
 import gtk.VPaned;
-import gtk.VScrollbar;
 import gtk.Widget;
 import gtk.Label;
 import gtk.Button;
