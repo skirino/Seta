@@ -62,7 +62,6 @@ import term.termios;
 import thread_list;
 import mediator;
 import ssh_connection;
-import move_files_job;
 
 
 // wrapper class of VteTerminal widget
@@ -242,7 +241,6 @@ private:
 
     case TerminalAction.PasteFilePaths:
       string[] files;
-      GetFilesInClipboard(files);
       if(files.length > 0){
         string s = " ";
         foreach(file; files){
@@ -700,7 +698,7 @@ public:
     SelectionData selection, uint info, uint time, Widget w)
   {
     if(info == 1){// URI list
-      string[] paths = GetFilesFromSelection(selection.getSelectionDataStruct());
+      string[] paths;
       if(paths.length > 0){
         string s = " ";
         foreach(path; paths){

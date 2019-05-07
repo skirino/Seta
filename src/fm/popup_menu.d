@@ -49,7 +49,6 @@ import config.dialog;
 import scripts = config.nautilus_scripts;
 import fm.file_view;
 import fm.rename_dialog;
-import move_files_job;
 
 
 void LaunchApp(AppInfoIF appInfo, FileIF f)
@@ -173,13 +172,6 @@ public:
     }
 
     if((!parentIncluded) && selected.length > 0){
-      append(new MenuItem(&CutFun, "Cut(_X)"));
-      append(new MenuItem(&CopyFun, "_Copy"));
-      itemAboveIsSeparator = false;
-    }
-
-    if(CanPaste()){
-      append(new MenuItem(&PasteFun, "_Paste"));
       itemAboveIsSeparator = false;
     }
 
@@ -272,10 +264,6 @@ private:
       }
     }
   }
-
-  void CutFun(MenuItem item) {PreparePaste(true,  pwd_, selectedFileNames_, view_);}
-  void CopyFun(MenuItem item){PreparePaste(false, pwd_, selectedFileNames_, view_);}
-  void PasteFun(MenuItem item){PasteFiles(pwd_);}
 
   void RenameFun(MenuItem item)
   {

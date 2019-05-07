@@ -69,7 +69,6 @@ import fm.entry_list;
 import fm.prepare_entries_job;
 import fm.popup_menu;
 import fm.rename_dialog;
-import move_files_job;
 import mediator;
 
 
@@ -777,15 +776,12 @@ private:
       }
 
     case FileViewAction.Cut:
-      PreparePaste(true, pwd_, GetSelectedFileNames(), this);
       return true;
 
     case FileViewAction.Copy:
-      PreparePaste(false, pwd_, GetSelectedFileNames(), this);
       return true;
 
     case FileViewAction.Paste:
-      PasteFiles(pwd_, this);
       return true;
 
     case FileViewAction.PopupMenu:
@@ -1029,8 +1025,6 @@ private:
   {
     // prepare items that will be moved/copied
     string[] filenames = GetSelectedFileNames();
-    if(filenames.length > 0)
-      selection.setUris(MakeURIList(pwd_, filenames));
     draggingState_ = DraggingState.NEUTRAL;
   }
 
@@ -1039,7 +1033,7 @@ private:
     DragContext context, int x, int y,
     SelectionData selection, uint info, uint time, Widget w)
   {
-    string[] files = GetFilesFromSelection(selection.getSelectionDataStruct());
+    string[] files;
 
     if(files.length > 0){
       // determine "destDir"
@@ -1064,7 +1058,6 @@ private:
       }
 
       GdkDragAction action = context.getSuggestedAction();
-      TransferFiles(action, files, cast(FileView)sourceWidget, destDir, this);// cast may fail and null may be passed
     }
 
     DragAndDrop.dragFinish(context, 1, 0, 0);
