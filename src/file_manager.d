@@ -51,7 +51,6 @@ import mediator;
 import statusbar;
 import volume_monitor;
 import ssh_connection;
-import ssh_dialog;
 
 
 class FileManager : VBox
@@ -408,7 +407,7 @@ public:
   void SSHClicked(ArgType)(ArgType b)
   {
     if(!mediator_.FileSystemIsRemote()){
-      SSHConnection connection = SSHConnectionDialog();
+      SSHConnection connection;
       if(connection !is null && connection.IsValid()){
 
         // send message to statusbar

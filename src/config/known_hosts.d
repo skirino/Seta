@@ -25,7 +25,6 @@ import std.string;
 import utils.string_util;
 import rcfile = config.rcfile;
 import ssh_connection;
-import ssh_dialog;
 
 
 private __gshared SSHConnection[] registeredHosts_;
