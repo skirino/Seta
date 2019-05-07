@@ -28,7 +28,6 @@ import gdk.Threads;
 import constants;
 import config.init;
 import anything_cd.init;
-import desktop_notification;
 import volume_monitor;
 import thread_list;
 import seta_window;
@@ -39,7 +38,6 @@ private void Initialize()
   constants.Init();
   config.init.Init();
   anything_cd.init.Init();
-  desktop_notification.Init();
   volume_monitor.Init();
   thread_list.Init();
 }
@@ -48,7 +46,6 @@ private void Initialize()
 private void Finalize()
 {
   thread_list.Finish();
-  desktop_notification.Finish();
   anything_cd.init.Finish();
   config.init.Finish();
 }

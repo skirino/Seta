@@ -37,7 +37,6 @@ import utils.string_util;
 import utils.gio_util;
 import utils.dialog_util;
 import constants;
-import desktop_notification;
 import fm.file_view;
 import thread_list;
 import statusbar;
@@ -311,7 +310,6 @@ private:
 
     auto message = NotificationMessage();
     PushIntoStatusbar(message);
-    desktop_notification.Notify(message);
 
     if(numTransferred_ > 0){
       // notify the source side to Update
