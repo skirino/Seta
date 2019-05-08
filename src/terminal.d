@@ -57,10 +57,7 @@ import config.keybind;
 import shellrc = config.shellrc;
 import term.search_dialog;
 import term.termios;
-import mediator;
 
-
-// wrapper class of VteTerminal widget
 class Terminal : VTE
 {
   override void* getStruct(){return vte_;}
@@ -73,15 +70,14 @@ private:
   string command_;
 
 public:
-  this(Mediator mediator,
-       string initialDir,
+  this(string initialDir,
        string terminalRunCommand,
-       string delegate(Side, uint) getCWDLR)
-  {
-    mediator_.init(mediator);
-    cwd_      = initialDir;
-    getCWDLR_ = getCWDLR;
-    command_  = terminalRunCommand;
+       string delegate(Side, uint) getCWDLR,
+       void delegate() closeThisPage) {
+    cwd_           = initialDir;
+    getCWDLR_      = getCWDLR;
+    command_       = terminalRunCommand;
+    closeThisPage_ = closeThisPage;
 
     vte_ = cast(VteTerminal*)vte_terminal_new();
     super(vte_);
@@ -105,12 +101,12 @@ public:
     shellSetting_ = shellrc.GetLocalShellSetting();
     ApplyPreferences();
 
-    if(command_.length > 0)
+    if(command_.length > 0) {
       feedChild(command_ ~ '\n');
+    }
   }
 
-  void ApplyPreferences()
-  {
+  void ApplyPreferences() {
     // appearance
     auto colorFore = new RGBA();
     auto colorBack = new RGBA();
@@ -145,7 +141,7 @@ private:
   void CloseThisPageCallback(int status, VTE term)
   {
     if(pid_ >= 0) {
-      mediator_.CloseThisPage();
+      closeThisPage_();
       pid_ = -1;
     }
   }
@@ -289,7 +285,7 @@ public:
 private:
   string cwd_;
   string delegate(Side, uint) getCWDLR_;
-  Nonnull!Mediator mediator_;
+  void delegate() closeThisPage_;
 
 public:
   void ChangeDirectoryFromFiler(string dirpath)

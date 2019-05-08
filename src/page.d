@@ -41,13 +41,11 @@ import rcfile = config.rcfile;
 import config.page_init_option;
 import tab;
 import terminal;
-import mediator;
 
 class Page : VBox
 {
   /////////////////////////// GUI stuff
 private:
-  Nonnull!Mediator mediator_;
   Nonnull!Tab      tab_;
   Nonnull!Terminal term_;
 
@@ -63,10 +61,8 @@ public:
     getCWDFromMain_ = GetCWDFromMain;
 
     super(0, 0);
-    tab_     .init(new Tab(side, ClosePage));
-    mediator_.init(new Mediator(this));
-    term_    .init(new Terminal(mediator_, initialDir, opt.terminalRunCommand_, GetCWDFromMain));
-    mediator_.Set(term_);
+    tab_ .init(new Tab(side, ClosePage));
+    term_.init(new Terminal(initialDir, opt.terminalRunCommand_, GetCWDFromMain, &CloseThisPage));
     PackTerminalWithScrollbar();
     showAll();
   }
@@ -79,7 +75,6 @@ public:
     packStart(box, true, true, 0);
   }
 
-  bool     OnLeftSide () { return tab_.OnLeftSide(); }
   Terminal GetTerminal() { return term_; }
   Tab      GetTab     () { return tab_; }
 
@@ -112,10 +107,6 @@ public:
 
 
   ///////////////////////// manipulation of focus
-  FocusInPage WhichIsFocused() {
-    return FocusInPage.LOWER;
-  }
-
   void GrabFocus() {
     term_.grabFocus();
   }

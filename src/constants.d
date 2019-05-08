@@ -74,13 +74,6 @@ enum Order
   BACKWARD,
 }
 
-enum FocusInPage
-{
-  NONE,
-  UPPER,
-  LOWER,
-}
-
 enum FocusInMainWindow
 {
   NONE,

@@ -114,8 +114,6 @@ public:
   string GetID(){return side_ ~ pageNum_.to!string;}
   Side GetSide(){return side_;}
 
-  bool OnLeftSide(){return side_ == Side.LEFT;}
-
   void SetPath(string p)
   {
     labelPath_.setText(p);

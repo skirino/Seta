@@ -278,10 +278,7 @@ private:
 
 private:
   void AddFocusToNoteIfNone(Note note) {
-    auto page = note.GetCurrentPage();
-    if(page.WhichIsFocused() == FocusInPage.NONE) {
-      page.GrabFocus();
-    }
+    note.GetCurrentPage().GrabFocus();
   }
   ///////////////////////// manipulation of focus
 
