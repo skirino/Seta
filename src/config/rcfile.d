@@ -360,22 +360,21 @@ private:
 
   void InstallKeybinds()
   {
-    mixin(InstallKeybind!("MainWindowAction.CreateNewPage"      , "<Alt>t,<Shift><Primary>t"));
-    mixin(InstallKeybind!("MainWindowAction.MoveToNextPage"     , "<Alt>m,<Shift><Primary>m,<Primary>Tab,<Shift><Primary>greater"));
-    mixin(InstallKeybind!("MainWindowAction.MoveToPreviousPage" , "<Shift><Primary>Tab,<Shift><Primary>less"));
-    mixin(InstallKeybind!("MainWindowAction.SwitchViewMode"     , "<Shift><Primary>x"));
-    mixin(InstallKeybind!("MainWindowAction.CloseThisPage"      , "<Shift><Primary>d"));
-    mixin(InstallKeybind!("MainWindowAction.MoveFocusUp"        , "<Shift><Primary>k"));
-    mixin(InstallKeybind!("MainWindowAction.MoveFocusDown"      , "<Shift><Primary>j"));
-    mixin(InstallKeybind!("MainWindowAction.MoveFocusLeft"      , "<Shift><Primary>h"));
-    mixin(InstallKeybind!("MainWindowAction.MoveFocusRight"     , "<Shift><Primary>l"));
-    mixin(InstallKeybind!("MainWindowAction.ExpandLeftPane"     , "<Shift><Primary>Left"));
-    mixin(InstallKeybind!("MainWindowAction.ExpandRightPane"    , "<Shift><Primary>Right"));
-    mixin(InstallKeybind!("MainWindowAction.GoToDirOtherSide"   , "<Alt>o,<Shift><Primary>o"));
-    mixin(InstallKeybind!("MainWindowAction.ShowChangeDirDialog", "<Shift><Primary>plus"));
-    mixin(InstallKeybind!("MainWindowAction.ShowConfigDialog"   , "<Shift><Primary>Escape"));
-    mixin(InstallKeybind!("MainWindowAction.ToggleFullscreen"   , "F11"));
-    mixin(InstallKeybind!("MainWindowAction.QuitApplication"    , "<Shift><Primary>q"));
+    mixin(InstallKeybind!("MainWindowAction.CreateNewPage"     , "<Alt>t,<Shift><Primary>t"));
+    mixin(InstallKeybind!("MainWindowAction.MoveToNextPage"    , "<Alt>m,<Shift><Primary>m,<Primary>Tab,<Shift><Primary>greater"));
+    mixin(InstallKeybind!("MainWindowAction.MoveToPreviousPage", "<Shift><Primary>Tab,<Shift><Primary>less"));
+    mixin(InstallKeybind!("MainWindowAction.SwitchViewMode"    , "<Shift><Primary>x"));
+    mixin(InstallKeybind!("MainWindowAction.CloseThisPage"     , "<Shift><Primary>d"));
+    mixin(InstallKeybind!("MainWindowAction.MoveFocusUp"       , "<Shift><Primary>k"));
+    mixin(InstallKeybind!("MainWindowAction.MoveFocusDown"     , "<Shift><Primary>j"));
+    mixin(InstallKeybind!("MainWindowAction.MoveFocusLeft"     , "<Shift><Primary>h"));
+    mixin(InstallKeybind!("MainWindowAction.MoveFocusRight"    , "<Shift><Primary>l"));
+    mixin(InstallKeybind!("MainWindowAction.ExpandLeftPane"    , "<Shift><Primary>Left"));
+    mixin(InstallKeybind!("MainWindowAction.ExpandRightPane"   , "<Shift><Primary>Right"));
+    mixin(InstallKeybind!("MainWindowAction.GoToDirOtherSide"  , "<Alt>o,<Shift><Primary>o"));
+    mixin(InstallKeybind!("MainWindowAction.ShowConfigDialog"  , "<Shift><Primary>Escape"));
+    mixin(InstallKeybind!("MainWindowAction.ToggleFullscreen"  , "F11"));
+    mixin(InstallKeybind!("MainWindowAction.QuitApplication"   , "<Shift><Primary>q"));
 
     mixin(InstallKeybind!("TerminalAction.ScrollUp"      , "<Shift><Primary>p"));
     mixin(InstallKeybind!("TerminalAction.ScrollDown"    , "<Shift><Primary>n"));
@@ -601,7 +600,6 @@ MainWindowAction.MoveFocusRight=<Shift><Primary>l
 MainWindowAction.ExpandLeftPane=<Shift><Primary>Left
 MainWindowAction.ExpandRightPane=<Shift><Primary>Right
 MainWindowAction.GoToDirOtherSide=<Alt>o,<Shift><Primary>o
-MainWindowAction.ShowChangeDirDialog=<Shift><Primary>plus
 MainWindowAction.ShowConfigDialog=<Shift><Primary>Escape
 MainWindowAction.ToggleFullscreen=F11
 MainWindowAction.QuitApplication=<Shift><Primary>q

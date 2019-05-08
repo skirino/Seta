@@ -25,16 +25,16 @@ import std.algorithm;
 
 import gtk.VBox;
 import gtk.HBox;
-import gtk.VPaned;
+import gtk.Paned;
 import gtk.Widget;
 import gtk.Label;
 import gtk.Button;
 import gtk.Tooltip;
+import gtk.c.types : GtkOrientation;
 
 import utils.ref_util;
 import utils.string_util;
 import utils.gio_util;
-import utils.image_util;
 import constants;
 import rcfile = config.rcfile;
 import config.page_init_option;
@@ -50,7 +50,7 @@ private:
   Nonnull!Mediator mediator_;
   Nonnull!Tab      tab_;
 
-  Nonnull!VPaned          paned_;
+  Nonnull!Paned           paned_;
   Nonnull!TerminalWrapper termWithScrollbar_;
 
   bool mapped_ = false;
@@ -60,11 +60,11 @@ public:
        PageInitOption opt,
        string delegate(Side, uint) GetCWDFromMain,
        void delegate(Side) AppendPageCopy,
-       void delegate(Side, uint) ClosePage)
-  {
+       void delegate(Side, uint) ClosePage) {
     auto initialDir = opt.initialDir_;
-    if(!DirectoryExists(initialDir))
+    if(!DirectoryExists(initialDir)) {
       initialDir = environment.get("HOME") ~ '/';
+    }
 
     getCWDFromMain_ = GetCWDFromMain;
     appendPage_     = AppendPageCopy;
@@ -77,7 +77,7 @@ public:
     termWithScrollbar_.init(new TerminalWrapper(mediator_, initialDir, opt.terminalRunCommand_, GetCWDFromMain));
     mediator_.Set(termWithScrollbar_.Get());
 
-    paned_.init(new VPaned);
+    paned_.init(new Paned(GtkOrientation.VERTICAL));
     paned_.pack2(termWithScrollbar_, true, 0);
     packStart(paned_, true, true, 0);
 
@@ -85,52 +85,43 @@ public:
     SetLayout();
   }
 
-  void SetLayout()
-  {
-    if(this.getRealized()){
+  void SetLayout() {
+    if(this.getRealized()) {
       uint split = tab_.OnLeftSide() ? rcfile.GetSplitVLeft() : rcfile.GetSplitVRight();
-      if(split == 0){
+      if(split == 0) {
         TerminalMode();
-      }
-      else if(split >= rcfile.GetWindowSizeV()){
+      } else if(split >= rcfile.GetWindowSizeV()) {
         FilerMode();
-      }
-      else{
+      } else {
         BothMode();
         paned_.setPosition(split);
       }
-    }
-    else{
+    } else {
       // Just realize all children on startup.
       uint split = rcfile.GetWindowSizeV() / 2;
       paned_.setPosition(split);
     }
   }
 
-
-  private void ResetLayoutOnFirstMap(Widget w)
-  {
+  private void ResetLayoutOnFirstMap(Widget w) {
     // Avoid errors due to "unrealized widgets";
     // After "realize" of this page and its child widgets,
     // set layout again in order to set proper mode_ of this page.
-    if(!mapped_){
+    if(!mapped_) {
       mapped_ = true;
       SetLayout();
     }
   }
 
+  bool     OnLeftSide () { return tab_.OnLeftSide(); }
+  Terminal GetTerminal() { return termWithScrollbar_.Get(); }
+  Tab      GetTab     () { return tab_; }
 
-  bool     OnLeftSide (){return tab_.OnLeftSide();}
-  Terminal GetTerminal(){return termWithScrollbar_.Get();}
-  Tab      GetTab     (){return tab_;}
-
-  void CloseThisPage()
-  {
+  void CloseThisPage() {
     tab_.CloseThisPage();
   }
 
-  void PrepareDestroy()
-  {
+  void PrepareDestroy() {
     GetTerminal().KillChildProcessIfStillAlive();
   }
   /////////////////////////// GUI stuff
@@ -143,21 +134,18 @@ private:
   int lastSplitPosition_;
   void delegate(Side) appendPage_;
 
-  void AppendPage(Button b)
-  {
+  void AppendPage(Button b) {
     appendPage_(tab_.GetSide());
   }
 
-  void GoToDirOtherSide(Button b)
-  {
+  void GoToDirOtherSide(Button b) {
   }
 
 public:
-  ViewMode GetViewMode(){return mode_;}
+  ViewMode GetViewMode() { return mode_; }
 
-  void ViewModeButtonClicked(Button b)
-  {
-    switch(mode_){
+  void ViewModeButtonClicked(Button b) {
+    switch(mode_) {
     case ViewMode.BOTH:// switch from BOTH mode to TERMINAL mode
       TerminalMode();
       break;
@@ -172,29 +160,28 @@ public:
   }
 
 private:
-  void SetLastSplitPosition()
-  {
+  void SetLastSplitPosition() {
     uint pos = paned_.getPosition();
     auto windowHeight = rcfile.GetWindowSizeV();
     lastSplitPosition_ = max(min(pos, 9*windowHeight/10), windowHeight/10);
   }
 
-  void TerminalMode()
-  {
-    if(mode_ != ViewMode.TERMINAL){
-      if(mode_ == ViewMode.BOTH)
+  void TerminalMode() {
+    if(mode_ != ViewMode.TERMINAL) {
+      if(mode_ == ViewMode.BOTH) {
         SetLastSplitPosition();
+      }
       mode_ = ViewMode.TERMINAL;
       termWithScrollbar_.showAll();
       MoveFocusPosition();
     }
   }
 
-  void FilerMode()
-  {
-    if(mode_ != ViewMode.FILER){
-      if(mode_ == ViewMode.BOTH)
+  void FilerMode() {
+    if(mode_ != ViewMode.FILER) {
+      if(mode_ == ViewMode.BOTH) {
         SetLastSplitPosition();
+      }
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.FILER;
       MoveFocusPosition();
@@ -202,9 +189,8 @@ private:
     }
   }
 
-  void BothMode()
-  {
-    if(mode_ != ViewMode.BOTH){
+  void BothMode() {
+    if(mode_ != ViewMode.BOTH) {
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.BOTH;
       termWithScrollbar_.showAll();
@@ -221,56 +207,43 @@ private:
   string delegate(Side, uint) getCWDFromMain_;
 
 public:
-  string FileSystemRoot()
-  {
-    return "/";
-  }
-
-  bool FileSystemIsRemote()
-  {
-    return false;
-  }
-
-  string GetCWD()
-  {
+  string GetCWD() {
     // if remote, return locally-mounted path
     return "/";
   }
 
-  void ChangeDirectoryToPage(Page page)
-  {
+  void ChangeDirectoryToPage(Page page) {
+    // TODO
   }
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
 
 
 
   ///////////////////////// manipulation of focus
-  FocusInPage WhichIsFocused()
-  {
-    if(termWithScrollbar_.Get().hasFocus())
+  FocusInPage WhichIsFocused() {
+    if(termWithScrollbar_.Get().hasFocus()) {
       return FocusInPage.LOWER;
-    return FocusInPage.NONE;
+    } else {
+      return FocusInPage.NONE;
+    }
   }
 
-  void FocusLower()
-  {
+  void FocusLower() {
     termWithScrollbar_.Get().grabFocus();
   }
 
-  void FocusUpper()
-  {
+  void FocusUpper() {
     termWithScrollbar_.Get().grabFocus();
   }
 
-  void FocusShownWidget()
-  {
+  void FocusShownWidget() {
     termWithScrollbar_.Get().grabFocus();
   }
 
-  void MoveFocusPosition()
-  {
-    if(getFocusChild() !is null)
+  void MoveFocusPosition() {
+    if(getFocusChild() !is null) {
       FocusShownWidget();
+    }
   }
   ///////////////////////// manipulation of focus
 }

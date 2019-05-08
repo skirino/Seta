@@ -167,7 +167,6 @@ enum MainWindowAction
   ExpandLeftPane,
   ExpandRightPane,
   GoToDirOtherSide,
-  ShowChangeDirDialog,
   ShowConfigDialog,
   ToggleFullscreen,
   QuitApplication,

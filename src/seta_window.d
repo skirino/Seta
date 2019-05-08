@@ -430,11 +430,6 @@ private:
     case MainWindowAction.GoToDirOtherSide:
       return GoToDirOtherSide();
 
-    case MainWindowAction.ShowChangeDirDialog:
-      mixin(FocusedNoteOrReturnFalse);
-      auto page = note.GetCurrentPage();
-      return !page.FileSystemIsRemote();
-
     case MainWindowAction.ShowConfigDialog:
       StartConfigDialog();
       return true;
