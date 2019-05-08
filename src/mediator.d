@@ -25,30 +25,24 @@ import utils.ref_util;
 import utils.dialog_util;
 import constants;
 import page;
-import file_manager;
 import terminal;
-import file_system;
 import statusbar;
 
 
 class Mediator
 {
 private:
-  Nonnull!Page        page_;
-  Nonnull!FileSystem  fsys_;
-  Nonnull!FileManager filer_;
-  Nonnull!Terminal    term_;
+  Nonnull!Page     page_;
+  Nonnull!Terminal term_;
 
 public:
   this(Page p)
   {
     page_.init(p);
-    fsys_.init(new FileSystem);
   }
 
-  void Set(FileManager f, Terminal t)
+  void Set(Terminal t)
   {
-    filer_.init(f);
     term_ .init(t);
   }
 
@@ -70,12 +64,10 @@ public:
   /////////////////// interface to FileManager
   bool FilerChangeDirectory(string p, bool appendHistory = true, bool notifyTerminal = true)
   {
-    return filer_.ChangeDirectory(p, appendHistory, notifyTerminal);
+    return true;
   }
   bool FilerChangeDirFromTerminal(string path)
   {
-    if(!filer_.ChangeDirectory(path, true, false))
-      return false;
     PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to file manager(" ~ GetPageID() ~ ")");
     return true;
   }
@@ -87,24 +79,10 @@ public:
   void TerminalChangeDirectoryFromFiler(string p)
   {
     // remove "/home/username/.gvfs/sftp ..." from p and pass it to the terminal
-    string path = fsys_.NativePath(p);
+    string path = "/";
     term_.ChangeDirectoryFromFiler(path);
     PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to terminal(" ~ GetPageID() ~ ")");
   }
   void TerminalQuitSSH(string pwd){ term_.QuitSSH(pwd); }
   /////////////////// interface to Terminal
-
-
-
-  /////////////////// interface to FileSystem
-  bool FileSystemLookingAtRemoteFS(string p){ return fsys_.LookingAtRemoteFS(p); }
-  bool FileSystemIsRemote(){ return fsys_.remote_; }
-  string FileSystemRoot   (){ return fsys_.rootDir_; }
-  string FileSystemHome   (){ return fsys_.homeDir_; }
-  string FileSystemNewPath(){ return fsys_.homeDir_ is null ? fsys_.rootDir_ : fsys_.homeDir_; }
-  string FileSystemParentDirectory(string path){ return fsys_.ParentDirectory(path); }
-  string FileSystemNativePath     (string path){ return fsys_.NativePath(path); }
-  string FileSystemMountedVFSPath (string path){ return fsys_.MountedVFSPath(path); }
-  string FileSystemSetLocal(){ return fsys_.SetLocal(); }
-  /////////////////// interface to FileSystem
 }

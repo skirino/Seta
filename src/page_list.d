@@ -65,15 +65,11 @@ void NotifyFilerDisconnect(string mountName, string gvfsroot)
 
 void NotifyEscapeFromPath(string path)
 {
-  foreach(page; pages_){
-    page.GetFileManager().EscapeFromPath(path);
-  }
 }
 
 void NotifySetLayout()
 {
   foreach(page; pages_){
-    page.GetFileManager().SetLayout();
     page.SetLayout();
   }
   SetaWindow.SetLayout();

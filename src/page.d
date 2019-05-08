@@ -41,7 +41,6 @@ import config.page_init_option;
 import tab;
 import terminal_wrapper;
 import terminal;
-import file_manager;
 import mediator;
 import page_list;
 import page_header;
@@ -56,7 +55,6 @@ private:
 
   Nonnull!PageHeader      header_;
   Nonnull!VPaned          paned_;
-  Nonnull!FileManager     filer_;
   Nonnull!TerminalWrapper termWithScrollbar_;
 
   bool mapped_ = false;
@@ -81,9 +79,8 @@ public:
 
     tab_              .init(new Tab(side, ClosePage));
     mediator_         .init(new Mediator(this));
-    filer_            .init(new FileManager(mediator_, initialDir));
     termWithScrollbar_.init(new TerminalWrapper(mediator_, initialDir, opt.terminalRunCommand_, GetCWDFromMain));
-    mediator_.Set(filer_, termWithScrollbar_.Get());
+    mediator_.Set(termWithScrollbar_.Get());
 
     header_.init(new PageHeader(
                    &AppendPage,
@@ -92,11 +89,8 @@ public:
     packStart(header_, 0, 0, 0);
 
     paned_.init(new VPaned);
-    paned_.pack1(filer_,             true, 0);
     paned_.pack2(termWithScrollbar_, true, 0);
     packStart(paned_, true, true, 0);
-
-    filer_.ChangeDirectory(initialDir, false, false);// do not notify terminal and do not append to history
 
     showAll();
     SetLayout();
@@ -137,16 +131,14 @@ public:
   }
 
 
-  bool        OnLeftSide    (){return tab_.OnLeftSide();}
-  FileManager GetFileManager(){return filer_;}
-  Terminal    GetTerminal   (){return termWithScrollbar_.Get();}
-  Tab         GetTab        (){return tab_;}
+  bool     OnLeftSide (){return tab_.OnLeftSide();}
+  Terminal GetTerminal(){return termWithScrollbar_.Get();}
+  Tab      GetTab     (){return tab_;}
 
   void UpdatePathLabel(string path, long numItems)
   {
-    string nativePath = mediator_.FileSystemNativePath(path);
     tab_.SetPath(path);
-    header_.SetPwd(nativePath);
+    header_.SetPwd(path);
     header_.SetNumItems(numItems);
   }
   void SetHostLabel(string h)
@@ -165,7 +157,6 @@ public:
 
   void PrepareDestroy()
   {
-    filer_.PrepareDestroy();// to stop directory monitoring
     GetTerminal().KillChildProcessIfStillAlive();
   }
   /////////////////////////// GUI stuff
@@ -185,7 +176,6 @@ private:
 
   void GoToDirOtherSide(Button b)
   {
-    filer_.ChangeDirectory(GetCWDOtherSide());
   }
 
 public:
@@ -223,7 +213,6 @@ private:
       mode_ = ViewMode.TERMINAL;
       termWithScrollbar_.showAll();
       MoveFocusPosition();
-      filer_.hide();
     }
   }
 
@@ -234,11 +223,8 @@ private:
         SetLastSplitPosition();
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.FILER;
-      filer_.showAll();
       MoveFocusPosition();
       termWithScrollbar_.hide();
-      if(needUpdate)// Update AFTER changing the mode
-        filer_.Update();
     }
   }
 
@@ -247,12 +233,9 @@ private:
     if(mode_ != ViewMode.BOTH){
       bool needUpdate = mode_ == ViewMode.TERMINAL;
       mode_ = ViewMode.BOTH;
-      filer_.showAll();
       termWithScrollbar_.showAll();
       MoveFocusPosition();
       paned_.setPosition(lastSplitPosition_);
-      if(needUpdate)// Update AFTER changing the mode
-        filer_.Update();
     }
   }
   //////////////////////// view mode
@@ -266,12 +249,12 @@ private:
 public:
   string FileSystemRoot()
   {
-    return mediator_.FileSystemRoot();
+    return "/";
   }
 
   bool FileSystemIsRemote()
   {
-    return mediator_.FileSystemIsRemote();
+    return false;
   }
 
   string GetCWD()
@@ -288,12 +271,11 @@ public:
 
   bool LookingAtRemoteDir()
   {
-    return mediator_.FileSystemLookingAtRemoteFS("/");
+    return false;
   }
 
   void ChangeDirectoryToPage(Page page)
   {
-    filer_.ChangeDirectory(page.GetCWD());
   }
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
 
@@ -302,8 +284,6 @@ public:
   ///////////////////////// manipulation of focus
   FocusInPage WhichIsFocused()
   {
-    if(filer_.hasFocus())
-      return FocusInPage.UPPER;
     if(termWithScrollbar_.Get().hasFocus())
       return FocusInPage.LOWER;
     return FocusInPage.NONE;
@@ -311,26 +291,17 @@ public:
 
   void FocusLower()
   {
-    if(mode_ == ViewMode.FILER)
-      filer_.GrabFocus();
-    else
-      termWithScrollbar_.Get().grabFocus();
+    termWithScrollbar_.Get().grabFocus();
   }
 
   void FocusUpper()
   {
-    if(mode_ == ViewMode.TERMINAL)
-      termWithScrollbar_.Get().grabFocus();
-    else
-      filer_.GrabFocus();
+    termWithScrollbar_.Get().grabFocus();
   }
 
   void FocusShownWidget()
   {
-    if(mode_ == ViewMode.FILER)
-      filer_.GrabFocus();
-    else // mode_ == ViewMode.TERMINAL || mode_ == ViewMode.BOTH
-      termWithScrollbar_.Get().grabFocus();
+    termWithScrollbar_.Get().grabFocus();
   }
 
   void MoveFocusPosition()

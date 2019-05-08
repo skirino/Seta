@@ -315,7 +315,7 @@ public:
   void ChangeDirectoryFromFiler(string dirpath)
   {
     cwd_ = dirpath;
-    if(ReadyToFeed(pty_, mediator_.FileSystemIsRemote())){
+    if(ReadyToFeed(pty_, false)){
       ClearInputtedCommand();
       string commandString = "cd " ~ EscapeSpecialChars(dirpath) ~ '\n';
       FeedChild(commandString);
@@ -330,15 +330,6 @@ public:
     if(shellSetting_ !is null){
       foreach(cdAlias; shellSetting_.GetChangeDirAliases()){
         if(command == cdAlias.command_){
-          string path =
-            cdAlias.path_[0] == '/' ? cdAlias.path_ :
-            cdAlias.path_[0] == '~' ? ExpandPath(mediator_.FileSystemHome()[0..$-1] ~ cdAlias.path_[1..$], mediator_.FileSystemRoot()) :
-                                      ExpandPath(cwd_ ~ cdAlias.path_, mediator_.FileSystemRoot());
-          if(path !is null){
-            if(mediator_.FilerChangeDirFromTerminal(path)){
-              cwd_ = mediator_.FileSystemNativePath(path);
-            }
-          }
           return;
         }
       }
@@ -348,17 +339,9 @@ public:
       string args = triml(command[2..$]);
 
       if(args.length == 0){// to $HOME
-        string home = mediator_.FileSystemHome();
-        if(home !is null){
-          mediator_.FilerChangeDirFromTerminal(home);
-          cwd_ = mediator_.FileSystemNativePath(home);
-        }
       }
       else if(args == "-"){// back to previous directory
-        string previous = "/";
-        if(previous.length > 0){
-          cwd_ = mediator_.FileSystemNativePath(previous);
-        }
+        cwd_ = "/";
       }
       else{
         if(command[2] == ' '){// "cd" command is separated with its 1st argument by ' '
@@ -387,23 +370,19 @@ public:
 
     // convert arg1 to absolute path
     if(arg1[0] == '/'){// path from ROOT
-      destination = mediator_.FileSystemRoot() ~ arg1[1..$];
+      destination = arg1;
     }
     else if(arg1[0] == '~'){// path from HOME
-      string home = mediator_.FileSystemHome();
-      if(home is null){
-        return;
-      }
-      destination = home ~ arg1[1..$];
+      destination = arg1;
     }
     else{// path from pwd
       destination = cwd_ ~ arg1;
     }
 
-    string absPath = ExpandPath(destination, mediator_.FileSystemRoot());
+    string absPath = ExpandPath(destination, "/");
     if(absPath !is null){
       if(mediator_.FilerChangeDirFromTerminal(absPath)){// change directory here
-        cwd_ = mediator_.FileSystemNativePath(absPath);
+        cwd_ = absPath;
       }
     }
   }
@@ -431,9 +410,6 @@ private:
 
   void SyncFilerDirectoryByCwd()
   {
-    if(mediator_.FileSystemIsRemote)
-      return; // cwd of the child process can be obtained only within localhost
-
     auto dirFromProc = GetCWDFromProcFS();
     auto realPath = RealPath(cwd_, readlinkBuffer_);
     if(dirFromProc.empty || realPath.empty)// cannot happen
@@ -550,7 +526,7 @@ private:
     string lineOld = GetLastCommand();
 
     // do nothing when working within remote shell or replacing functionality is disabled
-    if(mediator_.FileSystemIsRemote() || !enableReplace_){
+    if(!enableReplace_){
       static if(is(R == bool)){
         return false;
       }

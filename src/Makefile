@@ -1,4 +1,4 @@
-SRC = anything_cd/*.d config/*.d fm/*.d term/*.d utils/*.d *.d
+SRC = anything_cd/*.d config/*.d term/*.d utils/*.d *.d
 INPUTS = C/workaround.o ${SRC}
 GTKD_DIR = ../../SetupDDevelopmentEnvironment/GtkD/
 

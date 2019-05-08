@@ -66,7 +66,6 @@ void StartChangeDirDialog(Page page)
     if(path.StartsWith("~")){
       path = environment.get("HOME") ~ path[1..$];
     }
-    page.GetFileManager().ChangeDirectory(path);
   }
 }
 ///////////// public interfaces of this module
