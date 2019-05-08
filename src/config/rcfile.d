@@ -363,10 +363,7 @@ private:
     mixin(InstallKeybind!("MainWindowAction.CreateNewPage"     , "<Alt>t,<Shift><Primary>t"));
     mixin(InstallKeybind!("MainWindowAction.MoveToNextPage"    , "<Alt>m,<Shift><Primary>m,<Primary>Tab,<Shift><Primary>greater"));
     mixin(InstallKeybind!("MainWindowAction.MoveToPreviousPage", "<Shift><Primary>Tab,<Shift><Primary>less"));
-    mixin(InstallKeybind!("MainWindowAction.SwitchViewMode"    , "<Shift><Primary>x"));
     mixin(InstallKeybind!("MainWindowAction.CloseThisPage"     , "<Shift><Primary>d"));
-    mixin(InstallKeybind!("MainWindowAction.MoveFocusUp"       , "<Shift><Primary>k"));
-    mixin(InstallKeybind!("MainWindowAction.MoveFocusDown"     , "<Shift><Primary>j"));
     mixin(InstallKeybind!("MainWindowAction.MoveFocusLeft"     , "<Shift><Primary>h"));
     mixin(InstallKeybind!("MainWindowAction.MoveFocusRight"    , "<Shift><Primary>l"));
     mixin(InstallKeybind!("MainWindowAction.ExpandLeftPane"    , "<Shift><Primary>Left"));
@@ -591,10 +588,7 @@ Shortcuts=
 MainWindowAction.CreateNewPage=<Alt>t,<Shift><Primary>t
 MainWindowAction.MoveToNextPage=<Alt>m,<Shift><Primary>m,<Primary>Tab,<Shift><Primary>greater
 MainWindowAction.MoveToPreviousPage=<Shift><Primary>Tab,<Shift><Primary>less
-MainWindowAction.SwitchViewMode=<Shift><Primary>x
 MainWindowAction.CloseThisPage=<Shift><Primary>d
-MainWindowAction.MoveFocusUp=<Shift><Primary>k
-MainWindowAction.MoveFocusDown=<Shift><Primary>j
 MainWindowAction.MoveFocusLeft=<Shift><Primary>h
 MainWindowAction.MoveFocusRight=<Shift><Primary>l
 MainWindowAction.ExpandLeftPane=<Shift><Primary>Left

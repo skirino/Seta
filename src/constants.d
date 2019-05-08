@@ -58,8 +58,6 @@ enum FileColorType
 
 enum Direction
 {
-  UP,
-  DOWN,
   LEFT,
   RIGHT,
 }
@@ -88,13 +86,6 @@ enum FocusInMainWindow
   NONE,
   LEFT,
   RIGHT,
-}
-
-enum ViewMode
-{
-  TERMINAL,
-  FILER,
-  BOTH,
 }
 
 enum MouseButton{
@@ -158,10 +149,7 @@ enum MainWindowAction
   CreateNewPage,
   MoveToNextPage,
   MoveToPreviousPage,
-  SwitchViewMode,
   CloseThisPage,
-  MoveFocusUp,
-  MoveFocusDown,
   MoveFocusLeft,
   MoveFocusRight,
   ExpandLeftPane,

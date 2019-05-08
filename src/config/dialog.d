@@ -199,7 +199,7 @@ private:
     mixin(CheckSpinButton!("NotifyExpiresInMSec"));
 
     if(changed) {
-      SetaWindow.NotifySetLayout();
+      SetaWindow.SetLayout();
     }
   }
   ///////////////////// [Layout]
@@ -581,7 +581,7 @@ private:
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText9", entUserDefinedText9_.getText());
 
     if(changed) {
-      SetaWindow.NotifyApplyTerminalPreferences();
+      SetaWindow.NotifyTerminalsToApplyPreferences();
     }
   }
   ///////////////////// [Terminal]

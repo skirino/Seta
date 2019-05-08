@@ -58,12 +58,7 @@ public:
   }
 
   void AppendNewPage(PageInitOption opt) {
-    auto page = new Page(
-      side_,
-      opt,
-      &mainWin_.GetCWDOfChildWidget,
-      &mainWin_.AppendPageCopy, // not "&AppendPageCopy", since pages can be dragged onto the other Notebook
-      &mainWin_.ClosePage);
+    auto page = new Page(side_, opt, &mainWin_.GetCWDOfChildWidget, &mainWin_.ClosePage);
     appendPage(page, page.GetTab());
     setTabReorderable(page, 1);
     setTabDetachable(page, 1);

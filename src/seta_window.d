@@ -41,15 +41,16 @@ import page;
 class SetaWindow : MainWindow
 {
   ///////////////////////// static members for application-wide access
-public:
+private:
   static __gshared Nonnull!SetaWindow singleton_;
 
+public:
   static void Init() {
     singleton_.init(new SetaWindow());
-    SetLayout();                                           // set parameters in rcfile
-    singleton_.showAll();                                  // do size allocations and negotiations
-    SetLayout();                                           // reset parameters and hide some of child widgets
-    singleton_.noteL_.GetCurrentPage().FocusShownWidget(); // set initial focus to lower left widget (terminal)
+    SetLayout();                                    // set parameters in rcfile
+    singleton_.showAll();                           // do size allocations and negotiations
+    SetLayout();                                    // reset parameters and hide some of child widgets
+    singleton_.noteL_.GetCurrentPage().GrabFocus(); // set initial focus to lower left widget (terminal)
   }
 
   static void SetLayout() {
@@ -57,14 +58,7 @@ public:
     singleton_.hpaned_.setPosition(rcfile.GetSplitH());
   }
 
-  static void NotifySetLayout() {
-    singleton_.ForeachPage(delegate void(Page page) {
-        page.SetLayout();
-      });
-    singleton_.SetLayout();
-  }
-
-  static void NotifyApplyTerminalPreferences() {
+  static void NotifyTerminalsToApplyPreferences() {
     singleton_.ForeachPage(delegate void(Page page) {
         page.GetTerminal().ApplyPreferences();
       });
@@ -152,14 +146,10 @@ public:
       Main.quit();
     } else if(side == Side.LEFT && npagesL == 0) {
       auto pageR = noteR_.GetCurrentPage();
-      if(pageR.WhichIsFocused() == FocusInPage.NONE) {
-        pageR.FocusLower();
-      }
+      pageR.GrabFocus();
     } else if(side == Side.RIGHT && npagesR == 0) {
       auto pageL = noteL_.GetCurrentPage();
-      if(pageL.WhichIsFocused() == FocusInPage.NONE) {
-        pageL.FocusLower();
-      }
+      pageL.GrabFocus();
     } else { // each note has at least one page
       /+
        + Work around bug: newly-focused terminal does not process key-press events
@@ -168,8 +158,7 @@ public:
        + Once focus filer, then terminal.
        +/
       auto page = note.GetCurrentPage();
-      page.FocusUpper();
-      page.FocusLower();
+      page.GrabFocus();
     }
   }
 
@@ -234,7 +223,7 @@ private:
     } else {
       note.nextPage();
     }
-    note.GetCurrentPage().FocusShownWidget();
+    note.GetCurrentPage().GrabFocus();
   }
 
   void MoveToPreviousPage(Note note) {
@@ -243,7 +232,7 @@ private:
     } else {
       note.prevPage();
     }
-    note.GetCurrentPage().FocusShownWidget();
+    note.GetCurrentPage().GrabFocus();
   }
   ///////////////////////// pages
 
@@ -253,11 +242,11 @@ private:
 private:
   FocusInMainWindow WhichIsFocused() {
     auto pageL = noteL_.GetCurrentPage();
-    if(pageL !is null && pageL.WhichIsFocused() != FocusInPage.NONE) {
+    if(pageL !is null) {
       return FocusInMainWindow.LEFT;
     }
     auto pageR = noteR_.GetCurrentPage();
-    if(pageR !is null && pageR.WhichIsFocused() != FocusInPage.NONE) {
+    if(pageR !is null) {
       return FocusInMainWindow.RIGHT;
     }
     return FocusInMainWindow.NONE;
@@ -276,50 +265,14 @@ private:
     }
   }
 
-  void MoveFocus(Direction direction)() {
-    static if(direction == Direction.UP || direction == Direction.DOWN) {
-      auto note = GetFocusedNote();
-      if(note is null) return;
-      auto page = note.GetCurrentPage();
-      FocusInPage f = page.WhichIsFocused();
-      static if(direction == Direction.UP) {
-        if(f == FocusInPage.LOWER) {
-          page.FocusUpper();
-        }
-      }
-      static if(direction == Direction.DOWN) {
-        if(f == FocusInPage.UPPER) {
-          page.FocusLower();
-        }
-      }
-    } else { // direction == Direction.LEFT || direction == Direction.RIGHT
-      auto pageL = noteL_.GetCurrentPage();
-      if(pageL is null) return;
-      auto pageR = noteR_.GetCurrentPage();
-      if(pageR is null) return;
-
-      FocusInPage fl = pageL.WhichIsFocused();
-      FocusInPage fr = pageR.WhichIsFocused();
-      if(fl == FocusInPage.NONE && fr == FocusInPage.NONE) return;
-
-      static if(direction == Direction.LEFT) {
-        if(noteL_.getVisible) {
-          if(fr == FocusInPage.UPPER) {
-            pageL.FocusUpper();
-          } else if(fr == FocusInPage.LOWER) {
-            pageL.FocusLower();
-          }
-        }
-      }
-      static if(direction == Direction.RIGHT) {
-        if(noteR_.getVisible) {
-          if(fl == FocusInPage.UPPER) {
-            pageR.FocusUpper();
-          } else if(fl == FocusInPage.LOWER) {
-            pageR.FocusLower();
-          }
-        }
-      }
+  void MoveFocus(Direction direction) {
+    auto pageL = noteL_.GetCurrentPage();
+    if(pageL is null) return;
+    auto pageR = noteR_.GetCurrentPage();
+    if(pageR is null) return;
+    auto note = direction == Direction.LEFT ? noteL_ : noteR_;
+    if(note.getVisible()) {
+      note.GetCurrentPage().GrabFocus();
     }
   }
 
@@ -327,7 +280,7 @@ private:
   void AddFocusToNoteIfNone(Note note) {
     auto page = note.GetCurrentPage();
     if(page.WhichIsFocused() == FocusInPage.NONE) {
-      page.FocusShownWidget();
+      page.GrabFocus();
     }
   }
   ///////////////////////// manipulation of focus
@@ -396,29 +349,16 @@ private:
       MoveToPreviousPage(note);
       return true;
 
-    case MainWindowAction.SwitchViewMode:
-      mixin(FocusedNoteOrReturnFalse);
-      note.GetCurrentPage().ViewModeButtonClicked(null);
-      return true;
-
     case MainWindowAction.CloseThisPage:
       CloseThisPage();
       return true;
 
-    case MainWindowAction.MoveFocusUp:
-      MoveFocus!(Direction.UP)();
-      return true;
-
-    case MainWindowAction.MoveFocusDown:
-      MoveFocus!(Direction.DOWN)();
-      return true;
-
     case MainWindowAction.MoveFocusLeft:
-      MoveFocus!(Direction.LEFT)();
+      MoveFocus(Direction.LEFT);
       return true;
 
     case MainWindowAction.MoveFocusRight:
-      MoveFocus!(Direction.RIGHT)();
+      MoveFocus(Direction.RIGHT);
       return true;
 
     case MainWindowAction.ExpandLeftPane:
