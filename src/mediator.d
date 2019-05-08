@@ -26,7 +26,6 @@ import utils.dialog_util;
 import constants;
 import page;
 import terminal;
-import statusbar;
 
 
 class Mediator
@@ -68,7 +67,6 @@ public:
   }
   bool FilerChangeDirFromTerminal(string path)
   {
-    PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to file manager(" ~ GetPageID() ~ ")");
     return true;
   }
   /////////////////// interface to FileManager
@@ -81,7 +79,6 @@ public:
     // remove "/home/username/.gvfs/sftp ..." from p and pass it to the terminal
     string path = "/";
     term_.ChangeDirectoryFromFiler(path);
-    PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to terminal(" ~ GetPageID() ~ ")");
   }
   void TerminalQuitSSH(string pwd){ term_.QuitSSH(pwd); }
   /////////////////// interface to Terminal

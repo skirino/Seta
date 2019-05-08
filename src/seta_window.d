@@ -38,7 +38,6 @@ import constants;
 import rcfile = config.rcfile;
 import config.dialog;
 import config.keybind;
-import statusbar;
 import note;
 
 
@@ -49,7 +48,6 @@ private:
   static __gshared Nonnull!SetaWindow singleton_;
 
   Nonnull!HPaned hpaned_;
-  Nonnull!SetaStatusbar statusbar_;
   Nonnull!Note noteL_;
   Nonnull!Note noteR_;
 
@@ -59,7 +57,7 @@ public:
     singleton_.init(new SetaWindow());
     SetLayout();// set parameters in rcfile
     singleton_.showAll();// do size allocations and negotiations
-    SetLayout();// reset parameters and hide some of child widgets such as statusbar
+    SetLayout();// reset parameters and hide some of child widgets
 
     // set initial focus to lower left widget (terminal)
     singleton_.noteL_.GetCurrentPage().FocusShownWidget();
@@ -86,9 +84,6 @@ public:
       hpaned_.pack1(noteL_, 1, 0);
       hpaned_.pack2(noteR_, 1, 0);
       vbox.packStart(hpaned_, 1, 1, 0);
-
-      statusbar_.init(InitStatusbar(noteL_, noteR_));
-      vbox.packEnd(statusbar_, 0, 0, 0);
     }
     add(vbox);
   }
@@ -97,7 +92,6 @@ public:
   {
     singleton_.setDefaultSize(rcfile.GetWindowSizeH(), rcfile.GetWindowSizeV());
     singleton_.hpaned_.setPosition(rcfile.GetSplitH());
-    singleton_.statusbar_.SetLayout();
   }
 
 public:
@@ -129,15 +123,11 @@ public:
       auto pageR = noteR_.GetCurrentPage();
       if(pageR.WhichIsFocused() == FocusInPage.NONE)
         pageR.FocusLower();
-      ExpandRightPane();
-      ExpandRightPane();// expand twice in order to switch from left-pane-only mode to right-pane-only
     }
     else if(side == Side.RIGHT && npagesR == 0){
       auto pageL = noteL_.GetCurrentPage();
       if(pageL.WhichIsFocused() == FocusInPage.NONE)
         pageL.FocusLower();
-      ExpandLeftPane();
-      ExpandLeftPane();
     }
     else{// each note has at least one page
       /+
@@ -345,13 +335,9 @@ private:
       return true;
 
     case MainWindowAction.ExpandLeftPane:
-      if(statusbar.ExpandLeftPane())
-        AddFocusToNoteIfNone(noteL_);
       return true;
 
     case MainWindowAction.ExpandRightPane:
-      if(statusbar.ExpandRightPane())
-        AddFocusToNoteIfNone(noteR_);
       return true;
 
     case MainWindowAction.GoToDirOtherSide:
