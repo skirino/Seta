@@ -58,7 +58,6 @@ import constants;
 import rcfile = config.rcfile;
 import config.keybind;
 import config.hosts_view;
-import config.shortcut;
 import config.page_init_option;
 import page_list;
 
@@ -638,36 +637,6 @@ private:
     auto colDir = new TreeViewColumn("path", rendDir, "text", 1);
     colDir.setResizable(1);
     shortcuts_.appendColumn(colDir);
-
-    //                               label         path          add color for dirs which are not found?
-    shortcutsStore_ = new ListStore([GType.STRING, GType.STRING]);
-    shortcuts_.setModel(shortcutsStore_);
-
-    foreach(shortcut; rcfile.GetShortcuts()){
-      TreeIter iter = new TreeIter;
-      shortcutsStore_.append(iter);
-      shortcutsStore_.setValue(iter, 0, shortcut.label_);
-      shortcutsStore_.setValue(iter, 1, shortcut.path_);
-    }
-  }
-
-  void ApplyChangesInDirectories()
-  {
-    Shortcut[] list;
-    TreeIter iter = new TreeIter;
-    iter.setModel(shortcutsStore_);
-    if(shortcutsStore_.getIterFirst(iter)){// ListStore is not empty
-      do{
-        string label = trim(iter.getValueString(0));
-        string path  = trim(iter.getValueString(1));
-        if(label.length == 0)
-          label = GetBasename(path);
-        if(CanEnumerateChildren(path))
-          list ~= Shortcut(label, path);
-      }
-      while(shortcutsStore_.iterNext(iter));
-    }
-    rcfile.ResetShortcuts(list);
   }
   ///////////////////// [Directories]
 
@@ -795,7 +764,6 @@ private:
       ApplyChangesInLayout();
       ApplyChangesInPages();
       ApplyChangesInTerminal();
-      ApplyChangesInDirectories();
       ApplyChangesInSSH();
       rcfile.Write();
     }

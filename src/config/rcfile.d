@@ -37,7 +37,6 @@ import utils.string_util;
 import constants;
 import config.shellrc;
 import config.keybind;
-import config.shortcut;
 import config.page_init_option;
 import known_hosts = config.known_hosts;
 import page_list;
@@ -200,48 +199,19 @@ string GetUserDefinedText(int index)
 
 
 ///////////////// [Directories]
-Shortcut[] GetShortcuts()
-{
-  if(instance_.hasKey("Directories", "Shortcuts"))
-    return Shortcut.ParseList(instance_.getString("Directories", "Shortcuts"));
-  else
-    return null;
-}
-
 string GetNthShortcutDir(uint n)
 {
-  Shortcut[] shortcuts = GetShortcuts();
-  if(n < shortcuts.length)
-    return shortcuts[n].path_;
-  else
-    return null;
+  return null;
 }
 
 void AddDirectoryShortcut(string path)
 {
   instance_.changed_ = true;
-
-  Shortcut[] list = GetShortcuts() ~ Shortcut(GetBasename(path), path);
-  ResetShortcuts(list);
 }
 
 void RemoveDirectoryShortcut(string path)
 {
   instance_.changed_ = true;
-
-  if(instance_.hasKey("Directories", "Shortcuts")){
-    Shortcut[] old = GetShortcuts();
-    Shortcut[] list;
-    foreach(shortcut; old){
-      if(shortcut.path_ != path)
-        list ~= shortcut;
-    }
-    ResetShortcuts(list);
-  }
-}
-
-void ResetShortcuts(Shortcut[] list)
-{
 }
 ///////////////// [Directories]
 
