@@ -153,9 +153,9 @@ private:
       return;
 
     static if(o == Order.FORWARD)
-      terminal_.SearchNext();
+      terminal_.searchFindNext();
     else
-      terminal_.SearchPrevious();
+      terminal_.searchFindPrevious();
 
     // prepend or reorder the search text
     cb_.prependOrReplaceText(cb_.getActiveText());

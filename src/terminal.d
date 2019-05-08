@@ -70,8 +70,9 @@ class Terminal : VTE
   //////////////////// GUI stuff
 private:
   VteTerminal * vte_;
-  immutable int pty_;
+  int pty_;
   pid_t pid_ = -1;
+  string command_;
 
 public:
   this(Mediator mediator,
@@ -82,26 +83,23 @@ public:
     mediator_.init(mediator);
     cwd_      = initialDir;
     getCWDLR_ = getCWDLR;
+    command_  = terminalRunCommand;
 
     vte_ = cast(VteTerminal*)vte_terminal_new();
-    super(vte_, false);
+    super(vte_);
+    setScrollbackLines(-1); // infinite scrollback
+    setAudibleBell(false);
     addOnKeyPress(&KeyPressed);
 
-    vte_terminal_set_scrollback_lines(vte_, -1);// infinite scrollback
-    vte_terminal_set_audible_bell(vte_, 0);
+    spawnAsync(cast(VtePtyFlags)0, initialDir, [environment["SHELL"]], null,
+               cast(GSpawnFlags)0, null, null, null, -1, null,
+               &SpawnFinishCallback, cast(void*)this);
+  }
 
-    // Fork the child process.
-    const(char)*[2] argv = [environment["SHELL"].toStringz, null];
-    vte_terminal_spawn_async(vte_, cast(VtePtyFlags)0,
-                             initialDir.toStringz, cast(char**)argv.ptr, null,
-                             cast(GSpawnFlags)0, null, null, null, -1, null,
-                             &SpawnFinishCallback, cast(void*)this);
-    pty_ = vte_pty_get_fd(vte_terminal_get_pty(vte_));
-
-    Signals.connectData(vte_, "child-exited",
-                        cast(GCallback)(&CloseThisPageCallback),
-                        this, null, GConnectFlags.AFTER);
-
+  void InitAfterSpawn()
+  {
+    pty_ = getPty().getFd();
+    addOnChildExited(&CloseThisPageCallback, GConnectFlags.AFTER);
     InitTermios(pty_);
     InitDragAndDropFunctionality();
     InitSyncFilerDirFunctionality();
@@ -109,8 +107,8 @@ public:
     shellSetting_ = shellrc.GetLocalShellSetting();
     ApplyPreferences();
 
-    if(terminalRunCommand.length > 0)
-      FeedChild(terminalRunCommand ~ '\n');
+    if(command_.length > 0)
+      feedChild(command_ ~ '\n');
   }
 
   void ApplyPreferences()
@@ -120,15 +118,14 @@ public:
     auto colorBack = new RGBA();
     enforce(colorFore.parse(rcfile.GetColorForeground()));
     enforce(colorBack.parse(rcfile.GetColorBackground()));
-    vte_terminal_set_colors(vte_, colorFore.getRGBAStruct(), colorBack.getRGBAStruct(), null, 0);
+    setColors(colorFore, colorBack, []);
 
     auto fontString = rcfile.GetFont();
     auto splitPosition = fontString.lastIndexOf(' ');
     auto fontType = fontString[0 .. splitPosition];
     auto fontSize = fontString[splitPosition + 1 .. $].to!int;
-    auto fontDesc = new PgFontDescription(fontType, fontSize);
-    vte_terminal_set_font(vte_, fontDesc.getPgFontDescriptionStruct());
-    vte_terminal_search_set_wrap_around(vte_, 1);
+    setFont(new PgFontDescription(fontType, fontSize));
+    searchSetWrapAround(true);
 
     // to extract last command and replace $L(R)DIR
     prompt_  = rcfile.GetPROMPT();
@@ -146,17 +143,13 @@ public:
   }
 
 private:
-  extern(C) static void CloseThisPageCallback(VteTerminal * vte, int status, void *ptr)
+  void CloseThisPageCallback(int status, VTE term)
   {
-    // glib's callback does not grab GDK lock automatically
-    threadsEnter();
-    auto t = cast(Terminal)ptr;
-    t.CancelSyncFilerDirCallback();
-    if(t.pid_ >= 0) {
-      t.mediator_.CloseThisPage();
-      t.pid_ = -1;
+    CancelSyncFilerDirCallback();
+    if(pid_ >= 0) {
+      mediator_.CloseThisPage();
+      pid_ = -1;
     }
-    threadsLeave();
   }
 
   extern(C) static void SpawnFinishCallback(VteTerminal *terminal,
@@ -166,6 +159,7 @@ private:
   {
     auto t = cast(Terminal)user_data;
     t.pid_ = pid;
+    t.InitAfterSpawn();
   }
   //////////////////// GUI stuff
 
@@ -220,20 +214,20 @@ private:
 
     case TerminalAction.InputPWDLeft:
       string inputPath = getCWDLR_(Side.LEFT, 0);// cwd for currently displayed page in left pane
-      FeedChild(EscapeSpecialChars(inputPath));
+      feedChild(EscapeSpecialChars(inputPath));
       return true;
 
     case TerminalAction.InputPWDRight:
       string inputPath = getCWDLR_(Side.RIGHT, 0);// cwd for currently displayed page in right pane
-      FeedChild(EscapeSpecialChars(inputPath));
+      feedChild(EscapeSpecialChars(inputPath));
       return true;
 
     case TerminalAction.Copy:
-      vte_terminal_copy_clipboard(vte_);
+      copyClipboard();
       return true;
 
     case TerminalAction.Paste:
-      vte_terminal_paste_clipboard(vte_);
+      pasteClipboard();
       return true;
 
     case TerminalAction.PasteFilePaths:
@@ -243,7 +237,7 @@ private:
         foreach(file; files){
           s ~= EscapeSpecialChars(file) ~ ' ';
         }
-        FeedChild(s);
+        feedChild(s);
       }
       return true;
 
@@ -271,7 +265,7 @@ private:
           text = ReplaceLRDIR(text);
         }
         string replaced = text.substitute("\\n", "\n").idup;
-        FeedChild(replaced);
+        feedChild(replaced);
       }
       return true;
 
@@ -293,16 +287,6 @@ public:
     auto re = Regex.newSearch(pattern, -1, compileFlags);
     searchSetRegex(re, 0);
   }
-
-  void SearchNext()
-  {
-    vte_terminal_search_find_next(vte_);
-  }
-
-  void SearchPrevious()
-  {
-    vte_terminal_search_find_previous(vte_);
-  }
   ////////////////// search
 
 
@@ -320,7 +304,7 @@ public:
     if(ReadyToFeed(pty_, false)){
       ClearInputtedCommand();
       string commandString = "cd " ~ EscapeSpecialChars(dirpath) ~ '\n';
-      FeedChild(commandString);
+      feedChild(commandString);
     }
   }
 
@@ -442,15 +426,9 @@ private:
   shellrc.ShellSetting shellSetting_;
   string prompt_, rprompt_;
 
-  void FeedChild(string text)
-  {
-    // In the original C function 2nd arg is of type `const char*`, but it's `char*` in gtkd;
-    // we have to cast here.
-    vte_terminal_feed_child(vte_, cast(char*)text.ptr, text.length);
-  }
-
   string GetText()
   {
+    // Here we don't use getText() method to avoid handling of text attributes (which we don't need).
     char * text = vte_terminal_get_text(vte_, cast(VteSelectionFunc)null, null, null);
     string ret = text.to!string;
     free(text);
@@ -460,7 +438,7 @@ private:
   void ClearInputtedCommand()
   {
     static immutable string backspaces = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
-    FeedChild(backspaces);
+    feedChild(backspaces);
   }
 
   string GetLastCommand()
@@ -543,7 +521,7 @@ private:
 
     if(lineOld != lineNew){
       ClearInputtedCommand();
-      FeedChild(lineNew);
+      feedChild(lineNew);
       static if(is(R == bool)){
         return true;
       }
@@ -581,11 +559,11 @@ private:
         foreach(path; paths){
           s ~= EscapeSpecialChars(path) ~ ' ';
         }
-        FeedChild(s);
+        feedChild(s);
       }
     }
     else if(info == 2){// plain text, feed the original text
-      FeedChild(selection.getText());
+      feedChild(selection.getText());
     }
 
     DragAndDrop.dragFinish(context, 1, 0, 0);
