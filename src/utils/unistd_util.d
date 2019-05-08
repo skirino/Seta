@@ -20,51 +20,16 @@ MA 02110-1301 USA.
 
 module utils.unistd_util;
 
-import std.conv;
 import std.string;
 import core.sys.posix.unistd;
-import core.sys.posix.stdlib;
 
 import utils.string_util;
 
-
-string ReadLink(const string path, char[] buffer)
-{
+string ReadLink(const string path, char[] buffer) {
   ssize_t len = readlink(toStringz(path), buffer.ptr, buffer.length);
-  if(len != -1)
+  if(len != -1) {
     return AppendSlash(buffer[0 .. len].idup);
-  else
+  } else {
     return null;
-}
-
-
-string RealPath(const string path, char[] buffer)
-{
-  char * ptr = realpath(toStringz(path), buffer.ptr);
-  if(ptr)
-    return AppendSlash(ptr.to!string);
-  else
-    return null;
-}
-
-
-void ForkExec(string executablePath, string childDir, string[] args, string[string] envs)
-{
-  immutable(char)*[] argv, envv;
-
-  foreach(arg; args){
-    argv ~= toStringz(arg);
-  }
-  argv ~= null;
-
-  foreach(key; envs.keys){
-    envv ~= toStringz(key ~ '=' ~ envs[key]);
-  }
-  envv ~= null;
-
-  pid_t p = fork();
-  if(p == 0){// child process
-    chdir(toStringz(childDir));
-    execve(toStringz(executablePath), argv.ptr, envv.ptr);
   }
 }

@@ -22,12 +22,11 @@ module utils.menu_util;
 
 import gtk.Menu;
 
-
 class MenuWithMargin : Menu
 {
   static immutable int DEFAULT_MARGIN = 1;
 
-  this(){
+  this() {
     super();
     setMarginLeft  (DEFAULT_MARGIN);
     setMarginRight (DEFAULT_MARGIN);
