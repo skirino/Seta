@@ -20,41 +20,7 @@ MA 02110-1301 USA.
 
 module constants;
 
-import std.string;
-
-import gtk.DragAndDrop;
 import gtk.TargetEntry;
-import gio.ContentType;
-
-
-immutable string PARENT_STRING = "../";
-
-immutable string[] COLUMN_TITLES = [
-  "name",
-  "type",
-  "size",
-  "owner",
-  "permissions",
-  "last modified"];
-
-enum ColumnType
-{
-  NAME,
-  TYPE,
-  SIZE,
-  OWNER,
-  PERMISSIONS,
-  LAST_MODIFIED,
-  COLOR,
-}
-
-enum FileColorType
-{
-  Directory,
-  File,
-  SymLink,
-  Executable,
-}
 
 enum Direction
 {
@@ -81,61 +47,23 @@ enum FocusInMainWindow
   RIGHT,
 }
 
-enum MouseButton{
+enum MouseButton
+{
   LEFT   = 1,
   MIDDLE = 2,
   RIGHT  = 3,
 }
 
-enum DraggingState
-{
-  NEUTRAL,
-  PRESSED,
-  DRAGGING,
+void Init() {
+  dragTarget          = new TargetEntry("text/uri-list", 0, 1);
+  textPlainDragTarget = new TargetEntry("text/plain"   , 0, 2);
 }
 
-enum PasteModeFlags{
-  CANCEL_ALL = 0,
-  MULTIPLE   = 1,
-  ASK        = 2,
-}
+private __gshared TargetEntry dragTarget;
+TargetEntry[] GetDragTargets() { return [dragTarget]; }
 
-
-
-void Init()
-{
-  directoryTypeDescription = ContentType.getDescription("inode/directory");
-
-  gtkDragTarget.target = cast(char*) "text/uri-list".toStringz();
-  gtkDragTarget.flags  = 0;
-  gtkDragTarget.info   = 1;
-  dragTargets[0] = new TargetEntry(&gtkDragTarget);
-
-  gtkTextPlainDragTarget.target = cast(char*) "text/plain".toStringz();
-  gtkTextPlainDragTarget.flags  = 0;
-  gtkTextPlainDragTarget.info   = 2;
-}
-
-
-private __gshared string directoryTypeDescription;
-string GetDirectoryTypeDescription()
-{
-  return directoryTypeDescription;
-}
-
-private __gshared GtkTargetEntry gtkDragTarget;
-private __gshared TargetEntry[1] dragTargets;
-TargetEntry[] GetDragTargets()
-{
-  return dragTargets;
-}
-
-private __gshared GtkTargetEntry gtkTextPlainDragTarget;
-TargetEntry GetTextPlainDragTarget()
-{
-  return new TargetEntry(&gtkTextPlainDragTarget);
-}
-
+private __gshared TargetEntry textPlainDragTarget;
+TargetEntry GetTextPlainDragTarget() { return textPlainDragTarget; }
 
 enum MainWindowAction
 {
