@@ -35,8 +35,6 @@ import core.sys.posix.signal;
 import gtk.Widget;
 import gtk.DragAndDrop;
 import gtk.ScrolledWindow;
-import gtk.ScrollableIF;
-import gtk.ScrollableT;
 import gtk.SelectionData;
 import gtk.TargetEntry;
 import gobject.Signals;
@@ -48,6 +46,8 @@ import gdk.DragContext;
 import glib.Regex;
 import glib.Source;
 import pango.PgFontDescription;
+import vte.Terminal : VTE = Terminal;
+import vte.c.types : VteTerminal;
 
 import utils.ref_util;
 import utils.string_util;
@@ -62,10 +62,9 @@ import mediator;
 
 
 // wrapper class of VteTerminal widget
-class Terminal : Widget, ScrollableIF
+class Terminal : VTE
 {
   override void* getStruct(){return vte_;}
-  mixin ScrollableT!(VteTerminal);
 
   //////////////////// GUI stuff
 private:
@@ -84,7 +83,7 @@ public:
     getCWDLR_ = getCWDLR;
 
     vte_ = cast(VteTerminal*)vte_terminal_new();
-    super(cast(GtkWidget*)vte_);
+    super(vte_, false);
     addOnKeyPress(&KeyPressed);
 
     vte_terminal_set_scrollback_lines(vte_, -1);// infinite scrollback
@@ -594,7 +593,6 @@ private:
 
 // declarations of C functions in libvte
 extern(C){
-  struct VteTerminal{};
   GtkWidget * vte_terminal_new();
 
   // miscellaneous settings
