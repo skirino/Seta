@@ -25,7 +25,7 @@ import std.regex : regex, replaceFirst, split;
 import std.process;
 import std.conv;
 import std.exception;
-import std.algorithm : max;
+import std.algorithm : max, min;
 import std.array;
 import core.stdc.stdlib : free;
 import core.thread;

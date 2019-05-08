@@ -20,8 +20,6 @@ MA 02110-1301 USA.
 
 module seta_window;
 
-import core.memory;
-import std.stdio;
 import std.algorithm;
 
 import gtk.MainWindow;
@@ -40,7 +38,6 @@ import config.dialog;
 import config.keybind;
 import note;
 
-
 class SetaWindow : MainWindow
 {
   ///////////////////////// GUI stuff
@@ -55,12 +52,10 @@ public:
   static void Init()
   {
     singleton_.init(new SetaWindow());
-    SetLayout();// set parameters in rcfile
-    singleton_.showAll();// do size allocations and negotiations
-    SetLayout();// reset parameters and hide some of child widgets
-
-    // set initial focus to lower left widget (terminal)
-    singleton_.noteL_.GetCurrentPage().FocusShownWidget();
+    SetLayout();                                           // set parameters in rcfile
+    singleton_.showAll();                                  // do size allocations and negotiations
+    SetLayout();                                           // reset parameters and hide some of child widgets
+    singleton_.noteL_.GetCurrentPage().FocusShownWidget(); // set initial focus to lower left widget (terminal)
   }
 
   this()
@@ -272,6 +267,8 @@ private:
     auto ekey = e.key();
 
     version(DEBUG){
+      import std.stdio;
+      import core.memory;
       // manually run GC
       if(TurnOffLockFlags(ekey.state) == (GdkModifierType.CONTROL_MASK | GdkModifierType.SHIFT_MASK) &&
          ekey.keyval == GdkKeysyms.GDK_G){
@@ -398,8 +395,7 @@ private:
 private:
   bool isFullscreen_;
 
-  bool WindowStateChangedCallback(Event e, Widget w)
-  {
+  bool WindowStateChangedCallback(Event e, Widget w) {
     auto ewin = e.windowState();
     isFullscreen_ = (GdkWindowState.FULLSCREEN & ewin.newWindowState) != 0;
     return false;

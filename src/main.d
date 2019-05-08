@@ -20,8 +20,6 @@ MA 02110-1301 USA.
 
 module main;
 
-import std.stdio;
-
 import gtk.Main;
 import gdk.Threads;
 
@@ -29,31 +27,17 @@ import constants;
 import config.init;
 import seta_window;
 
-
-private void Initialize()
-{
-  constants.Init();
-  config.init.Init();
-}
-
-
-private void Finalize()
-{
-  config.init.Finish();
-}
-
-
-void main(string[] args)
-{
-  version(unittest){
+void main(string[] args) {
+  version(unittest) {
+    import std.stdio;
     writeln("All tests passed!");
-  }
-  else{
+  } else {
     Main.initMultiThread(args);
     threadsEnter();
     scope(exit){ threadsLeave(); }
-    Initialize();
-    scope(exit){ Finalize(); }
+    constants.Init();
+    config.init.Init();
+    scope(exit){ config.init.Finish(); }
     SetaWindow.Init();
     Main.run();
   }
