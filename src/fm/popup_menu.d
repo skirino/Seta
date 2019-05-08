@@ -48,7 +48,6 @@ import rcfile = config.rcfile;
 import config.dialog;
 import scripts = config.nautilus_scripts;
 import fm.file_view;
-import fm.rename_dialog;
 
 
 void LaunchApp(AppInfoIF appInfo, FileIF f)
@@ -267,7 +266,6 @@ private:
 
   void RenameFun(MenuItem item)
   {
-    RenameFiles(pwd_, selectedFileNames_);
     view_.TryUpdate();
   }
 

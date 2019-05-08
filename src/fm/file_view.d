@@ -68,7 +68,6 @@ import fm.entry;
 import fm.entry_list;
 import fm.prepare_entries_job;
 import fm.popup_menu;
-import fm.rename_dialog;
 import mediator;
 
 
@@ -794,7 +793,6 @@ private:
     case FileViewAction.Rename:
       auto selectedFiles = GetSelectedFileNames();
       if(selectedFiles.length > 0){
-        RenameFiles(pwd_, selectedFiles);
         TryUpdate();
       }
       return true;
