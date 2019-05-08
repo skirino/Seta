@@ -59,7 +59,6 @@ import config.keybind;
 import shellrc = config.shellrc;
 import term.search_dialog;
 import term.termios;
-import thread_list;
 import mediator;
 
 
@@ -554,92 +553,6 @@ private:
     }
   }
   /////////////////// replace $L(R)DIR
-
-
-
-  /////////////////// SSH
-private:
-  class InputPassThread : Thread, StoppableOperationIF
-  {
-    mixin ListedOperationT;
-    Nonnull!Terminal term_;
-    string host_, pass_;
-    bool cancelled_;
-
-    this(Terminal term, string host, string pass)
-    {
-      term_.init(term);
-      host_ = host;
-      pass_ = pass;
-      Register();
-      super(&Run);
-    }
-
-    void Run()// in a temporary thread other than the main thread
-    {
-      // try to input password for 10 seconds
-      for(int i=0; i<20; ++i){
-        if(cancelled_)
-          break;
-
-        if(AskingPassword(term_.pty_)){
-          string lastLine = splitLines(trim(term_.GetText()))[$-1];
-
-          if(lastLine.EndsWith("id_rsa':")){
-            // assumes that the password for rsa authentication is the same as the one for remote login
-            term_.FeedChild(pass_ ~ '\n');
-          }
-          else if(lastLine.EndsWith("assword:")){// (there can be both cases of "password:" and "Password:")
-            // password is being asked
-            term_.FeedChild(pass_ ~ '\n');
-            break;
-          }
-        }
-
-        SleepMillisecs(500);
-      }
-
-      // remove from ThreadList
-      threadsEnter();
-      Unregister();
-      threadsLeave();
-    }
-
-    void Stop()
-    {
-      cancelled_ = true;
-      Unregister();
-    }
-
-    string GetThreadListLabel(string startTime)
-    {
-      return "Waiting for password query from " ~ host_ ~ " (" ~ startTime ~ ')';
-    }
-
-    string GetStopDialogLabel(string startTime)
-    {
-      return GetThreadListLabel(startTime) ~ ".\nStop this thread?";
-    }
-
-    gdk.Window.Window GetAssociatedWindow(){return null;}
-  }
-
-
-public:
-  void StartSSH()
-  {
-  }
-
-  void QuitSSH(string pwd)
-  {
-    shellSetting_ = shellrc.GetLocalShellSetting();
-    prompt_  = rcfile.GetPROMPT();
-    rprompt_ = rcfile.GetRPROMPT();
-    ClearInputtedCommand();
-    FeedChild("exit\n");
-    cwd_ = pwd;
-  }
-  /////////////////// SSH
 
 
 

@@ -80,6 +80,5 @@ public:
     string path = "/";
     term_.ChangeDirectoryFromFiler(path);
   }
-  void TerminalQuitSSH(string pwd){ term_.QuitSSH(pwd); }
   /////////////////// interface to Terminal
 }

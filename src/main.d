@@ -27,7 +27,6 @@ import gdk.Threads;
 
 import constants;
 import config.init;
-import thread_list;
 import seta_window;
 
 
@@ -35,13 +34,11 @@ private void Initialize()
 {
   constants.Init();
   config.init.Init();
-  thread_list.Init();
 }
 
 
 private void Finalize()
 {
-  thread_list.Finish();
   config.init.Finish();
 }
 
