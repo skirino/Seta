@@ -6,7 +6,7 @@ ifeq ("$(SYSTEM)", "Darwin")
 	LINKOPTS = -L-lgtkd -L-lvte -L-L/opt/local/lib -L-lgtk-x11-2.0 -L-ldl
 else # assuming Linux
 	DFLAGS = -wi
-	LINKOPTS = -L-L/opt/dmd/current/lib/ -L-lgtkd-3 -L-lvted-3 -L-lvte-2.91 -L-ldl -L-lgtk-3
+	LINKOPTS = -L-L/opt/dmd/current/lib -L-lvted-3 -L-lgtkd-3 -L-lvte-2.91 -L-ldl -L-lgtk-3
 endif
 
 all:

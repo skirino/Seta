@@ -68,7 +68,7 @@ public:
     super("Seta");
     addOnKeyPress(&KeyPressed);
     addOnWindowState(&WindowStateChangedCallback);
-    //setIcon(new Pixbuf("/home/skirino/temp/seta_main.jpg"));
+    PrepareScreenWithAlphaForTransparency();
 
     auto vbox = new VBox(0, 0);
     {
@@ -94,7 +94,6 @@ public:
     singleton_.hpaned_.setPosition(rcfile.GetSplitH());
   }
 
-public:
   void AppendPageCopy(Side side)
   {
     // Make a copy of the displayed page.
@@ -143,6 +142,18 @@ public:
   }
 
 private:
+  void PrepareScreenWithAlphaForTransparency()
+  {
+    auto screen = getScreen();
+    if(screen.isComposited()) {
+      auto visual = screen.getRgbaVisual();
+      if(visual is null) {
+        visual = screen.getSystemVisual();
+      }
+      setVisual(visual);
+    }
+  }
+
   void CloseThisPage()
   {
     auto note = GetFocusedNote();

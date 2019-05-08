@@ -34,7 +34,6 @@ import core.sys.posix.signal;
 
 import gtk.Widget;
 import gtk.DragAndDrop;
-import gtk.ScrolledWindow;
 import gtk.SelectionData;
 import gtk.TargetEntry;
 import gobject.Signals;
@@ -118,6 +117,7 @@ public:
     auto colorBack = new RGBA();
     enforce(colorFore.parse(rcfile.GetColorForeground()));
     enforce(colorBack.parse(rcfile.GetColorBackground()));
+    colorBack.alpha(1.0 - rcfile.GetTransparency());
     setColors(colorFore, colorBack, []);
 
     auto fontString = rcfile.GetFont();
