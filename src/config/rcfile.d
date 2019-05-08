@@ -38,11 +38,10 @@ import constants;
 import config.shellrc;
 import config.keybind;
 import config.page_init_option;
-import known_hosts = config.known_hosts;
 import page_list;
 
 
-static immutable string SetaVersion = "0.7.1";
+static immutable string SetaVersion = "0.8.0";
 
 void Init()
 {
@@ -93,7 +92,6 @@ mixin(GetBoolean!("ShowRootButton"));
 mixin(GetBoolean!("ShowHomeButton"));
 mixin(GetBoolean!("ShowOtherSideButton"));
 mixin(GetBoolean!("ShowRefreshButton"));
-mixin(GetBoolean!("ShowSSHButton"));
 mixin(GetBoolean!("ShowHiddenButton"));
 mixin(GetBoolean!("ShowFilter"));
 
@@ -198,54 +196,6 @@ string GetUserDefinedText(int index)
 
 
 
-///////////////// [Directories]
-string GetNthShortcutDir(uint n)
-{
-  return null;
-}
-
-void AddDirectoryShortcut(string path)
-{
-  instance_.changed_ = true;
-}
-
-void RemoveDirectoryShortcut(string path)
-{
-  instance_.changed_ = true;
-}
-///////////////// [Directories]
-
-
-
-///////////////// [SSH]
-string GetSSHOption(){ return instance_.getString("SSH", "SSHOption"); }
-
-string[] GetSSHHosts()
-{
-  return instance_.GetSSHHosts();
-}
-
-void AddSSHHost()
-{
-}
-
-void RemoveSSHHost()
-{
-}
-
-void ResetRemoteHosts(string[] list)
-{
-  if(instance_.getStringList("SSH", "Hosts") != list){// has different value
-    string s = join(list, ",");
-    instance_.setString("SSH", "Hosts", NonnullString(s));
-    instance_.changed_ = true;
-    known_hosts.Register(list);
-  }
-}
-///////////////// [SSH]
-
-
-
 ///////////////// [Keybind]
 KeyCode[][string] GetKeybinds(){return instance_.dictKeybind_;}
 
@@ -299,7 +249,7 @@ private:
     filename_ = environment.get("HOME") ~ "/.setarc";
     if(Exists(filename_)){
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
-      if(getGroups(len) == ["Version", "Layout", "Pages", "Terminal", "Directories", "SSH", "Keybind"]){
+      if(getGroups(len) == ["Version", "Layout", "Pages", "Terminal", "Directories", "Keybind"]){
         if(getString("Version", "Version") != SetaVersion){// .setarc is old
           changed_ = true;
           setString("Version", "Version", SetaVersion);
@@ -331,7 +281,6 @@ private:
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowHomeButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowOtherSideButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowRefreshButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowSSHButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowHiddenButton", "true"));
     mixin(SetDefaultValue!("Boolean", "Layout", "ShowFilter", "true"));
 
@@ -390,21 +339,11 @@ private:
     mixin(SetDefaultValue!("String", "Terminal", "UserDefinedText9", "\"\""));
 
     // [Directories]
-    // check if entry is an existing directory
     InitInitialDirectories("InitialDirectoriesLeft");
     InitInitialDirectories("InitialDirectoriesRight");
 
-    mixin(SetDefaultValue!("String", "Directories", "Shortcuts", "\"\""));
-
-    // [SSH]
-    mixin(SetDefaultValue!("String", "SSH", "Hosts", "\"\""));
-    mixin(SetDefaultValue!("String", "SSH", "SSHOption", "\"-X\""));
-
     // [Keybind]
     InstallKeybinds();
-
-    // register SSH hosts
-    known_hosts.Register(GetSSHHosts());
   }
 
   void Write()
@@ -440,25 +379,24 @@ private:
     mixin(InstallKeybind!("MainWindowAction.ToggleFullscreen"   , "F11"));
     mixin(InstallKeybind!("MainWindowAction.QuitApplication"    , "<Shift><Primary>q"));
 
-    mixin(InstallKeybind!("FileManagerAction.GoToPrevious"    , "<Alt>b,<Shift><Primary>b,<Alt>Left"));
-    mixin(InstallKeybind!("FileManagerAction.GoToNext"        , "<Alt>f,<Alt>Right"));
-    mixin(InstallKeybind!("FileManagerAction.GoToParent"      , "<Alt>p,<Shift><Primary>p,<Alt>Up"));
-    mixin(InstallKeybind!("FileManagerAction.GoToRoot"        , "<Alt>r"));
-    mixin(InstallKeybind!("FileManagerAction.GoToHome"        , "<Alt>h"));
-    mixin(InstallKeybind!("FileManagerAction.Refresh"         , "F5"));
-    mixin(InstallKeybind!("FileManagerAction.StartSSH"        , "<Alt>s,<Shift><Primary>s"));
-    mixin(InstallKeybind!("FileManagerAction.ShowHidden"      , "<Alt>period"));
-    mixin(InstallKeybind!("FileManagerAction.SyncTerminalPWD" , "<Alt>c,<Shift><Primary>c"));
-    mixin(InstallKeybind!("FileManagerAction.GoToChild"       , "<Alt>n,<Shift><Primary>n,<Alt>Down"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir1"        , "<Alt>1"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir2"        , "<Alt>2"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir3"        , "<Alt>3"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir4"        , "<Alt>4"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir5"        , "<Alt>5"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir6"        , "<Alt>6"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir7"        , "<Alt>7"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir8"        , "<Alt>8"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir9"        , "<Alt>9"));
+    mixin(InstallKeybind!("FileManagerAction.GoToPrevious"   , "<Alt>b,<Shift><Primary>b,<Alt>Left"));
+    mixin(InstallKeybind!("FileManagerAction.GoToNext"       , "<Alt>f,<Alt>Right"));
+    mixin(InstallKeybind!("FileManagerAction.GoToParent"     , "<Alt>p,<Shift><Primary>p,<Alt>Up"));
+    mixin(InstallKeybind!("FileManagerAction.GoToRoot"       , "<Alt>r"));
+    mixin(InstallKeybind!("FileManagerAction.GoToHome"       , "<Alt>h"));
+    mixin(InstallKeybind!("FileManagerAction.Refresh"        , "F5"));
+    mixin(InstallKeybind!("FileManagerAction.ShowHidden"     , "<Alt>period"));
+    mixin(InstallKeybind!("FileManagerAction.SyncTerminalPWD", "<Alt>c,<Shift><Primary>c"));
+    mixin(InstallKeybind!("FileManagerAction.GoToChild"      , "<Alt>n,<Shift><Primary>n,<Alt>Down"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir1"       , "<Alt>1"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir2"       , "<Alt>2"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir3"       , "<Alt>3"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir4"       , "<Alt>4"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir5"       , "<Alt>5"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir6"       , "<Alt>6"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir7"       , "<Alt>7"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir8"       , "<Alt>8"));
+    mixin(InstallKeybind!("FileManagerAction.GoToDir9"       , "<Alt>9"));
 
     mixin(InstallKeybind!("FileViewAction.SelectAll"    , "<Primary>a"));
     mixin(InstallKeybind!("FileViewAction.UnselectAll"  , "<Primary>g"));
@@ -516,20 +454,8 @@ private:
 
   void InitInitialDirectories(string key)
   {
-    string[] initialDirs;
-    if(hasKey("Directories", key)){
-      auto dirs = getStringList("Directories", key);
-      auto existingDirs = dirs.map!(trim).map!(AppendSlash).filter!(CanEnumerateChildren);
-      initialDirs = array(existingDirs);
-      if(dirs != initialDirs){
-        changed_ = true;
-        setStringList("Directories", key, initialDirs);
-      }
-    }
-    if(initialDirs.length == 0){
-      changed_ = true;
-      setStringList("Directories", key, [AppendSlash(environment.get("HOME"))]);
-    }
+    changed_ = true;
+    setStringList("Directories", key, [AppendSlash(environment.get("HOME"))]);
   }
 
   string[] getStringList(string group, string key)
@@ -538,11 +464,6 @@ private:
       return super.getStringList(group, key);
     else
       return null;
-  }
-
-  string[] GetSSHHosts()
-  {
-    return getStringList("SSH", "Hosts");
   }
 }
 
@@ -616,7 +537,6 @@ private const string defaultContents =
 Version=" ~ SetaVersion ~ "
 
 
-
 [Layout]
 ### Sizes of main widgets
 WindowSizeH=1600
@@ -632,7 +552,6 @@ ShowRootButton=true
 ShowHomeButton=true
 ShowOtherSideButton=true
 ShowRefreshButton=true
-ShowSSHButton=true
 ShowHiddenButton=true
 ShowFilter=true
 
@@ -655,7 +574,6 @@ ColorExecutable=#228B22
 
 UseDesktopNotification=false
 NotifyExpiresInMSec=3000
-
 
 
 [Pages]
@@ -697,21 +615,10 @@ UserDefinedText8=
 UserDefinedText9=
 
 
-
 [Directories]
 # InitialDirectoriesLeft(Right)=/home/xxx/, ...
 # Shortcuts=[<label for directory1>_//_]<path to directory1>, ...
 Shortcuts=
-
-
-
-[SSH]
-# Hosts=<username1>:<URL of host1>:<path to home directory>:<PROMPT of default shell>:<RPROMPT (if zsh)>, ...
-Hosts=
-
-# command-line option for SSH
-SSHOption=-X
-
 
 
 [Keybind]
@@ -740,7 +647,6 @@ FileManagerAction.GoToParent=<Alt>p,<Shift><Primary>p,<Alt>Up
 FileManagerAction.GoToRoot=<Alt>r
 FileManagerAction.GoToHome=<Alt>h
 FileManagerAction.Refresh=F5
-FileManagerAction.StartSSH=<Alt>s,<Shift><Primary>s
 FileManagerAction.ShowHidden=<Alt>period
 FileManagerAction.SyncTerminalPWD=<Alt>c,<Shift><Primary>c
 FileManagerAction.GoToChild=<Alt>n,<Shift><Primary>n,<Alt>Down

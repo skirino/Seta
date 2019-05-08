@@ -181,7 +181,6 @@ enum FileManagerAction
   GoToRoot,
   GoToHome,
   Refresh,
-  StartSSH,
   ShowHidden,
   ShowDirTree,
   SyncTerminalPWD,

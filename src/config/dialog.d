@@ -93,7 +93,6 @@ private class ConfigDialog : Dialog
     InitPagesPage();
     InitKeybindPage();
     InitTerminalPage();
-    InitDirectoriesPage();
   }
 
 private:
@@ -104,7 +103,7 @@ private:
 
   // toolbar
   CheckButton cbShowBackButton_, cbShowForwardButton_, cbShowUpButton_, cbShowRootButton_, cbShowHomeButton_,
-    cbShowOtherSideButton_, cbShowRefreshButton_, cbShowSSHButton_, cbShowHiddenButton_,
+    cbShowOtherSideButton_, cbShowRefreshButton_, cbShowHiddenButton_,
     cbShowFilter_, cbUseDesktopNotification_;
   SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
 
@@ -142,7 +141,6 @@ private:
     mixin(AddCheckButton!("Layout", "ShowHomeButton",      "Show 'go to home directory' button"));
     mixin(AddCheckButton!("Layout", "ShowOtherSideButton", "Show 'go to directory shown in the other pane' button"));
     mixin(AddCheckButton!("Layout", "ShowRefreshButton",   "Show 'refresh' button"));
-    mixin(AddCheckButton!("Layout", "ShowSSHButton",       "Show 'SSH' button"));
     mixin(AddCheckButton!("Layout", "ShowHiddenButton",    "Show 'show/hide hidden files' button"));
     mixin(AddCheckButton!("Layout", "ShowFilter",          "Show filter box"));
 
@@ -186,7 +184,6 @@ private:
     mixin(CheckCheckButton!("Layout", "ShowHomeButton"));
     mixin(CheckCheckButton!("Layout", "ShowOtherSideButton"));
     mixin(CheckCheckButton!("Layout", "ShowRefreshButton"));
-    mixin(CheckCheckButton!("Layout", "ShowSSHButton"));
     mixin(CheckCheckButton!("Layout", "ShowHiddenButton"));
     mixin(CheckCheckButton!("Layout", "ShowFilter"));
 
@@ -592,86 +589,6 @@ private:
 
 
 
-  ///////////////////// [Directories]
-  Table pageDirectories_;
-  Entry sshOptionEntry_;
-  TreeView shortcuts_;
-  ListStore shortcutsStore_;
-
-  void InitDirectoriesPage()
-  {
-    pageDirectories_ = AppendWrappedTable(note_, "Directories and SSH");
-
-    uint row = 0;
-
-    AttachSectionLabel(pageDirectories_, row++, "Directory shortcuts");
-    InitShortcutsTreeView(row++);
-
-    AttachSectionLabel(pageDirectories_, row++, "Registered SSH hosts");
-    InitSSHPage(row++);
-    sshOptionEntry_ = new Entry(NonnullString(rcfile.GetSSHOption()));
-    AttachPairWidget(pageDirectories_, row++, "Command-line option for SSH: ", sshOptionEntry_);
-  }
-
-  void InitShortcutsTreeView(uint row)
-  {
-    shortcuts_ = new TreeView;
-    shortcuts_.setVexpand(1);
-    shortcuts_.setReorderable(1);
-    shortcuts_.addOnButtonPress(delegate bool(Event e, Widget w){
-        return ShowAppendRemoveMenu(e, w, shortcuts_, shortcutsStore_);
-      });
-    AppendWithScrolledWindow(pageDirectories_, row, shortcuts_);
-
-    auto rendLabel = new CellRendererText;
-    rendLabel.setProperty("editable", 1);
-    rendLabel.addOnEdited(&(CellEdited!(0, "shortcutsStore_")));
-    auto colLabel = new TreeViewColumn("label", rendLabel, "text", 0);
-    colLabel.setResizable(1);
-    shortcuts_.appendColumn(colLabel);
-
-    auto rendDir = new CellRendererText;
-    rendDir.setProperty("editable", 1);
-    rendDir.addOnEdited(&(CellEdited!(1, "shortcutsStore_", "AppendSlash")));
-    auto colDir = new TreeViewColumn("path", rendDir, "text", 1);
-    colDir.setResizable(1);
-    shortcuts_.appendColumn(colDir);
-  }
-  ///////////////////// [Directories]
-
-
-
-  ///////////////////// [SSH]
-  ListStore hostsStore_;
-
-  void InitSSHPage(uint row)
-  {
-  }
-
-  void ApplyChangesInSSH()
-  {
-    rcfile.ResetStringz("SSH", "SSHOption", sshOptionEntry_.getText());
-
-    string[] list;
-    TreeIter iter = new TreeIter;
-    iter.setModel(hostsStore_);
-    if(hostsStore_.getIterFirst(iter)){// ListStore is not empty
-      do{
-        string[] items;
-        for(uint i=0; i<5; ++i){
-          items ~= trim(iter.getValueString(i));
-        }
-        list ~= join(items, ":");
-      }
-      while(hostsStore_.iterNext(iter));
-    }
-
-    rcfile.ResetRemoteHosts(list);
-  }
-  ///////////////////// [SSH]
-
-
-
   ///////////////////// common parts
   bool ShowAppendRemoveMenu(Event e, Widget w, TreeView view, ListStore store)
   {
@@ -746,7 +663,6 @@ private:
       ApplyChangesInLayout();
       ApplyChangesInPages();
       ApplyChangesInTerminal();
-      ApplyChangesInSSH();
       rcfile.Write();
     }
 
