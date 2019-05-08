@@ -248,19 +248,6 @@ private:
 
 
 
-  ////////////////// search
-public:
-  void SetSearchRegexp(string pattern, bool ignoreCase) {
-    auto PCRE2_CASELESS  = 0x00000008u;
-    auto PCRE2_MULTILINE = 0x00000400u;
-    auto compileFlags = ignoreCase ? (PCRE2_MULTILINE | PCRE2_CASELESS) : PCRE2_MULTILINE;
-    auto re = Regex.newSearch(pattern, -1, compileFlags);
-    searchSetRegex(re, 0);
-  }
-  ////////////////// search
-
-
-
   ////////////////// traveling directory tree
 private:
   string cwd_;

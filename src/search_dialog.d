@@ -20,24 +20,20 @@ MA 02110-1301 USA.
 
 module search_dialog;
 
-import std.array;
-
 import gtk.Dialog;
 import gtk.Widget;
 import gtk.Label;
-import gtk.VBox;
 import gtk.HBox;
 import gtk.Entry;
-import gtk.EditableIF;
 import gtk.ComboBoxText;
 import gtk.CheckButton;
 import gtk.ToggleButton;
 import gdk.Keysyms;
 import gdk.Event;
-import glib.Regex;
 import glib.GException;
 import pango.PgAttribute;
 import pango.PgAttributeList;
+import vte.Regex;
 
 import constants;
 import utils.ref_util;
@@ -45,14 +41,11 @@ import utils.string_util;
 import config.keybind;
 import terminal;
 
-
-void StartTerminalSearch(Terminal terminal)
-{
+void StartTerminalSearch(Terminal terminal) {
   auto d = new TerminalSearchDialog(terminal);
   d.showAll();
   d.run();
 }
-
 
 private class TerminalSearchDialog : Dialog
 {
@@ -72,8 +65,7 @@ private:
   Regex re_;
 
 public:
-  this(Terminal terminal)
-  {
+  this(Terminal terminal) {
     terminal_.init(terminal);
     super();
     setResizable(false);
@@ -105,98 +97,93 @@ public:
 
     addButton(StockID.CLOSE, GtkResponseType.DELETE_EVENT);
     searchBackwardButton_.init(addButton(StockID.MEDIA_PREVIOUS, ResponseID.SEARCH_BACKWARD));
-    searchForwardButton_ .init(addButton(StockID.MEDIA_NEXT,     ResponseID.SEARCH_FORWARD));
+    searchForwardButton_ .init(addButton(StockID.MEDIA_NEXT    , ResponseID.SEARCH_FORWARD ));
 
     ApplySettings();
   }
 
 private:
-  bool KeyPressed(Event e, Widget w)
-  {
+  bool KeyPressed(Event e, Widget w) {
     auto ekey = e.key();
     auto state = TurnOffLockFlags(ekey.state);
-    if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return){
+    if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return) {
       Search();
       return true;
     }
-    if(state == GdkModifierType.SHIFT_MASK && ekey.keyval == GdkKeysyms.GDK_Return){
+    if(state == GdkModifierType.SHIFT_MASK && ekey.keyval == GdkKeysyms.GDK_Return) {
       Search!(Order.BACKWARD)();
       return true;
     }
     return false;
   }
 
-  void Respond(int responseID, Dialog dialog)
-  {
-    if(responseID == GtkResponseType.DELETE_EVENT){
+  void Respond(int responseID, Dialog dialog) {
+    if(responseID == GtkResponseType.DELETE_EVENT) {
       RestoreSettings();
       destroy();
-    }
-    else if(responseID == ResponseID.SEARCH_FORWARD){
+    } else if(responseID == ResponseID.SEARCH_FORWARD) {
       Search();
-    }
-    else if(responseID == ResponseID.SEARCH_BACKWARD){
+    } else if(responseID == ResponseID.SEARCH_BACKWARD) {
       Search!(Order.BACKWARD)();
     }
   }
 
-  bool FocusOut(Event e, Widget w)
-  {
+  bool FocusOut(Event e, Widget w) {
     RestoreSettings();
     destroy();
     return false;
   }
 
-  void Search(Order o = Order.FORWARD)()
-  {
-    if(re_ is null)
+  void Search(Order o = Order.FORWARD)() {
+    if(re_ is null) {
       return;
-
-    static if(o == Order.FORWARD)
+    }
+    static if(o == Order.FORWARD) {
       terminal_.searchFindNext();
-    else
+    } else {
       terminal_.searchFindPrevious();
-
+    }
     // prepend or reorder the search text
     cb_.prependOrReplaceText(cb_.getActiveText());
   }
 
-  void SearchTextChanged(T)(T t)
-  {
+  void SearchTextChanged(T)(T t) {
     BuildRegexp();
-    if(re_ is null){
+    if(re_ is null) {
       searchForwardButton_ .setSensitive(0);
       searchBackwardButton_.setSensitive(0);
-    }
-    else{
+    } else {
       searchForwardButton_ .setSensitive(1);
       searchBackwardButton_.setSensitive(1);
     }
   }
 
-  void BuildRegexp()
-  {
-    if(re_ !is null)
-      re_ = null;
-
+  void BuildRegexp() {
     auto text = cb_.getActiveText();
-    if(text.empty){
+    if(text.empty()) {
       re_ = null;
       reErrorLabel_.setText("");
       reErrorLabel_.setTooltipText("");
       return;
     }
 
-    try{
-      terminal_.SetSearchRegexp(text, ignoreCases_.getActive() != 0);
+    try {
+      re_ = MakeVteRegex(text, ignoreCases_.getActive() != 0);
       reErrorLabel_.setText("");
       reErrorLabel_.setTooltipText("");
-    }
-    catch(GException ex){
+      terminal_.searchSetRegex(re_, 0);
+    } catch(GException ex) {
       re_ = null;
       reErrorLabel_.setText(ex.msg);
       reErrorLabel_.setTooltipText(ex.msg);
     }
+  }
+
+  Regex MakeVteRegex(string text, bool ignoreCase) {
+    auto PCRE2_CASELESS  = 0x00000008u;
+    auto PCRE2_MULTILINE = 0x00000400u;
+    auto compileFlags = ignoreCase ? (PCRE2_MULTILINE | PCRE2_CASELESS) : PCRE2_MULTILINE;
+    return Regex.newSearch(text, -1, compileFlags);
   }
 
 
@@ -205,27 +192,26 @@ private:
   static __gshared string[] searchTextHistory = [];
   static __gshared bool ignoreCases = true;
 
-  void ApplySettings()
-  {
-    foreach(text; searchTextHistory){
+  void ApplySettings() {
+    foreach(text; searchTextHistory) {
       cb_.appendText(text);
     }
     cb_.setActive(0);
     ignoreCases_.setActive(ignoreCases);
   }
 
-  void RestoreSettings()
-  {
+  void RestoreSettings() {
     searchTextHistory = [];
 
     // append text until it returns the same text twice
     string previous;
     int index = 0;
-    while(true){
+    while(true) {
       cb_.setActive(index);
       string text = cb_.getActiveText();
-      if(text == previous)
+      if(text == previous) {
         break;
+      }
       searchTextHistory ~= text;
       previous = text;
       ++index;
