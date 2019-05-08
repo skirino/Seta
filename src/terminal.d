@@ -27,7 +27,6 @@ import std.conv;
 import std.exception;
 import std.algorithm : max, min;
 import std.array;
-import core.stdc.stdlib : free;
 import core.thread;
 import core.sys.posix.unistd;
 import core.sys.posix.signal;
@@ -145,7 +144,6 @@ public:
 private:
   void CloseThisPageCallback(int status, VTE term)
   {
-    CancelSyncFilerDirCallback();
     if(pid_ >= 0) {
       mediator_.CloseThisPage();
       pid_ = -1;
@@ -243,10 +241,6 @@ private:
 
     case TerminalAction.FindRegexp:
       StartTerminalSearch(this);
-      return true;
-
-    case TerminalAction.SyncFilerPWD:
-      SyncFilerDirectoryByCwd();
       return true;
 
     case TerminalAction.InputUserDefinedText1,
@@ -383,36 +377,12 @@ private:
   void InitSyncFilerDirFunctionality()
   {
     readlinkBuffer_.length = PATH_MAX + 1;
-    syncCallbackID_ = threadsAddTimeoutSeconds(2, &SyncFilerDirectoryByCwdCallback, cast(void*)this);
   }
 
   string GetCWDFromProcFS()
   {
     string filename = "/proc/" ~ pid_.to!string ~ "/cwd";
     return ReadLink(filename, readlinkBuffer_);
-  }
-
-  void SyncFilerDirectoryByCwd()
-  {
-    auto dirFromProc = GetCWDFromProcFS();
-    auto realPath = RealPath(cwd_, readlinkBuffer_);
-    if(dirFromProc.empty || realPath.empty)// cannot happen
-      return;
-    if(realPath != dirFromProc){
-      cwd_ = dirFromProc;
-    }
-  }
-
-  extern(C) static int SyncFilerDirectoryByCwdCallback(void * ptr)
-  {
-    auto t = cast(Terminal)ptr;
-    t.SyncFilerDirectoryByCwd();
-    return 1;// continues to call this function
-  }
-
-  void CancelSyncFilerDirCallback()
-  {
-    Source.remove(syncCallbackID_);
   }
   ////////////////// automatic sync of filer
 
@@ -425,6 +395,7 @@ private:
 
   string GetText()
   {
+    import core.stdc.stdlib : free;
     // Here we don't use getText() method to avoid handling of text attributes (which we don't need).
     char * text = vte_terminal_get_text(vte_, cast(VteSelectionFunc)null, null, null);
     string ret = text.to!string;

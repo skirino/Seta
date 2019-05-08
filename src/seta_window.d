@@ -20,14 +20,13 @@ MA 02110-1301 USA.
 
 module seta_window;
 
-import std.algorithm;
-
 import gtk.MainWindow;
 import gtk.Main;
 import gtk.Widget;
-import gtk.HPaned;
+import gtk.Paned;
 import gtk.VBox;
 import gtk.PopupBox;
+import gtk.c.types : GtkOrientation;
 import gdk.Event;
 import gdk.Keysyms;
 
@@ -44,13 +43,12 @@ class SetaWindow : MainWindow
 private:
   static __gshared Nonnull!SetaWindow singleton_;
 
-  Nonnull!HPaned hpaned_;
+  Nonnull!Paned hpaned_;
   Nonnull!Note noteL_;
   Nonnull!Note noteR_;
 
 public:
-  static void Init()
-  {
+  static void Init() {
     singleton_.init(new SetaWindow());
     SetLayout();                                           // set parameters in rcfile
     singleton_.showAll();                                  // do size allocations and negotiations
@@ -58,72 +56,79 @@ public:
     singleton_.noteL_.GetCurrentPage().FocusShownWidget(); // set initial focus to lower left widget (terminal)
   }
 
-  this()
-  {
-    super("Seta");
-    addOnKeyPress(&KeyPressed);
-    addOnWindowState(&WindowStateChangedCallback);
-    PrepareScreenWithAlphaForTransparency();
-
-    auto vbox = new VBox(0, 0);
-    {
-      hpaned_.init(new HPaned);
-      noteL_.init(new Note(Side.LEFT,  this));
-      noteR_.init(new Note(Side.RIGHT, this));
-
-      foreach(opt; rcfile.GetPageInitOptionsLeft())
-        noteL_.AppendNewPage(opt);
-      foreach(opt; rcfile.GetPageInitOptionsRight())
-        noteR_.AppendNewPage(opt);
-
-      hpaned_.pack1(noteL_, 1, 0);
-      hpaned_.pack2(noteR_, 1, 0);
-      vbox.packStart(hpaned_, 1, 1, 0);
-    }
-    add(vbox);
-  }
-
-  static void SetLayout()
-  {
+  static void SetLayout() {
     singleton_.setDefaultSize(rcfile.GetWindowSizeH(), rcfile.GetWindowSizeV());
     singleton_.hpaned_.setPosition(rcfile.GetSplitH());
   }
 
-  void AppendPageCopy(Side side)
-  {
+  this() {
+    super("Seta");
+    addOnKeyPress(&KeyPressed);
+    addOnWindowState(&WindowStateChangedCallback);
+    PrepareScreenWithAlphaForTransparency();
+    InitWidgets();
+  }
+
+private:
+  void PrepareScreenWithAlphaForTransparency() {
+    auto screen = getScreen();
+    if(screen.isComposited()) {
+      auto visual = screen.getRgbaVisual();
+      if(visual is null) {
+        visual = screen.getSystemVisual();
+      }
+      setVisual(visual);
+    }
+  }
+
+  void InitWidgets() {
+    auto vbox = new VBox(0, 0);
+    hpaned_.init(new Paned(GtkOrientation.HORIZONTAL));
+    noteL_.init(new Note(Side.LEFT , this));
+    noteR_.init(new Note(Side.RIGHT, this));
+    foreach(opt; rcfile.GetPageInitOptionsLeft()) {
+      noteL_.AppendNewPage(opt);
+    }
+    foreach(opt; rcfile.GetPageInitOptionsRight()) {
+      noteR_.AppendNewPage(opt);
+    }
+    hpaned_.pack1(noteL_, 1, 0);
+    hpaned_.pack2(noteR_, 1, 0);
+    vbox.packStart(hpaned_, 1, 1, 0);
+    add(vbox);
+  }
+
+public:
+  void AppendPageCopy(Side side) {
     // Make a copy of the displayed page.
     // If a remote directory is being displayed,
     // it is problematic to startup zsh within a remote directory,
     // so just create a new page with initial directory.
-    if(side == Side.LEFT)
-      noteL_.AppendPageCopy();
-    else
-      noteR_.AppendPageCopy();
+    auto note = side == Side.LEFT ? noteL_ : noteR_;
+    note.AppendPageCopy();
   }
 
-  void ClosePage(Side side, uint num)
-  {
+  void ClosePage(Side side, uint num) {
     Note note = (side == Side.LEFT) ? noteL_ : noteR_;
     note.GetNthPage(num).PrepareDestroy();
     note.removePage(num);
 
-    immutable int npagesL = noteL_.getNPages();
-    immutable int npagesR = noteR_.getNPages();
+    const npagesL = noteL_.getNPages();
+    const npagesR = noteR_.getNPages();
 
-    if(npagesL == 0 && npagesR == 0){
+    if(npagesL == 0 && npagesR == 0) {
       Main.quit();
-    }
-    else if(side == Side.LEFT && npagesL == 0){
+    } else if(side == Side.LEFT && npagesL == 0) {
       auto pageR = noteR_.GetCurrentPage();
-      if(pageR.WhichIsFocused() == FocusInPage.NONE)
+      if(pageR.WhichIsFocused() == FocusInPage.NONE) {
         pageR.FocusLower();
-    }
-    else if(side == Side.RIGHT && npagesR == 0){
+      }
+    } else if(side == Side.RIGHT && npagesR == 0) {
       auto pageL = noteL_.GetCurrentPage();
-      if(pageL.WhichIsFocused() == FocusInPage.NONE)
+      if(pageL.WhichIsFocused() == FocusInPage.NONE) {
         pageL.FocusLower();
-    }
-    else{// each note has at least one page
+      }
+    } else { // each note has at least one page
       /+
        + Work around bug: newly-focused terminal does not process key-press events
        + after closing a page (VTE's bug?).
@@ -137,20 +142,7 @@ public:
   }
 
 private:
-  void PrepareScreenWithAlphaForTransparency()
-  {
-    auto screen = getScreen();
-    if(screen.isComposited()) {
-      auto visual = screen.getRgbaVisual();
-      if(visual is null) {
-        visual = screen.getSystemVisual();
-      }
-      setVisual(visual);
-    }
-  }
-
-  void CloseThisPage()
-  {
+  void CloseThisPage() {
     auto note = GetFocusedNote();
     if(note is null) return;
     auto side = (note is noteL_) ? Side.LEFT : Side.RIGHT;
@@ -162,32 +154,85 @@ private:
 
   ///////////////////////// file/dir path
 public:
-  string GetCWDOfChildWidget(Side side, uint n)
-  {
+  string GetCWDOfChildWidget(Side side, uint n) {
     auto note = (side == Side.LEFT) ? noteL_ : noteR_;
     auto page = (n == 0) ? note.GetCurrentPage() : note.GetNthPage(n-1);
     return (page is null) ? null : page.GetCWD();
+  }
+
+private:
+  bool GoToDirOtherSide() {
+    auto f = WhichIsFocused();
+    auto pageL = noteL_.GetCurrentPage();
+    auto pageR = noteR_.GetCurrentPage();
+    if(f == FocusInMainWindow.NONE || pageL is null || pageR is null) {
+      return false;
+    }
+    if(f == FocusInMainWindow.LEFT) {
+      pageL.ChangeDirectoryToPage(pageR);
+    } else {
+      pageR.ChangeDirectoryToPage(pageL);
+    }
+    return true;
   }
   ///////////////////////// file/dir path
 
 
 
+  ///////////////////////// pages
+private:
+  bool CreateNewPage() {
+    switch(WhichIsFocused()) {
+    case FocusInMainWindow.NONE:
+      return false;
+    case FocusInMainWindow.LEFT:
+      noteL_.AppendPageCopy();
+      return true;
+    case FocusInMainWindow.RIGHT:
+      noteR_.AppendPageCopy();
+      return true;
+    default:
+      return false;
+    }
+  }
+
+  void MoveToNextPage(Note note) {
+    if(note.getCurrentPage() == note.getNPages() - 1) { // last page
+      note.setCurrentPage(0);// move to the 1st page
+    } else {
+      note.nextPage();
+    }
+    note.GetCurrentPage().FocusShownWidget();
+  }
+
+  void MoveToPreviousPage(Note note) {
+    if(note.getCurrentPage() == 0) { // 1st page
+      note.setCurrentPage(note.getNPages() - 1);// move to the last page
+    } else {
+      note.prevPage();
+    }
+    note.GetCurrentPage().FocusShownWidget();
+  }
+  ///////////////////////// pages
+
+
+
   ///////////////////////// manipulation of focus
 private:
-  FocusInMainWindow WhichIsFocused()
-  {
+  FocusInMainWindow WhichIsFocused() {
     auto pageL = noteL_.GetCurrentPage();
-    if(pageL !is null && pageL.WhichIsFocused() != FocusInPage.NONE)
+    if(pageL !is null && pageL.WhichIsFocused() != FocusInPage.NONE) {
       return FocusInMainWindow.LEFT;
+    }
     auto pageR = noteR_.GetCurrentPage();
-    if(pageR !is null && pageR.WhichIsFocused() != FocusInPage.NONE)
+    if(pageR !is null && pageR.WhichIsFocused() != FocusInPage.NONE) {
       return FocusInMainWindow.RIGHT;
+    }
     return FocusInMainWindow.NONE;
   }
 
-  Note GetFocusedNote()
-  {
-    switch(WhichIsFocused()){
+  Note GetFocusedNote() {
+    switch(WhichIsFocused()) {
     case FocusInMainWindow.NONE:
       return null;
     case FocusInMainWindow.LEFT:
@@ -199,23 +244,23 @@ private:
     }
   }
 
-  void MoveFocus(Direction direction)()
-  {
-    static if(direction == Direction.UP || direction == Direction.DOWN){
+  void MoveFocus(Direction direction)() {
+    static if(direction == Direction.UP || direction == Direction.DOWN) {
       auto note = GetFocusedNote();
       if(note is null) return;
       auto page = note.GetCurrentPage();
       FocusInPage f = page.WhichIsFocused();
-      static if(direction == Direction.UP){
-        if(f == FocusInPage.LOWER)
+      static if(direction == Direction.UP) {
+        if(f == FocusInPage.LOWER) {
           page.FocusUpper();
+        }
       }
-      static if(direction == Direction.DOWN){
-        if(f == FocusInPage.UPPER)
+      static if(direction == Direction.DOWN) {
+        if(f == FocusInPage.UPPER) {
           page.FocusLower();
+        }
       }
-    }
-    else{// direction == Direction.LEFT || direction == Direction.RIGHT
+    } else { // direction == Direction.LEFT || direction == Direction.RIGHT
       auto pageL = noteL_.GetCurrentPage();
       if(pageL is null) return;
       auto pageR = noteR_.GetCurrentPage();
@@ -225,33 +270,56 @@ private:
       FocusInPage fr = pageR.WhichIsFocused();
       if(fl == FocusInPage.NONE && fr == FocusInPage.NONE) return;
 
-      static if(direction == Direction.LEFT){
+      static if(direction == Direction.LEFT) {
         if(noteL_.getVisible) {
-          if(fr == FocusInPage.UPPER)
+          if(fr == FocusInPage.UPPER) {
             pageL.FocusUpper();
-          else if(fr == FocusInPage.LOWER)
+          } else if(fr == FocusInPage.LOWER) {
             pageL.FocusLower();
+          }
         }
       }
-      static if(direction == Direction.RIGHT){
+      static if(direction == Direction.RIGHT) {
         if(noteR_.getVisible) {
-          if(fl == FocusInPage.UPPER)
+          if(fl == FocusInPage.UPPER) {
             pageR.FocusUpper();
-          else if(fl == FocusInPage.LOWER)
+          } else if(fl == FocusInPage.LOWER) {
             pageR.FocusLower();
+          }
         }
       }
     }
   }
 
 private:
-  void AddFocusToNoteIfNone(Note note)
-  {
+  void AddFocusToNoteIfNone(Note note) {
     auto page = note.GetCurrentPage();
-    if(page.WhichIsFocused() == FocusInPage.NONE)
+    if(page.WhichIsFocused() == FocusInPage.NONE) {
       page.FocusShownWidget();
+    }
   }
   ///////////////////////// manipulation of focus
+
+
+
+  ///////////////////////// fullscreen
+private:
+  bool isFullscreen_;
+
+  void ToggleFullscreen() {
+    if(isFullscreen_) {
+      unfullscreen();
+    } else {
+      fullscreen();
+    }
+  }
+
+  bool WindowStateChangedCallback(Event e, Widget w) {
+    auto ewin = e.windowState();
+    isFullscreen_ = (GdkWindowState.FULLSCREEN & ewin.newWindowState) != 0;
+    return false;
+  }
+  ///////////////////////// fullscreen
 
 
 
@@ -262,11 +330,10 @@ private:
       return false;
     }";
 
-  bool KeyPressed(Event e, Widget w)
-  {
+  bool KeyPressed(Event e, Widget w) {
     auto ekey = e.key();
 
-    version(DEBUG){
+    version(DEBUG) {
       import std.stdio;
       import core.memory;
       // manually run GC
@@ -280,41 +347,21 @@ private:
     }
 
     // called before the focused widget's callback
-    switch(QueryAction!"MainWindow"(ekey)){
-
+    switch(QueryAction!"MainWindow"(ekey)) {
     case -1:
       return false;
 
     case MainWindowAction.CreateNewPage:
-      switch(WhichIsFocused()){
-      case FocusInMainWindow.NONE:
-        return false;
-      case FocusInMainWindow.LEFT:
-        noteL_.AppendPageCopy();
-        return true;
-      case FocusInMainWindow.RIGHT:
-        noteR_.AppendPageCopy();
-        return true;
-      default:
-        return false;
-      }
+      return CreateNewPage();
 
     case MainWindowAction.MoveToNextPage:
       mixin(FocusedNoteOrReturnFalse);
-      if(note.getCurrentPage() == note.getNPages() - 1)// last page
-        note.setCurrentPage(0);// move to the 1st page
-      else
-        note.nextPage();
-      note.GetCurrentPage().FocusShownWidget();
+      MoveToNextPage(note);
       return true;
 
     case MainWindowAction.MoveToPreviousPage:
       mixin(FocusedNoteOrReturnFalse);
-      if(note.getCurrentPage() == 0)// 1st page
-        note.setCurrentPage(note.getNPages() - 1);// move to the last page
-      else
-        note.prevPage();
-      note.GetCurrentPage().FocusShownWidget();
+      MoveToPreviousPage(note);
       return true;
 
     case MainWindowAction.SwitchViewMode:
@@ -349,38 +396,25 @@ private:
       return true;
 
     case MainWindowAction.GoToDirOtherSide:
-      auto f = WhichIsFocused();
-      auto pageL = noteL_.GetCurrentPage();
-      auto pageR = noteR_.GetCurrentPage();
-      if(f == FocusInMainWindow.NONE || pageL is null || pageR is null)
-        return false;
-      if(f == FocusInMainWindow.LEFT)
-        pageL.ChangeDirectoryToPage(pageR);
-      else
-        pageR.ChangeDirectoryToPage(pageL);
-      return true;
+      return GoToDirOtherSide();
 
     case MainWindowAction.ShowChangeDirDialog:
       mixin(FocusedNoteOrReturnFalse);
       auto page = note.GetCurrentPage();
-      if(page.FileSystemIsRemote())
-        return false;
-      return true;
+      return !page.FileSystemIsRemote();
 
     case MainWindowAction.ShowConfigDialog:
       StartConfigDialog();
       return true;
 
     case MainWindowAction.ToggleFullscreen:
-      if(isFullscreen_)
-        unfullscreen();
-      else
-        fullscreen();
+      ToggleFullscreen();
       return true;
 
     case MainWindowAction.QuitApplication:
-      if(PopupBox.yesNo("Quit Seta?", ""))
+      if(PopupBox.yesNo("Quit Seta?", "")) {
         Main.quit();
+      }
       return true;
 
     default:
@@ -388,17 +422,4 @@ private:
     }
   }
   ///////////////////////// callback for keyboard shortcuts
-
-
-
-  ///////////////////////// toggle fullscreen
-private:
-  bool isFullscreen_;
-
-  bool WindowStateChangedCallback(Event e, Widget w) {
-    auto ewin = e.windowState();
-    isFullscreen_ = (GdkWindowState.FULLSCREEN & ewin.newWindowState) != 0;
-    return false;
-  }
-  ///////////////////////// toggle fullscreen
 }

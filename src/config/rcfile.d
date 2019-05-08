@@ -379,45 +379,12 @@ private:
     mixin(InstallKeybind!("MainWindowAction.ToggleFullscreen"   , "F11"));
     mixin(InstallKeybind!("MainWindowAction.QuitApplication"    , "<Shift><Primary>q"));
 
-    mixin(InstallKeybind!("FileManagerAction.GoToPrevious"   , "<Alt>b,<Shift><Primary>b,<Alt>Left"));
-    mixin(InstallKeybind!("FileManagerAction.GoToNext"       , "<Alt>f,<Alt>Right"));
-    mixin(InstallKeybind!("FileManagerAction.GoToParent"     , "<Alt>p,<Shift><Primary>p,<Alt>Up"));
-    mixin(InstallKeybind!("FileManagerAction.GoToRoot"       , "<Alt>r"));
-    mixin(InstallKeybind!("FileManagerAction.GoToHome"       , "<Alt>h"));
-    mixin(InstallKeybind!("FileManagerAction.Refresh"        , "F5"));
-    mixin(InstallKeybind!("FileManagerAction.ShowHidden"     , "<Alt>period"));
-    mixin(InstallKeybind!("FileManagerAction.SyncTerminalPWD", "<Alt>c,<Shift><Primary>c"));
-    mixin(InstallKeybind!("FileManagerAction.GoToChild"      , "<Alt>n,<Shift><Primary>n,<Alt>Down"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir1"       , "<Alt>1"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir2"       , "<Alt>2"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir3"       , "<Alt>3"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir4"       , "<Alt>4"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir5"       , "<Alt>5"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir6"       , "<Alt>6"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir7"       , "<Alt>7"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir8"       , "<Alt>8"));
-    mixin(InstallKeybind!("FileManagerAction.GoToDir9"       , "<Alt>9"));
-
-    mixin(InstallKeybind!("FileViewAction.SelectAll"    , "<Primary>a"));
-    mixin(InstallKeybind!("FileViewAction.UnselectAll"  , "<Primary>g"));
-    mixin(InstallKeybind!("FileViewAction.SelectRow"    , "space,<Primary>space"));
-    mixin(InstallKeybind!("FileViewAction.Cut"          , "<Primary>x"));
-    mixin(InstallKeybind!("FileViewAction.Copy"         , "<Primary>c"));
-    mixin(InstallKeybind!("FileViewAction.Paste"        , "<Primary>v"));
-    mixin(InstallKeybind!("FileViewAction.PopupMenu"    , "<Primary>Return"));
-    mixin(InstallKeybind!("FileViewAction.Rename"       , "F6"));
-    mixin(InstallKeybind!("FileViewAction.MakeDirectory", "F7"));
-    mixin(InstallKeybind!("FileViewAction.MoveToTrash"  , "F8"));
-    mixin(InstallKeybind!("FileViewAction.FocusFilter"  , "<Primary>f"));
-    mixin(InstallKeybind!("FileViewAction.ClearFilter"  , "<Shift><Primary>f"));
-
     mixin(InstallKeybind!("TerminalAction.ScrollUp"      , "<Shift><Primary>p"));
     mixin(InstallKeybind!("TerminalAction.ScrollDown"    , "<Shift><Primary>n"));
     mixin(InstallKeybind!("TerminalAction.Copy"          , "<Shift><Primary>c"));
     mixin(InstallKeybind!("TerminalAction.Paste"         , "<Shift><Primary>v"));
     mixin(InstallKeybind!("TerminalAction.PasteFilePaths", "<Shift><Primary>y"));
     mixin(InstallKeybind!("TerminalAction.FindRegexp"    , "<Shift><Primary>f"));
-    mixin(InstallKeybind!("TerminalAction.SyncFilerPWD"  , "<Alt>c"));
     mixin(InstallKeybind!("TerminalAction.InputPWDLeft"  , "<Shift><Primary>braceleft"));
     mixin(InstallKeybind!("TerminalAction.InputPWDRight" , "<Shift><Primary>braceright"));
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText1", "<Alt>1"));
@@ -641,45 +608,12 @@ MainWindowAction.ShowConfigDialog=<Shift><Primary>Escape
 MainWindowAction.ToggleFullscreen=F11
 MainWindowAction.QuitApplication=<Shift><Primary>q
 
-FileManagerAction.GoToPrevious=<Alt>b,<Shift><Primary>b,<Alt>Left
-FileManagerAction.GoToNext=<Alt>f,<Alt>Right
-FileManagerAction.GoToParent=<Alt>p,<Shift><Primary>p,<Alt>Up
-FileManagerAction.GoToRoot=<Alt>r
-FileManagerAction.GoToHome=<Alt>h
-FileManagerAction.Refresh=F5
-FileManagerAction.ShowHidden=<Alt>period
-FileManagerAction.SyncTerminalPWD=<Alt>c,<Shift><Primary>c
-FileManagerAction.GoToChild=<Alt>n,<Shift><Primary>n,<Alt>Down
-FileManagerAction.GoToDir1=<Alt>1
-FileManagerAction.GoToDir2=<Alt>2
-FileManagerAction.GoToDir3=<Alt>3
-FileManagerAction.GoToDir4=<Alt>4
-FileManagerAction.GoToDir5=<Alt>5
-FileManagerAction.GoToDir6=<Alt>6
-FileManagerAction.GoToDir7=<Alt>7
-FileManagerAction.GoToDir8=<Alt>8
-FileManagerAction.GoToDir9=<Alt>9
-
-FileViewAction.SelectAll=<Primary>a
-FileViewAction.UnselectAll=<Primary>g
-FileViewAction.SelectRow=space,<Primary>space
-FileViewAction.Cut=<Primary>x,<Shift><Primary>x
-FileViewAction.Copy=<Primary>c,<Shift><Primary>c
-FileViewAction.Paste=<Primary>v
-FileViewAction.PopupMenu=<Primary>Return
-FileViewAction.Rename=F6
-FileViewAction.MakeDirectory=F7
-FileViewAction.MoveToTrash=F8
-FileViewAction.FocusFilter=<Primary>f
-FileViewAction.ClearFilter=<Shift><Primary>f
-
 TerminalAction.ScrollUp=<Shift><Primary>p
 TerminalAction.ScrollDown=<Shift><Primary>n
 TerminalAction.Copy=<Shift><Primary>c
 TerminalAction.Paste=<Shift><Primary>v
 TerminalAction.PasteFilePaths=<Shift><Primary>y
 TerminalAction.FindRegexp=<Shift><Primary>f
-TerminalAction.SyncFilerPWD=<Alt>c
 TerminalAction.InputPWDLeft=<Shift><Primary>braceleft
 TerminalAction.InputPWDRight=<Shift><Primary>braceright
 TerminalAction.InputUserDefinedText1=<Alt>1

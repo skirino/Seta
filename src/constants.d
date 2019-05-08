@@ -173,45 +173,6 @@ enum MainWindowAction
   QuitApplication,
 }
 
-enum FileManagerAction
-{
-  GoToPrevious,
-  GoToNext,
-  GoToParent,
-  GoToRoot,
-  GoToHome,
-  Refresh,
-  ShowHidden,
-  ShowDirTree,
-  SyncTerminalPWD,
-  GoToChild,
-  GoToDir1,
-  GoToDir2,
-  GoToDir3,
-  GoToDir4,
-  GoToDir5,
-  GoToDir6,
-  GoToDir7,
-  GoToDir8,
-  GoToDir9,
-}
-
-enum FileViewAction
-{
-  SelectAll,
-  UnselectAll,
-  SelectRow,
-  Cut,
-  Copy,
-  Paste,
-  PopupMenu,
-  Rename,
-  MakeDirectory,
-  MoveToTrash,
-  FocusFilter,
-  ClearFilter,
-}
-
 enum TerminalAction
 {
   ScrollUp,
@@ -222,7 +183,6 @@ enum TerminalAction
   Paste,
   PasteFilePaths,
   FindRegexp,
-  SyncFilerPWD,
   InputPWDLeft,
   InputPWDRight,
   InputUserDefinedText1,

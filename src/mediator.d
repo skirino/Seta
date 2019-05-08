@@ -41,17 +41,11 @@ public:
 
   void Set(Terminal t)
   {
-    term_ .init(t);
+    term_.init(t);
   }
 
   /////////////////// interface to Page
-  void CloseThisPage(){ page_.CloseThisPage(); }
-  void UpdatePathLabel(string path, long numItems){ page_.UpdatePathLabel(path, numItems); }
-  void SetHostLabel   (string path)               { page_.SetHostLabel(path); }
-  bool FilerIsVisible (){ return page_.GetViewMode() != ViewMode.TERMINAL; }
-  bool OnLeftSide     (){ return page_.OnLeftSide(); }
-  string GetPageID      (){ return page_.GetTab().GetID(); }
-  string GetHostLabel   (){ return page_.GetHostLabel(); }
-  string GetCWDOtherSide(){ return page_.GetCWDOtherSide(); }
+  void CloseThisPage() { page_.CloseThisPage(); }
+  bool OnLeftSide   () { return page_.OnLeftSide(); }
   /////////////////// interface to Page
 }

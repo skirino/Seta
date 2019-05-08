@@ -127,18 +127,6 @@ public:
   Terminal GetTerminal(){return termWithScrollbar_.Get();}
   Tab      GetTab     (){return tab_;}
 
-  void UpdatePathLabel(string path, long numItems)
-  {
-    tab_.SetPath(path);
-  }
-  void SetHostLabel(string h)
-  {
-  }
-  string GetHostLabel()
-  {
-    return "";
-  }
-
   void CloseThisPage()
   {
     tab_.CloseThisPage();
@@ -250,12 +238,6 @@ public:
   {
     // if remote, return locally-mounted path
     return "/";
-  }
-
-  string GetCWDOtherSide()
-  {
-    auto side = tab_.OnLeftSide() ? Side.RIGHT : Side.LEFT;
-    return getCWDFromMain_(side, 0);
   }
 
   bool LookingAtRemoteDir()

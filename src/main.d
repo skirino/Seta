@@ -32,13 +32,17 @@ void main(string[] args) {
     import std.stdio;
     writeln("All tests passed!");
   } else {
-    Main.initMultiThread(args);
-    threadsEnter();
-    scope(exit){ threadsLeave(); }
-    constants.Init();
-    config.init.Init();
-    scope(exit){ config.init.Finish(); }
-    SetaWindow.Init();
-    Main.run();
+    main2(args);
   }
+}
+
+void main2(string[] args) {
+  Main.initMultiThread(args);
+  threadsEnter();
+  scope(exit){ threadsLeave(); }
+  constants.Init();
+  config.init.Init();
+  scope(exit){ config.init.Finish(); }
+  SetaWindow.Init();
+  Main.run();
 }
