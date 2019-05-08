@@ -240,11 +240,6 @@ public:
     return "/";
   }
 
-  bool LookingAtRemoteDir()
-  {
-    return false;
-  }
-
   void ChangeDirectoryToPage(Page page)
   {
   }

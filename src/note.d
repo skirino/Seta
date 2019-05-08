@@ -32,20 +32,16 @@ import page_list;
 import page;
 import seta_window;
 
-
 class Note : Notebook
 {
-  ////////////////////////// GUI stuff
 private:
   immutable Side side_;
   Nonnull!SetaWindow mainWin_;
 
 public:
-  this(Side side, SetaWindow mainWin)
-  {
+  this(Side side, SetaWindow mainWin) {
     side_ = side;
     mainWin_.init(mainWin);
-
     super();
     setScrollable(1);
     setGroupName("Seta notebook");
@@ -54,17 +50,15 @@ public:
     addOnPageReordered(&LabelAllPages);
   }
 
-  Page GetNthPage(uint n)
-  {
+  Page GetNthPage(uint n) {
     return cast(Page)getNthPage(n);
   }
-  Page GetCurrentPage()
-  {
+
+  Page GetCurrentPage() {
     return GetNthPage(getCurrentPage());
   }
 
-  void AppendNewPage(PageInitOption opt)
-  {
+  void AppendNewPage(PageInitOption opt) {
     auto page = new Page(
       side_,
       opt,
@@ -74,52 +68,41 @@ public:
     appendPage(page, page.GetTab());
     setTabReorderable(page, 1);
     setTabDetachable(page, 1);
-
-    auto v = (new Value).init(GType.BOOLEAN);
-    v.setBoolean(true);
-    childSetProperty(page, "tab-expand", v);
-    childSetProperty(page, "tab-fill",   v);
-
+    SetTabProperties(page);
     page.show();
   }
-  void AppendNewPage(string dir)
-  {
-    AppendNewPage(PageInitOption(dir, null));
-  }
-  void AppendNewPage()
-  {
-    AppendNewPage(GetInitialDirectoryBySide());
-  }
 
-  void AppendPageCopy()
-  {
-    auto p = GetCurrentPage();
-    string initialDir = p.LookingAtRemoteDir() ? GetInitialDirectoryBySide() : p.GetCWD();
-    AppendNewPage(initialDir);
+  void AppendPageCopy() {
+    auto dir = GetCurrentPage().GetCWD();
+    AppendNewPage(PageInitOption(dir, null));
   }
 
 private:
-  string GetInitialDirectoryBySide()
-  {
-    if(side_ == Side.LEFT)
-      return rcfile.GetDefaultInitialDirectoryLeft();
-    else
-      return rcfile.GetDefaultInitialDirectoryRight();
+  void SetTabProperties(Page page) {
+    auto v = (new Value).init(GType.BOOLEAN);
+    v.setBoolean(true);
+    childSetProperty(page, "tab-expand", v);
+    childSetProperty(page, "tab-fill"  , v);
   }
 
-  void LabelAllPages(Widget w, uint u, Notebook note)
-  {
-    uint num = getNPages();
-    setShowTabs(num > 1);
-    for(uint i=0; i<num; ++i){
-      GetNthPage(i).GetTab().SetID(side_, i+1);
+  string GetInitialDirectoryBySide() {
+    if(side_ == Side.LEFT) {
+      return rcfile.GetDefaultInitialDirectoryLeft();
+    } else {
+      return rcfile.GetDefaultInitialDirectoryRight();
     }
   }
 
-  void PageAdded(Widget w, uint u, Notebook note)
-  {
+  void LabelAllPages(Widget w, uint u, Notebook note) {
+    uint num = getNPages();
+    setShowTabs(num > 1);
+    for(uint i = 0; i < num; ++i) {
+      GetNthPage(i).GetTab().SetID(side_, i + 1);
+    }
+  }
+
+  void PageAdded(Widget w, uint u, Notebook note) {
     page_list.Register(cast(Page)w);
     LabelAllPages(w, u, note);
   }
-  ////////////////////////// GUI stuff
 }
