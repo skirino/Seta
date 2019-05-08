@@ -23,7 +23,6 @@ module config.init;
 import config.rcfile;
 import config.keybind;
 import config.shellrc;
-import config.nautilus_scripts;
 
 
 void Init()
@@ -31,7 +30,6 @@ void Init()
   config.rcfile.Init();
   config.keybind.Init();
   config.shellrc.Init();
-  config.nautilus_scripts.Init();
 }
 
 void Finish()

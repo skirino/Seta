@@ -36,7 +36,6 @@ import utils.gio_util;
 import utils.string_util;
 import constants;
 import config.shellrc;
-import config.nautilus_scripts;
 import config.keybind;
 import config.shortcut;
 import config.page_init_option;
