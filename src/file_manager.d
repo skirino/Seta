@@ -48,7 +48,6 @@ import anything_cd.dir_list : Add, Remove;
 import thread_list;
 import mediator;
 import statusbar;
-import volume_monitor;
 
 
 class FileManager : VBox
