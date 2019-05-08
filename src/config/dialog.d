@@ -57,7 +57,6 @@ import utils.menu_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
-import config.hosts_view;
 import config.page_init_option;
 import page_list;
 
@@ -643,27 +642,10 @@ private:
 
 
   ///////////////////// [SSH]
-  HostView hosts_;
   ListStore hostsStore_;
 
   void InitSSHPage(uint row)
   {
-    hosts_ = new HostView;
-    hosts_.setVexpand(1);
-    hosts_.setReorderable(1);
-    hosts_.addOnButtonPress(delegate bool(Event e, Widget w){
-        return ShowAppendRemoveMenu(e, w, hosts_, hostsStore_);
-      });
-
-    hosts_.SetEditable(
-      &CellEdited!(0, "hostsStore_"),
-      &CellEdited!(1, "hostsStore_"),
-      &CellEdited!(2, "hostsStore_", "AppendSlash"),
-      &CellEdited!(3, "hostsStore_"),
-      &CellEdited!(4, "hostsStore_"));
-
-    hostsStore_ = hosts_.GetListStore();
-    AppendWithScrolledWindow(pageDirectories_, row, hosts_);
   }
 
   void ApplyChangesInSSH()
