@@ -20,28 +20,22 @@ MA 02110-1301 USA.
 
 module terminal;
 
-import std.string;
+import std.string : lastIndexOf;
 import std.regex : regex, replaceFirst, split;
-import std.process;
+import std.process : environment;
 import std.conv;
-import std.exception;
+import std.exception : enforce;
 import std.algorithm : max, min;
-import std.array;
-import core.thread;
-import core.sys.posix.unistd;
+import std.array : empty;
 import core.sys.posix.signal;
 
 import gtk.Widget;
 import gtk.DragAndDrop;
 import gtk.SelectionData;
 import gtk.TargetEntry;
-import gobject.Signals;
-import gdk.Threads;
-import gdk.Color;
 import gdk.RGBA;
 import gdk.Event;
 import gdk.DragContext;
-import glib.Source;
 import pango.PgFontDescription;
 import vte.Terminal : VTE = Terminal;
 import vte.Regex;
@@ -55,17 +49,13 @@ import constants;
 import rcfile = config.rcfile;
 import config.keybind;
 import shellrc = config.shellrc;
-import term.search_dialog;
-import term.termios;
+import search_dialog;
 
 class Terminal : VTE
 {
-  override void* getStruct(){return vte_;}
-
   //////////////////// GUI stuff
 private:
   VteTerminal * vte_;
-  int pty_;
   pid_t pid_ = -1;
   string command_;
 
@@ -90,11 +80,17 @@ public:
                &SpawnFinishCallback, cast(void*)this);
   }
 
-  void InitAfterSpawn()
-  {
-    pty_ = getPty().getFd();
+  extern(C) private static void SpawnFinishCallback(VteTerminal *terminal,
+                                                    GPid pid,
+                                                    GError *error,
+                                                    void *user_data) {
+    auto t = cast(Terminal)user_data;
+    t.pid_ = pid;
+    t.InitAfterSpawn();
+  }
+
+  void InitAfterSpawn() {
     addOnChildExited(&CloseThisPageCallback, GConnectFlags.AFTER);
-    InitTermios(pty_);
     InitDragAndDropFunctionality();
     InitSyncFilerDirFunctionality();
 
@@ -129,8 +125,7 @@ public:
     ResetReplaceTargets(rcfile.GetReplaceTargetLeft(), rcfile.GetReplaceTargetRight());
   }
 
-  void KillChildProcessIfStillAlive()
-  {
+  void KillChildProcessIfStillAlive() {
     if(pid_ >= 0) {
       kill(pid_, SIGKILL);
       pid_ = -1;
@@ -138,22 +133,11 @@ public:
   }
 
 private:
-  void CloseThisPageCallback(int status, VTE term)
-  {
+  void CloseThisPageCallback(int status, VTE term) {
     if(pid_ >= 0) {
       closeThisPage_();
       pid_ = -1;
     }
-  }
-
-  extern(C) static void SpawnFinishCallback(VteTerminal *terminal,
-                                            GPid pid,
-                                            GError *error,
-                                            void *user_data)
-  {
-    auto t = cast(Terminal)user_data;
-    t.pid_ = pid;
-    t.InitAfterSpawn();
   }
   //////////////////// GUI stuff
 
@@ -168,19 +152,16 @@ private:
    +/
   uint lastKeyPressTime_ = 0;
 
-  bool KeyPressed(Event e, Widget w)
-  {
+  bool KeyPressed(Event e, Widget w) {
     auto ekey = e.key();
-    if(lastKeyPressTime_ == ekey.time){
+    if(lastKeyPressTime_ == ekey.time) {
       return false;
-    }
-    else{
+    } else {
       lastKeyPressTime_ = ekey.time;
     }
 
     int q = QueryAction!"Terminal"(ekey);
-    switch(q){
-
+    switch(q) {
     case -1:
       return false;
 
@@ -226,9 +207,9 @@ private:
 
     case TerminalAction.PasteFilePaths:
       string[] files;
-      if(files.length > 0){
+      if(files.length > 0) {
         string s = " ";
-        foreach(file; files){
+        foreach(file; files) {
           s ~= EscapeSpecialChars(file) ~ ' ';
         }
         feedChild(s);
@@ -240,18 +221,18 @@ private:
       return true;
 
     case TerminalAction.InputUserDefinedText1,
-      TerminalAction.InputUserDefinedText2,
-      TerminalAction.InputUserDefinedText3,
-      TerminalAction.InputUserDefinedText4,
-      TerminalAction.InputUserDefinedText5,
-      TerminalAction.InputUserDefinedText6,
-      TerminalAction.InputUserDefinedText7,
-      TerminalAction.InputUserDefinedText8,
-      TerminalAction.InputUserDefinedText9:
-      int index = q + 1 - TerminalAction.InputUserDefinedText1;// 1 <= index <= 9
+         TerminalAction.InputUserDefinedText2,
+         TerminalAction.InputUserDefinedText3,
+         TerminalAction.InputUserDefinedText4,
+         TerminalAction.InputUserDefinedText5,
+         TerminalAction.InputUserDefinedText6,
+         TerminalAction.InputUserDefinedText7,
+         TerminalAction.InputUserDefinedText8,
+         TerminalAction.InputUserDefinedText9:
+      int index = q + 1 - TerminalAction.InputUserDefinedText1; // 1 <= index <= 9
       string text = rcfile.GetUserDefinedText(index);
-      if(text.length > 0){
-        if(enableReplace_){
+      if(text.length > 0) {
+        if(enableReplace_) {
           text = ReplaceLRDIR(text);
         }
         string replaced = text.substitute("\\n", "\n").idup;
@@ -260,7 +241,7 @@ private:
       return true;
 
     default:
-      return false;// pass control to the child process
+      return false; // pass control to the child process
     }
   }
   //////////////////// key pressed
@@ -269,8 +250,7 @@ private:
 
   ////////////////// search
 public:
-  void SetSearchRegexp(string pattern, bool ignoreCase)
-  {
+  void SetSearchRegexp(string pattern, bool ignoreCase) {
     auto PCRE2_CASELESS  = 0x00000008u;
     auto PCRE2_MULTILINE = 0x00000400u;
     auto compileFlags = ignoreCase ? (PCRE2_MULTILINE | PCRE2_CASELESS) : PCRE2_MULTILINE;
@@ -287,57 +267,42 @@ private:
   string delegate(Side, uint) getCWDLR_;
   void delegate() closeThisPage_;
 
-public:
-  void ChangeDirectoryFromFiler(string dirpath)
-  {
-    cwd_ = dirpath;
-    if(ReadyToFeed(pty_, false)){
-      ClearInputtedCommand();
-      string commandString = "cd " ~ EscapeSpecialChars(dirpath) ~ '\n';
-      feedChild(commandString);
-    }
-  }
-
-  void ChangeDirectoryOfFilerFromCommandLine(string replacedCommand)
-  {
+  void ChangeDirectoryOfFilerFromCommandLine(string replacedCommand) {
     string command = trim(replacedCommand);
-
-    // aliases
-    if(shellSetting_ !is null){
-      foreach(cdAlias; shellSetting_.GetChangeDirAliases()){
-        if(command == cdAlias.command_){
+    // shell aliases
+    if(shellSetting_ !is null) {
+      foreach(cdAlias; shellSetting_.GetChangeDirAliases()) {
+        if(command == cdAlias.command_) {
           return;
         }
       }
     }
 
-    if(command.StartsWith("cd")){
+    if(command.StartsWith("cd")) {
       string args = triml(command[2..$]);
 
-      if(args.length == 0){// to $HOME
-      }
-      else if(args == "-"){// back to previous directory
-        cwd_ = "/";
-      }
-      else{
-        if(command[2] == ' '){// "cd" command is separated with its 1st argument by ' '
+      if(args.length == 0) { // to $HOME
+        // TODO
+      } else if(args == "-") { // back to previous directory
+        // TODO
+      } else {
+        if(command[2] == ' ') { // "cd" command is separated with its 1st argument by ' '
           ChangeDirTo1stArg(args);
         }
       }
-    }
-    else{
-      if(shellSetting_ !is null && shellSetting_.GetAutoCd()){// if zsh's auto_cd is used, cd can be omitted
+    } else {
+      if(shellSetting_ !is null && shellSetting_.GetAutoCd()) { // if zsh's auto_cd is used, cd can be omitted
         ChangeDirTo1stArg(command);
       }
     }
   }
 
-  void ChangeDirTo1stArg(string args)
-  {
+public:
+  void ChangeDirTo1stArg(string args) {
     string temp = Extract1stArg(args);
-    if(temp.empty)
+    if(temp.empty) {
       return;
-
+    }
     // note that this cannot replace all environment variables
     // since the child process can have original variables
     // which cannot be shared with the process executing this code
@@ -345,18 +310,16 @@ public:
     string destination;
 
     // convert arg1 to absolute path
-    if(arg1[0] == '/'){// path from ROOT
+    if(arg1[0] == '/') { // path from ROOT
       destination = arg1;
-    }
-    else if(arg1[0] == '~'){// path from HOME
+    } else if(arg1[0] == '~') { // path from HOME
       destination = arg1;
-    }
-    else{// path from pwd
+    } else { // path from pwd
       destination = cwd_ ~ arg1;
     }
 
     string absPath = ExpandPath(destination, "/");
-    if(absPath !is null){
+    if(absPath !is null) {
       cwd_ = absPath;
     }
   }
@@ -366,17 +329,15 @@ public:
 
   ////////////////// automatic sync of filer
 private:
-  static immutable int PATH_MAX = 4096;// PATH_MAX in /usr/include/linux/limits.h
+  static immutable int PATH_MAX = 4096; // PATH_MAX in /usr/include/linux/limits.h
   uint syncCallbackID_;
   char[] readlinkBuffer_;
 
-  void InitSyncFilerDirFunctionality()
-  {
+  void InitSyncFilerDirFunctionality() {
     readlinkBuffer_.length = PATH_MAX + 1;
   }
 
-  string GetCWDFromProcFS()
-  {
+  string GetCWDFromProcFS() {
     string filename = "/proc/" ~ pid_.to!string ~ "/cwd";
     return ReadLink(filename, readlinkBuffer_);
   }
@@ -389,8 +350,7 @@ private:
   shellrc.ShellSetting shellSetting_;
   string prompt_, rprompt_;
 
-  string GetText()
-  {
+  string GetText() {
     import core.stdc.stdlib : free;
     // Here we don't use getText() method to avoid handling of text attributes (which we don't need).
     char * text = vte_terminal_get_text(vte_, cast(VteSelectionFunc)null, null, null);
@@ -399,20 +359,20 @@ private:
     return ret;
   }
 
-  void ClearInputtedCommand()
-  {
+  void ClearInputtedCommand() {
     static immutable string backspaces = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
     feedChild(backspaces);
   }
 
-  string GetLastCommand()
-  {
+  string GetLastCommand() {
     string t0 = trimr(GetText());
-    if(t0.empty)
+    if(t0.empty) {
       return null;
+    }
     string t1 = t0.split(regex(prompt_))[$ - 1];
-    if(t1.length == t0.length)
+    if(t1.length == t0.length) {
       return null;
+    }
     string t2 = t1.split(regex(rprompt_))[0];
     return trimr(t2);
   }
@@ -425,35 +385,31 @@ private:
   bool enableReplace_;
   string[10] targetsL_, targetsR_;
 
-  void ResetReplaceTargets(string targetLDIR, string targetRDIR)
-  {
+  void ResetReplaceTargets(string targetLDIR, string targetRDIR) {
     targetsL_[0] = substitute(targetLDIR, "<n>", "").idup;
-    for(uint i=1; i<10; ++i){
+    for(uint i=1; i<10; ++i) {
       targetsL_[i] = substitute(targetLDIR, "<n>", i.to!string).idup;
     }
-
     targetsR_[0] = substitute(targetRDIR, "<n>", "").idup;
-    for(uint i=1; i<10; ++i){
+    for(uint i=1; i<10; ++i) {
       targetsR_[i] = substitute(targetRDIR, "<n>", i.to!string).idup;
     }
   }
 
-  string ReplaceDIR(Side side)(string line)
-  {
-    static if(side == Side.LEFT){
+  string ReplaceDIR(Side side)(string line) {
+    static if(side == Side.LEFT) {
       alias targetsL_ targets;
-    }
-    else{
+    } else {
       alias targetsR_ targets;
     }
 
     string ret = line;
 
     // this code may have performance problem
-    foreach(int i, target; targets){
-      if(containsPattern(line, target)){
+    foreach(int i, target; targets) {
+      if(containsPattern(line, target)) {
         string replace = getCWDLR_(side, i);
-        if(replace !is null){
+        if(replace !is null) {
           ret = substitute(ret, target, EscapeSpecialChars(replace)).idup;
         }
       }
@@ -462,39 +418,35 @@ private:
     return ret;
   }
 
-  string ReplaceLRDIR(string line)
-  {
+  string ReplaceLRDIR(string line) {
     return ReplaceDIR!(Side.RIGHT)(ReplaceDIR!(Side.LEFT)(line));
   }
 
-  R ReplaceLRDIRInCommandLine(R)()// R is "bool" or "string"
-  {
+  R ReplaceLRDIRInCommandLine(R)() { // R is "bool" or "string"
     string lineOld = GetLastCommand();
 
     // do nothing when working within remote shell or replacing functionality is disabled
-    if(!enableReplace_){
-      static if(is(R == bool)){
+    if(!enableReplace_) {
+      static if(is(R == bool)) {
         return false;
-      }
-      else{
+      } else {
         return lineOld;
       }
     }
 
     string lineNew = ReplaceLRDIR(lineOld);
 
-    if(lineOld != lineNew){
+    if(lineOld != lineNew) {
       ClearInputtedCommand();
       feedChild(lineNew);
-      static if(is(R == bool)){
+      static if(is(R == bool)) {
         return true;
       }
     }
 
-    static if(is(R == bool)){
+    static if(is(R == bool)) {
       return false;
-    }
-    else{
+    } else {
       static assert(is(R == string));
       return lineNew;
     }
@@ -504,34 +456,28 @@ private:
 
 
   /////////////////// drag and drop
-  void InitDragAndDropFunctionality()
-  {
+  void InitDragAndDropFunctionality() {
     // accept "text/uri-list" (info==1) and "text/plain" (info==2)
     TargetEntry[] dragTargets = constants.GetDragTargets() ~ constants.GetTextPlainDragTarget();
     dragDestSet(GtkDestDefaults.ALL, dragTargets, GdkDragAction.MOVE | GdkDragAction.COPY);
     addOnDragDataReceived(&DragDataReceived);
   }
 
-  void DragDataReceived(
-    DragContext context, int x, int y,
-    SelectionData selection, uint info, uint time, Widget w)
-  {
-    if(info == 1){// URI list
+  void DragDataReceived(DragContext context, int x, int y,
+                        SelectionData selection, uint info, uint time, Widget w) {
+    if(info == 1) { // URI list
       string[] paths;
-      if(paths.length > 0){
+      if(paths.length > 0) {
         string s = " ";
-        foreach(path; paths){
+        foreach(path; paths) {
           s ~= EscapeSpecialChars(path) ~ ' ';
         }
         feedChild(s);
       }
-    }
-    else if(info == 2){// plain text, feed the original text
+    } else if(info == 2) { // plain text, feed the original text
       feedChild(selection.getText());
     }
-
     DragAndDrop.dragFinish(context, 1, 0, 0);
-
     grabFocus();
   }
   /////////////////// drag and drop

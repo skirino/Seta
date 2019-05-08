@@ -1,4 +1,4 @@
-SRC = config/*.d term/*.d utils/*.d *.d
+SRC = config/*.d utils/*.d *.d
 
 SYSTEM = $(shell uname -s)
 ifeq ("$(SYSTEM)", "Darwin")
