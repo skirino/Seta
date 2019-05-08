@@ -38,7 +38,6 @@ import constants;
 import rcfile = config.rcfile;
 import config.dialog;
 import config.keybind;
-import anything_cd.dialog;
 import statusbar;
 import note;
 
@@ -372,7 +371,6 @@ private:
       auto page = note.GetCurrentPage();
       if(page.FileSystemIsRemote())
         return false;
-      StartChangeDirDialog(page);
       return true;
 
     case MainWindowAction.ShowConfigDialog:
