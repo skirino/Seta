@@ -208,7 +208,6 @@ public:
           // The root directory does not exist!
           // This should be due to accidental disconnection from a SSH host
           assert(mediator_.FileSystemIsRemote());
-          mediator_.FilerDisconnect();
           break;
         }
 

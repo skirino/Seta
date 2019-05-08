@@ -61,7 +61,6 @@ import term.search_dialog;
 import term.termios;
 import thread_list;
 import mediator;
-import ssh_connection;
 
 
 // wrapper class of VteTerminal widget
@@ -651,24 +650,8 @@ private:
 
 
 public:
-  void StartSSH(SSHConnection con)
+  void StartSSH()
   {
-    shellSetting_ = con.GetShellSetting();
-    string host = con.GetUserDomain();
-    string password = con.getPassword();
-    prompt_ = con.getPrompt();
-    rprompt_ = con.getRPrompt();
-
-    ClearInputtedCommand();
-    string sshCommand = "ssh " ~ rcfile.GetSSHOption() ~ " " ~ host ~ '\n';
-    FeedChild(sshCommand);
-
-    if(password !is null){
-      // in order to flush the vte terminal I need some idle time for main thread,
-      // so I create a thread to input password
-      (new InputPassThread(this, host, password)).start();
-    }
-    cwd_ = con.getHomeDir();
   }
 
   void QuitSSH(string pwd)

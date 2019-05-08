@@ -50,7 +50,6 @@ import thread_list;
 import mediator;
 import statusbar;
 import volume_monitor;
-import ssh_connection;
 
 
 class FileManager : VBox
@@ -152,7 +151,6 @@ private:
       return true;
 
     case FileManagerAction.StartSSH:
-      SSHClicked!(Button)(null);
       return true;
 
     case FileManagerAction.ShowHidden:
@@ -399,152 +397,4 @@ public:
     }
   }
   /////////////////////// callbacks for toolbar
-
-
-
-  ///////////////////////// SSH
-public:
-  void SSHClicked(ArgType)(ArgType b)
-  {
-    if(!mediator_.FileSystemIsRemote()){
-      SSHConnection connection;
-      if(connection !is null && connection.IsValid()){
-
-        // send message to statusbar
-        PushIntoStatusbar("Trying to establish SSH connection to " ~ connection.GetUserDomain() ~ " ...");
-
-        // check whether the remote host is already mounted
-        FileIF remoteRoot = File.parseName("sftp://" ~ connection.GetUserDomain() ~ '/');
-        if(remoteRoot.queryExists(null)){// already mounted
-          string remotePath = remoteRoot.getPath() ~ '/';
-          mediator_.SSHConnectionSucceeded(remotePath, connection);
-        }
-        else{// try to mount
-          // initialize sftpStarter_ and register it to the global ThreadList
-          if(sftpStarter_ is null){
-            sftpStarter_ = new SFTPMountStarter;
-          }
-          sftpStarter_.Start(remoteRoot, &(mediator_.SSHConnectionSucceeded), connection);
-        }
-      }
-    }
-    else{// already connected to a remotehost
-      Disconnect();
-    }
-  }
-
-public:
-  void Disconnect(bool notifyTerminal = true)()
-  {
-    string userDomain = mediator_.GetHostLabel();
-
-    // decrement use count
-    known_hosts.Disconnect(userDomain);
-
-    // send message to statusbar
-    PushIntoStatusbar("Disconnected from " ~ userDomain);
-
-    string pwd = mediator_.FileSystemSetLocal();
-    static if(notifyTerminal){
-      mediator_.TerminalQuitSSH(pwd);
-    }
-
-    mediator_.SetHostLabel("localhost");
-    hist_.Reset(pwd);
-    view_.ChangeDirectory(pwd);
-    ReconstructShortcuts();
-  }
-
-  // executed within the GDK lock
-  void ConnectionSucceeded(SSHConnection con, string gvfsRoot)
-  {
-    string newpath;
-    if(con.GetBothSFTPAndSSH()){
-      mediator_.SetHostLabel(con.GetUserDomain());
-      newpath = mediator_.FileSystemNewPath();
-    }
-    else{
-      newpath = gvfsRoot ~ con.getHomeDir();
-    }
-
-    view_.ChangeDirectory(newpath);
-
-    if(con.GetBothSFTPAndSSH()){
-      hist_.Reset(newpath);
-      toolbar_.ClearShortcuts();
-      con.IncrementUseCount();
-    }
-    else{
-      hist_.Append(newpath);
-      mediator_.TerminalChangeDirectoryFromFiler(newpath);
-    }
-
-    if(! known_hosts.AlreadyRegistered(con)){// not registered
-      bool save = PopupBox.yesNo("Register " ~ con.getDomain() ~ '?', "Unregistered host");
-      known_hosts.AddNewHost(con, save);
-    }
-  }
-
-private:
-  extern(C) static void MountFinishedCallback(
-    GFile * ptr,
-    GAsyncResult * res,
-    void * data)
-  {
-    // need GDK lock to call gtk functions
-    threadsEnter();
-    SFTPMountStarter arg = cast(SFTPMountStarter)data;
-    arg.Unregister();
-
-    // Since I don't know how to instantiate AsyncResultIF from GAsyncResult* (maybe I should use SimpleAsyncResult),
-    // I use the original GIO function
-    GError * error;
-    g_file_mount_enclosing_volume_finish(ptr, res, &error);
-
-    if(error == null){// notify successful mount
-      arg.dlgSuccess_(arg.remoteRoot_.getPath() ~ '/', arg.con_);// mediator_.ConnectionSucceeded
-    }
-    else{
-      // FAILED_HANDLED is returned when password dialog has been canceled
-      if(error.code != GIOErrorEnum.FAILED_HANDLED){// other cases, e.g. password is incorrect
-        PopupBox.error(error.message.to!string, "error");
-        PushIntoStatusbar("Failed to establish SSH/SFTP connection");
-      }
-    }
-    threadsLeave();
-  }
-
-  class SFTPMountStarter : ListedOperationIF
-  {
-    mixin ListedOperationT;
-    FileIF remoteRoot_;
-    void delegate(string, SSHConnection) dlgSuccess_;
-    SSHConnection con_;
-
-    void Start(FileIF remoteRoot, void delegate(string, SSHConnection) dlg, SSHConnection con)
-    {
-      remoteRoot_ = remoteRoot;
-      dlgSuccess_ = dlg;
-      con_ = con;
-      Register();
-
-      remoteRoot_.mountEnclosingVolume(
-        GMountMountFlags.NONE, con_, null,
-        cast(GAsyncReadyCallback)(&MountFinishedCallback), cast(void*)this);
-    }
-
-    // Judging from the source code in gvfs (gdaemonfile.c),
-    // canceling "g_file_mount_enclosing_volume" seems not to be supported at present.
-    // Thus this class is not a StoppableOperationIF.
-    // implementation of ListedOperationIF
-    string GetThreadListLabel(string startTime)
-    {
-      return "Mounting " ~ con_.GetUserDomain() ~ " (" ~ startTime ~ ')';
-    }
-
-    gdk.Window.Window GetAssociatedWindow(){return null;}
-  }
-
-  SFTPMountStarter sftpStarter_;
-  ///////////////////////// SSH
 }

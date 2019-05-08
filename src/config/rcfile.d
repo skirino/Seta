@@ -41,7 +41,6 @@ import config.keybind;
 import config.shortcut;
 import config.page_init_option;
 import known_hosts = config.known_hosts;
-import ssh_connection;
 import page_list;
 
 
@@ -264,42 +263,12 @@ string[] GetSSHHosts()
   return instance_.GetSSHHosts();
 }
 
-void AddSSHHost(SSHConnection con)
+void AddSSHHost()
 {
-  instance_.changed_ = true;
-
-  string s = con.toStr!(true)();
-  if(instance_.hasKey("SSH", "Hosts")){
-    string older = instance_.getString("SSH", "Hosts");
-    string newer = (trim(older).split(",") ~ s).join(",");
-    instance_.setString("SSH", "Hosts", newer);
-  }
-  else{
-    instance_.setString("SSH", "Hosts", s);
-  }
 }
 
-void RemoveSSHHost(SSHConnection con)
+void RemoveSSHHost()
 {
-  instance_.changed_ = true;
-
-  known_hosts.Unregister(con);
-  if(instance_.hasKey("SSH", "Hosts")){
-    string s1 = con.toStr!(true)();
-    string s2 = con.toStr!(false)();
-
-    string older = instance_.getString("SSH", "Hosts");
-    string[] hosts = split(older, ",");
-    string[] newhosts;
-    foreach(host; hosts){
-      host = trim(host);
-      scope con2 = new SSHConnection(host);
-      if(!con2.Equals(con))
-        newhosts ~= host;
-    }
-    string newer = join(newhosts, ",");
-    instance_.setString("SSH", "Hosts", newer);
-  }
 }
 
 void ResetRemoteHosts(string[] list)

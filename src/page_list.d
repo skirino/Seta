@@ -67,7 +67,6 @@ void NotifyFilerDisconnect(string mountName, string gvfsroot)
         PopupBox.information("SFTP connection to " ~ mountName ~ " has suddenly been shut down.", "");
         alreadyPopup = true;
       }
-      page.GetFileManager().Disconnect!(false)();// do not force Terminal to logout
     }
   }
 }

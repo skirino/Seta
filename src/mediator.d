@@ -28,7 +28,6 @@ import page;
 import file_manager;
 import terminal;
 import file_system;
-import ssh_connection;
 import statusbar;
 
 
@@ -52,32 +51,6 @@ public:
     filer_.init(f);
     term_ .init(t);
   }
-
-
-  /////////////////// SSH
-  void SSHConnectionSucceeded(string gvfsRoot, SSHConnection con)
-  {
-    // within GDK lock
-    string userDomain = con.GetUserDomain();
-
-    if(con.GetBothSFTPAndSSH()){
-      string password = con.getPassword();
-      if(password.length == 0){
-        password = InputDialog!(true)("SSH", "The remote filesystem is already mounted by gvfs.\nInput password for SSH :");
-        if(password.length == 0)// no valid password
-          return;
-        con.setPassword(password);
-      }
-
-      con.ReadShellSetting(gvfsRoot);
-      term_.StartSSH(con);
-      fsys_.SetRemote(gvfsRoot, con.getUsername(), con.getHomeDir(), FilerGetPWD(false));
-    }
-
-    filer_.ConnectionSucceeded(con, gvfsRoot);
-    PushIntoStatusbar("Succeeded in connecting to " ~ userDomain);
-  }
-  /////////////////// SSH
 
 
 
@@ -116,7 +89,6 @@ public:
     PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to file manager(" ~ GetPageID() ~ ")");
     return true;
   }
-  void FilerDisconnect (){ filer_.Disconnect(); }
   void FilerFocusFilter(){ filer_.FocusFilter(); }
   void FilerClearFilter(){ filer_.ClearFilter(); }
   /////////////////// interface to FileManager

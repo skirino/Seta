@@ -133,7 +133,7 @@ private:
                                                &parent_.RefreshClicked!(Button),
                                                &parent_.RefreshClicked!(MenuItem));
     itemSSH_ = ConstructToolItemWithButton(LoadImage(StockID.NETWORK), "Start/quit SSH",
-                                           &parent_.SSHClicked!(Button), &parent_.SSHClicked!(MenuItem));
+                                           &parent_.RefreshClicked!(Button), &parent_.RefreshClicked!(MenuItem));
 
     itemHidden_ = ConstructToolItemWithToggleButton(LoadImage("/usr/share/pixmaps/seta/seta_show-hidden-files.svg"),
                                                     "Show/hide hidden files",

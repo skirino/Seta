@@ -24,77 +24,23 @@ import std.string;
 
 import utils.string_util;
 import rcfile = config.rcfile;
-import ssh_connection;
-
-
-private __gshared SSHConnection[] registeredHosts_;
-private __gshared SSHConnection[] temporalHosts_;
-
-SSHConnection[] GetKnownHosts(){ return registeredHosts_; }
 
 
 void Register(string[] list)
 {
-  registeredHosts_.length = 0;
-  foreach(host; list){
-    auto con = new SSHConnection(host);
-    if(con.IsValid())
-      registeredHosts_ ~= con;
-  }
 }
 
-void Unregister(SSHConnection con)
+void Unregister()
 {
-  SSHConnection[] temp;
-  foreach(host; registeredHosts_){
-    if(!host.Equals(con.getUsername(), con.getDomain()))
-      temp ~= host;
-  }
-  registeredHosts_ = temp;
 }
 
 bool HostIsLoggedIn(string username, string domain)
 {
-  auto con = Find(username, domain);
-  return (con !is null) && (con.IsUsed());
+  return true;
 }
 
 void Disconnect(string userDomain)
 {
   size_t posAtmark = locate(userDomain, '@');
   assert(posAtmark != userDomain.length);
-
-  auto con = Find(userDomain[0 .. posAtmark], userDomain[posAtmark+1 .. $]);
-  assert(con !is null);
-  con.DecrementUseCount();
-}
-
-bool AlreadyRegistered(SSHConnection con)
-{
-  return Find(con.getUsername(), con.getDomain()) !is null;
-}
-
-void AddNewHost(SSHConnection con, bool save)
-{
-  if(save){
-    registeredHosts_ ~= con;
-    rcfile.AddSSHHost(con);
-  }
-  else{
-    temporalHosts_ ~= con;
-  }
-}
-
-SSHConnection Find(string username, string domain)
-{
-  // if the host has been registered, return it
-  foreach(host; registeredHosts_){
-    if(host.Equals(username, domain))
-      return host;
-  }
-  foreach(host; temporalHosts_){
-    if(host.Equals(username, domain))
-      return host;
-  }
-  return null;
 }
