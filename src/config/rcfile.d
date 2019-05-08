@@ -248,7 +248,6 @@ void ResetShortcuts(Shortcut[] list)
     string s = Shortcut.ToListString(list);
     instance_.setString("Directories", "Shortcuts", NonnullString(s));
     instance_.changed_ = true;
-    page_list.NotifyReconstructShortcuts();
   }
 }
 ///////////////// [Directories]

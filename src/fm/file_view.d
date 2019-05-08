@@ -806,11 +806,9 @@ private:
       return true;
 
     case FileViewAction.FocusFilter:
-      mediator_.FilerFocusFilter();
       return true;
 
     case FileViewAction.ClearFilter:
-      mediator_.FilerClearFilter();
       return true;
 
     default:

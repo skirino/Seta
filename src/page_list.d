@@ -49,14 +49,6 @@ void Unregister(Page p)
   }
 }
 
-
-void NotifyReconstructShortcuts()
-{
-  foreach(page; pages_){
-    page.GetFileManager().ReconstructShortcuts();
-  }
-}
-
 void NotifyFilerDisconnect(string mountName, string gvfsroot)
 {
   bool alreadyPopup = false;

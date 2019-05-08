@@ -89,8 +89,6 @@ public:
     PushIntoStatusbar("\"cd " ~ path ~ "\" was sent to file manager(" ~ GetPageID() ~ ")");
     return true;
   }
-  void FilerFocusFilter(){ filer_.FocusFilter(); }
-  void FilerClearFilter(){ filer_.ClearFilter(); }
   /////////////////// interface to FileManager
 
 

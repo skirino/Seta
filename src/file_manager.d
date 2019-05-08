@@ -44,7 +44,6 @@ import config.keybind;
 import known_hosts = config.known_hosts;
 import fm.file_view;
 import fm.history;
-import fm.toolbar;
 import anything_cd.dir_list : Add, Remove;
 import thread_list;
 import mediator;
@@ -57,7 +56,6 @@ class FileManager : VBox
   //////////////////////// GUI stuff
 private:
   Mediator mediator_;
-  SetaToolbar toolbar_;
   ScrolledWindow swTree_;
   ScrolledWindow swView_;
   FileView view_;
@@ -73,9 +71,6 @@ public:
     super(0, 0);
     addOnKeyPress(&KeyPressed);
 
-    toolbar_ = new SetaToolbar(this);
-    packStart(toolbar_, 0, 0, 0);
-
     // TreeView does not need Viewport. just use add()
     swView_ = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.ALWAYS);
     swView_.add(view_);
@@ -86,7 +81,6 @@ public:
 
   void SetLayout()
   {
-    toolbar_.SetLayout();
     view_.SetLayout();
   }
 
@@ -154,7 +148,6 @@ private:
       return true;
 
     case FileManagerAction.ShowHidden:
-      toolbar_.ToggleShowHidden();
       return true;
 
     case FileManagerAction.SyncTerminalPWD:
@@ -174,15 +167,6 @@ private:
       FileManagerAction.GoToDir7,
       FileManagerAction.GoToDir8,
       FileManagerAction.GoToDir9:
-      int index = q - FileManagerAction.GoToDir1;// 0 <= index <= 8
-      if(index < toolbar_.GetNumShortcuts()){// shortcut exists
-        string dir = rcfile.GetNthShortcutDir(index);
-        CheckChangeDir(dir);
-      }
-      else{// mounted volumes
-        string path = GetPathToNthVolume(index - toolbar_.GetNumShortcuts());
-        CheckChangeDir(path);
-      }
       return true;
 
     default:
@@ -375,8 +359,6 @@ public:
   }
 
   // filter
-  void FocusFilter(){toolbar_.GetFilterEntry().grabFocus();}
-  void ClearFilter(){toolbar_.GetFilterEntry().setText("");}
   void FilterChanged(EditableIF entry){view_.FilterChanged((cast(Entry)entry).getText());}
 
   // toggle buttons
@@ -389,12 +371,6 @@ public:
   void PathButtonClicked(ArgType)(ArgType b, string path)
   {
     CheckChangeDir(path);
-  }
-  void ReconstructShortcuts()
-  {
-    if(!mediator_.FileSystemIsRemote()){// only when dealing within localhost
-      toolbar_.ReconstructShortcuts();
-    }
   }
   /////////////////////// callbacks for toolbar
 }

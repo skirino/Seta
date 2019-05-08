@@ -56,7 +56,6 @@ private:
   {
     PushIntoStatusbar("\"" ~ mount.getName() ~ "\" was mounted");
     RescanAll();
-    page_list.NotifyReconstructShortcuts();
   }
 
   void NotifyUnmount(MountIF mount, VolumeMonitor monitor)
@@ -84,7 +83,6 @@ private:
         }
       }
     }
-    page_list.NotifyReconstructShortcuts();
   }
 
   void RescanAll()
