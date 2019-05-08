@@ -38,8 +38,6 @@ import constants;
 import config.shellrc;
 import config.keybind;
 import config.page_init_option;
-import page_list;
-
 
 static immutable string SetaVersion = "0.8.0";
 

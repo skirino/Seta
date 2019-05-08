@@ -36,18 +36,14 @@ import rcfile = config.rcfile;
 import config.dialog;
 import config.keybind;
 import note;
+import page;
 
 class SetaWindow : MainWindow
 {
-  ///////////////////////// GUI stuff
-private:
+  ///////////////////////// static members for application-wide access
+public:
   static __gshared Nonnull!SetaWindow singleton_;
 
-  Nonnull!Paned hpaned_;
-  Nonnull!Note noteL_;
-  Nonnull!Note noteR_;
-
-public:
   static void Init() {
     singleton_.init(new SetaWindow());
     SetLayout();                                           // set parameters in rcfile
@@ -61,6 +57,42 @@ public:
     singleton_.hpaned_.setPosition(rcfile.GetSplitH());
   }
 
+  static void NotifySetLayout() {
+    singleton_.ForeachPage(delegate void(Page page) {
+        page.SetLayout();
+      });
+    singleton_.SetLayout();
+  }
+
+  static void NotifyApplyTerminalPreferences() {
+    singleton_.ForeachPage(delegate void(Page page) {
+        page.GetTerminal().ApplyPreferences();
+      });
+  }
+
+private:
+  void ForeachPage(void delegate(Page) f) {
+    ForeachPageInNote(singleton_.noteL_, f);
+    ForeachPageInNote(singleton_.noteR_, f);
+  }
+
+  static void ForeachPageInNote(Note note, void delegate(Page) f) {
+    auto n = note.getNPages();
+    for(int i = 0; i < n; i++) {
+      f(note.GetNthPage(i));
+    }
+  }
+  ///////////////////////// static members for application-wide access
+
+
+
+  ///////////////////////// GUI stuff
+private:
+  Nonnull!Paned hpaned_;
+  Nonnull!Note noteL_;
+  Nonnull!Note noteR_;
+
+public:
   this() {
     super("Seta");
     addOnKeyPress(&KeyPressed);

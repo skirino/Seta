@@ -42,8 +42,6 @@ import tab;
 import terminal_wrapper;
 import terminal;
 import mediator;
-import page_list;
-
 
 class Page : VBox
 {
@@ -73,7 +71,6 @@ public:
 
     super(0, 0);
     addOnMap(&ResetLayoutOnFirstMap);
-    addOnUnrealize(&UnregisterFromPageList);
 
     tab_              .init(new Tab(side, ClosePage));
     mediator_         .init(new Mediator(this));
@@ -276,15 +273,4 @@ public:
       FocusShownWidget();
   }
   ///////////////////////// manipulation of focus
-
-
-
-  ///////////////////////// PageList
-  // It is unsafe to make this method inline-delegate since
-  // "this" parameter's address might be different inside definition of inline-delegates.
-  void UnregisterFromPageList(Widget w)
-  {
-    page_list.Unregister(this);
-  }
-  ///////////////////////// PageList
 }

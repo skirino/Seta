@@ -28,7 +28,6 @@ import utils.ref_util;
 import constants;
 import rcfile = config.rcfile;
 import config.page_init_option;
-import page_list;
 import page;
 import seta_window;
 
@@ -63,7 +62,7 @@ public:
       side_,
       opt,
       &mainWin_.GetCWDOfChildWidget,
-      &mainWin_.AppendPageCopy,// not "&AppendPageCopy", since pages can be dragged onto the other Notebook
+      &mainWin_.AppendPageCopy, // not "&AppendPageCopy", since pages can be dragged onto the other Notebook
       &mainWin_.ClosePage);
     appendPage(page, page.GetTab());
     setTabReorderable(page, 1);
@@ -102,7 +101,6 @@ private:
   }
 
   void PageAdded(Widget w, uint u, Notebook note) {
-    page_list.Register(cast(Page)w);
     LabelAllPages(w, u, note);
   }
 }

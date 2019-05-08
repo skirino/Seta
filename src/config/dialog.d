@@ -58,16 +58,13 @@ import constants;
 import rcfile = config.rcfile;
 import config.keybind;
 import config.page_init_option;
-import page_list;
+import seta_window;
 
-
-void StartConfigDialog()
-{
+void StartConfigDialog() {
   scope d = new ConfigDialog;
   d.showAll();
   d.run();
 }
-
 
 private class ConfigDialog : Dialog
 {
@@ -201,8 +198,9 @@ private:
     mixin(CheckCheckButton!("Layout", "UseDesktopNotification"));
     mixin(CheckSpinButton!("NotifyExpiresInMSec"));
 
-    if(changed)
-      page_list.NotifySetLayout();
+    if(changed) {
+      SetaWindow.NotifySetLayout();
+    }
   }
   ///////////////////// [Layout]
 
@@ -582,8 +580,9 @@ private:
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText8", entUserDefinedText8_.getText());
     changed |= rcfile.ResetStringz("Terminal", "UserDefinedText9", entUserDefinedText9_.getText());
 
-    if(changed)
-      page_list.NotifyApplyTerminalPreferences();
+    if(changed) {
+      SetaWindow.NotifyApplyTerminalPreferences();
+    }
   }
   ///////////////////// [Terminal]
 
