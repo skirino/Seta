@@ -52,7 +52,6 @@ import pango.PgFontDescription;
 import utils.ref_util;
 import utils.string_util;
 import utils.unistd_util;
-import utils.thread_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
