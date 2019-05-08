@@ -367,9 +367,7 @@ public:
 
     string absPath = ExpandPath(destination, "/");
     if(absPath !is null){
-      if(mediator_.FilerChangeDirFromTerminal(absPath)){// change directory here
-        cwd_ = absPath;
-      }
+      cwd_ = absPath;
     }
   }
   ////////////////// traveling directory tree
@@ -402,7 +400,6 @@ private:
       return;
     if(realPath != dirFromProc){
       cwd_ = dirFromProc;
-      mediator_.FilerChangeDirFromTerminal(cwd_);
     }
   }
 

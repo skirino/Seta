@@ -44,8 +44,6 @@ public:
     term_ .init(t);
   }
 
-
-
   /////////////////// interface to Page
   void CloseThisPage(){ page_.CloseThisPage(); }
   void UpdatePathLabel(string path, long numItems){ page_.UpdatePathLabel(path, numItems); }
@@ -56,28 +54,4 @@ public:
   string GetHostLabel   (){ return page_.GetHostLabel(); }
   string GetCWDOtherSide(){ return page_.GetCWDOtherSide(); }
   /////////////////// interface to Page
-
-
-
-  /////////////////// interface to FileManager
-  bool FilerChangeDirectory(string p, bool appendHistory = true, bool notifyTerminal = true)
-  {
-    return true;
-  }
-  bool FilerChangeDirFromTerminal(string path)
-  {
-    return true;
-  }
-  /////////////////// interface to FileManager
-
-
-
-  /////////////////// interface to Terminal
-  void TerminalChangeDirectoryFromFiler(string p)
-  {
-    // remove "/home/username/.gvfs/sftp ..." from p and pass it to the terminal
-    string path = "/";
-    term_.ChangeDirectoryFromFiler(path);
-  }
-  /////////////////// interface to Terminal
 }

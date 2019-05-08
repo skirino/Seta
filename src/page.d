@@ -43,7 +43,6 @@ import terminal_wrapper;
 import terminal;
 import mediator;
 import page_list;
-import page_header;
 
 
 class Page : VBox
@@ -53,7 +52,6 @@ private:
   Nonnull!Mediator mediator_;
   Nonnull!Tab      tab_;
 
-  Nonnull!PageHeader      header_;
   Nonnull!VPaned          paned_;
   Nonnull!TerminalWrapper termWithScrollbar_;
 
@@ -81,12 +79,6 @@ public:
     mediator_         .init(new Mediator(this));
     termWithScrollbar_.init(new TerminalWrapper(mediator_, initialDir, opt.terminalRunCommand_, GetCWDFromMain));
     mediator_.Set(termWithScrollbar_.Get());
-
-    header_.init(new PageHeader(
-                   &AppendPage,
-                   &ViewModeButtonClicked,
-                   &GoToDirOtherSide));
-    packStart(header_, 0, 0, 0);
 
     paned_.init(new VPaned);
     paned_.pack2(termWithScrollbar_, true, 0);
@@ -138,16 +130,13 @@ public:
   void UpdatePathLabel(string path, long numItems)
   {
     tab_.SetPath(path);
-    header_.SetPwd(path);
-    header_.SetNumItems(numItems);
   }
   void SetHostLabel(string h)
   {
-    header_.SetHost(h);
   }
   string GetHostLabel()
   {
-    return header_.GetHost();
+    return "";
   }
 
   void CloseThisPage()
