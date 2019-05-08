@@ -23,7 +23,7 @@ module config.nautilus_scripts;
 import std.process;
 import std.algorithm : sort;
 
-import gio.File;
+import gio.FileIF;
 import gio.FileInfo;
 
 import utils.string_util;
@@ -54,7 +54,7 @@ class ScriptsDir
     const string attributes = "standard::name,standard::type,access::can-execute";
 
     try{
-      scope enumerate = File.parseName(path_).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
+      scope enumerate = FileIF.parseName(path_).enumerateChildren(attributes, GFileQueryInfoFlags.NONE, null);
 
       FileInfo info;
       while((info = enumerate.nextFile(null)) !is null){

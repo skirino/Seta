@@ -20,7 +20,6 @@ MA 02110-1301 USA.
 
 module utils.gio_util;
 
-import gio.File;
 import gio.FileIF;
 import gio.FileInfo;
 import gio.FileEnumerator;
@@ -33,7 +32,7 @@ FileIF GetFileForDirectory(string dirname)
     return null;
 
   try{
-    auto f = gio.File.File.parseName(dirname);
+    auto f = FileIF.parseName(dirname);
     scope FileInfo info = f.queryInfo("standard::type", GFileQueryInfoFlags.NONE, null);
     if(info.getFileType() == GFileType.DIRECTORY)
       return f;
@@ -50,7 +49,7 @@ bool Exists(string path)
   if(path.length == 0)
     return false;
 
-  scope f = File.parseName(path);
+  scope f = FileIF.parseName(path);
   return f.queryExists(null) != 0;
 }
 

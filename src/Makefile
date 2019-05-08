@@ -1,13 +1,12 @@
 SRC = config/*.d term/*.d utils/*.d *.d
-GTKD_DIR = ../../SetupDDevelopmentEnvironment/GtkD/
 
 SYSTEM = $(shell uname -s)
 ifeq ("$(SYSTEM)", "Darwin")
 	DFLAGS = -m32 -w
 	LINKOPTS = -L-lgtkd -L-lvte -L-L/opt/local/lib -L-lgtk-x11-2.0 -L-ldl
 else # assuming Linux
-	DFLAGS = -I${GTKD_DIR}generated/gtkd/ -wi
-	LINKOPTS = -L-L${GTKD_DIR} -L-lgtkd-3 -L-lvte-2.91 -L-ldl -L-lgtk-3
+	DFLAGS = -wi
+	LINKOPTS = -L-L/opt/dmd/current/lib/ -L-lgtkd-3 -L-lvte-2.91 -L-ldl -L-lgtk-3
 endif
 
 all:

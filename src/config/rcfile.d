@@ -29,7 +29,7 @@ import std.process;
 import glib.KeyFile;
 import gtk.PopupBox;
 import gdk.Color;
-import gio.File;
+import gio.FileIF;
 import gio.FileOutputStream;
 
 import utils.gio_util;
@@ -243,12 +243,6 @@ void RemoveDirectoryShortcut(string path)
 
 void ResetShortcuts(Shortcut[] list)
 {
-  Shortcut[] old = GetShortcuts();
-  if(old != list) {
-    string s = Shortcut.ToListString(list);
-    instance_.setString("Directories", "Shortcuts", NonnullString(s));
-    instance_.changed_ = true;
-  }
 }
 ///////////////// [Directories]
 
@@ -450,7 +444,7 @@ private:
       changed_ = false;
 
       // "scope" storage-class specifier is necessary to remove segfault at shutdown of Seta
-      scope f = File.parseName(filename_);
+      scope f = FileIF.parseName(filename_);
       scope stream = f.replace(null, 1, GFileCreateFlags.NONE, null);
       ulong len1, len2;
       stream.writeAll(cast(ubyte[]) toData(len1), len2, null);
