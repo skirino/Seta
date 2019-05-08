@@ -1,3 +1,0 @@
-[submodule "src/extern/libnotify"]
-	path = src/extern/libnotify
-	url = https://github.com/D-Programming-Deimos/libnotify.git
