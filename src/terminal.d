@@ -43,11 +43,12 @@ import gdk.Color;
 import gdk.RGBA;
 import gdk.Event;
 import gdk.DragContext;
-import glib.Regex;
 import glib.Source;
 import pango.PgFontDescription;
 import vte.Terminal : VTE = Terminal;
+import vte.Regex;
 import vte.c.types : VteTerminal;
+import vte.c.functions;
 
 import utils.ref_util;
 import utils.string_util;
@@ -92,7 +93,7 @@ public:
     // Fork the child process.
     const(char)*[2] argv = [environment["SHELL"].toStringz, null];
     vte_terminal_spawn_async(vte_, cast(VtePtyFlags)0,
-                             initialDir.toStringz, argv.ptr, null,
+                             initialDir.toStringz, cast(char**)argv.ptr, null,
                              cast(GSpawnFlags)0, null, null, null, -1, null,
                              &SpawnFinishCallback, cast(void*)this);
     pty_ = vte_pty_get_fd(vte_terminal_get_pty(vte_));
@@ -284,9 +285,13 @@ private:
 
   ////////////////// search
 public:
-  void SetSearchRegexp(Regex re)
+  void SetSearchRegexp(string pattern, bool ignoreCase)
   {
-    vte_terminal_search_set_gregex(vte_, re.getRegexStruct());
+    auto PCRE2_CASELESS  = 0x00000008u;
+    auto PCRE2_MULTILINE = 0x00000400u;
+    auto compileFlags = ignoreCase ? (PCRE2_MULTILINE | PCRE2_CASELESS) : PCRE2_MULTILINE;
+    auto re = Regex.newSearch(pattern, -1, compileFlags);
+    searchSetRegex(re, 0);
   }
 
   void SearchNext()
@@ -439,7 +444,9 @@ private:
 
   void FeedChild(string text)
   {
-    vte_terminal_feed_child(vte_, text.ptr, text.length);
+    // In the original C function 2nd arg is of type `const char*`, but it's `char*` in gtkd;
+    // we have to cast here.
+    vte_terminal_feed_child(vte_, cast(char*)text.ptr, text.length);
   }
 
   string GetText()
@@ -586,86 +593,4 @@ private:
     grabFocus();
   }
   /////////////////// drag and drop
-}
-
-
-
-
-// declarations of C functions in libvte
-extern(C){
-  GtkWidget * vte_terminal_new();
-
-  // miscellaneous settings
-  void vte_terminal_set_colors(VteTerminal *terminal,
-                               const GdkRGBA *foreground,
-                               const GdkRGBA *background,
-                               const GdkRGBA *palette,
-                               ulong palette_size);
-  void vte_terminal_set_font(VteTerminal *terminal,
-                             const PangoFontDescription *font_desc);
-  void vte_terminal_set_scrollback_lines(VteTerminal *terminal,
-                                         glong lines);
-  void vte_terminal_set_audible_bell(VteTerminal *terminal,
-                                     bool is_audible);
-
-  // IO between child process
-  void vte_terminal_feed_child(VteTerminal *terminal,
-                               const char *text,
-                               long length);
-  alias bool function(VteTerminal *terminal,
-                          long column,
-                          long row,
-                          void * data) VteSelectionFunc;
-  char * vte_terminal_get_text(VteTerminal *terminal,
-                               VteSelectionFunc is_selected,
-                               void * data,
-                               GArray *attributes);
-
-  // copy and paste
-  void vte_terminal_copy_clipboard(VteTerminal *terminal);
-  void vte_terminal_paste_clipboard(VteTerminal *terminal);
-
-  // search
-  void vte_terminal_search_set_gregex(VteTerminal *terminal,
-                                      GRegex *regex);
-  bool vte_terminal_search_find_next(VteTerminal *terminal);
-  bool vte_terminal_search_find_previous(VteTerminal *terminal);
-  void vte_terminal_search_set_wrap_around(VteTerminal *terminal,
-                                           bool wrap_around);
-
-  // process management
-  enum VtePtyFlags : int;
-  enum GSpawnFlags : int;
-  alias int GPid;// the same type as pid_t
-  alias extern(C) void function(VteTerminal *terminal,
-                                GPid pid,
-                                GError *error,
-                                void *user_data) VteTerminalSpawnAsyncCallback;
-  void vte_terminal_spawn_async(VteTerminal *terminal,
-                                VtePtyFlags pty_flags,
-                                const(char) *working_directory,
-                                const(char) **argv,
-                                const(char) **envv,
-                                GSpawnFlags spawn_flags_,
-                                GSpawnChildSetupFunc child_setup,
-                                void *child_setup_data,
-                                GDestroyNotify child_setup_data_destroy,
-                                int timeout,
-                                GCancellable *cancellable,
-                                VteTerminalSpawnAsyncCallback callback,
-                                void *user_data);
-  struct VtePty;
-  VtePty * vte_terminal_get_pty(VteTerminal *terminal);
-  int vte_pty_get_fd(VtePty * pty);
-  bool vte_terminal_spawn_sync(VteTerminal *terminal,
-                               VtePtyFlags pty_flags,
-                               const(char) *working_directory,
-                               const(char) **argv,
-                               const(char) **envv,
-                               GSpawnFlags spawn_flags,
-                               GSpawnChildSetupFunc child_setup,
-                               void *child_setup_data,
-                               GPid *child_pid,
-                               GCancellable *cancellable,
-                               GError **error);
 }

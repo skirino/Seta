@@ -188,11 +188,7 @@ private:
     }
 
     try{
-      auto compileFlags =
-        (ignoreCases_.getActive() == 0) ? GRegexCompileFlags.MULTILINE :
-                                          GRegexCompileFlags.MULTILINE | GRegexCompileFlags.CASELESS;
-      re_ = new Regex(text, compileFlags, cast(GRegexMatchFlags)0);
-      terminal_.SetSearchRegexp(re_);
+      terminal_.SetSearchRegexp(text, ignoreCases_.getActive() != 0);
       reErrorLabel_.setText("");
       reErrorLabel_.setTooltipText("");
     }
