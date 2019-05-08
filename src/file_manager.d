@@ -43,7 +43,6 @@ import rcfile = config.rcfile;
 import config.keybind;
 import known_hosts = config.known_hosts;
 import fm.file_view;
-import fm.history;
 import anything_cd.dir_list : Add, Remove;
 import thread_list;
 import mediator;
@@ -64,7 +63,6 @@ public:
   this(Mediator mediator, string initialDir)
   {
     mediator_ = mediator;
-    hist_ = new DirHistory(initialDir);
     view_ = new FileView(mediator_);
 
     super(0, 0);
@@ -150,7 +148,6 @@ private:
       return true;
 
     case FileManagerAction.SyncTerminalPWD:
-      mediator_.TerminalChangeDirectoryFromFiler(hist_.GetPWD());
       return true;
 
     case FileManagerAction.GoToChild:
@@ -192,43 +189,7 @@ public:
       return false;
     }
   }
-
-private:
-  void CheckChangeDir(string path)
-  {
-    if(path !is null && hist_.GetPWD() != path){
-      ChangeDirectory(path);
-    }
-  }
   /////////////////////// traveling directory tree
-
-
-
-  /////////////////////// history of directories
-private:
-  DirHistory hist_;
-
-public:
-  string GetPWD(bool onlyAfterGVFS = true)
-  {
-    if(onlyAfterGVFS){// return "/..." instead of "/home/username/.gvfs/sftp aaa@bbb/..."
-      return mediator_.FileSystemNativePath(hist_.GetPWD());
-    }
-    else{// to substitute $LDIR and $RDIR, non-native path is required
-      return hist_.GetPWD();
-    }
-  }
-
-  string GetPreviousDir()// for "cd -" in terminal
-  {
-    return hist_.GetDirNext!(false)();
-  }
-
-  void AppendToHistory(string dir)
-  {
-    hist_.Append(dir);
-  }
-  /////////////////////// history of directories
 
 
 
@@ -236,11 +197,6 @@ public:
 public:
   void EscapeFromPath(string path)
   {
-    string pwd = hist_.GetPWD();
-    if(pwd.StartsWith(path)){// inside the mounted volume
-      string defaultDir = mediator_.OnLeftSide() ? rcfile.GetDefaultInitialDirectoryLeft() : rcfile.GetDefaultInitialDirectoryRight();
-      ChangeDirectory(defaultDir);
-    }
   }
   /////////////////////// called for all pages in PageList
 
@@ -251,21 +207,6 @@ public:
   // back and forward
   void NextDirInHistoryClicked(bool ForwardDirection, ArgType = Button)(ArgType b)
   {
-    string d = hist_.GetDirNext!(ForwardDirection)();
-    if(d !is null){// valid path is in history
-      if(d == hist_.GetPWD()){// same directory
-        hist_.RemoveDirNext!(ForwardDirection)();
-      }
-      else{
-        if(ChangeDirectory(d, false, true)){// path exists, cd successfully
-          hist_.GoNext!(ForwardDirection)();
-        }
-        else{// path does not exist
-          PopupBox.error("directory " ~ d ~ " does not exist.", "error");
-          hist_.RemoveDirNext!(ForwardDirection)();
-        }
-      }
-    }
   }
   bool PopupDirHistoryMenu(bool ForwardDirection)(Event e, Widget w)
   {
@@ -303,7 +244,7 @@ public:
   // go up
   void UpClicked(ArgType)(ArgType b)
   {
-    string pwd = hist_.GetPWD();
+    string pwd = "/";
     string parent = mediator_.FileSystemParentDirectory(pwd);
     if(pwd != parent){
       ChangeDirectory(parent);
@@ -315,42 +256,15 @@ public:
     if(eb.button != MouseButton.RIGHT){
       return false;
     }
-
-    string pwd = GetPWD();
-    if(pwd == "/"){
-      return false;
-    }
-
-    auto menu = new MenuWithMargin;
-    string path = ParentDirectory(pwd);
-    while(path != "/"){
-      auto fullpath = mediator_.FileSystemMountedVFSPath(path);
-      auto dlg = delegate void(MenuItem item){
-        PathButtonClicked(item, fullpath);
-      };
-      menu.append(new MenuItem(dlg, path, false));
-      path = ParentDirectory(path);
-    }
-    auto fullpath = mediator_.FileSystemMountedVFSPath("/");
-    auto dlg = delegate void(MenuItem item){
-      PathButtonClicked(item, fullpath);
-    };
-    menu.append(new MenuItem(dlg, "/", false));
-
-    menu.showAll();
-    menu.popup(0, eb.time);
-
     return false;
   }
 
   // miscellaneous
   void RootClicked(ArgType)(ArgType b)
   {
-    CheckChangeDir(mediator_.FileSystemRoot());
   }
   void HomeClicked(ArgType)(ArgType b)
   {
-    CheckChangeDir(mediator_.FileSystemHome());
   }
   void RefreshClicked(ArgType)(ArgType b)
   {
@@ -369,7 +283,6 @@ public:
   // shortcut buttons
   void PathButtonClicked(ArgType)(ArgType b, string path)
   {
-    CheckChangeDir(path);
   }
   /////////////////////// callbacks for toolbar
 }

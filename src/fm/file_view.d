@@ -235,8 +235,6 @@ private:
 
       if(notifyTerminal)
         mediator_.TerminalChangeDirectoryFromFiler(pwd_);
-      if(appendToHistory)
-        mediator_.FilerAppendToHistory(pwd_);
     }
   }
   ///////////////////// list up entries in directory
@@ -362,8 +360,6 @@ private:
 
     ResetRows();
 
-    static if(appendToHistory)
-      mediator_.FilerAppendToHistory(pwd_);
     static if(notifyTerminal)
       mediator_.TerminalChangeDirectoryFromFiler(pwd_);
   }

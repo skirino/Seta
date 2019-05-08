@@ -277,7 +277,7 @@ public:
   string GetCWD()
   {
     // if remote, return locally-mounted path
-    return filer_.GetPWD(!mediator_.FileSystemIsRemote());
+    return "/";
   }
 
   string GetCWDOtherSide()
@@ -288,7 +288,7 @@ public:
 
   bool LookingAtRemoteDir()
   {
-    return mediator_.FileSystemLookingAtRemoteFS(filer_.GetPWD(false));
+    return mediator_.FileSystemLookingAtRemoteFS("/");
   }
 
   void ChangeDirectoryToPage(Page page)

@@ -355,7 +355,7 @@ public:
         }
       }
       else if(args == "-"){// back to previous directory
-        string previous = mediator_.FilerCDToPrevious();
+        string previous = "/";
         if(previous.length > 0){
           cwd_ = mediator_.FileSystemNativePath(previous);
         }

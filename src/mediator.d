@@ -68,16 +68,6 @@ public:
 
 
   /////////////////// interface to FileManager
-  string FilerGetPWD(bool onlyAfterGVFS = true){ return filer_.GetPWD(onlyAfterGVFS); }
-  void FilerAppendToHistory(string dir){ filer_.AppendToHistory(dir); }
-  string FilerCDToPrevious()// for "cd -"
-  {
-    string previous = filer_.GetPreviousDir();
-    if(previous.length > 0){
-      filer_.ChangeDirectory(previous, true, false);
-    }
-    return previous;
-  }
   bool FilerChangeDirectory(string p, bool appendHistory = true, bool notifyTerminal = true)
   {
     return filer_.ChangeDirectory(p, appendHistory, notifyTerminal);
