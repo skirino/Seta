@@ -34,89 +34,71 @@ import gdk.Event;
 import utils.ref_util;
 import constants;
 
-
-// tab with close button
-// In order to catch button press event on tab, make a subclass of EventBox
+// Notebook tab with close button.
+// In order to catch button press event on tab, make a subclass of EventBox.
 class Tab : EventBox
 {
 private:
-  Nonnull!HBox   hbox_;
   Nonnull!Label  labelIndex_;
-  Nonnull!Label  labelPath_;// shared with FileManager
+  Nonnull!Label  labelPath_;
   Nonnull!Button closeButton_;
   void delegate(Side, uint) closePage_;
   Side side_;
   uint pageNum_;
 
 public:
-  this(Side side, void delegate(Side, uint) closePage)
-  {
+  this(Side side, void delegate(Side, uint) closePage) {
     side_ = side;
     closePage_ = closePage;
-
-    labelIndex_.init(new Label("idx"));
-    labelPath_ .init(new Label(""));
-    labelPath_.setEllipsize(PangoEllipsizeMode.START);
-
-    // to reduce blank space around the button, wrap "img" by HBox and VBox
-    auto img = new Image("gtk-close", GtkIconSize.MENU);
-    auto hboxImg = new HBox(0, 0);
-    hboxImg.packStart(img, 1, 0, 0);
-    auto vboxImg = new VBox(0, 0);
-    vboxImg.packStart(hboxImg, 1, 0, 0);
-
-    // close button with x-mark
-    closeButton_.init(new Button);
-    closeButton_.add(vboxImg);
-    closeButton_.setRelief(GtkReliefStyle.NONE);
-    closeButton_.setSizeRequest(20, 20);
-    closeButton_.addOnClicked(&ClosePage);
-
-    hbox_.init(new HBox(0, 0));
-    hbox_.packStart(labelIndex_, 0, 0, 2);
-    hbox_.packStart(labelPath_,  1, 1, 2);
-    hbox_.packEnd(closeButton_,  0, 0, 2);
-
     super();
-    add(hbox_);
-    addOnButtonPress(&ButtonPressed);
+    InitChildWidgets();
     setVisibleWindow(0);// For clean redrawing of tabs, it is better not to have visible window.
     showAll();
   }
 
 private:
-  bool ButtonPressed(Event e, Widget w)
-  {
-    auto eb = e.button();
-    if(eb.button != 2) // only middle button
-      return false;
-    CloseThisPage();
-    return true;
+  void InitChildWidgets() {
+    labelIndex_.init(new Label("idx"));
+    labelPath_ .init(new Label(""));
+    labelPath_.setEllipsize(PangoEllipsizeMode.START);
+    InitCloseButton();
+    auto hbox = new HBox(0, 0);
+    hbox.packStart(labelIndex_, 0, 0, 2);
+    hbox.packStart(labelPath_,  1, 1, 2);
+    hbox.packEnd(closeButton_,  0, 0, 2);
+    add(hbox);
   }
 
-  void ClosePage(Button b)
-  {
+  void InitCloseButton() {
+    closeButton_.init(new Button);
+    closeButton_.add(makeWrappedCloseImage());
+    closeButton_.setRelief(GtkReliefStyle.NONE);
+    closeButton_.setSizeRequest(20, 20);
+    closeButton_.addOnClicked(&ClosePage);
+  }
+
+  Widget makeWrappedCloseImage() {
+    // to reduce blank space around the button, wrap "img" by HBox and VBox
+    auto img = new Image("window-close", GtkIconSize.MENU);
+    auto hboxImg = new HBox(0, 0);
+    hboxImg.packStart(img, 1, 0, 0);
+    auto vboxImg = new VBox(0, 0);
+    vboxImg.packStart(hboxImg, 1, 0, 0);
+    return vboxImg;
+  }
+
+  void ClosePage(Button b) {
     CloseThisPage();
   }
 
 public:
-  void CloseThisPage()
-  {
-    closePage_(side_, pageNum_ - 1);// convert to 0-based number
+  void CloseThisPage() {
+    closePage_(side_, pageNum_ - 1); // convert to 0-based number
   }
 
-  void SetID(Side side, uint n)
-  {
+  void SetID(Side side, uint n) {
     side_ = side;
     pageNum_ = n;
     labelIndex_.setText(n.to!string ~ ": ");
-  }
-  string GetID(){return side_ ~ pageNum_.to!string;}
-  Side GetSide(){return side_;}
-
-  void SetPath(string p)
-  {
-    labelPath_.setText(p);
-    setTooltipText(p);
   }
 }
