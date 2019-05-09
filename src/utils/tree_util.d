@@ -58,3 +58,13 @@ TreeIter GetIterFromString(TreeModelIF model, string pathStr) {
     return null;
   }
 }
+
+void ForeachRow(TreeModelIF model, TreeIter categoryOrNull, void delegate(TreeIter) dlg) {
+  auto iter = new TreeIter;
+  if(model.iterChildren(iter, categoryOrNull)) {
+    iter.setModel(model);
+    do {
+      dlg(iter);
+    } while(model.iterNext(iter));
+  }
+}

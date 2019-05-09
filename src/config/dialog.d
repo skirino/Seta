@@ -60,7 +60,7 @@ import config.page_init_option;
 import seta_window;
 
 void StartConfigDialog() {
-  scope d = new ConfigDialog;
+  auto d = new ConfigDialog;
   d.showAll();
   d.run();
 }
@@ -175,16 +175,13 @@ private:
 
   void ApplyChangesInPageInitOptions(ListStore store, string key) {
     PageInitOption[] opts;
-    auto iter = new TreeIter;
-    iter.setModel(store);
-    if(store.getIterFirst(iter)) {
-      do {
+    ForeachRow(store, null, delegate void(TreeIter iter) {
         auto path    = iter.getValueString(0).trim.AppendSlash;
         auto command = iter.getValueString(1);
-        if(CanEnumerateChildren(path))
+        if(CanEnumerateChildren(path)) {
           opts ~= PageInitOption(path, command);
-      } while(store.iterNext(iter));
-    }
+        }
+      });
     rcfile.ResetPageInitOptions(key, opts);
   }
   ///////////////////// [Pages]
@@ -192,11 +189,13 @@ private:
 
 
   ///////////////////// [Keybind]
+  static immutable N_CATEGORIES = 2;
+  static immutable string[N_CATEGORIES] CATEGORY_IDENTIFIERS  = ["MainWindow", "Terminal"];
+  static immutable string[N_CATEGORIES] CATEGORY_EXPLANATIONS = ["general", "terminal"];
+
   TreeView keybinds_;
   TreeStore keyStore_;
-  TreeIter[4] categories_;
-  static immutable string[4] CATEGORY_IDENTIFIERS  = ["MainWindow", "Terminal"];
-  static immutable string[4] CATEGORY_EXPLANATIONS = ["general", "terminal"];
+  TreeIter[N_CATEGORIES] categories_;
   KeyCode[][string] dictKeyCode_;
 
   void InitKeybindPage() {
@@ -237,7 +236,7 @@ private:
     keyStore_ = new TreeStore([GType.STRING, GType.STRING, GType.STRING, GType.BOOLEAN]);
     keybinds_.setModel(keyStore_);
 
-    for(int i = 0; i < 4; ++i) {
+    for(int i = 0; i < N_CATEGORIES; ++i) {
       categories_[i] = keyStore_.createIter();
       keyStore_.setValue(categories_[i], 0, CATEGORY_EXPLANATIONS[i]);
     }
@@ -251,7 +250,7 @@ private:
       auto categoryIter = FindCategoryIterFromActionKey(key);
       KeyCode[] codes = dictKeyCode_[key];
       foreach(code; codes) {
-        scope iter = keyStore_.append(categoryIter);
+        auto iter = keyStore_.append(categoryIter);
         keyStore_.set(iter, [1, 2], [key[key.locate('.')+1 .. $], code.toString()]);
         keyStore_.setValue(iter, 3, 1); // make Key-cell editable
       }
@@ -285,37 +284,16 @@ private:
   void ApplyChangesInKeybind() {
     bool changed = false;
 
-    TreeIter iter = new TreeIter;
-    iter.setModel(keyStore_);
     foreach(int i, category; categories_) {
-      if(keyStore_.iterChildren(iter, category)) {
-        string categoryName = CATEGORY_IDENTIFIERS[i] ~ "Action.";
-        string previousKey;
-        string[] codeList;
-
-        do {
+      string categoryName = CATEGORY_IDENTIFIERS[i] ~ "Action.";
+      string[][string] bindings;
+      ForeachRow(keyStore_, category, delegate void(TreeIter iter) {
           string key  = iter.getValueString(1);
           string code = iter.getValueString(2);
-          if(key == previousKey) {
-            if(code.length > 0) { // skip empty (cleared) row
-              codeList ~= code;
-            }
-          } else {
-            if(previousKey.length > 0) { // exclude first time for each category
-              changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
-            }
-
-            previousKey = key;
-            codeList.length = 0;
-            if(code.length > 0) { // skip empty (cleared) row
-              codeList ~= code;
-            }
-          }
-        } while(keyStore_.iterNext(iter));
-
-        if(previousKey.length > 0) {
-          changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
-        }
+          bindings[key] ~= code;
+        });
+      foreach(key, codes; bindings) {
+        changed |= rcfile.ResetKeybind(categoryName ~ key, codes);
       }
     }
 
@@ -459,10 +437,11 @@ private:
 
     // check whether replace targets have "<n>"
     string targetL = entReplaceTargetLeft_.getText();
-    if(targetL.containsPattern("<n>"))
+    if(targetL.containsPattern("<n>")) {
       changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetLeft" , targetL);
-    else
+    } else {
       PopupBox.error(targetL ~ " is neglected since the signature for replace should contain \"<n>\".", "");
+    }
 
     string targetR = entReplaceTargetRight_.getText();
     if(targetR.containsPattern("<n>")) {
@@ -550,7 +529,7 @@ private:
     static if(transformFun.length == 0) {
       model.setValue(iter, idx, newName);
     } else {
-      model.setValue(iter, idx, mixin(transformFun) (newName));
+      model.setValue(iter, idx, mixin(transformFun)(newName));
     }
   }
   ///////////////////// common parts
