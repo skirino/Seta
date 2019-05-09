@@ -23,7 +23,6 @@ module page;
 import std.process;
 import std.algorithm;
 
-import gtk.VBox;
 import gtk.HBox;
 import gtk.VScrollbar;
 import gtk.Paned;
@@ -41,13 +40,15 @@ import rcfile = config.rcfile;
 import config.page_init_option;
 import tab;
 import terminal;
+import terminal_search_bar;
 
-class Page : VBox
+class Page : Paned
 {
   /////////////////////////// GUI stuff
 private:
-  Nonnull!Tab      tab_;
-  Nonnull!Terminal term_;
+  Nonnull!Tab               tab_;
+  Nonnull!TerminalSearchBar searchBar_;
+  Nonnull!Terminal          term_;
 
 public:
   this(Side side,
@@ -60,19 +61,33 @@ public:
     }
     getCWDFromMain_ = GetCWDFromMain;
 
-    super(0, 0);
+    super(GtkOrientation.VERTICAL);
     tab_ .init(new Tab(side, ClosePage));
     term_.init(new Terminal(initialDir, opt.terminalRunCommand_, GetCWDFromMain, &CloseThisPage));
-    PackTerminalWithScrollbar();
-    showAll();
+    AddTerminalSearchBar();
+    AddTerminalWithScrollbar();
   }
 
-  private void PackTerminalWithScrollbar() {
+  private void AddTerminalSearchBar() {
+    searchBar_.init(new TerminalSearchBar(term_));
+    add1(searchBar_);
+  }
+
+  private void AddTerminalWithScrollbar() {
     auto box = new HBox(false, 0);
     box.packStart(term_, true, true, 0);
     auto vscrollbar = new VScrollbar(term_.getVadjustment());
     box.packStart(vscrollbar, false, false, 0);
-    packStart(box, true, true, 0);
+    add2(box);
+    box.showAll();
+  }
+
+  void ShowTerminalSearchBar() {
+    searchBar_.Show();
+  }
+
+  void HideTerminalSearchBar() {
+    searchBar_.hide();
   }
 
   Terminal GetTerminal() { return term_; }

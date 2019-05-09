@@ -49,7 +49,7 @@ public:
     singleton_.init(new SetaWindow());
     SetLayout();                                    // set parameters in rcfile
     singleton_.showAll();                           // do size allocations and negotiations
-    SetLayout();                                    // reset parameters and hide some of child widgets
+    singleton_.HideTerminalSearchBars();            // initially we want search bars to be hidden
     singleton_.noteL_.GetCurrentPage().GrabFocus(); // set initial focus to lower left widget (terminal)
   }
 
@@ -65,6 +65,12 @@ public:
   }
 
 private:
+  void HideTerminalSearchBars() {
+    singleton_.ForeachPage(delegate void(Page page) {
+        page.HideTerminalSearchBar();
+      });
+  }
+
   void ForeachPage(void delegate(Page) f) {
     ForeachPageInNote(singleton_.noteL_, f);
     ForeachPageInNote(singleton_.noteR_, f);

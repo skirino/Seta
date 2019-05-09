@@ -18,14 +18,14 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module search_dialog;
+module terminal_search_bar;
 
 import gtk.Dialog;
 import gtk.Widget;
 import gtk.Label;
 import gtk.HBox;
-import gtk.Entry;
 import gtk.ComboBoxText;
+import gtk.Button;
 import gtk.CheckButton;
 import gtk.ToggleButton;
 import gdk.Keysyms;
@@ -41,100 +41,85 @@ import utils.string_util;
 import config.keybind;
 import terminal;
 
-void StartTerminalSearch(Terminal terminal) {
-  auto d = new TerminalSearchDialog(terminal);
-  d.showAll();
-  d.run();
-}
-
-private class TerminalSearchDialog : Dialog
+class TerminalSearchBar : HBox
 {
 private:
-  enum ResponseID
-  {
-    SEARCH_FORWARD  = 1,
-    SEARCH_BACKWARD = 2,
-  }
-
-  Nonnull!Terminal     terminal_;
-  Nonnull!ComboBoxText cb_;
-  Nonnull!Label        reErrorLabel_;
-  Nonnull!Widget       searchForwardButton_;
-  Nonnull!Widget       searchBackwardButton_;
-  Nonnull!CheckButton  ignoreCases_;
-  Regex re_;
+  Terminal     terminal_;
+  ComboBoxText cb_;
+  Label        reErrorLabel_;
+  Button       searchForwardButton_;
+  Button       searchBackwardButton_;
+  CheckButton  ignoreCases_;
+  Regex        re_;
 
 public:
   this(Terminal terminal) {
-    terminal_.init(terminal);
-    super();
-    setResizable(false);
-    addOnResponse(&Respond);
+    terminal_ = terminal;
+    super(0, 0);
     addOnKeyPress(&KeyPressed);
-    addOnFocusOut(&FocusOut);
-    auto contentArea = getContentArea();
 
-    auto hbox = new HBox(0, 0);
     auto l = new Label("_Search for: ");
-    hbox.packStart(l, 0, 0, 5);
+    packStart(l, 0, 0, 5);
 
-    cb_.init(new ComboBoxText);
+    cb_ = new ComboBoxText;
     cb_.addOnChanged(&SearchTextChanged!(ComboBoxText));
-    hbox.packStart(cb_, 0, 0, 0);
+    packStart(cb_, 0, 0, 0);
     l.setMnemonicWidget(cb_);
-    contentArea.packStart(hbox, 0, 0, 5);
 
-    reErrorLabel_.init(new Label(""));
+    ignoreCases_ = new CheckButton("_Ignore cases");
+    ignoreCases_.addOnToggled(&SearchTextChanged!(ToggleButton));
+    packStart(ignoreCases_, 0, 0, 0);
+
+    searchBackwardButton_ = new Button(StockID.MEDIA_PREVIOUS);
+    searchForwardButton_  = new Button(StockID.MEDIA_NEXT    );
+    searchBackwardButton_.addOnClicked(&SearchFromButton!(Order.BACKWARD));
+    searchForwardButton_ .addOnClicked(&SearchFromButton!(Order.FORWARD ));
+    packStart(searchBackwardButton_, false, false, 0);
+    packStart(searchForwardButton_ , false, false, 0);
+
+    reErrorLabel_ = new Label("");
     reErrorLabel_.setEllipsize(PangoEllipsizeMode.END);
     auto attrs = new PgAttributeList;
     attrs.insert(PgAttribute.foregroundNew(65535, 0, 0));
     reErrorLabel_.setAttributes(attrs);
-    contentArea.packStart(reErrorLabel_, 0, 0, 0);
+    packStart(reErrorLabel_, false, false, 0);
 
-    ignoreCases_.init(new CheckButton("_Ignore cases"));
-    ignoreCases_.addOnToggled(&SearchTextChanged!(ToggleButton));
-    contentArea.packStart(ignoreCases_, 0, 0, 0);
+    auto closeButton = new Button(StockID.CLOSE);
+    closeButton.addOnClicked(&Hide);
+    packEnd(closeButton, false, false, 0);
+  }
 
-    addButton(StockID.CLOSE, GtkResponseType.DELETE_EVENT);
-    searchBackwardButton_.init(addButton(StockID.MEDIA_PREVIOUS, ResponseID.SEARCH_BACKWARD));
-    searchForwardButton_ .init(addButton(StockID.MEDIA_NEXT    , ResponseID.SEARCH_FORWARD ));
-
-    ApplySettings();
+  void Show() {
+    show();
+    cb_.grabFocus();
   }
 
 private:
+  void Hide() {
+    hide();
+    terminal_.grabFocus();
+  }
+  void Hide(Button b) { Hide(); }
+
   bool KeyPressed(Event e, Widget w) {
     auto ekey = e.key();
     auto state = TurnOffLockFlags(ekey.state);
     if(state == 0 && ekey.keyval == GdkKeysyms.GDK_Return) {
-      Search();
+      Search!(Order.FORWARD)();
       return true;
     }
     if(state == GdkModifierType.SHIFT_MASK && ekey.keyval == GdkKeysyms.GDK_Return) {
       Search!(Order.BACKWARD)();
       return true;
     }
-    return false;
-  }
-
-  void Respond(int responseID, Dialog dialog) {
-    if(responseID == GtkResponseType.DELETE_EVENT) {
-      RestoreSettings();
-      destroy();
-    } else if(responseID == ResponseID.SEARCH_FORWARD) {
-      Search();
-    } else if(responseID == ResponseID.SEARCH_BACKWARD) {
-      Search!(Order.BACKWARD)();
+    if(ekey.keyval == GdkKeysyms.GDK_Escape) {
+      Hide();
+      return true;
     }
-  }
-
-  bool FocusOut(Event e, Widget w) {
-    RestoreSettings();
-    destroy();
     return false;
   }
 
-  void Search(Order o = Order.FORWARD)() {
+  void Search(Order o)() {
     if(re_ is null) {
       return;
     }
@@ -146,16 +131,15 @@ private:
     // prepend or reorder the search text
     cb_.prependOrReplaceText(cb_.getActiveText());
   }
+  void SearchFromButton(Order o)(Button b) {
+    Search!(o);
+  }
 
   void SearchTextChanged(T)(T t) {
     BuildRegexp();
-    if(re_ is null) {
-      searchForwardButton_ .setSensitive(0);
-      searchBackwardButton_.setSensitive(0);
-    } else {
-      searchForwardButton_ .setSensitive(1);
-      searchBackwardButton_.setSensitive(1);
-    }
+    bool sensitive = re_ !is null;
+    searchForwardButton_ .setSensitive(sensitive);
+    searchBackwardButton_.setSensitive(sensitive);
   }
 
   void BuildRegexp() {
@@ -184,38 +168,5 @@ private:
     auto PCRE2_MULTILINE = 0x00000400u;
     auto compileFlags = ignoreCase ? (PCRE2_MULTILINE | PCRE2_CASELESS) : PCRE2_MULTILINE;
     return Regex.newSearch(text, -1, compileFlags);
-  }
-
-
-
-  //////////////// remember settings used at last time
-  static __gshared string[] searchTextHistory = [];
-  static __gshared bool ignoreCases = true;
-
-  void ApplySettings() {
-    foreach(text; searchTextHistory) {
-      cb_.appendText(text);
-    }
-    cb_.setActive(0);
-    ignoreCases_.setActive(ignoreCases);
-  }
-
-  void RestoreSettings() {
-    searchTextHistory = [];
-
-    // append text until it returns the same text twice
-    string previous;
-    int index = 0;
-    while(true) {
-      cb_.setActive(index);
-      string text = cb_.getActiveText();
-      if(text == previous) {
-        break;
-      }
-      searchTextHistory ~= text;
-      previous = text;
-      ++index;
-    }
-    ignoreCases = ignoreCases_.getActive();
   }
 }

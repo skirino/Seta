@@ -49,7 +49,7 @@ import constants;
 import rcfile = config.rcfile;
 import config.keybind;
 import shellrc = config.shellrc;
-import search_dialog;
+import page;
 
 class Terminal : VTE
 {
@@ -217,7 +217,9 @@ private:
       return true;
 
     case TerminalAction.FindRegexp:
-      StartTerminalSearch(this);
+      auto hbox = getParent();
+      auto page = cast(Page)hbox.getParent();
+      page.ShowTerminalSearchBar();
       return true;
 
     case TerminalAction.InputUserDefinedText1,
