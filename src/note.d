@@ -66,6 +66,11 @@ public:
     page.show();
   }
 
+  void AppendNewPage() {
+    auto dir = GetInitialDirectoryBySide();
+    AppendNewPage(PageInitOption(dir, null));
+  }
+
   void AppendPageCopy() {
     auto dir = GetCurrentPage().GetCWD();
     AppendNewPage(PageInitOption(dir, null));

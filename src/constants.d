@@ -34,6 +34,13 @@ enum Side
   RIGHT = 'R',
 }
 
+enum PaneArrangement
+{
+  LEFTONLY,
+  BOTH,
+  RIGHTONLY,
+}
+
 enum Order
 {
   FORWARD,

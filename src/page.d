@@ -111,6 +111,10 @@ public:
     term_.grabFocus();
   }
 
+  bool HasFocus() {
+    return term_.hasFocus();
+  }
+
   void MoveFocusPosition() {
     if(getFocusChild() !is null) {
       term_.grabFocus();

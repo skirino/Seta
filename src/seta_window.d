@@ -85,6 +85,7 @@ private:
   Nonnull!Paned hpaned_;
   Nonnull!Note noteL_;
   Nonnull!Note noteR_;
+  PaneArrangement arrangement_ = PaneArrangement.BOTH;
 
 public:
   this() {
@@ -145,11 +146,11 @@ public:
     if(npagesL == 0 && npagesR == 0) {
       Main.quit();
     } else if(side == Side.LEFT && npagesL == 0) {
-      auto pageR = noteR_.GetCurrentPage();
-      pageR.GrabFocus();
+      ExpandRightPane(); // expand twice to get displayed
+      ExpandRightPane();
     } else if(side == Side.RIGHT && npagesR == 0) {
-      auto pageL = noteL_.GetCurrentPage();
-      pageL.GrabFocus();
+      ExpandLeftPane();
+      ExpandLeftPane();
     } else { // each note has at least one page
       note.GetCurrentPage().GrabFocus();
     }
@@ -161,6 +162,34 @@ private:
     if(note is null) return;
     auto side = (note is noteL_) ? Side.LEFT : Side.RIGHT;
     ClosePage(side, note.getCurrentPage());
+  }
+
+  void ExpandLeftPane() {
+    if(arrangement_ == PaneArrangement.RIGHTONLY) {
+      arrangement_ = PaneArrangement.BOTH;
+      if(noteL_.getNPages() == 0) {
+        noteL_.AppendNewPage();
+      }
+      noteL_.show();
+    } else if(arrangement_ == PaneArrangement.BOTH) {
+      arrangement_ = PaneArrangement.LEFTONLY;
+      noteR_.hide();
+      noteL_.GetCurrentPage().GrabFocus();
+    }
+  }
+
+  void ExpandRightPane() {
+    if(arrangement_ == PaneArrangement.LEFTONLY) {
+      arrangement_ = PaneArrangement.BOTH;
+      if(noteR_.getNPages() == 0) {
+        noteR_.AppendNewPage();
+      }
+      noteR_.show();
+    } else if(arrangement_ == PaneArrangement.BOTH) {
+      arrangement_ = PaneArrangement.RIGHTONLY;
+      noteL_.hide();
+      noteR_.GetCurrentPage().GrabFocus();
+    }
   }
   ///////////////////////// GUI stuff
 
@@ -196,16 +225,14 @@ private:
   ///////////////////////// pages
 private:
   bool CreateNewPage() {
-    switch(WhichIsFocused()) {
-    case FocusInMainWindow.NONE:
-      return false;
-    case FocusInMainWindow.LEFT:
+    auto f = WhichIsFocused();
+    if(f == FocusInMainWindow.LEFT) {
       noteL_.AppendPageCopy();
       return true;
-    case FocusInMainWindow.RIGHT:
+    } else if(f == FocusInMainWindow.RIGHT) {
       noteR_.AppendPageCopy();
       return true;
-    default:
+    } else {
       return false;
     }
   }
@@ -235,11 +262,11 @@ private:
 private:
   FocusInMainWindow WhichIsFocused() {
     auto pageL = noteL_.GetCurrentPage();
-    if(pageL !is null) {
+    if(pageL !is null && pageL.HasFocus()) {
       return FocusInMainWindow.LEFT;
     }
     auto pageR = noteR_.GetCurrentPage();
-    if(pageR !is null) {
+    if(pageR !is null && pageR.HasFocus()) {
       return FocusInMainWindow.RIGHT;
     }
     return FocusInMainWindow.NONE;
@@ -352,12 +379,15 @@ private:
       return true;
 
     case MainWindowAction.ExpandLeftPane:
+      ExpandLeftPane();
       return true;
 
     case MainWindowAction.ExpandRightPane:
+      ExpandRightPane();
       return true;
 
     case MainWindowAction.GoToDirOtherSide:
+      // TODO
       return GoToDirOtherSide();
 
     case MainWindowAction.ShowConfigDialog:
