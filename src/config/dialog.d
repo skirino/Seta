@@ -195,8 +195,8 @@ private:
   TreeView keybinds_;
   TreeStore keyStore_;
   TreeIter[4] categories_;
-  static immutable string[4] CATEGORY_IDENTIFIERS  = ["MainWindow", "FileManager", "FileView", "Terminal"];
-  static immutable string[4] CATEGORY_EXPLANATIONS = ["general", "file manager", "file view", "terminal"];
+  static immutable string[4] CATEGORY_IDENTIFIERS  = ["MainWindow", "Terminal"];
+  static immutable string[4] CATEGORY_EXPLANATIONS = ["general", "terminal"];
   KeyCode[][string] dictKeyCode_;
 
   void InitKeybindPage() {

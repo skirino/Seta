@@ -205,17 +205,6 @@ private:
       pasteClipboard();
       return true;
 
-    case TerminalAction.PasteFilePaths:
-      string[] files;
-      if(files.length > 0) {
-        string s = " ";
-        foreach(file; files) {
-          s ~= EscapeSpecialChars(file) ~ ' ';
-        }
-        feedChild(s);
-      }
-      return true;
-
     case TerminalAction.FindRegexp:
       auto hbox = getParent();
       auto page = cast(Page)hbox.getParent();

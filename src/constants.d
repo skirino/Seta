@@ -96,7 +96,6 @@ enum TerminalAction
   Replace,
   Copy,
   Paste,
-  PasteFilePaths,
   FindRegexp,
   InputPWDLeft,
   InputPWDRight,

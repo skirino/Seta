@@ -256,14 +256,13 @@ private:
     mixin(InstallKeybind!("MainWindowAction.ToggleFullscreen"  , "F11"));
     mixin(InstallKeybind!("MainWindowAction.QuitApplication"   , "<Shift><Primary>q"));
 
-    mixin(InstallKeybind!("TerminalAction.ScrollUp"      , "<Shift><Primary>p"));
-    mixin(InstallKeybind!("TerminalAction.ScrollDown"    , "<Shift><Primary>n"));
-    mixin(InstallKeybind!("TerminalAction.Copy"          , "<Shift><Primary>c"));
-    mixin(InstallKeybind!("TerminalAction.Paste"         , "<Shift><Primary>v"));
-    mixin(InstallKeybind!("TerminalAction.PasteFilePaths", "<Shift><Primary>y"));
-    mixin(InstallKeybind!("TerminalAction.FindRegexp"    , "<Shift><Primary>f"));
-    mixin(InstallKeybind!("TerminalAction.InputPWDLeft"  , "<Shift><Primary>braceleft"));
-    mixin(InstallKeybind!("TerminalAction.InputPWDRight" , "<Shift><Primary>braceright"));
+    mixin(InstallKeybind!("TerminalAction.ScrollUp"     , "<Shift><Primary>p"));
+    mixin(InstallKeybind!("TerminalAction.ScrollDown"   , "<Shift><Primary>n"));
+    mixin(InstallKeybind!("TerminalAction.Copy"         , "<Shift><Primary>c"));
+    mixin(InstallKeybind!("TerminalAction.Paste"        , "<Shift><Primary>v"));
+    mixin(InstallKeybind!("TerminalAction.FindRegexp"   , "<Shift><Primary>f"));
+    mixin(InstallKeybind!("TerminalAction.InputPWDLeft" , "<Shift><Primary>braceleft"));
+    mixin(InstallKeybind!("TerminalAction.InputPWDRight", "<Shift><Primary>braceright"));
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText1", "<Alt>1"));
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText2", "<Alt>2"));
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText3", "<Alt>3"));
@@ -439,7 +438,6 @@ TerminalAction.ScrollUp=<Shift><Primary>p
 TerminalAction.ScrollDown=<Shift><Primary>n
 TerminalAction.Copy=<Shift><Primary>c
 TerminalAction.Paste=<Shift><Primary>v
-TerminalAction.PasteFilePaths=<Shift><Primary>y
 TerminalAction.FindRegexp=<Shift><Primary>f
 TerminalAction.InputPWDLeft=<Shift><Primary>braceleft
 TerminalAction.InputPWDRight=<Shift><Primary>braceright
