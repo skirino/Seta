@@ -20,21 +20,20 @@ MA 02110-1301 USA.
 
 module config.page_init_option;
 
-import std.string;
-import std.algorithm;
+import std.string : split, join;
+import std.algorithm : map;
 
 import utils.gio_util;
 
 immutable SEPARATOR_PAGE_INIT_OPTIONS_LIST = "_///_";
-immutable SEPARATOR_PAGE_INIT_OPTIONS = "_//_";
+immutable SEPARATOR_PAGE_INIT_OPTIONS      = "_//_";
 
 struct PageInitOption
 {
   string initialDir_;
   string terminalRunCommand_;
 
-  string toString()
-  {
+  string toString() {
     return initialDir_ ~ SEPARATOR_PAGE_INIT_OPTIONS ~ terminalRunCommand_;
   }
 
@@ -45,8 +44,7 @@ struct PageInitOption
       if(DirectoryExists(path)) {
         return PageInitOption(path, null);
       }
-    }
-    else if(l.length == 2) {
+    } else if(l.length == 2) {
       auto path    = l[0];
       auto command = l[1];
       if(DirectoryExists(path)) {

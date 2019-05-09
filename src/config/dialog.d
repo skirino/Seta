@@ -20,7 +20,6 @@ MA 02110-1301 USA.
 
 module config.dialog;
 
-import std.string;
 import std.algorithm : sort;
 
 import gtk.Dialog;
@@ -50,10 +49,10 @@ import gdk.Keysyms;
 import gdk.Event;
 import gdk.Color;
 
-import utils.gio_util;
 import utils.string_util;
 import utils.tree_util;
 import utils.menu_util;
+import utils.gio_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
@@ -70,8 +69,7 @@ private class ConfigDialog : Dialog
 {
   Notebook note_;
 
-  this()
-  {
+  this() {
     super();
     setResizable(false);
     setSizeRequest(800, 720);
@@ -105,14 +103,12 @@ private:
   SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
 
   // main widgets
-  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_,
-    sbNotifyExpiresInMSec_;
+  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_, sbNotifyExpiresInMSec_;
 
   // row colors
   ColorButton cbColorDirectory_, cbColorFile_, cbColorSymlink_, cbColorExecutable_;
 
-  void InitLayoutPage()
-  {
+  void InitLayoutPage() {
     pageLayout_ = AppendWrappedTable(note_, "Appearance");
 
     uint row = 0;
@@ -159,8 +155,7 @@ private:
     mixin(AddSpinButton!("Layout", "NotifyExpiresInMSec", "0, 30000, 100", "Expiration time on a notification (in milliseconds): "));
   }
 
-  void ApplyChangesInLayout()
-  {
+  void ApplyChangesInLayout() {
     bool changed = false;
 
     mixin(CheckSpinButton!("WidthType"));
@@ -211,9 +206,7 @@ private:
   TreeView pagesLeft_, pagesRight_;
   ListStore pagesLeftStore_, pagesRightStore_;
 
-
-  void InitPagesPage()
-  {
+  void InitPagesPage() {
     pagePages_ = AppendWrappedTable(note_, "Pages");
 
     uint row = 0;
@@ -225,11 +218,10 @@ private:
     InitPagesTree!(Side.RIGHT)(row++, pagesRight_, pagesRightStore_);
   }
 
-  void InitPagesTree(Side side)(uint row, ref TreeView view, ref ListStore store)
-  {
+  void InitPagesTree(Side side)(uint row, ref TreeView view, ref ListStore store) {
     view = new TreeView;
     view.setVexpand(1);
-    view.addOnButtonPress(delegate bool(Event e, Widget w){
+    view.addOnButtonPress(delegate bool(Event e, Widget w) {
         return ShowAppendRemoveMenu(e, w, view, store);
       });
     AppendWithScrolledWindow(pagePages_, row, view);
@@ -260,19 +252,17 @@ private:
     }
   }
 
-  void ApplyChangesInPages()
-  {
-    ApplyChangesInPageInitOptions(pagesLeftStore_,  "InitialPagesLeft");
+  void ApplyChangesInPages() {
+    ApplyChangesInPageInitOptions(pagesLeftStore_ , "InitialPagesLeft" );
     ApplyChangesInPageInitOptions(pagesRightStore_, "InitialPagesRight");
   }
 
-  void ApplyChangesInPageInitOptions(ListStore store, string key)
-  {
+  void ApplyChangesInPageInitOptions(ListStore store, string key) {
     PageInitOption[] opts;
     auto iter = new TreeIter;
     iter.setModel(store);
-    if(store.getIterFirst(iter)){
-      do{
+    if(store.getIterFirst(iter)) {
+      do {
         auto path    = iter.getValueString(0).trim.AppendSlash;
         auto command = iter.getValueString(1);
         if(CanEnumerateChildren(path))
@@ -293,14 +283,13 @@ private:
   static immutable string[4] CATEGORY_EXPLANATIONS = ["general", "file manager", "file view", "terminal"];
   KeyCode[][string] dictKeyCode_;
 
-  void InitKeybindPage()
-  {
+  void InitKeybindPage() {
     keybinds_ = new TreeView;
     keybinds_.setEnableSearch(0);
     keybinds_.addOnButtonPress(&KeybindButtonPress);
 
     auto sw = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
-    sw.add(keybinds_);// without Viewport
+    sw.add(keybinds_); // without Viewport
     note_.appendPage(sw, "Key bindings");
 
     auto rend0 = new CellRendererText;
@@ -318,7 +307,7 @@ private:
     keybinds_.appendColumn(col1);
 
     auto rend2 = new CellRendererAccel;
-    rend2.setProperty("accel-mode", cast(int)GtkCellRendererAccelMode.OTHER);// to react to accels with Tab
+    rend2.setProperty("accel-mode", cast(int)GtkCellRendererAccelMode.OTHER); // to react to accels with Tab
     rend2.addOnAccelEdited(&AccelEdited);
     rend2.addOnAccelCleared(&AccelCleared);
     auto col2 = new TreeViewColumn("Key", rend2, "text", 2);
@@ -332,7 +321,7 @@ private:
     keyStore_ = new TreeStore([GType.STRING, GType.STRING, GType.STRING, GType.BOOLEAN]);
     keybinds_.setModel(keyStore_);
 
-    for(int i=0; i<4; ++i){
+    for(int i = 0; i < 4; ++i) {
       categories_[i] = keyStore_.createIter();
       keyStore_.setValue(categories_[i], 0, CATEGORY_EXPLANATIONS[i]);
     }
@@ -342,10 +331,10 @@ private:
     string[] keys = dictKeyCode_.keys;
     sort(keys);
 
-    foreach(key; keys){
+    foreach(key; keys) {
       auto categoryIter = FindCategoryIterFromActionKey(key);
       KeyCode[] codes = dictKeyCode_[key];
-      foreach(code; codes){
+      foreach(code; codes) {
         scope iter = keyStore_.append(categoryIter);
         keyStore_.set(iter, [1, 2], [key[key.locate('.')+1 .. $], code.toString()]);
         keyStore_.setValue(iter, 3, 1); // make Key-cell editable
@@ -355,85 +344,87 @@ private:
     keybinds_.expandAll();
   }
 
-  TreeIter FindCategoryIterFromActionKey(string key)
-  {
-    foreach(i, id; CATEGORY_IDENTIFIERS){
-      if(key.StartsWith(id))
+  TreeIter FindCategoryIterFromActionKey(string key) {
+    foreach(i, id; CATEGORY_IDENTIFIERS) {
+      if(key.StartsWith(id)) {
         return categories_[i];
+      }
     }
     assert(false);
   }
 
-  void AccelEdited(string pathStr, uint key, GdkModifierType mod, uint hardwareKeycode, CellRendererAccel rend)
-  {
+  void AccelEdited(string pathStr, uint key, GdkModifierType mod, uint hardwareKeycode, CellRendererAccel rend) {
     // update contents of the cell by the accelerator name
     TreeIter iter = GetIterFromString(keyStore_, pathStr);
     keyStore_.setValue(iter, 2, AccelGroup.acceleratorName(key, mod));
   }
 
-  void AccelCleared(string pathStr, CellRendererAccel rend)
-  {
+  void AccelCleared(string pathStr, CellRendererAccel rend) {
     // Backspace is pressed
     // do not clear and set "BackSpace" to the cell
     TreeIter iter = GetIterFromString(keyStore_, pathStr);
     keyStore_.setValue(iter, 2, AccelGroup.acceleratorName(cast(uint)GdkKeysyms.GDK_BackSpace, cast(GdkModifierType)0));
   }
 
-  void ApplyChangesInKeybind()
-  {
+  void ApplyChangesInKeybind() {
     bool changed = false;
 
     TreeIter iter = new TreeIter;
     iter.setModel(keyStore_);
-    foreach(int i, category; categories_){
-      if(keyStore_.iterChildren(iter, category)){
+    foreach(int i, category; categories_) {
+      if(keyStore_.iterChildren(iter, category)) {
         string categoryName = CATEGORY_IDENTIFIERS[i] ~ "Action.";
         string previousKey;
         string[] codeList;
 
-        do{
+        do {
           string key  = iter.getValueString(1);
           string code = iter.getValueString(2);
-          if(key == previousKey){
-            if(code.length > 0)// skip empty (cleared) row
+          if(key == previousKey) {
+            if(code.length > 0) { // skip empty (cleared) row
               codeList ~= code;
-          }
-          else{
-            if(previousKey.length > 0)// exclude first time for each category
+            }
+          } else {
+            if(previousKey.length > 0) { // exclude first time for each category
               changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
+            }
 
             previousKey = key;
             codeList.length = 0;
-            if(code.length > 0)// skip empty (cleared) row
+            if(code.length > 0) { // skip empty (cleared) row
               codeList ~= code;
+            }
           }
-        }
-        while(keyStore_.iterNext(iter));
+        } while(keyStore_.iterNext(iter));
 
-        if(previousKey.length > 0)
+        if(previousKey.length > 0) {
           changed |= rcfile.ResetKeybind(categoryName ~ previousKey, codeList);
+        }
       }
     }
 
-    if(changed)
+    if(changed) {
       rcfile.ReconstructKeybinds();
+    }
   }
 
   // for right click menu
-  bool KeybindButtonPress(Event e, Widget w)
-  {
+  bool KeybindButtonPress(Event e, Widget w) {
     auto eb = e.button();
 
-    if(eb.window != keybinds_.getBinWindow().getWindowStruct())// header is clicked
+    if(eb.window != keybinds_.getBinWindow().getWindowStruct()) { // header is clicked
       return false;
-    if(eb.button != MouseButton.RIGHT)// not right button
+    }
+    if(eb.button != MouseButton.RIGHT) { // not right button
       return false;
+    }
 
     grabFocus();
 
     TreePath path = GetPathAtPos(keybinds_, eb.x, eb.y);
-    if(path is null)// empty space is clicked
+    if(path is null) { // empty space is clicked
       return false;
+    }
     TreeIter iter = GetIter(keyStore_, path);
 
     // show menu for "Clear" and "Add"
@@ -448,8 +439,7 @@ private:
     TreeStore keyStore_;
     TreeIter iter_;
 
-    this(TreeStore store, TreeIter iter)
-    {
+    this(TreeStore store, TreeIter iter) {
       keyStore_ = store;
       iter_ = iter;
 
@@ -459,13 +449,11 @@ private:
       showAll();
     }
 
-    void Clear(MenuItem item)
-    {
+    void Clear(MenuItem item) {
       keyStore_.setValue(iter_, 2, "");
     }
 
-    void Add(MenuItem item)
-    {
+    void Add(MenuItem item) {
       TreeIter next = new TreeIter;
       keyStore_.insertAfter(next, null, iter_);
       keyStore_.setValue(next, 1, iter_.getValueString(1));
@@ -486,8 +474,7 @@ private:
     entUserDefinedText1_, entUserDefinedText2_, entUserDefinedText3_, entUserDefinedText4_, entUserDefinedText5_,
     entUserDefinedText6_, entUserDefinedText7_, entUserDefinedText8_, entUserDefinedText9_;
 
-  void InitTerminalPage()
-  {
+  void InitTerminalPage() {
     pageTerminal_ = AppendWrappedTable(note_, "Terminal");
 
     uint row = 0;
@@ -539,8 +526,7 @@ private:
                     "\"User defined text 9 (bound to \" ~ rcfile.GetInputUserDefinedText9() ~ ')'"));
   }
 
-  void ApplyChangesInTerminal()
-  {
+  void ApplyChangesInTerminal() {
     bool changed = false;
 
     changed |= rcfile.ResetStringz("Terminal", "Font", fontButton_.getFontName());
@@ -563,10 +549,11 @@ private:
       PopupBox.error(targetL ~ " is neglected since the signature for replace should contain \"<n>\".", "");
 
     string targetR = entReplaceTargetRight_.getText();
-    if(targetR.containsPattern("<n>"))
+    if(targetR.containsPattern("<n>")) {
       changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetRight", targetR);
-    else
+    } else {
       PopupBox.error(targetR ~ " is neglected since the signature for replace should contain \"<n>\".", "");
+    }
 
     changed |= rcfile.ResetInteger("Terminal", "ScrollLinesOnKeyAction", cast(int)sbScrollLinesOnKeyAction_.getValue());
 
@@ -589,13 +576,14 @@ private:
 
 
   ///////////////////// common parts
-  bool ShowAppendRemoveMenu(Event e, Widget w, TreeView view, ListStore store)
-  {
+  bool ShowAppendRemoveMenu(Event e, Widget w, TreeView view, ListStore store) {
     auto eb = e.button();
-    if(eb.window != view.getBinWindow().getWindowStruct())// header is clicked
+    if(eb.window != view.getBinWindow().getWindowStruct()) { // header is clicked
       return false;
-    if(eb.button != MouseButton.RIGHT)// not right button
+    }
+    if(eb.button != MouseButton.RIGHT) { // not right button
       return false;
+    }
 
     auto iter = store.GetIter(GetPathAtPos(view, eb.x, eb.y));
     auto menu = new AppendRemoveMenu(view, store, iter);
@@ -609,70 +597,66 @@ private:
     ListStore store_;
     TreeIter iter_;
 
-    this(TreeView view, ListStore store, TreeIter iter)
-    {
+    this(TreeView view, ListStore store, TreeIter iter) {
       view_ = view;
       store_ = store;
       iter_ = iter;
 
       append(new MenuItem(&Append, "_Append"));
-      if(iter !is null)
+      if(iter !is null) {
         append(new MenuItem(&Remove, "_Remove"));
-
+      }
       showAll();
     }
 
-    void Append(MenuItem item)
-    {
+    void Append(MenuItem item) {
       TreeIter next = new TreeIter;
       next.setModel(store_);
-      if(iter_ is null)// empty space is clicked
+      if(iter_ is null) { // empty space is clicked
         store_.append(next);
-      else// one row is clicked
+      } else { // one row is clicked
         store_.insertAfter(next, iter_);
+      }
 
       // select the new row
       TreePath path = next.getTreePath();
       view_.setCursor(path, null, 1);
     }
 
-    void Remove(MenuItem item)
-    {
+    void Remove(MenuItem item) {
       store_.remove(iter_);
     }
   }
 
-  void CellEdited(int idx, string modelIdentifier, string transformFun = "")(
-    string pathStr, string newName, CellRendererText rend)
-  {
+  void CellEdited(int idx, string modelIdentifier, string transformFun = "")(string pathStr, string newName, CellRendererText rend) {
     ListStore model = mixin(modelIdentifier);
     TreeIter iter = GetIterFromString(model, pathStr);
-    static if(transformFun.length == 0)
+    static if(transformFun.length == 0) {
       model.setValue(iter, idx, newName);
-    else
+    } else {
       model.setValue(iter, idx, mixin(transformFun) (newName));
+    }
   }
   ///////////////////// common parts
 
 
-  void Respond(int responseID, Dialog dialog)
-  {
-    if(responseID == GtkResponseType.OK || responseID == GtkResponseType.APPLY){
+  void Respond(int responseID, Dialog dialog) {
+    if(responseID == GtkResponseType.OK || responseID == GtkResponseType.APPLY) {
       ApplyChangesInKeybind();
       ApplyChangesInLayout();
       ApplyChangesInPages();
       ApplyChangesInTerminal();
       rcfile.Write();
     }
-
-    if(responseID != GtkResponseType.APPLY)
+    if(responseID != GtkResponseType.APPLY) {
       destroy();
+    }
   }
 }
 
 
 
-private template AddSpinButton(string group, string key, string args, string explanation){
+private template AddSpinButton(string group, string key, string args, string explanation) {
   const string AddSpinButton =
     "
     sb" ~ key ~ "_ = new SpinButton(" ~ args ~ ");
@@ -680,17 +664,14 @@ private template AddSpinButton(string group, string key, string args, string exp
     AttachPairWidget(page" ~ group ~ "_, row++, \"" ~ explanation ~ "\", sb" ~ key ~ "_);
     ";
 }
-private template CheckSpinButton(string key)// currently only for "Layout" group
-{
+private template CheckSpinButton(string key) { // currently only for "Layout" group
   const string CheckSpinButton =
     "
     changed |= rcfile.ResetInteger(\"Layout\", \"" ~ key ~ "\", sb" ~ key ~ "_.getValueAsInt());
     ";
 }
 
-
-private template AddCheckButton(string group, string key, string explanation)
-{
+private template AddCheckButton(string group, string key, string explanation) {
   const string AddCheckButton =
     "
     cb" ~ key ~ "_ = new CheckButton(\"" ~ explanation ~ "\");
@@ -700,17 +681,14 @@ private template AddCheckButton(string group, string key, string explanation)
     ++row;
     ";
 }
-private template CheckCheckButton(string group, string key)
-{
+private template CheckCheckButton(string group, string key) {
   const string CheckCheckButton =
     "
     changed |= rcfile.ResetBoolean(\"" ~ group ~ "\", \"" ~ key ~ "\", cb" ~ key ~ "_.getActive() != 0);
     ";
 }
 
-
-private template AddColorButton(string group, string key, string explanation)
-{
+private template AddColorButton(string group, string key, string explanation) {
   const string AddColorButton =
     "
     {
@@ -721,8 +699,7 @@ private template AddColorButton(string group, string key, string explanation)
     }
     ";
 }
-private template CheckColorButton(string group, string key)
-{
+private template CheckColorButton(string group, string key) {
   const string CheckColorButton =
     "
     {
@@ -733,9 +710,7 @@ private template CheckColorButton(string group, string key)
     ";
 }
 
-
-private template AddEntry(string group, string key, string explanation, string tooltip = "")
-{
+private template AddEntry(string group, string key, string explanation, string tooltip = "") {
   const string AddEntry =
     "
     ent" ~ key ~ "_ = new Entry(NonnullString(rcfile.Get" ~ key ~ "()));
@@ -743,49 +718,42 @@ private template AddEntry(string group, string key, string explanation, string t
     ";
 }
 
-
-private Table AppendWrappedTable(Notebook note, string title)
-{
+private Table AppendWrappedTable(Notebook note, string title) {
   Table t = new Table(1, 2, 0);
   auto win = new ScrolledWindow(GtkPolicyType.AUTOMATIC, GtkPolicyType.AUTOMATIC);
-  win.addWithViewport(t);// Table needs Viewport
+  win.addWithViewport(t); // Table needs Viewport
   note.appendPage(win, title);
   return t;
 }
 
-
-private void AppendWithScrolledWindow(Table t, uint row, Widget w)
-{
+private void AppendWithScrolledWindow(Table t, uint row, Widget w) {
   auto sw = new ScrolledWindow(GtkPolicyType.NEVER, GtkPolicyType.AUTOMATIC);
-  sw.add(w);// widget is assumed to support scrolling by itself, not with Viewport
+  sw.add(w); // widget is assumed to support scrolling by itself, not with Viewport
   t.attach(sw, 0, 2, row, row+1, GtkAttachOptions.FILL | GtkAttachOptions.EXPAND, GtkAttachOptions.FILL, XPadding, YPadding);
 }
 
-
-private void AttachPairWidget(Table t, uint row, string labelText, Widget w, string tooltip = "")
-{
+private void AttachPairWidget(Table t, uint row, string labelText, Widget w, string tooltip = "") {
   Label l = new Label(labelText);
-  if(tooltip.length > 0){
+  if(tooltip.length > 0) {
     l.setTooltipText(tooltip);
     w.setTooltipText(tooltip);
   }
   l.setMnemonicWidget(w);
-  l.setAlignment(0.0, 0.5);// left-align labels
+  l.setAlignment(0.0, 0.5); // left-align labels
   t.attach(l, 0, 1, row, row+1, GtkAttachOptions.FILL,   cast(GtkAttachOptions)0, XPadding, YPadding);
   t.attach(w, 1, 2, row, row+1, GtkAttachOptions.FILL | GtkAttachOptions.EXPAND, cast(GtkAttachOptions)0, XPadding, YPadding);
 }
 
-private void AttachSectionLabel(Table t, uint row, string text)
-{
-  if(row > 0)// append additional space between sections
+private void AttachSectionLabel(Table t, uint row, string text) {
+  if(row > 0) { // append additional space between sections
     t.setRowSpacing(row-1, 15);
+  }
 
-  auto l = new Label("<b>" ~ text ~ "</b>");// bold text
+  auto l = new Label("<b>" ~ text ~ "</b>"); // bold text
   l.setUseMarkup(1);
   l.setAlignment(0.0, 1.0);
   t.attach(l, 0, 2, row, row+1, GtkAttachOptions.FILL, GtkAttachOptions.FILL, 10, 5);
 }
-
 
 // constants to align widgets in Table
 private immutable int XPadding = 20;

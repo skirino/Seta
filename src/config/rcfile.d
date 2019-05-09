@@ -21,10 +21,10 @@ MA 02110-1301 USA.
 module config.rcfile;
 
 import std.conv;
-import std.string;
-import std.array;
-import std.algorithm;
-import std.process;
+import std.string : join;
+import std.array : array;
+import std.algorithm : max, filter;
+import std.process : environment;
 
 import glib.KeyFile;
 import gtk.PopupBox;
@@ -41,39 +41,30 @@ import config.page_init_option;
 
 static immutable string SetaVersion = "0.8.0";
 
-void Init()
-{
+void Init() {
   instance_ = new SetaRCFile();
 }
 
-void Write()
-{
+void Write() {
   instance_.Write();
 }
 
-void Free()
-{
+void Free() {
   instance_.Write();
   instance_.free();
 }
 
-
-
-private template GetString(string group, string key)
-{
+private template GetString(string group, string key) {
   immutable string GetString =
     "string Get" ~ key ~ "(){return instance_.getString(\"" ~ group ~ "\", \"" ~ key ~ "\");}";
 }
 
-
 ///////////////// [Layout]
-private template GetUint(string key)
-{
+private template GetUint(string key) {
   immutable string GetUint =
     "uint Get" ~ key ~ "(){return ForceUint(instance_.getInteger(\"Layout\", \"" ~ key ~ "\"));}";
 }
-private template GetBoolean(string key)
-{
+private template GetBoolean(string key) {
   immutable string GetBoolean =
     "bool Get" ~ key ~ "(){return instance_.getBoolean(\"Layout\", \"" ~ key ~ "\") != 0;}";
 }
@@ -101,8 +92,7 @@ mixin(GetUint!("WidthOwner"));
 mixin(GetUint!("WidthPermissions"));
 mixin(GetUint!("WidthLastModified"));
 
-uint[] GetWidths()
-{
+uint[] GetWidths() {
   int widthName = max(10,
                       instance_.getInteger("Layout", "SplitH") - 40 -
                       instance_.getInteger("Layout", "WidthType") -
@@ -116,17 +106,18 @@ uint[] GetWidths()
     ForceUint(instance_.getInteger("Layout", "WidthSize")),
     ForceUint(instance_.getInteger("Layout", "WidthOwner")),
     ForceUint(instance_.getInteger("Layout", "WidthPermissions")),
-    ForceUint(instance_.getInteger("Layout", "WidthLastModified"))
-    ];
+    ForceUint(instance_.getInteger("Layout", "WidthLastModified")),
+  ];
 }
 mixin(GetUint!("HeightStatusbar"));
 
-string[] GetRowColors()
-{
-  return [instance_.getString("Layout", "ColorDirectory"),
-          instance_.getString("Layout", "ColorFile"),
-          instance_.getString("Layout", "ColorSymlink"),
-          instance_.getString("Layout", "ColorExecutable")];
+string[] GetRowColors() {
+  return [
+    instance_.getString("Layout", "ColorDirectory"),
+    instance_.getString("Layout", "ColorFile"),
+    instance_.getString("Layout", "ColorSymlink"),
+    instance_.getString("Layout", "ColorExecutable"),
+  ];
 }
 mixin(GetString!("Layout", "ColorDirectory"));
 mixin(GetString!("Layout", "ColorFile"));
@@ -137,22 +128,18 @@ mixin(GetBoolean!("UseDesktopNotification"));
 mixin(GetUint!("NotifyExpiresInMSec"));
 ///////////////// [Layout]
 
-
-
 ///////////////// [Pages]
-PageInitOption[] GetPageInitOptionsLeft (){ return instance_.GetPageInitOptionsBase("InitialPagesLeft" ); }
-PageInitOption[] GetPageInitOptionsRight(){ return instance_.GetPageInitOptionsBase("InitialPagesRight"); }
+PageInitOption[] GetPageInitOptionsLeft () { return instance_.GetPageInitOptionsBase("InitialPagesLeft" ); }
+PageInitOption[] GetPageInitOptionsRight() { return instance_.GetPageInitOptionsBase("InitialPagesRight"); }
 
-private string GetDefaultInitialDirectoryBase(string key)
-{
+private string GetDefaultInitialDirectoryBase(string key) {
   auto list = instance_.GetPageInitOptionsBase(key);
   return (list.length > 0) ? list[0].initialDir_ : environment.get("HOME") ~ '/';
 }
-string GetDefaultInitialDirectoryLeft (){ return GetDefaultInitialDirectoryBase("InitialPagesLeft" ); }
-string GetDefaultInitialDirectoryRight(){ return GetDefaultInitialDirectoryBase("InitialPagesRight"); }
+string GetDefaultInitialDirectoryLeft () { return GetDefaultInitialDirectoryBase("InitialPagesLeft" ); }
+string GetDefaultInitialDirectoryRight() { return GetDefaultInitialDirectoryBase("InitialPagesRight"); }
 
-void ResetPageInitOptions(string key, PageInitOption[] list)
-{
+void ResetPageInitOptions(string key, PageInitOption[] list) {
   PageInitOption[] old = instance_.GetPageInitOptionsBase(key);
   if(old != list) {
     string s = PageInitOption.ToListString(list);
@@ -162,8 +149,6 @@ void ResetPageInitOptions(string key, PageInitOption[] list)
 }
 ///////////////// [Pages]
 
-
-
 ///////////////// [Terminal]
 mixin(GetString!("Terminal", "ColorForeground"));
 mixin(GetString!("Terminal", "ColorBackground"));
@@ -172,9 +157,9 @@ mixin(GetString!("Terminal", "PROMPT"));
 mixin(GetString!("Terminal", "RPROMPT"));
 mixin(GetString!("Terminal", "ReplaceTargetLeft"));
 mixin(GetString!("Terminal", "ReplaceTargetRight"));
-double GetTransparency          (){ return instance_.getDouble ("Terminal", "BackgroundTransparency"); }
-uint   GetScrollLinesOnKeyAction(){ return instance_.getInteger("Terminal", "ScrollLinesOnKeyAction"); }
-bool   GetEnablePathExpansion   (){ return instance_.getBoolean("Terminal", "EnablePathExpansion") != 0; }
+double GetTransparency          () { return instance_.getDouble ("Terminal", "BackgroundTransparency"); }
+uint   GetScrollLinesOnKeyAction() { return instance_.getInteger("Terminal", "ScrollLinesOnKeyAction"); }
+bool   GetEnablePathExpansion   () { return instance_.getBoolean("Terminal", "EnablePathExpansion") != 0; }
 
 mixin(GetString!("Terminal", "UserDefinedText1"));
 mixin(GetString!("Terminal", "UserDefinedText2"));
@@ -185,32 +170,26 @@ mixin(GetString!("Terminal", "UserDefinedText6"));
 mixin(GetString!("Terminal", "UserDefinedText7"));
 mixin(GetString!("Terminal", "UserDefinedText8"));
 mixin(GetString!("Terminal", "UserDefinedText9"));
-string GetUserDefinedText(int index)
-{
+string GetUserDefinedText(int index) {
   string key = "UserDefinedText" ~ index.to!string;
   return instance_.getString("Terminal", key);
 }
 ///////////////// [Terminal]
 
-
-
 ///////////////// [Keybind]
-KeyCode[][string] GetKeybinds(){return instance_.dictKeybind_;}
+KeyCode[][string] GetKeybinds() { return instance_.dictKeybind_; }
 
-bool ResetKeybind(string keyname, string[] codeList)
-{
+bool ResetKeybind(string keyname, string[] codeList) {
   string codes = join(codeList, ",");
   return ResetStringz("Keybind", keyname, codes);
 }
 
-void ReconstructKeybinds()
-{
+void ReconstructKeybinds() {
   instance_.InstallKeybinds();
   config.keybind.Init();
 }
 
-private template GetKeybindInString(string widget, string action)
-{
+private template GetKeybindInString(string widget, string action) {
   immutable string GetKeybindInString =
     "string Get" ~ action ~ "(){return instance_.getString(\"Keybind\", \"" ~ widget ~ "Action." ~ action ~ "\");}";
 }
@@ -226,8 +205,6 @@ mixin(GetKeybindInString!("Terminal", "InputUserDefinedText8"));
 mixin(GetKeybindInString!("Terminal", "InputUserDefinedText9"));
 ///////////////// [Keybind]
 
-
-
 private __gshared SetaRCFile instance_;
 
 class SetaRCFile : KeyFile
@@ -237,29 +214,26 @@ private:
   string filename_;
   KeyCode[][string] dictKeybind_;
 
-  this()
-  {
+  this() {
     super();
     setListSeparator(',');
 
     ulong len;
     changed_ = false;
     filename_ = environment.get("HOME") ~ "/.setarc";
-    if(Exists(filename_)){
+    if(Exists(filename_)) {
       loadFromFile(filename_, GKeyFileFlags.KEEP_COMMENTS);
-      if(getGroups(len) == ["Version", "Layout", "Pages", "Terminal", "Directories", "Keybind"]){
-        if(getString("Version", "Version") != SetaVersion){// .setarc is old
+      if(getGroups(len) == ["Version", "Layout", "Pages", "Terminal", "Directories", "Keybind"]) {
+        if(getString("Version", "Version") != SetaVersion) { // .setarc is old
           changed_ = true;
           setString("Version", "Version", SetaVersion);
         }
-      }
-      else{// .setarc is old (<= 0.4.0) or there's something wrong with .setarc
+      } else { // .setarc is old (<= 0.4.0) or there's something wrong with .setarc
         loadFromData(defaultContents, len, GKeyFileFlags.KEEP_COMMENTS);
         changed_ = true;
         PopupBox.information("Your configuration file may be older than the application or may be broken.\nStarts with default settings.", "");
       }
-    }
-    else{
+    } else {
       loadFromData(defaultContents, len, GKeyFileFlags.KEEP_COMMENTS);
       changed_ = true;
     }
@@ -308,11 +282,11 @@ private:
     // [Terminal]
     auto colorTest = new Color;
     if(!hasKey("Terminal", "ColorForeground") ||
-       !Color.parse(getString("Terminal", "ColorForeground"), colorTest)){
+       !Color.parse(getString("Terminal", "ColorForeground"), colorTest)) {
       setString("Terminal", "ColorForeground", "#000000");
     }
     if(!hasKey("Terminal", "ColorBackground") ||
-       !Color.parse(getString("Terminal", "ColorBackground"), colorTest)){
+       !Color.parse(getString("Terminal", "ColorBackground"), colorTest)) {
       setString("Terminal", "ColorBackground", "#ffffff");
     }
     mixin(SetDefaultValue!("String", "Terminal", "Font", "\"Monospace 11\""));
@@ -344,9 +318,8 @@ private:
     InstallKeybinds();
   }
 
-  void Write()
-  {
-    if(changed_){
+  void Write() {
+    if(changed_) {
       changed_ = false;
 
       // "scope" storage-class specifier is necessary to remove segfault at shutdown of Seta
@@ -358,8 +331,7 @@ private:
     }
   }
 
-  void InstallKeybinds()
-  {
+  void InstallKeybinds() {
     mixin(InstallKeybind!("MainWindowAction.CreateNewPage"     , "<Alt>t,<Shift><Primary>t"));
     mixin(InstallKeybind!("MainWindowAction.MoveToNextPage"    , "<Alt>m,<Shift><Primary>m,<Primary>Tab,<Shift><Primary>greater"));
     mixin(InstallKeybind!("MainWindowAction.MoveToPreviousPage", "<Shift><Primary>Tab,<Shift><Primary>less"));
@@ -392,16 +364,15 @@ private:
     mixin(InstallKeybind!("TerminalAction.InputUserDefinedText9", "<Alt>9"));
   }
 
-  PageInitOption[] GetPageInitOptionsBase(string key)
-  {
-    if(hasKey("Pages", key))
+  PageInitOption[] GetPageInitOptionsBase(string key) {
+    if(hasKey("Pages", key)) {
       return PageInitOption.ParseList(getString("Pages", key));
-    else
+    } else {
       return null;
+    }
   }
 
-  void InitInitialPages(string key)
-  {
+  void InitInitialPages(string key) {
     auto pageOpts = GetPageInitOptionsBase(key);
     auto pageOptsWithExistingDirs = pageOpts.filter!((p) => CanEnumerateChildren(p.initialDir_)).array;
     if(pageOptsWithExistingDirs.length == 0) {
@@ -413,57 +384,49 @@ private:
     }
   }
 
-  void InitInitialDirectories(string key)
-  {
+  void InitInitialDirectories(string key) {
     changed_ = true;
     setStringList("Directories", key, [AppendSlash(environment.get("HOME"))]);
   }
 
-  string[] getStringList(string group, string key)
-  {
-    if(hasKey(group, key))
+  string[] getStringList(string group, string key) {
+    if(hasKey(group, key)) {
       return super.getStringList(group, key);
-    else
+    } else {
       return null;
+    }
   }
 }
 
-
-private template SetDefaultValue(string Type, string group, string key, string value)
-{
+private template SetDefaultValue(string Type, string group, string key, string value) {
   immutable string SetDefaultValue =
     "
-    if(!hasKey(\"" ~ group ~ "\", \"" ~ key ~ "\")){
+    if(!hasKey(\"" ~ group ~ "\", \"" ~ key ~ "\")) {
       changed_ = true;
       set" ~ Type ~ "(\"" ~ group ~ "\", \"" ~ key ~ "\", " ~ value ~ ");
     }";
 }
 
-private template InstallKeybind(string action, string keystr)
-{
+private template InstallKeybind(string action, string keystr) {
   immutable string InstallKeybind =
     SetDefaultValue!("String", "Keybind", action, "\"" ~ keystr ~ "\"") ~
     "{
       string val = getString(\"Keybind\", \"" ~ action ~ "\");
       KeyCode[] array = ParseKeyCodeList(val, " ~ action ~ ");
-      if(array.length > 0){
+      if(array.length > 0) {
         dictKeybind_[\"" ~ action ~ "\"] = array;
       }
     }";
 }
 
-
 /////////////////// for ConfigDialog
-private template ResetValue(string type, string Type)
-{
+private template ResetValue(string type, string Type) {
   immutable string ResetValue =
     "
-    bool Reset" ~ Type ~ "(string group, string key, " ~ type ~ " val)
-    {
-      if(instance_.get" ~ Type ~ "(group, key) == val){// has the same value
+    bool Reset" ~ Type ~ "(string group, string key, " ~ type ~ " val) {
+      if(instance_.get" ~ Type ~ "(group, key) == val) { // has the same value
         return false;
-      }
-      else{
+      } else {
         instance_.set" ~ Type ~ "(group, key, val);
         instance_.changed_ = true;
         return true;
@@ -477,19 +440,15 @@ mixin(ResetValue!("double", "Double"));
 mixin(ResetValue!("string[]", "StringList"));
 mixin("private " ~ ResetValue!("string", "String"));// use ResetStringz instead
 
-bool ResetStringz(string group, string key, string val)
-{
+bool ResetStringz(string group, string key, string val) {
   return ResetString(group, key, NonnullString(val));
 }
 /////////////////// for ConfigDialog
 
 
-
-private uint ForceUint(int i)
-{
+private uint ForceUint(int i) {
   return i < 0 ? 0 : i;
 }
-
 
 private const string defaultContents =
   "###################### configuration file for Seta

@@ -24,16 +24,12 @@ import config.rcfile;
 import config.keybind;
 import config.shellrc;
 
-
-void Init()
-{
+void Init() {
   config.rcfile.Init();
   config.keybind.Init();
   config.shellrc.Init();
 }
 
-void Finish()
-{
+void Finish() {
   config.rcfile.Free();
 }
-
