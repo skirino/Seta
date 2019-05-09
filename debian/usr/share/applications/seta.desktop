@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=seta
-GenericName=file manager and terminal
-Comment=2-pane file manager and terminal
-Exec=seta
-Terminal=false
-StartupNotify=false
-Categories=System;FileTools;GTK;FileManager;
