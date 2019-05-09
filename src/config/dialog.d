@@ -93,106 +93,22 @@ private class ConfigDialog : Dialog
 private:
   ///////////////////// [Layout]
   Table pageLayout_;
-  SpinButton sbWidthType_, sbWidthSize_, sbWidthOwner_, sbWidthPermissions_, sbWidthLastModified_;
-  SpinButton sbHeightStatusbar_;
-
-  // toolbar
-  CheckButton cbShowBackButton_, cbShowForwardButton_, cbShowUpButton_, cbShowRootButton_, cbShowHomeButton_,
-    cbShowOtherSideButton_, cbShowRefreshButton_, cbShowHiddenButton_,
-    cbShowFilter_, cbUseDesktopNotification_;
-  SpinButton sbWidthFilterEntry_, sbWidthShortcutButton_;
-
-  // main widgets
-  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_, sbSplitVLeft_, sbSplitVRight_, sbNotifyExpiresInMSec_;
-
-  // row colors
-  ColorButton cbColorDirectory_, cbColorFile_, cbColorSymlink_, cbColorExecutable_;
+  SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_;
 
   void InitLayoutPage() {
     pageLayout_ = AppendWrappedTable(note_, "Appearance");
-
     uint row = 0;
-
-    AttachSectionLabel(pageLayout_, row++, "Columns in file view (0 to hide)");
-    mixin(AddSpinButton!("Layout", "WidthType",         "0, 500, 1", "Width of 'type' column: "));
-    mixin(AddSpinButton!("Layout", "WidthSize",         "0, 500, 1", "Width of 'size' column: "));
-    mixin(AddSpinButton!("Layout", "WidthOwner",        "0, 500, 1", "Width of 'owner' column: "));
-    mixin(AddSpinButton!("Layout", "WidthPermissions",  "0, 500, 1", "Width of 'permissions' column: "));
-    mixin(AddSpinButton!("Layout", "WidthLastModified", "0, 500, 1", "Width of 'last modified' column: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Colors for rows in file list");
-    mixin(AddColorButton!("Layout", "ColorSymlink",    "Color for symbolic links: "));
-    mixin(AddColorButton!("Layout", "ColorDirectory",  "Color for directories: "));
-    mixin(AddColorButton!("Layout", "ColorExecutable", "Color for executable files: "));
-    mixin(AddColorButton!("Layout", "ColorFile",       "Color for the others: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Toolbar");
-    mixin(AddCheckButton!("Layout", "ShowBackButton",      "Show 'go back' button"));
-    mixin(AddCheckButton!("Layout", "ShowForwardButton",   "Show 'go forward' button"));
-    mixin(AddCheckButton!("Layout", "ShowUpButton",        "Show 'go up' button"));
-    mixin(AddCheckButton!("Layout", "ShowRootButton",      "Show 'go to root directory' button"));
-    mixin(AddCheckButton!("Layout", "ShowHomeButton",      "Show 'go to home directory' button"));
-    mixin(AddCheckButton!("Layout", "ShowOtherSideButton", "Show 'go to directory shown in the other pane' button"));
-    mixin(AddCheckButton!("Layout", "ShowRefreshButton",   "Show 'refresh' button"));
-    mixin(AddCheckButton!("Layout", "ShowHiddenButton",    "Show 'show/hide hidden files' button"));
-    mixin(AddCheckButton!("Layout", "ShowFilter",          "Show filter box"));
-
-    mixin(AddSpinButton!("Layout", "WidthFilterEntry",    "0, 200, 1", "Width of filter box in toolbar: "));
-    mixin(AddSpinButton!("Layout", "WidthShortcutButton", "0, 200, 1", "Width of shortcut buttons in toolbar: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Other widgets");
-    mixin(AddSpinButton!("Layout", "HeightStatusbar", "0, 100, 1", "Height of the statusbar (0 to hide): "));
-
-    AttachSectionLabel(pageLayout_, row++, "Sizes of main widgets");
-    mixin(AddSpinButton!("Layout", "SplitH",      "0, 5000, 10",  "Width of the left half: "));
-    mixin(AddSpinButton!("Layout", "SplitVLeft" , "0, 5000, 10",  "Height of the upper half on the left side: "));
-    mixin(AddSpinButton!("Layout", "SplitVRight", "0, 5000, 10",  "Height of the upper half on the right side: "));
+    AttachSectionLabel(pageLayout_, row++, "Size of the main window");
     mixin(AddSpinButton!("Layout", "WindowSizeH", "10, 5000, 10", "Horizontal size of the main window: "));
     mixin(AddSpinButton!("Layout", "WindowSizeV", "10, 5000, 10", "Vertical size of the main window: "));
-
-    AttachSectionLabel(pageLayout_, row++, "Desktop notification");
-    mixin(AddCheckButton!("Layout", "UseDesktopNotification", "Notify finish of async file transfer using desktop-notification"));
-    mixin(AddSpinButton!("Layout", "NotifyExpiresInMSec", "0, 30000, 100", "Expiration time on a notification (in milliseconds): "));
+    mixin(AddSpinButton!("Layout", "SplitH",      "0, 5000, 10",  "Width of the left half: "));
   }
 
   void ApplyChangesInLayout() {
     bool changed = false;
-
-    mixin(CheckSpinButton!("WidthType"));
-    mixin(CheckSpinButton!("WidthSize"));
-    mixin(CheckSpinButton!("WidthOwner"));
-    mixin(CheckSpinButton!("WidthPermissions"));
-    mixin(CheckSpinButton!("WidthLastModified"));
-
-    mixin(CheckColorButton!("Layout", "ColorSymlink"));
-    mixin(CheckColorButton!("Layout", "ColorDirectory"));
-    mixin(CheckColorButton!("Layout", "ColorExecutable"));
-    mixin(CheckColorButton!("Layout", "ColorFile"));
-
-    mixin(CheckCheckButton!("Layout", "ShowBackButton"));
-    mixin(CheckCheckButton!("Layout", "ShowForwardButton"));
-    mixin(CheckCheckButton!("Layout", "ShowUpButton"));
-    mixin(CheckCheckButton!("Layout", "ShowRootButton"));
-    mixin(CheckCheckButton!("Layout", "ShowHomeButton"));
-    mixin(CheckCheckButton!("Layout", "ShowOtherSideButton"));
-    mixin(CheckCheckButton!("Layout", "ShowRefreshButton"));
-    mixin(CheckCheckButton!("Layout", "ShowHiddenButton"));
-    mixin(CheckCheckButton!("Layout", "ShowFilter"));
-
-    mixin(CheckSpinButton!("WidthFilterEntry"));
-    mixin(CheckSpinButton!("WidthShortcutButton"));
-
-    mixin(CheckSpinButton!("HeightStatusbar"));
-
     mixin(CheckSpinButton!("SplitH"));
-    mixin(CheckSpinButton!("SplitVLeft"));
-    mixin(CheckSpinButton!("SplitVRight"));
     mixin(CheckSpinButton!("WindowSizeH"));
     mixin(CheckSpinButton!("WindowSizeV"));
-
-    mixin(CheckCheckButton!("Layout", "UseDesktopNotification"));
-    mixin(CheckSpinButton!("NotifyExpiresInMSec"));
-
     if(changed) {
       SetaWindow.SetLayout();
     }

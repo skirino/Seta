@@ -64,68 +64,10 @@ private template GetUint(string key) {
   immutable string GetUint =
     "uint Get" ~ key ~ "(){return ForceUint(instance_.getInteger(\"Layout\", \"" ~ key ~ "\"));}";
 }
-private template GetBoolean(string key) {
-  immutable string GetBoolean =
-    "bool Get" ~ key ~ "(){return instance_.getBoolean(\"Layout\", \"" ~ key ~ "\") != 0;}";
-}
+
 mixin(GetUint!("WindowSizeH"));
 mixin(GetUint!("WindowSizeV"));
 mixin(GetUint!("SplitH"));
-mixin(GetUint!("SplitVLeft"));
-mixin(GetUint!("SplitVRight"));
-
-mixin(GetBoolean!("ShowBackButton"));
-mixin(GetBoolean!("ShowForwardButton"));
-mixin(GetBoolean!("ShowUpButton"));
-mixin(GetBoolean!("ShowRootButton"));
-mixin(GetBoolean!("ShowHomeButton"));
-mixin(GetBoolean!("ShowOtherSideButton"));
-mixin(GetBoolean!("ShowRefreshButton"));
-mixin(GetBoolean!("ShowHiddenButton"));
-mixin(GetBoolean!("ShowFilter"));
-
-mixin(GetUint!("WidthShortcutButton"));
-mixin(GetUint!("WidthFilterEntry"));
-mixin(GetUint!("WidthType"));
-mixin(GetUint!("WidthSize"));
-mixin(GetUint!("WidthOwner"));
-mixin(GetUint!("WidthPermissions"));
-mixin(GetUint!("WidthLastModified"));
-
-uint[] GetWidths() {
-  int widthName = max(10,
-                      instance_.getInteger("Layout", "SplitH") - 40 -
-                      instance_.getInteger("Layout", "WidthType") -
-                      instance_.getInteger("Layout", "WidthSize") -
-                      instance_.getInteger("Layout", "WidthOwner") -
-                      instance_.getInteger("Layout", "WidthPermissions") -
-                      instance_.getInteger("Layout", "WidthLastModified"));
-  return [
-    ForceUint(widthName),
-    ForceUint(instance_.getInteger("Layout", "WidthType")),
-    ForceUint(instance_.getInteger("Layout", "WidthSize")),
-    ForceUint(instance_.getInteger("Layout", "WidthOwner")),
-    ForceUint(instance_.getInteger("Layout", "WidthPermissions")),
-    ForceUint(instance_.getInteger("Layout", "WidthLastModified")),
-  ];
-}
-mixin(GetUint!("HeightStatusbar"));
-
-string[] GetRowColors() {
-  return [
-    instance_.getString("Layout", "ColorDirectory"),
-    instance_.getString("Layout", "ColorFile"),
-    instance_.getString("Layout", "ColorSymlink"),
-    instance_.getString("Layout", "ColorExecutable"),
-  ];
-}
-mixin(GetString!("Layout", "ColorDirectory"));
-mixin(GetString!("Layout", "ColorFile"));
-mixin(GetString!("Layout", "ColorSymlink"));
-mixin(GetString!("Layout", "ColorExecutable"));
-
-mixin(GetBoolean!("UseDesktopNotification"));
-mixin(GetUint!("NotifyExpiresInMSec"));
 ///////////////// [Layout]
 
 ///////////////// [Pages]
@@ -243,37 +185,6 @@ private:
     mixin(SetDefaultValue!("Integer", "Layout", "WindowSizeH", "1600"));
     mixin(SetDefaultValue!("Integer", "Layout", "WindowSizeV", "900"));
     mixin(SetDefaultValue!("Integer", "Layout", "SplitH",      "800"));
-    mixin(SetDefaultValue!("Integer", "Layout", "SplitVLeft",  "450"));
-    mixin(SetDefaultValue!("Integer", "Layout", "SplitVRight", "450"));
-
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowBackButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowForwardButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowUpButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowRootButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowHomeButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowOtherSideButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowRefreshButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowHiddenButton", "true"));
-    mixin(SetDefaultValue!("Boolean", "Layout", "ShowFilter", "true"));
-
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthFilterEntry",    "120"));
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthShortcutButton", "80"));
-
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthType", "120"));
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthSize", "70"));
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthOwner", "70"));
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthPermissions", "85"));
-    mixin(SetDefaultValue!("Integer", "Layout", "WidthLastModified", "125"));
-
-    mixin(SetDefaultValue!("Integer", "Layout", "HeightStatusbar", "20"));
-
-    mixin(SetDefaultValue!("String", "Layout", "ColorDirectory",  "\"#0000FF\""));
-    mixin(SetDefaultValue!("String", "Layout", "ColorFile",       "\"#000000\""));
-    mixin(SetDefaultValue!("String", "Layout", "ColorSymlink",    "\"#20B0E0\""));
-    mixin(SetDefaultValue!("String", "Layout", "ColorExecutable", "\"#228B22\""));
-
-    mixin(SetDefaultValue!("Boolean", "Layout", "UseDesktopNotification", "false"));
-    mixin(SetDefaultValue!("Integer", "Layout", "NotifyExpiresInMSec", "3000"));
 
     // [Pages]
     InitInitialPages("InitialPagesLeft");
@@ -458,42 +369,9 @@ Version=" ~ SetaVersion ~ "
 
 
 [Layout]
-### Sizes of main widgets
 WindowSizeH=1600
 WindowSizeV=900
 SplitH=800
-SplitVLeft=450
-SplitVRight=450
-
-ShowBackButton=true
-ShowForwardButton=true
-ShowUpButton=true
-ShowRootButton=true
-ShowHomeButton=true
-ShowOtherSideButton=true
-ShowRefreshButton=true
-ShowHiddenButton=true
-ShowFilter=true
-
-WidthShortcutButton=80
-WidthFilterEntry=120
-
-### Widths of columns in filer (columns whose width=0 will not be shown)
-WidthType=120
-WidthSize=70
-WidthOwner=70
-WidthPermissions=85
-WidthLastModified=125
-
-HeightStatusbar=20
-
-ColorDirectory=#0000FF
-ColorFile=#000000
-ColorSymlink=#20B0E0
-ColorExecutable=#228B22
-
-UseDesktopNotification=false
-NotifyExpiresInMSec=3000
 
 
 [Pages]
