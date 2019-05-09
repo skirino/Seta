@@ -151,14 +151,7 @@ public:
       auto pageL = noteL_.GetCurrentPage();
       pageL.GrabFocus();
     } else { // each note has at least one page
-      /+
-       + Work around bug: newly-focused terminal does not process key-press events
-       + after closing a page (VTE's bug?).
-       + Occurs with Mint Lisa but not with Ubuntu 11.10.
-       + Once focus filer, then terminal.
-       +/
-      auto page = note.GetCurrentPage();
-      page.GrabFocus();
+      note.GetCurrentPage().GrabFocus();
     }
   }
 
