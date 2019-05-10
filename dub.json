@@ -1,0 +1,10 @@
+{
+	"authors": ["Shunsuke Kirino"],
+	"copyright": "Copyright (C) 2012-2019, Shunsuke Kirino",
+	"description": "A GTK+ terminal emulator.",
+	"license": "GPL-3.0",
+	"name": "seta",
+	"dependencies": {
+		"gtk-d:vte": "3.8.5"
+	}
+}

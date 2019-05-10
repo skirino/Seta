@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/seta
+seta.so
+seta.dylib
+seta.dll
+seta.a
+seta.lib
+seta-test-*
+*.exe
+*.o
+*.obj
+*.lst
