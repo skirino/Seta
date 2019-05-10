@@ -507,14 +507,12 @@ private:
 
     void Append(MenuItem item) {
       TreeIter next = new TreeIter;
-      next.setModel(store_);
       if(iter_ is null) { // empty space is clicked
         store_.append(next);
       } else { // one row is clicked
         store_.insertAfter(next, iter_);
       }
-
-      // select the new row
+      next.setModel(store_);
       TreePath path = next.getTreePath();
       view_.setCursor(path, null, 1);
     }
