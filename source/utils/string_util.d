@@ -41,15 +41,6 @@ pure bool StartsWith(string s1, string s2) {
   }
 }
 
-void EachLineInFile(string filename, bool delegate(string) f) {
-  try {
-    scope file = File(filename);
-    foreach(line; file.byLine()) {
-      if(!f(line.idup)) break;
-    }
-  } catch(Exception ex) {} // no such file or permission denied
-}
-
 pure string AppendSlash(string s) {
   if(s is null) {
     return "/";
@@ -57,48 +48,6 @@ pure string AppendSlash(string s) {
     return (s[$-1] == '/') ? s : s ~ '/';
   }
 }
-
-pure string ExpandPath(string path, string root) {
-  /+
-   + Canonicalize path by expanding "//", "." and "..".
-   + "realpath" cannot be used here since symlinks should not be expanded.
-   +/
-  assert(path[0] == '/');
-  assert(path[$-1] == '/');
-
-  char[] ret = path.dup;
-
-  // first obtain an absolute path from the root directory
-  // replace "////..." to "/"
-  while(containsPattern(ret, "//")) {
-    ret = substitute(ret, "//", "/");
-  }
-
-  // replace "/./" before "/../"
-  while(containsPattern(ret, "/./")) {
-    ret = substitute(ret, "/./", "/");
-  }
-
-  // if "/path/to/somewhere/../" is found replace with its parent directory
-  size_t pos;
-  while((pos = ret.locatePattern("/../")) != ret.length) {
-    string parent = ParentDirectory(ret[0..pos+1].idup, root);
-    ret = parent ~ ret[pos+4..$];
-  }
-
-  // now "ret" becomes an absolute path.
-  // next substitute escaped chars into original ones
-  ret = UnescapeSpecialChars(ret.idup).dup;
-
-  // "ret" should start with "root".
-  // if not, "ret" is modified as "root" ~ "ret"
-  if(!ret.idup.StartsWith(root)) {
-    ret = root[0 .. $-1] ~ ret;// remove '/' at the last of "root"
-  }
-
-  return ret.idup;
-}
-
 
 // backslash should be the first entry
 private immutable string SpecialChars = "\\!\"$&\'()~=|`{}[]*:;<>?, ";
@@ -111,190 +60,26 @@ pure string EscapeSpecialChars(string input) {
   return ret.idup;
 }
 
-private pure string UnescapeSpecialChars(string input) {
-  string ret;
-  for(int i = 0; i < input.length; ++i) {
-    char c1 = input[i];
-    if(c1 == '\\' && i < input.length - 1) {
-      char c2 = input[i+1];
-      foreach(c; SpecialChars) {
-        if(c2 == c) {
-          ret ~= c;
-          ++i;// proceed 2 chars
-          goto end_of_loop;
-        }
-      }
-
-      // no match in SpecialChars
-      ret ~= input[i..i+2];
-      ++i; // proceed 2 chars
-    } else {
-      ret ~= c1;
-    }
-    end_of_loop:;
-  }
-  return ret;
-}
-
-// not to go beyond root directory of filesystem
-private pure string ParentDirectory(string dir, string root = "/") {
-  if(dir == "/" || dir == root) {
-    return root;
-  }
-  assert(dir.length > 1);
-  size_t index = dir.length-2;// dir[$-1] == '/'
-  while(dir[index] != '/') {
-    --index;
-  }
-  return dir[0..index+1];// dir[0..index+1] end with '/'
-}
-
-string Extract1stArg(string args) {
-  // "args" is already trimmed, so there is no whitespace at both start and end of the input
-  string replaced = ReplaceQuotedArg(args);
-  if(replaced.length == 0) {
-    return null;
-  }
-  size_t posSpace = FindUnescapedChar(replaced, ' ');
-  size_t posNewline = locate(replaced, '\n');
-  size_t posSemicolon = FindUnescapedChar(replaced, ';');
-  return replaced[0 .. min(min(posSpace, posNewline), posSemicolon)];
-}
-
-private string ReplaceQuotedArg(string args) {
-  size_t index = 0;
-  string ret;
-
-  while(true) {
-    size_t startQuote1 = FindUnescapedChar(args, '\'', index);
-    size_t startQuote2 = FindUnescapedChar(args, '\"', index);
-
-    if(startQuote1 == args.length && startQuote2 == args.length) {
-      ret ~= args[index .. $];
-      break;
-    }
-
-    size_t start;
-    char quotation;
-    if(startQuote1 < startQuote2) { // '\'' comes faster than '\"'
-      start = startQuote1;
-      quotation = '\'';
-    } else { // '\"' comes faster than '\''
-      start = startQuote2;
-      quotation = '\"';
-    }
-
-    size_t end = FindUnescapedChar(args, quotation, start+1);
-    if(end == args.length) { // unmatched
-      return null;
-    }
-    ret ~= args[index .. start];
-    ret ~= EscapeSpecialChars(args[start + 1 .. end]);
-    index = end+1;
-    if(index == args.length) {
-      break;
-    }
-  }
-  return ret;
-}
-
-pure private size_t FindUnescapedChar(string s, char target, size_t start = 0) {
-  for(size_t i=start; i<s.length; ++i) {
-    if(s[i] == target) {
-      if(i == 0 || ReverseCountBackslash(s[0 .. i-1]) % 2 == 0) {
-        return i;
-      }
-    }
-  }
-  return s.length;
-}
-
-pure private size_t ReverseCountBackslash(string s) {
-  if(s.length == 0) {
-    return 0;
-  }
-  size_t num = 0;
-  size_t pos = s.length-1;
-  while(pos >= 0 && s[pos] == '\\') {
-    ++num;
-    --pos;
-  }
-  return num;
-}
-
-string ExpandEnvVars(string arg) {
-  size_t indexStart = 0;
-  string ret;
-  while(indexStart != arg.length) {
-    // find dollar which is not escaped by backslash
-    size_t dollar = FindUnescapedChar(arg, '$', indexStart);
-    ret ~= arg[indexStart .. dollar];
-    if(dollar == arg.length) {
-      break;
-    }
-    // extract variable token
-    size_t end = dollar+1;
-    while(end != arg.length && !(isControl(arg[end]) || arg[end] == '/')) {
-      ++end;
-    }
-    string var = arg[dollar..end];
-    ret ~= environment.get(var[1..$]) || var;
-    indexStart = end;
-  }
-  return ret;
-}
-
-pure string RemovePercentBrace(string s) {
-  int open = 0;
-  string ret;
-
-  for(size_t i = 0; i < s.length; ++i) {
-    if(s[i] == '%') {
-      if(i<s.length-1) {
-        if(s[i+1] == '{') {
-          ++i;
-          ++open;
-          continue;
-        } else if(s[i+1] == '}') {
-          ++i;
-          --open;
-          continue;
-        }
-      }
-
-      if(open == 0) {
-        ret ~= '%';
-      }
-    } else {
-      if(open == 0) {
-        ret ~= s[i];
-      }
-    }
-  }
-  return ret;
-}
-
 // tango compatibility layer
-C[] triml(C)(C[] s)
-{
-  foreach(i, c; s){
-    if(!isWhite(c))
+C[] triml(C)(C[] s) {
+  foreach(i, c; s) {
+    if(!isWhite(c)) {
       return s[i .. $];
+    }
   }
   return "";
 }
 
-C[] trimr(C)(C[] s)
-{
-  for(ptrdiff_t i=s.length-1; i>=0; --i){
-    if(!isWhite(s[i]))
+C[] trimr(C)(C[] s) {
+  for(ptrdiff_t i = s.length - 1; i >= 0; --i) {
+    if(!isWhite(s[i])) {
       return s[0 .. i+1];
+    }
   }
   return "";
 }
 
-C[] trim(C)(C[] s)
-{
+C[] trim(C)(C[] s) {
   return s.triml().trimr();
 }
 
