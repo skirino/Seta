@@ -175,7 +175,7 @@ private:
         PopupBox.information("Your configuration file may be older than the application or may be broken.\nStarts with default settings.", "");
       }
     } else {
-      loadFromData(defaultContents, len, GKeyFileFlags.KEEP_COMMENTS);
+      loadFromData(defaultContents, defaultContents.length, GKeyFileFlags.KEEP_COMMENTS);
       changed_ = true;
     }
 
@@ -398,7 +398,7 @@ EnablePathExpansion=true
 ReplaceTargetLeft=$L<n>DIR
 ReplaceTargetRight=$R<n>DIR
 
-ScrollLinesOnKeyAction=1
+ScrollLinesOnKeyAction=5
 
 UserDefinedText1=
 UserDefinedText2=
