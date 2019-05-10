@@ -35,7 +35,6 @@ import gio.FileOutputStream;
 import utils.gio_util;
 import utils.string_util;
 import constants;
-import config.shellrc;
 import config.keybind;
 import config.page_init_option;
 

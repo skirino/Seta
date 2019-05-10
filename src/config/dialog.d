@@ -96,7 +96,7 @@ private:
   SpinButton sbWindowSizeH_, sbWindowSizeV_, sbSplitH_;
 
   void InitLayoutPage() {
-    pageLayout_ = AppendWrappedTable(note_, "Appearance");
+    pageLayout_ = AppendWrappedTable(note_, "Window arrangement");
     uint row = 0;
     AttachSectionLabel(pageLayout_, row++, "Size of the main window");
     mixin(AddSpinButton!("Layout", "WindowSizeH", "10, 5000, 10", "Horizontal size of the main window: "));

@@ -22,12 +22,10 @@ module config.init;
 
 import config.rcfile;
 import config.keybind;
-import config.shellrc;
 
 void Init() {
   config.rcfile.Init();
   config.keybind.Init();
-  config.shellrc.Init();
 }
 
 void Finish() {

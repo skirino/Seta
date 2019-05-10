@@ -48,7 +48,6 @@ import utils.unistd_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
-import shellrc = config.shellrc;
 import page;
 
 class Terminal : VTE
@@ -93,7 +92,6 @@ public:
   void InitAfterSpawn() {
     addOnChildExited(&CloseThisPageCallback, GConnectFlags.AFTER);
     InitDragAndDropFunctionality();
-    shellSetting_ = shellrc.GetLocalShellSetting();
     ApplyPreferences();
     if(command_.length > 0) {
       feedChild(command_ ~ '\n');
@@ -262,7 +260,6 @@ public:
 
   /////////////////// manipulate text in vte terminal
 private:
-  shellrc.ShellSetting shellSetting_;
   string prompt_, rprompt_;
 
   string GetText() {
