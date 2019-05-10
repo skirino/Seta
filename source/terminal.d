@@ -42,7 +42,6 @@ import vte.Regex;
 import vte.c.types : VteTerminal;
 import vte.c.functions;
 
-import utils.ref_util;
 import utils.string_util;
 import utils.unistd_util;
 import constants;

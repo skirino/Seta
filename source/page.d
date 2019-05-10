@@ -32,7 +32,6 @@ import gtk.Button;
 import gtk.Tooltip;
 import gtk.c.types : GtkOrientation;
 
-import utils.ref_util;
 import utils.string_util;
 import utils.gio_util;
 import constants;
@@ -46,9 +45,9 @@ class Page : Paned
 {
   /////////////////////////// GUI stuff
 private:
-  Nonnull!Tab               tab_;
-  Nonnull!TerminalSearchBar searchBar_;
-  Nonnull!Terminal          term_;
+  Tab               tab_;
+  TerminalSearchBar searchBar_;
+  Terminal          term_;
 
 public:
   this(Side side,
@@ -61,14 +60,14 @@ public:
     }
 
     super(GtkOrientation.VERTICAL);
-    tab_ .init(new Tab(side, ClosePage));
-    term_.init(new Terminal(initialDir, opt.terminalRunCommand_, GetCWDFromMain, &CloseThisPage));
+    tab_  = new Tab(side, ClosePage);
+    term_ = new Terminal(initialDir, opt.terminalRunCommand_, GetCWDFromMain, &CloseThisPage);
     AddTerminalSearchBar();
     AddTerminalWithScrollbar();
   }
 
   private void AddTerminalSearchBar() {
-    searchBar_.init(new TerminalSearchBar(term_));
+    searchBar_ = new TerminalSearchBar(term_);
     add1(searchBar_);
   }
 

@@ -36,7 +36,6 @@ import pango.PgAttributeList;
 import vte.Regex;
 
 import constants;
-import utils.ref_util;
 import utils.string_util;
 import config.keybind;
 import terminal;

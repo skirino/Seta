@@ -31,7 +31,6 @@ import gtk.VBox;
 import gtk.EventBox;
 import gdk.Event;
 
-import utils.ref_util;
 import constants;
 
 // Notebook tab with close button.
@@ -39,8 +38,8 @@ import constants;
 class Tab : EventBox
 {
 private:
-  Nonnull!Label  labelIndex_;
-  Nonnull!Button closeButton_;
+  Label  labelIndex_;
+  Button closeButton_;
   void delegate(Side, uint) closePage_;
   Side side_;
   uint pageNum_;
@@ -57,7 +56,7 @@ public:
 
 private:
   void InitChildWidgets() {
-    labelIndex_.init(new Label("idx"));
+    labelIndex_ = new Label("idx");
     InitCloseButton();
     auto hbox = new HBox(0, 0);
     hbox.packStart(labelIndex_, 0, 0, 2);
@@ -66,7 +65,7 @@ private:
   }
 
   void InitCloseButton() {
-    closeButton_.init(new Button);
+    closeButton_ = new Button;
     closeButton_.add(makeWrappedCloseImage());
     closeButton_.setRelief(GtkReliefStyle.NONE);
     closeButton_.setSizeRequest(20, 20);

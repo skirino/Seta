@@ -30,7 +30,6 @@ import gtk.c.types : GtkOrientation;
 import gdk.Event;
 import gdk.Keysyms;
 
-import utils.ref_util;
 import constants;
 import rcfile = config.rcfile;
 import config.dialog;
@@ -42,11 +41,11 @@ class SetaWindow : MainWindow
 {
   ///////////////////////// static members for application-wide access
 private:
-  static __gshared Nonnull!SetaWindow singleton_;
+  static __gshared SetaWindow singleton_;
 
 public:
   static void Init() {
-    singleton_.init(new SetaWindow());
+    singleton_ = new SetaWindow();
     SetLayout();                                    // set parameters in rcfile
     singleton_.showAll();                           // do size allocations and negotiations
     singleton_.HideTerminalSearchBars();            // initially we want search bars to be hidden
@@ -88,9 +87,9 @@ private:
 
   ///////////////////////// GUI stuff
 private:
-  Nonnull!Paned hpaned_;
-  Nonnull!Note noteL_;
-  Nonnull!Note noteR_;
+  Paned hpaned_;
+  Note noteL_;
+  Note noteR_;
   PaneArrangement arrangement_ = PaneArrangement.BOTH;
 
 public:
@@ -116,9 +115,9 @@ private:
 
   void InitWidgets() {
     auto vbox = new VBox(0, 0);
-    hpaned_.init(new Paned(GtkOrientation.HORIZONTAL));
-    noteL_.init(new Note(Side.LEFT , this));
-    noteR_.init(new Note(Side.RIGHT, this));
+    hpaned_ = new Paned(GtkOrientation.HORIZONTAL);
+    noteL_  = new Note(Side.LEFT , this);
+    noteR_  = new Note(Side.RIGHT, this);
     foreach(opt; rcfile.GetPageInitOptionsLeft()) {
       noteL_.AppendNewPage(opt);
     }

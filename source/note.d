@@ -24,7 +24,6 @@ import gtk.Notebook;
 import gtk.Widget;
 import gobject.Value;
 
-import utils.ref_util;
 import constants;
 import rcfile = config.rcfile;
 import config.page_init_option;
@@ -35,12 +34,12 @@ class Note : Notebook
 {
 private:
   immutable Side side_;
-  Nonnull!SetaWindow mainWin_;
+  SetaWindow mainWin_;
 
 public:
   this(Side side, SetaWindow mainWin) {
     side_ = side;
-    mainWin_.init(mainWin);
+    mainWin_ = mainWin;
     super();
     setScrollable(1);
     setGroupName("Seta notebook");
