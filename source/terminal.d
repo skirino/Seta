@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module terminal;
 
-import std.string : lastIndexOf, stripRight;
+import std.string : lastIndexOf, stripRight, tr;
 import std.regex : regex, replaceFirst, split;
 import std.process : environment;
 import std.conv;
@@ -219,7 +219,7 @@ private:
         if(enableReplace_) {
           text = ReplaceLRDIR(text);
         }
-        string replaced = text.substitute("\\n", "\n").idup;
+        string replaced = text.tr("\\n", "\n").idup;
         feedChild(replaced);
       }
       return true;
@@ -297,13 +297,13 @@ private:
   string[10] targetsL_, targetsR_;
 
   void ResetReplaceTargets(string targetLDIR, string targetRDIR) {
-    targetsL_[0] = substitute(targetLDIR, "<n>", "").idup;
+    targetsL_[0] = tr(targetLDIR, "<n>", "").idup;
     for(uint i=1; i<10; ++i) {
-      targetsL_[i] = substitute(targetLDIR, "<n>", i.to!string).idup;
+      targetsL_[i] = tr(targetLDIR, "<n>", i.to!string).idup;
     }
-    targetsR_[0] = substitute(targetRDIR, "<n>", "").idup;
+    targetsR_[0] = tr(targetRDIR, "<n>", "").idup;
     for(uint i=1; i<10; ++i) {
-      targetsR_[i] = substitute(targetRDIR, "<n>", i.to!string).idup;
+      targetsR_[i] = tr(targetRDIR, "<n>", i.to!string).idup;
     }
   }
 
@@ -318,10 +318,10 @@ private:
 
     // this code may have performance problem
     foreach(int i, target; targets) {
-      if(containsPattern(line, target)) {
+      if(ContainsPattern(line, target)) {
         string replace = getCWDLR_(side, i);
         if(replace !is null) {
-          ret = substitute(ret, target, EscapeSpecialChars(replace)).idup;
+          ret = tr(ret, target, EscapeSpecialChars(replace)).idup;
         }
       }
     }

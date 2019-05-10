@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module config.dialog;
 
-import std.string : strip;
+import std.string : strip, indexOf;
 import std.algorithm : sort;
 
 import gtk.Dialog;
@@ -252,7 +252,7 @@ private:
       KeyCode[] codes = dictKeyCode_[key];
       foreach(code; codes) {
         auto iter = keyStore_.append(categoryIter);
-        keyStore_.set(iter, [1, 2], [key[key.locate('.')+1 .. $], code.toString()]);
+        keyStore_.set(iter, [1, 2], [key[key.indexOf('.') + 1 .. $], code.toString()]);
         keyStore_.setValue(iter, 3, 1); // make Key-cell editable
       }
     }
@@ -438,14 +438,14 @@ private:
 
     // check whether replace targets have "<n>"
     string targetL = entReplaceTargetLeft_.getText();
-    if(targetL.containsPattern("<n>")) {
+    if(targetL.ContainsPattern("<n>")) {
       changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetLeft" , targetL);
     } else {
       PopupBox.error(targetL ~ " is neglected since the signature for replace should contain \"<n>\".", "");
     }
 
     string targetR = entReplaceTargetRight_.getText();
-    if(targetR.containsPattern("<n>")) {
+    if(targetR.ContainsPattern("<n>")) {
       changed |= rcfile.ResetStringz("Terminal", "ReplaceTargetRight", targetR);
     } else {
       PopupBox.error(targetR ~ " is neglected since the signature for replace should contain \"<n>\".", "");
