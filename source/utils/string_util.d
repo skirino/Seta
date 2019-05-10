@@ -60,51 +60,6 @@ pure string EscapeSpecialChars(string input) {
   return ret.idup;
 }
 
-// tango compatibility layer
-C[] triml(C)(C[] s) {
-  foreach(i, c; s) {
-    if(!isWhite(c)) {
-      return s[i .. $];
-    }
-  }
-  return "";
-}
-
-C[] trimr(C)(C[] s) {
-  for(ptrdiff_t i = s.length - 1; i >= 0; --i) {
-    if(!isWhite(s[i])) {
-      return s[0 .. i+1];
-    }
-  }
-  return "";
-}
-
-C[] trim(C)(C[] s) {
-  return s.triml().trimr();
-}
-
-unittest
-{
-  assert("" == triml(""));
-  assert("" == trimr(""));
-  assert("" == trim(""));
-
-  string x = "abcあいう";
-  assert(x == x.triml());
-  assert(x == x.trimr());
-  assert(x == x.trim());
-
-  string y = "  abcあいう  ";
-  assert("abcあいう  " == y.triml());
-  assert("  abcあいう" == y.trimr());
-  assert("abcあいう"   == y.trim());
-
-  string z = "   ";
-  assert("" == z.triml());
-  assert("" == z.trimr());
-  assert("" == z.trim());
-}
-
 C[] substitute(C)(const(C)[] s, const(C)[] from, const(C)[] to) {
   if(from.length == 0) {
     return s.dup;

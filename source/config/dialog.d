@@ -20,6 +20,7 @@ MA 02110-1301 USA.
 
 module config.dialog;
 
+import std.string : strip;
 import std.algorithm : sort;
 
 import gtk.Dialog;
@@ -176,7 +177,7 @@ private:
   void ApplyChangesInPageInitOptions(ListStore store, string key) {
     PageInitOption[] opts;
     ForeachRow(store, null, delegate void(TreeIter iter) {
-        auto path    = iter.getValueString(0).trim.AppendSlash;
+        auto path    = iter.getValueString(0).strip().AppendSlash();
         auto command = iter.getValueString(1);
         if(CanEnumerateChildren(path)) {
           opts ~= PageInitOption(path, command);

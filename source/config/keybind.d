@@ -20,8 +20,8 @@ MA 02110-1301 USA.
 
 module config.keybind;
 
-import std.string : split;
-import std.ascii;
+import std.string : split, strip;
+import std.ascii : isAlpha, toUpper;
 
 import gtk.AccelGroup;
 import gdk.Keysyms;
@@ -90,7 +90,7 @@ KeyCode[] ParseKeyCodeList(string s, uint action) {
   auto list = split(s, ",");
 
   foreach(x; list) {
-    KeyCode code = ParseKeyCode(trim(x), action);
+    KeyCode code = ParseKeyCode(strip(x), action);
     if(code.IsValid()) {
       ret ~= code;
     }

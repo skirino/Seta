@@ -20,7 +20,7 @@ MA 02110-1301 USA.
 
 module terminal;
 
-import std.string : lastIndexOf;
+import std.string : lastIndexOf, stripRight;
 import std.regex : regex, replaceFirst, split;
 import std.process : environment;
 import std.conv;
@@ -276,7 +276,7 @@ private:
   }
 
   string GetLastCommand() {
-    string t0 = trimr(GetText());
+    string t0 = GetText().stripRight();
     if(t0.empty) {
       return null;
     }
@@ -285,7 +285,7 @@ private:
       return null;
     }
     string t2 = t1.split(regex(rprompt_))[0];
-    return trimr(t2);
+    return t2.stripRight();
   }
   /////////////////// manipulate text in vte terminal
 
