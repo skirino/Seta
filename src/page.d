@@ -59,7 +59,6 @@ public:
     if(!DirectoryExists(initialDir)) {
       initialDir = environment.get("HOME") ~ '/';
     }
-    getCWDFromMain_ = GetCWDFromMain;
 
     super(GtkOrientation.VERTICAL);
     tab_ .init(new Tab(side, ClosePage));
@@ -105,17 +104,13 @@ public:
 
 
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
-private:
-  string delegate(Side, uint) getCWDFromMain_;
-
 public:
   string GetCWD() {
-    // if remote, return locally-mounted path
-    return "/";
+    return term_.GetCWD();
   }
 
   void ChangeDirectoryToPage(Page page) {
-    // TODO
+    term_.ChangeDirectory(page.GetCWD());
   }
   ////////////////////////// file/dir path (for $LDIR and $RDIR)
 

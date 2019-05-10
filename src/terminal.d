@@ -58,16 +58,17 @@ private:
   VteTerminal * vte_;
   pid_t pid_ = -1;
   string command_;
+  void delegate() closeThisPage_;
 
 public:
   this(string initialDir,
        string terminalRunCommand,
        string delegate(Side, uint) getCWDLR,
        void delegate() closeThisPage) {
-    cwd_           = initialDir;
     getCWDLR_      = getCWDLR;
     command_       = terminalRunCommand;
     closeThisPage_ = closeThisPage;
+    InitReadLinkBuffer();
 
     vte_ = cast(VteTerminal*)vte_terminal_new();
     super(vte_);
@@ -92,11 +93,8 @@ public:
   void InitAfterSpawn() {
     addOnChildExited(&CloseThisPageCallback, GConnectFlags.AFTER);
     InitDragAndDropFunctionality();
-    InitSyncFilerDirFunctionality();
-
     shellSetting_ = shellrc.GetLocalShellSetting();
     ApplyPreferences();
-
     if(command_.length > 0) {
       feedChild(command_ ~ '\n');
     }
@@ -178,9 +176,7 @@ private:
       return true;
 
     case TerminalAction.Enter:
-      // if necessary send command for change directory
-      string replacedCommand = ReplaceLRDIRInCommandLine!(string)();
-      ChangeDirectoryOfFilerFromCommandLine(replacedCommand);
+      ReplaceLRDIRInCommandLine!(string)();
       return false;
 
     case TerminalAction.Replace:
@@ -241,85 +237,26 @@ private:
 
   ////////////////// traveling directory tree
 private:
-  string cwd_;
   string delegate(Side, uint) getCWDLR_;
-  void delegate() closeThisPage_;
 
-  void ChangeDirectoryOfFilerFromCommandLine(string replacedCommand) {
-    string command = trim(replacedCommand);
-    // shell aliases
-    if(shellSetting_ !is null) {
-      foreach(cdAlias; shellSetting_.GetChangeDirAliases()) {
-        if(command == cdAlias.command_) {
-          return;
-        }
-      }
-    }
-
-    if(command.StartsWith("cd")) {
-      string args = triml(command[2..$]);
-
-      if(args.length == 0) { // to $HOME
-        // TODO
-      } else if(args == "-") { // back to previous directory
-        // TODO
-      } else {
-        if(command[2] == ' ') { // "cd" command is separated with its 1st argument by ' '
-          ChangeDirTo1stArg(args);
-        }
-      }
-    } else {
-      if(shellSetting_ !is null && shellSetting_.GetAutoCd()) { // if zsh's auto_cd is used, cd can be omitted
-        ChangeDirTo1stArg(command);
-      }
-    }
-  }
-
-public:
-  void ChangeDirTo1stArg(string args) {
-    string temp = Extract1stArg(args);
-    if(temp.empty) {
-      return;
-    }
-    // note that this cannot replace all environment variables
-    // since the child process can have original variables
-    // which cannot be shared with the process executing this code
-    string arg1 = AppendSlash(ExpandEnvVars(temp));
-    string destination;
-
-    // convert arg1 to absolute path
-    if(arg1[0] == '/') { // path from ROOT
-      destination = arg1;
-    } else if(arg1[0] == '~') { // path from HOME
-      destination = arg1;
-    } else { // path from pwd
-      destination = cwd_ ~ arg1;
-    }
-
-    string absPath = ExpandPath(destination, "/");
-    if(absPath !is null) {
-      cwd_ = absPath;
-    }
-  }
-  ////////////////// traveling directory tree
-
-
-
-  ////////////////// automatic sync of filer
-private:
   static immutable int PATH_MAX = 4096; // PATH_MAX in /usr/include/linux/limits.h
-  uint syncCallbackID_;
   char[] readlinkBuffer_;
 
-  void InitSyncFilerDirFunctionality() {
+  void InitReadLinkBuffer() {
     readlinkBuffer_.length = PATH_MAX + 1;
   }
 
-  string GetCWDFromProcFS() {
+public:
+  string GetCWD() {
     string filename = "/proc/" ~ pid_.to!string ~ "/cwd";
     return ReadLink(filename, readlinkBuffer_);
   }
-  ////////////////// automatic sync of filer
+
+  void ChangeDirectory(string dir) {
+    ClearInputtedCommand();
+    feedChild("cd '" ~ dir ~ "'\n");
+  }
+  ////////////////// traveling directory tree
 
 
 

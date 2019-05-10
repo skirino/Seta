@@ -40,7 +40,6 @@ class Tab : EventBox
 {
 private:
   Nonnull!Label  labelIndex_;
-  Nonnull!Label  labelPath_;
   Nonnull!Button closeButton_;
   void delegate(Side, uint) closePage_;
   Side side_;
@@ -52,19 +51,16 @@ public:
     closePage_ = closePage;
     super();
     InitChildWidgets();
-    setVisibleWindow(0);// For clean redrawing of tabs, it is better not to have visible window.
+    setVisibleWindow(0); // For clean redrawing of tabs, it is better not to have visible window.
     showAll();
   }
 
 private:
   void InitChildWidgets() {
     labelIndex_.init(new Label("idx"));
-    labelPath_ .init(new Label(""));
-    labelPath_.setEllipsize(PangoEllipsizeMode.START);
     InitCloseButton();
     auto hbox = new HBox(0, 0);
     hbox.packStart(labelIndex_, 0, 0, 2);
-    hbox.packStart(labelPath_,  1, 1, 2);
     hbox.packEnd(closeButton_,  0, 0, 2);
     add(hbox);
   }
