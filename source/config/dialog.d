@@ -77,8 +77,8 @@ private class ConfigDialog : Dialog
     addOnResponse(&Respond);
 
     addButton(StockID.CANCEL, GtkResponseType.CANCEL);
-    addButton(StockID.APPLY,  GtkResponseType.APPLY);
-    addButton(StockID.OK,     GtkResponseType.OK);
+    addButton(StockID.APPLY , GtkResponseType.APPLY );
+    addButton(StockID.OK    , GtkResponseType.OK    );
 
     note_ = new Notebook;
     note_.setScrollable(1);

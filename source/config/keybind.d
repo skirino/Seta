@@ -26,8 +26,8 @@ import std.ascii : isAlpha, toUpper;
 import gtk.AccelGroup;
 import gdk.Keysyms;
 
-import utils.string_util;
-import constants;
+import utils.string_util : StartsWith;
+import constants : TerminalAction;
 import rcfile = config.rcfile;
 
 struct KeyCode

@@ -24,7 +24,7 @@ import gtk.Notebook;
 import gtk.Widget;
 import gobject.Value;
 
-import constants;
+import constants : Side;
 import rcfile = config.rcfile;
 import config.page_init_option;
 import page;

@@ -20,22 +20,15 @@ MA 02110-1301 USA.
 
 module page;
 
-import std.process;
-import std.algorithm;
+import std.process : environment;
 
 import gtk.HBox;
 import gtk.VScrollbar;
 import gtk.Paned;
-import gtk.Widget;
-import gtk.Label;
-import gtk.Button;
-import gtk.Tooltip;
 import gtk.c.types : GtkOrientation;
 
-import utils.string_util;
 import utils.gio_util;
-import constants;
-import rcfile = config.rcfile;
+import constants : Side;
 import config.page_init_option;
 import tab;
 import terminal;

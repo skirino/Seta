@@ -30,7 +30,6 @@ import glib.KeyFile;
 import gtk.PopupBox;
 import gdk.Color;
 import gio.FileIF;
-import gio.FileOutputStream;
 
 import utils.gio_util;
 import utils.string_util;
@@ -283,7 +282,7 @@ private:
 
   void InitInitialPages(string key) {
     auto pageOpts = GetPageInitOptionsBase(key);
-    auto pageOptsWithExistingDirs = pageOpts.filter!((p) => CanEnumerateChildren(p.initialDir_)).array;
+    auto pageOptsWithExistingDirs = pageOpts.filter!((p) => CanEnumerateChildren(p.initialDir_)).array();
     if(pageOptsWithExistingDirs.length == 0) {
       pageOptsWithExistingDirs = [PageInitOption(environment.get("HOME") ~ '/', null)];
     }

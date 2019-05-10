@@ -20,7 +20,6 @@ MA 02110-1301 USA.
 
 module utils.tree_util;
 
-import glib.ListG;
 import gtk.TreeView;
 import gtk.TreeViewColumn;
 import gtk.TreeModelIF;

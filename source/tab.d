@@ -29,9 +29,8 @@ import gtk.Image;
 import gtk.HBox;
 import gtk.VBox;
 import gtk.EventBox;
-import gdk.Event;
 
-import constants;
+import constants : Side;
 
 // Notebook tab with close button.
 // In order to catch button press event on tab, make a subclass of EventBox.

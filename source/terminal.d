@@ -27,7 +27,7 @@ import std.conv;
 import std.exception : enforce;
 import std.algorithm : max, min;
 import std.array : empty;
-import core.sys.posix.signal;
+import core.sys.posix.signal : kill, SIGKILL;
 
 import gtk.Widget;
 import gtk.DragAndDrop;
@@ -38,8 +38,7 @@ import gdk.Event;
 import gdk.DragContext;
 import pango.PgFontDescription;
 import vte.Terminal : VTE = Terminal;
-import vte.Regex;
-import vte.c.types : VteTerminal;
+import vte.c.types;
 import vte.c.functions;
 
 import utils.string_util;

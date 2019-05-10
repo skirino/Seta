@@ -21,13 +21,8 @@ MA 02110-1301 USA.
 module utils.string_util;
 
 import std.string;
-import std.stdio;
-import std.ascii;
-import std.process;
 import std.algorithm : min, map, fold;
-import std.array;
 import std.conv;
-import core.stdc.string : memcmp;
 
 pure string NonnullString(string s) {
   return s is null ? "" : s;

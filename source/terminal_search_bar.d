@@ -20,14 +20,13 @@ MA 02110-1301 USA.
 
 module terminal_search_bar;
 
-import gtk.Dialog;
 import gtk.Widget;
 import gtk.Label;
 import gtk.HBox;
 import gtk.ComboBoxText;
 import gtk.Button;
-import gtk.CheckButton;
 import gtk.ToggleButton;
+import gtk.CheckButton;
 import gdk.Keysyms;
 import gdk.Event;
 import glib.GException;
@@ -35,9 +34,8 @@ import pango.PgAttribute;
 import pango.PgAttributeList;
 import vte.Regex;
 
-import constants;
-import utils.string_util;
-import config.keybind;
+import constants : Order;
+import config.keybind : TurnOffLockFlags;
 import terminal;
 
 class TerminalSearchBar : HBox
