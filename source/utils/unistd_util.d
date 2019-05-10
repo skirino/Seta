@@ -27,9 +27,8 @@ import utils.string_util;
 
 string ReadLink(const string path, char[] buffer) {
   ssize_t len = readlink(toStringz(path), buffer.ptr, buffer.length);
-  if(len != -1) {
-    return AppendSlash(buffer[0 .. len].idup);
-  } else {
-    return null;
+  if(len == -1) {
+    throw new Exception("Failed to readlink: " ~ path);
   }
+  return AppendSlash(buffer[0 .. len].idup);
 }
