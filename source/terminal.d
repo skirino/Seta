@@ -42,7 +42,7 @@ import vte.c.types;
 import vte.c.functions;
 
 import utils.string_util;
-import utils.unistd_util;
+import utils.os_util;
 import constants;
 import rcfile = config.rcfile;
 import config.keybind;
@@ -236,16 +236,15 @@ private:
   string delegate(Side, uint) getCWDLR_;
 
   static immutable int PATH_MAX = 4096; // PATH_MAX in /usr/include/linux/limits.h
-  char[] readlinkBuffer_;
+  char[] readCwdBuffer_;
 
   void InitReadLinkBuffer() {
-    readlinkBuffer_.length = PATH_MAX + 1;
+    readCwdBuffer_.length = PATH_MAX + 1;
   }
 
 public:
   string GetCWD() {
-    string filename = "/proc/" ~ pid_.to!string ~ "/cwd";
-    return ReadLink(filename, readlinkBuffer_);
+    return ReadCwdOfProcess(pid_, readCwdBuffer_);
   }
 
   void ChangeDirectory(string dir) {

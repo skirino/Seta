@@ -18,17 +18,29 @@ Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301 USA.
 */
 
-module utils.unistd_util;
+module utils.os_util;
 
-import std.string;
+import std.conv;
+import core.sys.posix.sys.types : pid_t;
 import core.sys.posix.unistd;
 
 import utils.string_util;
 
-string ReadLink(const string path, char[] buffer) {
-  ssize_t len = readlink(toStringz(path), buffer.ptr, buffer.length);
-  if(len == -1) {
-    throw new Exception("Failed to readlink: " ~ path);
+string ReadCwdOfProcess(pid_t pid, char[] buffer) {
+  version(darwin) {
+    int len = readCwd(pid, buffer.ptr);
+  } else {
+    string path = "/proc/" ~ pid.to!string ~ "/cwd";
+    ssize_t len = readlink(toStringz(path), buffer.ptr, buffer.length);
+  }
+  if(len <= 0) {
+    throw new Exception("Failed to get working directory of " ~ pid.to!string);
   }
   return AppendSlash(buffer[0 .. len].idup);
+}
+
+// In case of macOS use libproc (but note that it's basically private interface).
+// https://opensource.apple.com/source/xnu/xnu-2422.1.72/libsyscall/wrappers/libproc/libproc.h.auto.html
+extern (C) {
+  int readCwd(pid_t, char*);
 }

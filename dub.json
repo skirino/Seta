@@ -6,5 +6,6 @@
 	"name": "seta",
 	"dependencies": {
 		"gtk-d:vte": "3.8.5"
-	}
+	},
+	"lflags": ["darwin_readcwd.o"]
 }
