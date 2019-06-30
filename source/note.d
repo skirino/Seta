@@ -41,6 +41,7 @@ public:
     side_ = side;
     mainWin_ = mainWin;
     super();
+    setShowTabs(true);
     setScrollable(1);
     setGroupName("Seta notebook");
     addOnPageAdded(&PageAdded);
@@ -61,8 +62,8 @@ public:
     appendPage(page, page.GetTab());
     setTabReorderable(page, 1);
     setTabDetachable(page, 1);
-    SetTabProperties(page);
     page.show();
+    setCurrentPage(getNPages() - 1);
   }
 
   void AppendNewPage() {
@@ -76,13 +77,6 @@ public:
   }
 
 private:
-  void SetTabProperties(Page page) {
-    auto v = (new Value).init(GType.BOOLEAN);
-    v.setBoolean(true);
-    childSetProperty(page, "tab-expand", v);
-    childSetProperty(page, "tab-fill"  , v);
-  }
-
   string GetInitialDirectoryBySide() {
     if(side_ == Side.LEFT) {
       return rcfile.GetDefaultInitialDirectoryLeft();
@@ -93,7 +87,6 @@ private:
 
   void LabelAllPages(Widget w, uint u, Notebook note) {
     uint num = getNPages();
-    setShowTabs(num > 1);
     for(uint i = 0; i < num; ++i) {
       GetNthPage(i).GetTab().SetID(side_, i + 1);
     }
