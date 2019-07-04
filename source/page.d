@@ -23,7 +23,7 @@ module page;
 import std.process : environment;
 
 import gtk.HBox;
-import gtk.VScrollbar;
+import gtk.Scrollbar;
 import gtk.Paned;
 import gtk.c.types : GtkOrientation;
 
@@ -67,8 +67,8 @@ public:
   private void AddTerminalWithScrollbar() {
     auto box = new HBox(false, 0);
     box.packStart(term_, true, true, 0);
-    auto vscrollbar = new VScrollbar(term_.getVadjustment());
-    box.packStart(vscrollbar, false, false, 0);
+    auto scrollbar = new Scrollbar(GtkOrientation.VERTICAL, term_.getVadjustment());
+    box.packStart(scrollbar, false, false, 0);
     add2(box);
     box.showAll();
   }
