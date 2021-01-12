@@ -5,7 +5,7 @@
 	"license": "GPL-3.0",
 	"name": "seta",
 	"dependencies": {
-		"gtk-d:vte": "3.8.5"
+		"gtk-d:vte": "3.9.0"
 	},
 	"lflags": ["darwin_readcwd.o"]
 }

@@ -20,6 +20,7 @@ MA 02110-1301 USA.
 
 module terminal_search_bar;
 
+import std.range;
 import gtk.Widget;
 import gtk.Label;
 import gtk.HBox;
